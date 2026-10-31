@@ -9,6 +9,10 @@
 
 Next.js 16 (App Router) + TypeScript, Tailwind CSS 4, next-intl and Zustand, hosted on Vercel. Phase 1 has no database: pages read football-data.org directly and cache it for an hour. Postgres arrives in phase 2 with accounts. Real fixtures and results come from [football-data.org](https://www.football-data.org/) (free tier).
 
+## Deploy
+
+Production runs on Vercel at footsimu.com. See [docs/DEPLOY.md](docs/DEPLOY.md) for the step-by-step setup (domain, environment variables, Google Search Console).
+
 ## Run locally
 
 Requires **Node.js 22.18 or newer** (`node -v`).

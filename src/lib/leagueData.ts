@@ -17,6 +17,8 @@ export interface LeagueData {
 /** Server responses are cached for an hour, well inside the free tier's rate limit. */
 const REVALIDATE_SECONDS = 3600;
 
+let warnedMissingKey = false;
+
 export function seasonLabel(season: Pick<ApiSeason, "startDate" | "endDate">): string {
   const start = season.startDate.slice(0, 4);
   const end = season.endDate.slice(0, 4);
@@ -56,6 +58,10 @@ function loadSample(league: LeagueConfig): LeagueData {
  */
 export async function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
+  if (!apiKey && process.env.NODE_ENV === "production" && !warnedMissingKey) {
+    warnedMissingKey = true;
+    console.warn("FOOTBALL_DATA_API_KEY is not set: serving generated sample leagues instead of real data.");
+  }
   if (apiKey) {
     try {
       return await loadLive(league, apiKey);
