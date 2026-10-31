@@ -55,22 +55,10 @@ export function StandingsTable({ league, rows, teams, basePoints }: Props) {
                   key={row.teamId}
                   data-testid="standings-row"
                   data-zone={zone?.kind ?? ""}
-                  className="border-t border-zinc-100 dark:border-zinc-800"
+                  title={zone ? tz(zone.kind) : undefined}
+                  className={`border-t border-zinc-200/70 dark:border-zinc-800 ${zone ? ZONE_STYLES[zone.kind].row : ""}`}
                 >
-                  <td
-                    className="py-1.5 pl-2"
-                    style={zone ? { boxShadow: `inset 4px 0 0 ${ZONE_STYLES[zone.kind].color}` } : undefined}
-                  >
-                    <span
-                      title={zone ? tz(zone.kind) : undefined}
-                      aria-label={zone ? `${row.position} · ${tz(zone.kind)}` : undefined}
-                      className={`inline-flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold tabular-nums ${
-                        zone ? ZONE_STYLES[zone.kind].dot : "text-zinc-500"
-                      }`}
-                    >
-                      {row.position}
-                    </span>
-                  </td>
+                  <td className="py-2 pl-3 font-semibold tabular-nums text-zinc-600 dark:text-zinc-300">{row.position}</td>
                   <td className="py-2">
                     <span className="flex min-w-0 items-center gap-2">
                       <TeamBadge team={team} />
@@ -105,7 +93,7 @@ export function StandingsTable({ league, rows, teams, basePoints }: Props) {
       <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-600 dark:text-zinc-400">
         {league.zones.map((z) => (
           <li key={z.kind} className="flex items-center gap-1.5">
-            <span className={`h-2.5 w-2.5 rounded-sm ${ZONE_STYLES[z.kind].dot}`} />
+            <span className={`h-3 w-3 rounded-sm ring-1 ring-zinc-300 dark:ring-zinc-600 ${ZONE_STYLES[z.kind].row}`} />
             {tz(z.kind)}
           </li>
         ))}

@@ -54,13 +54,14 @@ async function step(name, fn) {
         const p = await ctx.newPage();
         await p.goto(`${BASE_URL}/en/premier-league`);
         const zones = await p.locator('[data-testid="standings-row"]').evaluateAll((rows) =>
-          rows.map((r) => ({ zone: r.dataset.zone, bar: getComputedStyle(r.cells[0]).boxShadow })),
+          rows.map((r) => ({ zone: r.dataset.zone, bg: getComputedStyle(r).backgroundColor })),
         );
         const kinds = zones.map((z) => z.zone);
         assert.deepEqual(kinds.slice(0, 6), ["championsLeague", "championsLeague", "championsLeague", "championsLeague", "europaLeague", "conferenceLeague"]);
         assert.deepEqual(kinds.slice(17), ["relegation", "relegation", "relegation"]);
-        assert.match(zones[19].bar, /rgb\(220, 38, 38\)/, `${colorScheme}: relegation bar missing`);
-        assert.equal(zones[10].bar, "none");
+        const clear = zones[10].bg;
+        for (const i of [0, 4, 5, 19]) assert.notEqual(zones[i].bg, clear, `${colorScheme}: row ${i + 1} not tinted`);
+        assert.notEqual(zones[0].bg, zones[19].bg, `${colorScheme}: Champions League and relegation share a colour`);
         await ctx.close();
       }
     });
