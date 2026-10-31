@@ -121,11 +121,53 @@ async function step(name, fn) {
       assert.equal(titles.filter((x) => x === "100%").length, 1);
     });
 
-    await step("reset restores the real table", async () => {
+    await step("reset asks for confirmation in a modal", async () => {
       await page.getByRole("tab", { name: "Table" }).click();
-      page.once("dialog", (d) => d.accept());
-      await page.getByRole("button", { name: "Reset" }).click();
+      let nativeDialog = false;
+      page.on("dialog", (d) => {
+        nativeDialog = true;
+        d.dismiss();
+      });
+      const predicted = await totalPoints(page);
+      const modal = page.getByRole("dialog", { name: "Reset this league?" });
+
+      await page.getByRole("button", { name: "Reset", exact: true }).click();
+      await modal.waitFor();
+      await modal.getByRole("button", { name: "Cancel" }).click();
+      await modal.waitFor({ state: "hidden" });
+      assert.equal(await totalPoints(page), predicted, "cancel keeps predictions");
+
+      await page.getByRole("button", { name: "Reset", exact: true }).click();
+      await modal.waitFor();
+      await page.keyboard.press("Escape");
+      await modal.waitFor({ state: "hidden" });
+      assert.equal(await totalPoints(page), predicted, "Esc keeps predictions");
+
+      await page.getByRole("button", { name: "Reset", exact: true }).click();
+      await modal.getByRole("button", { name: "Reset predictions" }).click();
+      await modal.waitFor({ state: "hidden" });
       assert.equal(await totalPoints(page), initialPoints);
+      assert.equal(nativeDialog, false, "no native browser dialog");
+    });
+
+    await step("matchday dropdown is readable in dark mode", async () => {
+      const ctx = await browser.newContext({ colorScheme: "dark" });
+      const p = await ctx.newPage();
+      await p.goto(LEAGUE);
+      const colors = await p.locator('[data-testid="matchday-select"] option').first().evaluate((o) => {
+        const cs = getComputedStyle(o);
+        return { color: cs.color, background: cs.backgroundColor };
+      });
+      // Compare perceived lightness (Tailwind 4 emits lab() colours).
+      const lightness = (c) => {
+        const lab = c.match(/^lab\(([\d.]+)/);
+        if (lab) return Number(lab[1]);
+        const [r, g, b] = c.match(/\d+(\.\d+)?/g).map(Number);
+        return ((0.2126 * r + 0.7152 * g + 0.0722 * b) / 255) * 100;
+      };
+      assert.ok(lightness(colors.background) < 20, `dark background: ${colors.background}`);
+      assert.ok(lightness(colors.color) > 80, `light text: ${colors.color}`);
+      await ctx.close();
     });
 
     await step("Portuguese and Spanish pages are translated", async () => {
