@@ -19,7 +19,7 @@ export function LanguageSwitcher() {
           locale={l}
           hrefLang={l}
           aria-current={l === locale ? "true" : undefined}
-          className={`rounded px-1.5 py-1 ${l === locale ? "bg-white/20 text-white" : "text-pitch-100 hover:text-white"}`}
+          className={`rounded px-1.5 py-1 ${l === locale ? "bg-white text-pitch-900" : "text-white hover:bg-white/10"}`}
         >
           {LABELS[l]}
         </Link>

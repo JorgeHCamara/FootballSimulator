@@ -43,6 +43,7 @@ export function FixtureList(props: Props) {
           value={matchday}
           onChange={(e) => onMatchdayChange(Number(e.target.value))}
           data-testid="matchday-select"
+          aria-label={t("fixtures")}
         >
           {matchdays.map((md) => (
             <option key={md} value={md}>

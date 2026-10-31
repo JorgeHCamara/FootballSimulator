@@ -21,11 +21,20 @@ export interface Zone {
 /** football-data.org competition codes for the launch leagues. */
 export type CompetitionCode = "PL" | "PD" | "BL1" | "SA" | "FL1" | "BSA";
 
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "br";
+
+export type SiteLocale = "en" | "pt" | "es";
+
 export interface LeagueConfig {
   code: CompetitionCode;
   slug: string;
   name: string;
   country: string;
+  flag: FlagCode;
+  /** Localized page heading / SEO name, e.g. "Simulador do Brasileirão". */
+  simulatorName: Record<SiteLocale, string>;
+  /** How people also search for the league, e.g. "Campeonato Brasileiro". */
+  aka: Record<SiteLocale, string>;
   teams: number;
   tiebreakers: readonly Tiebreaker[];
   /**
@@ -41,6 +50,9 @@ export const LEAGUES: readonly LeagueConfig[] = [
     slug: "premier-league",
     name: "Premier League",
     country: "England",
+    flag: "gb-eng",
+    simulatorName: { en: "Premier League Simulator", pt: "Simulador da Premier League", es: "Simulador de la Premier League" },
+    aka: { en: "English Premier League", pt: "Campeonato Inglês", es: "Liga inglesa" },
     teams: 20,
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadAwayGoalsFor"],
     zones: [
@@ -55,6 +67,9 @@ export const LEAGUES: readonly LeagueConfig[] = [
     slug: "la-liga",
     name: "La Liga",
     country: "Spain",
+    flag: "es",
+    simulatorName: { en: "La Liga Simulator", pt: "Simulador da La Liga", es: "Simulador de LaLiga" },
+    aka: { en: "Spanish La Liga", pt: "Campeonato Espanhol", es: "Liga española" },
     teams: 20,
     tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
     zones: [
@@ -69,6 +84,9 @@ export const LEAGUES: readonly LeagueConfig[] = [
     slug: "bundesliga",
     name: "Bundesliga",
     country: "Germany",
+    flag: "de",
+    simulatorName: { en: "Bundesliga Simulator", pt: "Simulador da Bundesliga", es: "Simulador de la Bundesliga" },
+    aka: { en: "German Bundesliga", pt: "Campeonato Alemão", es: "Liga alemana" },
     teams: 18,
     tiebreakers: [
       "points",
@@ -91,6 +109,9 @@ export const LEAGUES: readonly LeagueConfig[] = [
     slug: "serie-a",
     name: "Serie A",
     country: "Italy",
+    flag: "it",
+    simulatorName: { en: "Serie A Simulator", pt: "Simulador da Serie A", es: "Simulador de la Serie A" },
+    aka: { en: "Italian Serie A", pt: "Campeonato Italiano", es: "Liga italiana" },
     teams: 20,
     tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
     zones: [
@@ -105,6 +126,9 @@ export const LEAGUES: readonly LeagueConfig[] = [
     slug: "ligue-1",
     name: "Ligue 1",
     country: "France",
+    flag: "fr",
+    simulatorName: { en: "Ligue 1 Simulator", pt: "Simulador da Ligue 1", es: "Simulador de la Ligue 1" },
+    aka: { en: "French Ligue 1", pt: "Campeonato Francês", es: "Liga francesa" },
     teams: 18,
     tiebreakers: [
       "points",
@@ -128,6 +152,9 @@ export const LEAGUES: readonly LeagueConfig[] = [
     slug: "brasileirao",
     name: "Brasileirão Série A",
     country: "Brazil",
+    flag: "br",
+    simulatorName: { en: "Brasileirão Simulator", pt: "Simulador do Brasileirão", es: "Simulador del Brasileirão" },
+    aka: { en: "Brazilian Série A", pt: "Campeonato Brasileiro", es: "Liga brasileña" },
     teams: 20,
     tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadPoints"],
     zones: [

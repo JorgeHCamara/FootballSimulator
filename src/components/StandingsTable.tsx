@@ -16,11 +16,9 @@ interface Props {
   league: LeagueConfig;
   rows: StandingRow[];
   teams: Map<TeamId, Team>;
-  /** Points each team had before the user's predictions, to highlight changes. */
-  basePoints: Map<TeamId, number>;
 }
 
-export function StandingsTable({ league, rows, teams, basePoints }: Props) {
+export function StandingsTable({ league, rows, teams }: Props) {
   const t = useTranslations("Simulator");
   const tz = useTranslations("Zones");
   const cell = "px-1.5 py-2 text-center tabular-nums";
@@ -30,7 +28,7 @@ export function StandingsTable({ league, rows, teams, basePoints }: Props) {
     <div>
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
         <table className="w-full text-sm" data-testid="standings">
-          <thead className="bg-zinc-100 text-xs text-zinc-500 dark:bg-zinc-800/60 dark:text-zinc-400">
+          <thead className="bg-zinc-100 text-xs text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-300">
             <tr>
               <th className="w-11 py-2 pl-3 text-left">{t("position")}</th>
               <th className="py-2 text-left">{t("team")}</th>
@@ -49,7 +47,6 @@ export function StandingsTable({ league, rows, teams, basePoints }: Props) {
             {rows.map((row) => {
               const team = teams.get(row.teamId)!;
               const zone = zoneForPosition(league, row.position);
-              const delta = row.points - (basePoints.get(row.teamId) ?? row.points);
               return (
                 <tr
                   key={row.teamId}
@@ -75,7 +72,6 @@ export function StandingsTable({ league, rows, teams, basePoints }: Props) {
                   <td className={cell}>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
                   <td className={`${cell} pr-2 font-bold`} data-testid="points">
                     {row.points}
-                    {delta > 0 && <span className="ml-1 text-[10px] font-semibold text-pitch-600">+{delta}</span>}
                   </td>
                   <td className="hidden py-2 pr-3 lg:table-cell">
                     <span className="flex gap-1">

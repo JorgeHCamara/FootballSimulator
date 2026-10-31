@@ -15,7 +15,7 @@ export function TeamBadge({ team, size = 20 }: { team: Team; size?: number }) {
     <span
       aria-hidden
       className="inline-flex shrink-0 items-center justify-center rounded-full font-bold text-white"
-      style={{ width: size, height: size, fontSize: size * 0.36, background: `hsl(${hue} 55% 42%)` }}
+      style={{ width: size, height: size, fontSize: size * 0.36, background: `hsl(${hue} 60% 30%)` }}
     >
       {team.tla.slice(0, 3)}
     </span>

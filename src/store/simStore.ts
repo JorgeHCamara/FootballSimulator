@@ -104,7 +104,7 @@ export const useSimStore = create<SimStore>()(
       };
     },
     {
-      name: "footballsimulator",
+      name: "footsimu",
       version: 1,
       storage: createJSONStorage(() => localStorage),
       partialize: (s) => ({ seasons: s.seasons }),

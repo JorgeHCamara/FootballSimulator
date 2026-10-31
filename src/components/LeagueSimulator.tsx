@@ -45,10 +45,6 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
 
   const effective = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
   const rows = useMemo(() => computeStandings(teams, ordered, effective, standingsOptions), [teams, ordered, effective, standingsOptions]);
-  const basePoints = useMemo(() => {
-    const base = computeStandings(teams, ordered, real, { ...standingsOptions, includeForm: false });
-    return new Map(base.map((r) => [r.teamId, r.points]));
-  }, [teams, ordered, real, standingsOptions]);
 
   const matchdays = useMemo(() => [...new Set(ordered.map((f) => f.matchday))], [ordered]);
   const [matchday, setMatchday] = useState(() => {
@@ -128,7 +124,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
     "rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800";
   const primaryButton = "rounded-lg bg-pitch-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-pitch-700";
   const tabButton = (active: boolean) =>
-    `rounded-md px-3 py-1.5 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-700" : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"}`;
+    `rounded-md px-3 py-1.5 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-700" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"}`;
 
   return (
     <div className="space-y-4">
@@ -169,7 +165,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
         {tab === "table" ? (
-          <StandingsTable league={league} rows={rows} teams={teamMap} basePoints={basePoints} />
+          <StandingsTable league={league} rows={rows} teams={teamMap} />
         ) : (
           <ProbabilityGrid league={league} input={monteCarloInput} rows={rows} teams={teamMap} />
         )}

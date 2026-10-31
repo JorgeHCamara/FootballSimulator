@@ -135,6 +135,40 @@ async function step(name, fn) {
       await page.getByRole("button", { name: "Simular jornada" }).waitFor();
     });
 
+    await step("table shows no +N points badge after simulating", async () => {
+      await page.goto(LEAGUE);
+      await page.getByRole("button", { name: "Simulate matchday" }).click();
+      const cells = await page.locator('[data-testid="standings-row"] [data-testid="points"]').allInnerTexts();
+      assert.ok(cells.every((c) => /^-?\d+$/.test(c.trim())), cells.join(","));
+      await page.getByRole("button", { name: "Undo" }).click();
+    });
+
+    await step("SEO: titles, structured data, sitemap, robots and images", async () => {
+      await page.goto(`${BASE_URL}/pt/brasileirao`);
+      assert.match(await page.title(), /^Simulador do Brasileirão .* \| Foot Simu$/);
+      assert.equal(await page.locator("h1").count(), 1);
+      assert.equal(await page.locator("html").getAttribute("lang"), "pt-BR");
+      const types = (await page.locator('script[type="application/ld+json"]').allInnerTexts())
+        .flatMap((text) => JSON.parse(text)["@graph"].map((node) => node["@type"]));
+      for (const type of ["WebApplication", "BreadcrumbList", "FAQPage"]) assert.ok(types.includes(type), type);
+      assert.equal(await page.locator('link[rel="alternate"][hreflang="x-default"]').count(), 1);
+      assert.ok(await page.locator('meta[property="og:image"]').getAttribute("content"));
+
+      await page.goto(`${BASE_URL}/en`);
+      assert.match(await page.title(), /^Football Simulator/);
+      assert.equal(await page.locator("main svg[viewBox='0 0 30 20']").count() >= 6, true, "home flags");
+
+      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      assert.match(sitemap, /footsimu\.com\/pt\/brasileirao/);
+      const robots = await (await page.request.get(`${BASE_URL}/robots.txt`)).text();
+      assert.match(robots, /Sitemap: https:\/\/footsimu\.com\/sitemap\.xml/);
+      for (const path of ["/en/opengraph-image", "/pt/brasileirao/opengraph-image", "/apple-icon"]) {
+        const res = await page.request.get(`${BASE_URL}${path}`);
+        assert.equal(res.status(), 200, path);
+        assert.equal(res.headers()["content-type"], "image/png", path);
+      }
+    });
+
     assert.deepEqual(errors, [], `browser errors:\n${errors.join("\n")}`);
 
     await step("unknown league returns 404", async () => {

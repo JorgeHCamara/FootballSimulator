@@ -1,16 +1,16 @@
 {
   "Metadata": {
-    "homeTitle": "FootballSimulator: simulate the football leagues",
-    "homeDescription": "Predict or simulate every remaining match of the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão, and watch the table update live.",
-    "leagueTitle": "{league} simulator {season}",
-    "leagueDescription": "Simulate the rest of the {league} {season} season: enter your own scores or let the simulator play them, then see title, Europe and relegation chances."
+    "homeTitle": "Football Simulator – Simulate the Premier League, La Liga, Brasileirão and more",
+    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão. Live table plus title, Europe and relegation chances.",
+    "leagueTitle": "{simulator} {season} – Predict the Table",
+    "leagueDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Europe and relegation chances.",
+    "ogTagline": "Predict the table · Simulate the season · Title and relegation chances"
   },
   "Nav": {
     "home": "Home",
     "language": "Language"
   },
   "Home": {
-    "heading": "Simulate the season before it happens",
     "subheading": "Pick a league, enter your predictions or let the simulator play the remaining matches, and watch the table change live.",
     "teams": "{count} teams",
     "open": "Simulate",
@@ -19,7 +19,11 @@
     "featureSimulateTitle": "Realistic simulation",
     "featureSimulateBody": "Results are drawn from each team's attack and defence this season, with home advantage.",
     "featureChancesTitle": "Season chances",
-    "featureChancesBody": "10,000 simulated seasons show the odds of the title, Europe and relegation."
+    "featureChancesBody": "10,000 simulated seasons show the odds of the title, Europe and relegation.",
+    "heading": "Football Simulator",
+    "tagline": "Simulate the season before it happens",
+    "aboutTitle": "A free football simulator for the top leagues",
+    "aboutBody": "Foot Simu is a free football simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
   },
   "Simulator": {
     "table": "Table",
@@ -78,10 +82,62 @@
   },
   "Footer": {
     "attribution": "Football data provided by the Football-Data.org API.",
-    "disclaimer": "FootballSimulator is not affiliated with any league or club. Simulations are for entertainment only."
+    "disclaimer": "Foot Simu is not affiliated with any league or club. Simulations are for entertainment only."
   },
   "NotFound": {
     "title": "Page not found",
     "back": "Back to the leagues"
+  },
+  "Seo": {
+    "intro": "Use the {simulator} to predict the rest of the {league} {season} season ({aka}). Type your own scores or simulate the remaining matches: the table updates instantly with the official tiebreakers and the qualification and relegation zones.",
+    "howTitle": "How the {simulator} works",
+    "step1": "Choose a matchday and type a score for each match, or use the dice to simulate it.",
+    "step2": "Press Simulate matchday or Simulate rest of season to play the remaining fixtures in one click.",
+    "step3": "Open the Chances tab to see every team's chances of the title, Europe and relegation.",
+    "faqTitle": "Frequently asked questions",
+    "otherLeagues": "Other league simulators",
+    "breadcrumbHome": "Football Simulator"
+  },
+  "Faq": {
+    "league": [
+      {
+        "q": "How does the {simulator} work?",
+        "a": "It starts from the real {league} {season} table and fixtures. Type a score for any remaining match or press Simulate: each result is drawn from the attack and defence each team has shown this season, including home advantage. The table updates instantly with the official tiebreakers."
+      },
+      {
+        "q": "How are the title and relegation chances calculated?",
+        "a": "The Chances tab plays out the rest of the season 10,000 times from the current table, including your own predictions, and counts how often each team finishes in each position."
+      },
+      {
+        "q": "Are my predictions saved?",
+        "a": "Yes. Your predictions are saved in your browser, so they are still there when you come back. Use Share to send a link that shows exactly your table."
+      },
+      {
+        "q": "Can I change results of matches already played?",
+        "a": "Yes. Click a final score to change it and see how the {league} table would look with a different result."
+      },
+      {
+        "q": "Is Foot Simu free?",
+        "a": "Yes. Foot Simu is completely free and you don't need an account."
+      }
+    ],
+    "home": [
+      {
+        "q": "What is Foot Simu?",
+        "a": "Foot Simu is a free football simulator. Pick a league, predict or simulate the remaining matches and watch the table change live."
+      },
+      {
+        "q": "Which leagues can I simulate?",
+        "a": "The Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão Série A, with real fixtures and results for the current season."
+      },
+      {
+        "q": "How does the football simulator decide results?",
+        "a": "Each simulated score is drawn from the attack and defence each team has shown this season, with home advantage. Strong teams win more often, but upsets still happen."
+      },
+      {
+        "q": "Do I need an account?",
+        "a": "No. Foot Simu is free, your predictions are saved in your browser and you can share them with a link."
+      }
+    ]
   }
 }

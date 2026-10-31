@@ -1,6 +1,6 @@
-# FootballSimulator
+# Foot Simu
 
-A web platform for simulating real-world football leagues. Pick a league, see the current table and fixtures, then predict or simulate the remaining matches while the table updates live.
+[footsimu.com](https://footsimu.com) is a free football simulator: a web platform for simulating real-world football leagues. Pick a league, see the current table and fixtures, then predict or simulate the remaining matches while the table updates live.
 
 - **Phase 1:** league simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão Série A. Available in EN, PT and ES. No accounts: progress is saved in the browser and can be shared by link.
 - **Phase 2:** career / mini-game mode. Users pick leagues and play through their own seasons.
@@ -34,6 +34,17 @@ Without an API key the site runs on **generated sample leagues** (fictional team
 3. Restart `npm run dev`
 
 Real data is cached for an hour, which stays well inside the free tier's limit of 10 requests per minute.
+
+## SEO
+
+Each league × language page is pre-rendered with:
+- Keyword-targeted titles and descriptions ("Football Simulator", "Simulador de Futebol", "Simulador do Brasileirão", "Premier League Simulator"…), set per language in `messages/*.json` (`Metadata`, `Seo`, `Faq`).
+- Canonical and `hreflang` links (`en`, `pt-BR`, `es`, `x-default`), Open Graph and Twitter cards with generated images (`opengraph-image.tsx`).
+- JSON-LD structured data: `WebSite`, `Organization`, `WebApplication`, `BreadcrumbList` and `FAQPage`.
+- Crawlable intro, "how it works" and FAQ content, plus internal links between all league simulators.
+- `sitemap.xml`, `robots.txt`, web manifest and icons.
+
+After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` to your Google Search Console code, then submit `/sitemap.xml` in Search Console.
 
 ### Other commands
 

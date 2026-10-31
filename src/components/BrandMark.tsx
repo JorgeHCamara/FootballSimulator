@@ -1,0 +1,17 @@
+// The Foot Simu logo mark: a stylised ball on a pitch-green tile. Also used to
+// render the favicon and social images.
+export function BrandMark({ size = 28 }: { size?: number }) {
+  return (
+    <svg viewBox="0 0 32 32" width={size} height={size} aria-hidden="true" focusable="false">
+      <rect width="32" height="32" rx="8" fill="#15803d" />
+      <circle cx="16" cy="16" r="10" fill="#ffffff" />
+      <polygon points="16,11.2 20.6,14.5 18.8,19.9 13.2,19.9 11.4,14.5" fill="#14532d" />
+      <path
+        d="M16 11.2V6.4M20.6 14.5l4.5-1.5M18.8 19.9l2.8 3.9M13.2 19.9l-2.8 3.9M11.4 14.5l-4.5-1.5"
+        stroke="#14532d"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
