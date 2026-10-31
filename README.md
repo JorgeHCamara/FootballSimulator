@@ -35,6 +35,16 @@ Without an API key the site runs on **generated sample leagues** (fictional team
 
 Real data is cached for an hour, which stays well inside the free tier's limit of 10 requests per minute.
 
+### Renaming clubs
+
+To show a different name than the one football-data.org sends (for example "CA Paranaense" → "Athletico Paranaense"), add an entry to `src/config/teamOverrides.ts`:
+
+```ts
+{ match: "CA Paranaense", name: "Athletico Paranaense", shortName: "Athletico-PR", tla: "CAP" },
+```
+
+`match` is the club's name as the API sends it (case-insensitive) or its football-data.org team id. `name` is shown in the table, `shortName` in fixtures and on phones, `tla` in the badge; `crest` can replace the crest image. Only what you set changes.
+
 ## SEO
 
 Each league × language page is pre-rendered with:

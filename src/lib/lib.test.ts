@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { LEAGUES, getLeagueBySlug, zoneForPosition } from "../config/leagues.ts";
+import { TEAM_OVERRIDES, applyTeamOverrides } from "../config/teamOverrides.ts";
 import { doubleRoundRobin } from "../engine/schedule.ts";
 import type { ResultMap } from "../engine/types.ts";
 import { mapMatches, mapTeam, type ApiMatch } from "./footballData.ts";
@@ -97,5 +98,31 @@ describe("league config", () => {
     const bundesliga = getLeagueBySlug("bundesliga")!;
     assert.equal(zoneForPosition(bundesliga, 16)?.kind, "relegationPlayoff");
     assert.equal(zoneForPosition(bundesliga, 10), undefined);
+  });
+});
+
+describe("team name overrides", () => {
+  const paranaense = { id: 1776, name: "CA Paranaense", shortName: "Paranaense", tla: "CAP", crest: "https://example.com/cap.png" };
+  const flamengo = { id: 1783, name: "CR Flamengo", shortName: "Flamengo", tla: "FLA" };
+
+  it("renames Athletico Paranaense with the default list", () => {
+    const [renamed, untouched] = applyTeamOverrides([paranaense, flamengo]);
+    assert.equal(renamed!.name, "Athletico Paranaense");
+    assert.equal(renamed!.shortName, "Athletico-PR");
+    assert.equal(renamed!.id, 1776);
+    assert.equal(renamed!.crest, paranaense.crest);
+    assert.equal(untouched, flamengo);
+    assert.ok(TEAM_OVERRIDES.length > 0);
+  });
+
+  it("matches by id, by name case-insensitively, and by short name", () => {
+    assert.equal(applyTeamOverrides([flamengo], [{ match: 1783, name: "Flamengo" }])[0]!.name, "Flamengo");
+    assert.equal(applyTeamOverrides([flamengo], [{ match: " cr FLAMENGO ", name: "Mengão" }])[0]!.name, "Mengão");
+    assert.equal(applyTeamOverrides([paranaense], [{ match: "paranaense", shortName: "Furacão" }])[0]!.shortName, "Furacão");
+  });
+
+  it("replaces only the fields given", () => {
+    const [team] = applyTeamOverrides([flamengo], [{ match: 1783, tla: "CRF" }]);
+    assert.deepEqual(team, { ...flamengo, tla: "CRF" });
   });
 });

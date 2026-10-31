@@ -1,4 +1,5 @@
 import type { LeagueConfig } from "../config/leagues.ts";
+import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
 import { fetchMatches, fetchTeams, mapMatches, mapTeam, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
@@ -29,7 +30,7 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
     fetchMatches(league.code, apiKey, init),
   ]);
   return {
-    teams: teamsRes.teams.map(mapTeam),
+    teams: applyTeamOverrides(teamsRes.teams.map(mapTeam)),
     fixtures: mapMatches(matchesRes.matches),
     season: seasonLabel(teamsRes.season),
     seasonKey: `${league.code}:${teamsRes.season.id}`,
