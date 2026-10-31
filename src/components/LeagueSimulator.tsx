@@ -259,7 +259,6 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             fixtures={matchdayFixtures}
             teams={teamMap}
             predictions={season.predictions}
-            model={model}
             onScore={onScore}
             onSimulate={simulateOne}
             {...(playoff ? { playoff: { ties, seasonComplete, promotedTo: playoff.promotedTo } } : {})}

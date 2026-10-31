@@ -59,7 +59,6 @@
     "form": "Últimos",
     "homeGoals": "Gols do mandante {team}",
     "awayGoals": "Gols do visitante {team}",
-    "odds": "Mandante {home}% · Empate {draw}% · Visitante {away}%",
     "calculating": "Calculando…",
     "basedOn": "Baseado em {count} temporadas simuladas a partir da tabela atual, incluindo seus palpites.",
     "averagePoints": "Pts méd.",

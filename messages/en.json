@@ -59,7 +59,6 @@
     "form": "Form",
     "homeGoals": "Home goals for {team}",
     "awayGoals": "Away goals for {team}",
-    "odds": "Home {home}% · Draw {draw}% · Away {away}%",
     "calculating": "Calculating…",
     "basedOn": "Based on {count} simulated seasons from the current table, including your predictions.",
     "averagePoints": "Avg pts",

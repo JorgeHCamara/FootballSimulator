@@ -2,9 +2,7 @@
 
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { expectedGoals, outcomeProbabilities } from "../engine/match.ts";
 import { tieOutcome, type TwoLeggedTie } from "../engine/playoffs.ts";
-import type { LeagueModel } from "../engine/ratings.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 
@@ -25,14 +23,13 @@ interface Props {
   fixtures: Fixture[];
   teams: Map<TeamId, Team>;
   predictions: ResultMap;
-  model: LeagueModel;
   onScore: (fixture: Fixture, score: Score | null) => void;
   onSimulate: (fixture: Fixture) => void;
   playoff?: PlayoffView;
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, model, onScore, onSimulate, playoff } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -84,7 +81,6 @@ export function FixtureList(props: Props) {
               home={teams.get(f.homeId)!}
               away={teams.get(f.awayId)!}
               prediction={predictions[f.id]}
-              model={model}
               onScore={(score) => onScore(f, score)}
               onSimulate={() => onSimulate(f)}
             />
@@ -96,7 +92,7 @@ export function FixtureList(props: Props) {
 }
 
 /** Two-legged play-off ties: both legs, the rule and the aggregate once decided. */
-function PlayoffTies({ playoff, teams, predictions, model, onScore, onSimulate }: Props & { playoff: PlayoffView }) {
+function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props & { playoff: PlayoffView }) {
   const t = useTranslations("Simulator");
   const done = playoff.seasonComplete;
   // Until the league is finished the pairings aren't known: show positions, not clubs.
@@ -136,7 +132,6 @@ function PlayoffTies({ playoff, teams, predictions, model, onScore, onSimulate }
                   home={teams.get(leg.homeId)!}
                   away={teams.get(leg.awayId)!}
                   prediction={predictions[leg.id]}
-                  model={model}
                   onScore={(score) => onScore(leg, score)}
                   onSimulate={() => onSimulate(leg)}
                 />
@@ -169,7 +164,6 @@ interface RowProps {
   home: Team;
   away: Team;
   prediction: Score | undefined;
-  model: LeagueModel;
   onScore: (score: Score | null) => void;
   onSimulate: () => void;
 }
@@ -179,7 +173,7 @@ function parseGoals(text: string): number | null {
   return Number(text);
 }
 
-export function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate, disabled = false }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false }: RowProps) {
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
   const locked = fixture.result !== null && prediction === undefined;
@@ -200,8 +194,6 @@ export function MatchRow({ fixture, home, away, prediction, model, onScore, onSi
     else if (next.home === "" && next.away === "" && prediction) onScore(null);
   };
 
-  const odds = outcomeProbabilities(expectedGoals(model, fixture.homeId, fixture.awayId));
-  const pct = (x: number) => Math.round(x * 100);
   const showInputs = !locked || editing;
   const scoreBox =
     "h-9 w-10 rounded-md border text-center text-base font-bold tabular-nums outline-none focus:border-pitch-500 focus:ring-2 focus:ring-pitch-500/30";
@@ -263,19 +255,8 @@ export function MatchRow({ fixture, home, away, prediction, model, onScore, onSi
           <span className="truncate">{away.shortName}</span>
         </span>
       </div>
-      <div className="mt-1.5 flex items-center gap-2">
-        <div
-          className="flex h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800"
-          title={t("odds", { home: pct(odds.home), draw: pct(odds.draw), away: pct(odds.away) })}
-        >
-          <span className="bg-pitch-500" style={{ width: `${(odds.home * 100).toFixed(1)}%` }} />
-          <span className="bg-zinc-400" style={{ width: `${(odds.draw * 100).toFixed(1)}%` }} />
-          <span className="bg-sky-500" style={{ width: `${(odds.away * 100).toFixed(1)}%` }} />
-        </div>
-        <span className="w-24 text-right text-[10px] tabular-nums text-zinc-500">
-          {pct(odds.home)} · {pct(odds.draw)} · {pct(odds.away)}
-        </span>
-        {showInputs && !disabled && (
+      {showInputs && !disabled && (
+        <div className="mt-1 flex justify-end">
           <button
             type="button"
             onClick={onSimulate}
@@ -285,8 +266,8 @@ export function MatchRow({ fixture, home, away, prediction, model, onScore, onSi
           >
             🎲
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </li>
   );
 }

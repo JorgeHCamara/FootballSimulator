@@ -59,7 +59,6 @@
     "form": "Racha",
     "homeGoals": "Goles del local {team}",
     "awayGoals": "Goles del visitante {team}",
-    "odds": "Local {home}% · Empate {draw}% · Visitante {away}%",
     "calculating": "Calculando…",
     "basedOn": "Basado en {count} temporadas simuladas desde la clasificación actual, incluidos tus pronósticos.",
     "averagePoints": "Pts med.",
