@@ -30,7 +30,10 @@ async function step(name, fn) {
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  page.on("console", (m) => {
+    // Vercel Web Analytics' script is only served on Vercel, so it 404s locally.
+    if (m.type() === "error" && !(m.location().url ?? "").includes("/_vercel/insights/")) errors.push(m.text());
+  });
 
   try {
     let initialPoints = 0;
