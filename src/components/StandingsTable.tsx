@@ -32,7 +32,7 @@ export function StandingsTable({ league, rows, teams, basePoints }: Props) {
         <table className="w-full text-sm" data-testid="standings">
           <thead className="bg-zinc-100 text-xs text-zinc-500 dark:bg-zinc-800/60 dark:text-zinc-400">
             <tr>
-              <th className="w-10 py-2 pl-2 text-left">{t("position")}</th>
+              <th className="w-11 py-2 pl-3 text-left">{t("position")}</th>
               <th className="py-2 text-left">{t("team")}</th>
               <th className={cell}>{t("played")}</th>
               <th className={optional}>{t("won")}</th>
@@ -54,9 +54,23 @@ export function StandingsTable({ league, rows, teams, basePoints }: Props) {
                 <tr
                   key={row.teamId}
                   data-testid="standings-row"
-                  className={`border-t border-l-4 border-zinc-100 dark:border-zinc-800 ${zone ? ZONE_STYLES[zone.kind].bar : "border-l-transparent"}`}
+                  data-zone={zone?.kind ?? ""}
+                  className="border-t border-zinc-100 dark:border-zinc-800"
                 >
-                  <td className="py-2 pl-2 tabular-nums text-zinc-500">{row.position}</td>
+                  <td
+                    className="py-1.5 pl-2"
+                    style={zone ? { boxShadow: `inset 4px 0 0 ${ZONE_STYLES[zone.kind].color}` } : undefined}
+                  >
+                    <span
+                      title={zone ? tz(zone.kind) : undefined}
+                      aria-label={zone ? `${row.position} · ${tz(zone.kind)}` : undefined}
+                      className={`inline-flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold tabular-nums ${
+                        zone ? ZONE_STYLES[zone.kind].dot : "text-zinc-500"
+                      }`}
+                    >
+                      {row.position}
+                    </span>
+                  </td>
                   <td className="py-2">
                     <span className="flex min-w-0 items-center gap-2">
                       <TeamBadge team={team} />

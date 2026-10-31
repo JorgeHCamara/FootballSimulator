@@ -48,6 +48,23 @@ async function step(name, fn) {
       initialPoints = await totalPoints(page);
     });
 
+    await step("table positions are marked by zone (light and dark)", async () => {
+      for (const colorScheme of ["light", "dark"]) {
+        const ctx = await browser.newContext({ colorScheme });
+        const p = await ctx.newPage();
+        await p.goto(`${BASE_URL}/en/premier-league`);
+        const zones = await p.locator('[data-testid="standings-row"]').evaluateAll((rows) =>
+          rows.map((r) => ({ zone: r.dataset.zone, bar: getComputedStyle(r.cells[0]).boxShadow })),
+        );
+        const kinds = zones.map((z) => z.zone);
+        assert.deepEqual(kinds.slice(0, 6), ["championsLeague", "championsLeague", "championsLeague", "championsLeague", "europaLeague", "conferenceLeague"]);
+        assert.deepEqual(kinds.slice(17), ["relegation", "relegation", "relegation"]);
+        assert.match(zones[19].bar, /rgb\(220, 38, 38\)/, `${colorScheme}: relegation bar missing`);
+        assert.equal(zones[10].bar, "none");
+        await ctx.close();
+      }
+    });
+
     await step("simulating a matchday adds points", async () => {
       await page.getByRole("button", { name: "Simulate matchday" }).click();
       const after = await totalPoints(page);
