@@ -177,8 +177,13 @@ async function step(name, fn) {
       const ctx = await browser.newContext();
       const p = await ctx.newPage();
       await p.goto(`${BASE_URL}/en/brasileirao-serie-b`);
-      await p.locator('[data-testid="playoff"]').waitFor();
+      // The play-off is the last entry in the matchday selector, after Matchday 38.
+      const options = await p.locator('[data-testid="matchday-select"] option').allInnerTexts();
+      assert.deepEqual(options.slice(-2), ["Matchday 38", "Play-off"]);
+      await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Play-off" });
+      await p.locator('[data-testid="fixtures"] [data-testid="playoff"]').waitFor();
       assert.equal(await p.locator('[data-testid="playoff-tie"]').count(), 2);
+      assert.equal(await p.getByRole("button", { name: "Simulate matchday" }).isDisabled(), true, "play-off locked until the season ends");
       assert.equal(await p.locator('[data-testid="promoted-team"]').count(), 0, "nothing promoted before the season ends");
 
       await p.getByRole("button", { name: "Simulate rest of season" }).click();

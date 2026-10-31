@@ -69,8 +69,6 @@
     "replacedNotice": "{count, plural, one {# prediction was} other {# predictions were}} replaced by real results.",
     "sharedLoaded": "Loaded a shared simulation.",
     "dismiss": "Dismiss",
-    "playoffTitle": "Promotion play-off",
-    "simulatePlayoff": "Simulate play-off",
     "playoffProjected": "Projected from the current table. Play-off scores open once every league match has a result.",
     "playoffTie": "{higherPos, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} v {lowerPos, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
     "playoffRule": "{higher} hosts the 2nd leg and goes through if the aggregate is level.",
@@ -79,7 +77,8 @@
     "promotedPending": "Complete the season and the play-off to see the four promoted clubs.",
     "promotedChampion": "Champion",
     "promotedRunnerUp": "Runner-up",
-    "promotedPlayoff": "Play-off winner"
+    "promotedPlayoff": "Play-off winner",
+    "playoffs": "Play-off"
   },
   "Zones": {
     "championsLeague": "Champions League",

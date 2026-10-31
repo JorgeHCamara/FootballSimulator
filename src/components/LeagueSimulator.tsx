@@ -14,9 +14,9 @@ import type { Fixture, ResultMap, Score, StandingRow, Team } from "../engine/typ
 import { decodeResults, encodeResults } from "../lib/shareCodec.ts";
 import { emptySeason, useSimStore } from "../store/simStore.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
-import { FixtureList } from "./FixtureList.tsx";
+import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
 import { ITERATIONS, ProbabilityGrid } from "./ProbabilityGrid.tsx";
-import { PromotionPlayoff } from "./PromotionPlayoff.tsx";
+import { PromotedClubs } from "./PromotedClubs.tsx";
 import { StandingsTable } from "./StandingsTable.tsx";
 
 interface Props {
@@ -85,11 +85,16 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
   const simulatePlayoffLegs = (table: StandingRow[], known: ResultMap): ResultMap =>
     simulateFixtures(buildTies(table).flatMap((tie) => [tie.leg1, tie.leg2]).filter((leg) => !leg.result), known, model, createRng(randomSeed()));
 
-  const matchdays = useMemo(() => [...new Set(ordered.map((f) => f.matchday))], [ordered]);
+  // The play-off is listed as one more entry after the last matchday.
+  const matchdays = useMemo(
+    () => [...new Set(ordered.map((f) => f.matchday)), ...(playoff ? [PLAYOFF_MATCHDAY] : [])],
+    [ordered, playoff],
+  );
   const [matchday, setMatchday] = useState(() => {
     const next = ordered.find((f) => !f.result);
     return next?.matchday ?? matchdays.at(-1) ?? 1;
   });
+  const onPlayoff = matchday === PLAYOFF_MATCHDAY;
   const matchdayFixtures = useMemo(() => ordered.filter((f) => f.matchday === matchday), [ordered, matchday]);
 
   // Load saved predictions, then apply a shared link (?r=...) if present.
@@ -206,18 +211,15 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             <>
               <StandingsTable league={league} rows={rows} teams={teamMap} />
               {playoff && ties.length > 0 && (
-                <PromotionPlayoff
-                  league={{ ...league, playoff }}
+                <PromotedClubs
                   ties={ties}
                   rows={rows}
                   teams={teamMap}
                   predictions={season.predictions}
-                  model={model}
                   seasonComplete={seasonComplete}
+                  directPromotion={playoff.directPromotion}
+                  promotedTo={playoff.promotedTo}
                   nextSeason={/^\d{4}$/.test(seasonLabel) ? String(Number(seasonLabel) + 1) : ""}
-                  onScore={onScore}
-                  onSimulateLeg={simulateOne}
-                  onSimulatePlayoff={simulatePlayoff}
                 />
               )}
             </>
@@ -227,7 +229,12 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
         </div>
 
         <div className="flex flex-wrap gap-2 lg:col-span-2 lg:col-start-2 lg:row-start-1 lg:justify-end" data-testid="actions">
-          <button type="button" className={`${primaryButton} grow lg:grow-0`} onClick={() => simulate(matchdayFixtures)}>
+          <button
+            type="button"
+            className={`${primaryButton} grow disabled:opacity-40 lg:grow-0`}
+            onClick={() => (onPlayoff ? simulatePlayoff() : simulate(matchdayFixtures))}
+            disabled={onPlayoff && !seasonComplete}
+          >
             {t("simulateMatchday")}
           </button>
           <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={simulateRest}>
@@ -255,6 +262,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             model={model}
             onScore={onScore}
             onSimulate={simulateOne}
+            {...(playoff ? { playoff: { ties, seasonComplete, promotedTo: playoff.promotedTo } } : {})}
           />
         </div>
       </div>

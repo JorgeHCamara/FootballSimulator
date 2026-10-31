@@ -3,9 +3,20 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { expectedGoals, outcomeProbabilities } from "../engine/match.ts";
+import { tieOutcome, type TwoLeggedTie } from "../engine/playoffs.ts";
 import type { LeagueModel } from "../engine/ratings.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
+
+/** Value of the "Playoff" entry in the matchday selector (after the last matchday). */
+export const PLAYOFF_MATCHDAY = -1;
+
+export interface PlayoffView {
+  ties: TwoLeggedTie[];
+  /** Every league match has a score, so the seeding is final and legs can be edited. */
+  seasonComplete: boolean;
+  promotedTo: string;
+}
 
 interface Props {
   matchday: number;
@@ -17,10 +28,11 @@ interface Props {
   model: LeagueModel;
   onScore: (fixture: Fixture, score: Score | null) => void;
   onSimulate: (fixture: Fixture) => void;
+  playoff?: PlayoffView;
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, model, onScore, onSimulate } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, model, onScore, onSimulate, playoff } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -47,7 +59,7 @@ export function FixtureList(props: Props) {
         >
           {matchdays.map((md) => (
             <option key={md} value={md} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
-              {t("matchday", { number: md })}
+              {md === PLAYOFF_MATCHDAY ? t("playoffs") : t("matchday", { number: md })}
             </option>
           ))}
         </select>
@@ -61,21 +73,80 @@ export function FixtureList(props: Props) {
           ›
         </button>
       </header>
-      <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-        {fixtures.map((f) => (
-          <MatchRow
-            key={f.id}
-            fixture={f}
-            home={teams.get(f.homeId)!}
-            away={teams.get(f.awayId)!}
-            prediction={predictions[f.id]}
-            model={model}
-            onScore={(score) => onScore(f, score)}
-            onSimulate={() => onSimulate(f)}
-          />
-        ))}
-      </ul>
+      {matchday === PLAYOFF_MATCHDAY && playoff ? (
+        <PlayoffTies {...props} playoff={playoff} />
+      ) : (
+        <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          {fixtures.map((f) => (
+            <MatchRow
+              key={f.id}
+              fixture={f}
+              home={teams.get(f.homeId)!}
+              away={teams.get(f.awayId)!}
+              prediction={predictions[f.id]}
+              model={model}
+              onScore={(score) => onScore(f, score)}
+              onSimulate={() => onSimulate(f)}
+            />
+          ))}
+        </ul>
+      )}
     </section>
+  );
+}
+
+/** Two-legged play-off ties: both legs, the rule and the aggregate once decided. */
+function PlayoffTies({ playoff, teams, predictions, model, onScore, onSimulate }: Props & { playoff: PlayoffView }) {
+  const t = useTranslations("Simulator");
+  const name = (id: TeamId) => teams.get(id)?.shortName ?? "";
+  return (
+    <div data-testid="playoff">
+      {!playoff.seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t("playoffProjected")}</p>}
+      {playoff.ties.map((tie) => {
+        const outcome = playoff.seasonComplete ? tieOutcome(tie, predictions) : null;
+        return (
+          <div key={tie.seeds.join("-")} className="border-b border-zinc-100 last:border-b-0 dark:border-zinc-800" data-testid="playoff-tie">
+            <div className="px-3 pt-3">
+              <h3 className="text-sm font-semibold">
+                {t("playoffTie", { higherPos: tie.seeds[0], lowerPos: tie.seeds[1] })}
+                <span className="font-normal text-zinc-500">
+                  {" "}
+                  · {name(tie.higher)} × {name(tie.lower)}
+                </span>
+              </h3>
+              <p className="text-xs text-zinc-500">{t("playoffRule", { higher: name(tie.higher) })}</p>
+            </div>
+            <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {[tie.leg1, tie.leg2].map((leg) => (
+                <MatchRow
+                  key={`${leg.id}-${leg.homeId}-${leg.awayId}`}
+                  fixture={leg}
+                  home={teams.get(leg.homeId)!}
+                  away={teams.get(leg.awayId)!}
+                  prediction={predictions[leg.id]}
+                  model={model}
+                  disabled={!playoff.seasonComplete}
+                  onScore={(score) => onScore(leg, score)}
+                  onSimulate={() => onSimulate(leg)}
+                />
+              ))}
+            </ul>
+            {outcome && (
+              <p className="bg-pitch-50 px-3 py-2 text-sm font-medium text-pitch-900 dark:bg-pitch-900/30 dark:text-pitch-100" data-testid="playoff-result">
+                {t("playoffAggregate", {
+                  higher: name(tie.higher),
+                  lower: name(tie.lower),
+                  hg: outcome.higherGoals,
+                  lg: outcome.lowerGoals,
+                  winner: name(outcome.winner),
+                  promotedTo: playoff.promotedTo,
+                })}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

@@ -69,8 +69,6 @@
     "replacedNotice": "{count, plural, one {# pronóstico fue sustituido} other {# pronósticos fueron sustituidos}} por resultados reales.",
     "sharedLoaded": "Simulación compartida cargada.",
     "dismiss": "Cerrar",
-    "playoffTitle": "Playoff de ascenso",
-    "simulatePlayoff": "Simular playoff",
     "playoffProjected": "Proyección según la clasificación actual. Los marcadores del playoff se habilitan cuando todos los partidos de la liga tengan resultado.",
     "playoffTie": "{higherPos}.º vs {lowerPos}.º",
     "playoffRule": "{higher} juega la vuelta en casa y pasa si el global termina empatado.",
@@ -79,7 +77,8 @@
     "promotedPending": "Completa la temporada y el playoff para ver los cuatro clubes ascendidos.",
     "promotedChampion": "Campeón",
     "promotedRunnerUp": "Subcampeón",
-    "promotedPlayoff": "Ganador del playoff"
+    "promotedPlayoff": "Ganador del playoff",
+    "playoffs": "Playoff"
   },
   "Zones": {
     "championsLeague": "Champions League",
