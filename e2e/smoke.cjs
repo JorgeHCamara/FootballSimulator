@@ -173,6 +173,27 @@ async function step(name, fn) {
       await ctx.close();
     });
 
+    await step("layout: actions sit between table and fixtures on phones", async () => {
+      const box = async (p, selector) => (await p.locator(selector).first().boundingBox());
+      const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      await phone.goto(LEAGUE);
+      const [tabs, table, actions, fixtures] = await Promise.all(
+        ['[role="tablist"]', '[data-testid="standings"]', '[data-testid="actions"]', '[data-testid="fixtures"]'].map((s) => box(phone, s)),
+      );
+      assert.ok(tabs.y < table.y && table.y < actions.y && actions.y < fixtures.y, "phone order: tabs, table, actions, fixtures");
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, "no horizontal scroll");
+      await phone.close();
+
+      const desktop = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await desktop.goto(LEAGUE);
+      const [dTabs, dTable, dActions, dFixtures] = await Promise.all(
+        ['[role="tablist"]', '[data-testid="standings"]', '[data-testid="actions"]', '[data-testid="fixtures"]'].map((s) => box(desktop, s)),
+      );
+      assert.ok(Math.abs(dTabs.y - dActions.y) < 12, "desktop: tabs and actions on one row");
+      assert.ok(dActions.y < dTable.y && dFixtures.x > dTable.x + dTable.width - 1, "desktop: fixtures beside the table");
+      await desktop.close();
+    });
+
     await step("Portuguese and Spanish pages are translated", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       await page.getByRole("button", { name: "Simular rodada" }).waitFor();

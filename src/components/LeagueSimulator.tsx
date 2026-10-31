@@ -140,8 +140,10 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="mr-auto flex rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="tablist">
+      {/* Phones: tabs, table, actions, fixtures. Desktop: tabs and actions on one
+          row above the table and fixtures columns. */}
+      <div className="grid gap-4 lg:grid-cols-[auto_minmax(0,1fr)_400px] lg:items-start">
+        <div className="flex self-start rounded-lg bg-zinc-200/70 p-1 justify-self-start dark:bg-zinc-800 lg:col-start-1 lg:row-start-1" role="tablist">
           <button type="button" role="tab" aria-selected={tab === "table"} className={tabButton(tab === "table")} onClick={() => setTab("table")}>
             {t("table")}
           </button>
@@ -149,40 +151,46 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
             {t("chances")}
           </button>
         </div>
-        <button type="button" className={primaryButton} onClick={() => simulate(matchdayFixtures)}>
-          {t("simulateMatchday")}
-        </button>
-        <button type="button" className={actionButton} onClick={() => simulate(ordered)}>
-          {t("simulateRest")}
-        </button>
-        <button type="button" className={actionButton} onClick={() => undo(seasonKey)} disabled={!canUndo}>
-          {t("undo")}
-        </button>
-        <button type="button" className={actionButton} onClick={onReset}>
-          {t("reset")}
-        </button>
-        <button type="button" className={actionButton} onClick={share}>
-          {copied ? t("linkCopied") : t("share")}
-        </button>
-      </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
-        {tab === "table" ? (
-          <StandingsTable league={league} rows={rows} teams={teamMap} />
-        ) : (
-          <ProbabilityGrid league={league} input={monteCarloInput} rows={rows} teams={teamMap} />
-        )}
-        <FixtureList
-          matchday={matchday}
-          matchdays={matchdays}
-          onMatchdayChange={setMatchday}
-          fixtures={matchdayFixtures}
-          teams={teamMap}
-          predictions={season.predictions}
-          model={model}
-          onScore={onScore}
-          onSimulate={simulateOne}
-        />
+        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2">
+          {tab === "table" ? (
+            <StandingsTable league={league} rows={rows} teams={teamMap} />
+          ) : (
+            <ProbabilityGrid league={league} input={monteCarloInput} rows={rows} teams={teamMap} />
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-2 lg:col-span-2 lg:col-start-2 lg:row-start-1 lg:justify-end" data-testid="actions">
+          <button type="button" className={`${primaryButton} grow lg:grow-0`} onClick={() => simulate(matchdayFixtures)}>
+            {t("simulateMatchday")}
+          </button>
+          <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={() => simulate(ordered)}>
+            {t("simulateRest")}
+          </button>
+          <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={() => undo(seasonKey)} disabled={!canUndo}>
+            {t("undo")}
+          </button>
+          <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={onReset}>
+            {t("reset")}
+          </button>
+          <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={share}>
+            {copied ? t("linkCopied") : t("share")}
+          </button>
+        </div>
+
+        <div className="min-w-0 lg:col-start-3 lg:row-start-2" data-testid="fixtures">
+          <FixtureList
+            matchday={matchday}
+            matchdays={matchdays}
+            onMatchdayChange={setMatchday}
+            fixtures={matchdayFixtures}
+            teams={teamMap}
+            predictions={season.predictions}
+            model={model}
+            onScore={onScore}
+            onSimulate={simulateOne}
+          />
+        </div>
       </div>
       <ConfirmDialog
         open={confirmReset}
