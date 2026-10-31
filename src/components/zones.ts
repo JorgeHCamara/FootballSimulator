@@ -11,6 +11,8 @@ export const ZONE_STYLES: Record<ZoneKind, { row: string; dot: string }> = {
   libertadores: { row: "bg-blue-100 dark:bg-blue-900/45", dot: "bg-blue-600" },
   libertadoresQualifying: { row: "bg-sky-50 dark:bg-sky-700/35", dot: "bg-sky-400" },
   sudamericana: { row: "bg-emerald-100 dark:bg-emerald-900/40", dot: "bg-emerald-500" },
+  promotion: { row: "bg-emerald-100 dark:bg-emerald-900/40", dot: "bg-emerald-500" },
+  promotionPlayoff: { row: "bg-sky-50 dark:bg-sky-700/35", dot: "bg-sky-400" },
   relegationPlayoff: { row: "bg-amber-100 dark:bg-amber-900/40", dot: "bg-amber-500" },
   relegation: { row: "bg-red-100 dark:bg-red-900/40", dot: "bg-red-600" },
 };

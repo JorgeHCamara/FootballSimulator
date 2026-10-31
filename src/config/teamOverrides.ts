@@ -1,4 +1,5 @@
 import type { Team } from "../engine/types.ts";
+import type { CompetitionCode } from "./leagues.ts";
 
 // Display-name overrides for clubs whose football-data.org name isn't the one
 // fans use. Only names, codes and crests change: simulations, saved predictions
@@ -9,9 +10,14 @@ import type { Team } from "../engine/types.ts";
 //   /v4/competitions/{code}/teams response), or
 // - the club's name or short name as the API sends it (case-insensitive).
 //   If a club still shows its old name, copy the exact name the site shows here.
+//
+// Set `league` when a name could match a club in another league too (e.g.
+// "Athletic" is both Athletic Club in La Liga and Athletic-MG in Série B).
 
 export interface TeamOverride {
   match: number | string;
+  /** Only apply in this league. */
+  league?: CompetitionCode;
   /** Full name, shown in the table on wider screens. */
   name?: string;
   /** Short name, shown in fixtures and on phones. */
@@ -138,6 +144,9 @@ export const TEAM_OVERRIDES: readonly TeamOverride[] = [
   { match: "Le Havre AC", name: "Le Havre", shortName: "Le Havre" },
   { match: "Le Mans FC", name: "Le Mans", shortName: "Le Mans" },
   { match: "ES Troyes AC", name: "Troyes", shortName: "Troyes" },
+  // Brasileirão Série B (names from ESPN)
+  { match: "Operário PR", league: "BSB", name: "Operário-PR", shortName: "Operário-PR" },
+  { match: "Athletic", league: "BSB", name: "Athletic-MG", shortName: "Athletic-MG" },
 ];
 
 const normalize = (text: string) => text.trim().toLowerCase();
@@ -148,11 +157,15 @@ function matches(team: Team, override: TeamOverride): boolean {
   return normalize(team.name) === wanted || normalize(team.shortName) === wanted;
 }
 
-export function applyTeamOverrides(teams: readonly Team[], overrides: readonly TeamOverride[] = TEAM_OVERRIDES): Team[] {
+export function applyTeamOverrides(
+  teams: readonly Team[],
+  { league, overrides = TEAM_OVERRIDES }: { league?: CompetitionCode; overrides?: readonly TeamOverride[] } = {},
+): Team[] {
+  const applicable = overrides.filter((o) => !o.league || o.league === league);
   return teams.map((team) => {
-    const override = overrides.find((o) => matches(team, o));
+    const override = applicable.find((o) => matches(team, o));
     if (!override) return team;
-    const { match: _match, ...fields } = override;
+    const { match: _match, league: _league, ...fields } = override;
     return { ...team, ...Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined)) };
   });
 }

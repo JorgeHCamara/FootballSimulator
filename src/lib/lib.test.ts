@@ -6,6 +6,7 @@ import { doubleRoundRobin } from "../engine/schedule.ts";
 import type { ResultMap } from "../engine/types.ts";
 import { mapMatches, mapTeam, request, seasonOf, teamsFromMatches, type ApiMatch } from "./footballData.ts";
 import { decodeResults, encodeResults } from "./shareCodec.ts";
+import { espnFixtures, espnTeams, type EspnEvent } from "./espn.ts";
 
 describe("shareCodec", () => {
   const fixtures = doubleRoundRobin(Array.from({ length: 20 }, (_, i) => i + 1)).map((f) => ({
@@ -133,13 +134,13 @@ describe("team name overrides", () => {
   });
 
   it("matches by id, by name case-insensitively, and by short name", () => {
-    assert.equal(applyTeamOverrides([flamengo], [{ match: 1783, name: "Flamengo" }])[0]!.name, "Flamengo");
-    assert.equal(applyTeamOverrides([flamengo], [{ match: " cr FLAMENGO ", name: "Mengão" }])[0]!.name, "Mengão");
-    assert.equal(applyTeamOverrides([paranaense], [{ match: "paranaense", shortName: "Furacão" }])[0]!.shortName, "Furacão");
+    assert.equal(applyTeamOverrides([flamengo], { overrides: [{ match: 1783, name: "Flamengo" }] })[0]!.name, "Flamengo");
+    assert.equal(applyTeamOverrides([flamengo], { overrides: [{ match: " cr FLAMENGO ", name: "Mengão" }] })[0]!.name, "Mengão");
+    assert.equal(applyTeamOverrides([paranaense], { overrides: [{ match: "paranaense", shortName: "Furacão" }] })[0]!.shortName, "Furacão");
   });
 
   it("replaces only the fields given", () => {
-    const [team] = applyTeamOverrides([flamengo], [{ match: 1783, tla: "CRF" }]);
+    const [team] = applyTeamOverrides([flamengo], { overrides: [{ match: 1783, tla: "CRF" }] });
     assert.deepEqual(team, { ...flamengo, tla: "CRF" });
   });
 });
@@ -182,5 +183,59 @@ describe("football-data single-request loading", () => {
   it("gives up with the status code after repeated errors", async () => {
     const fakeFetch = (async () => new Response("{}", { status: 403 })) as unknown as typeof fetch;
     await assert.rejects(request("/competitions/BSA/matches", "key", {}, fakeFetch), /HTTP 403/);
+  });
+});
+
+describe("ESPN feed mapping", () => {
+  const side = (homeAway: "home" | "away", id: string, name: string, score?: string) => ({
+    homeAway,
+    ...(score === undefined ? {} : { score }),
+    team: { id, displayName: name, shortDisplayName: name, abbreviation: name.slice(0, 3).toUpperCase(), logo: `https://logos/${id}.png` },
+  });
+  const done = { type: { name: "STATUS_FULL_TIME", state: "post", completed: true } };
+  const later = { type: { name: "STATUS_SCHEDULED", state: "pre", completed: false } };
+  const game = (id: string, date: string, h: [string, string], a: [string, string], status = done, score?: [string, string]): EspnEvent => ({
+    id,
+    date,
+    status,
+    competitions: [{ competitors: [side("home", h[0], h[1], score?.[0]), side("away", a[0], a[1], score?.[1])] }],
+  });
+  const A: [string, string] = ["1", "Ceará"];
+  const B: [string, string] = ["2", "Sport"];
+  const C: [string, string] = ["3", "Goiás"];
+  const D: [string, string] = ["4", "Avaí"];
+  const events: EspnEvent[] = [
+    game("10", "2026-04-04T19:00Z", A, B, done, ["2", "1"]),
+    // C v D was postponed from round 1 and played after round 2.
+    game("13", "2026-04-20T19:00Z", C, D, done, ["0", "0"]),
+    game("11", "2026-04-11T19:00Z", A, C, done, ["1", "1"]),
+    game("12", "2026-04-11T19:00Z", B, D, done, ["3", "0"]),
+    game("14", "2026-04-25T19:00Z", A, D, later),
+    game("15", "2026-11-21T20:00Z", ["131556", "TBD Home"], ["131554", "TBD Away"], later),
+    game("16", "2026-04-25T19:00Z", B, C, { type: { name: "STATUS_CANCELED", state: "post", completed: false } }),
+  ];
+
+  it("skips undecided play-off slots and cancelled games", () => {
+    const ids = espnFixtures(events).map((f) => f.id).sort();
+    assert.deepEqual(ids, [10, 11, 12, 13, 14]);
+    assert.deepEqual(espnTeams(events).map((t) => t.name).sort(), ["Avaí", "Ceará", "Goiás", "Sport"]);
+  });
+
+  it("rebuilds rounds, putting postponed games back in their original round", () => {
+    const round = Object.fromEntries(espnFixtures(events).map((f) => [f.id, f.matchday]));
+    assert.deepEqual(round, { 10: 1, 13: 1, 11: 2, 12: 2, 14: 3 });
+  });
+
+  it("keeps scores only for finished games", () => {
+    const byId = Object.fromEntries(espnFixtures(events).map((f) => [f.id, f.result]));
+    assert.deepEqual(byId[10], { home: 2, away: 1 });
+    assert.deepEqual(byId[13], { home: 0, away: 0 });
+    assert.equal(byId[14], null);
+  });
+
+  it("applies league-scoped renames only in that league", () => {
+    const athletic = { id: 20851, name: "Athletic", shortName: "Athletic", tla: "ACMG" };
+    assert.equal(applyTeamOverrides([athletic], { league: "BSB" })[0]!.name, "Athletic-MG");
+    assert.equal(applyTeamOverrides([athletic], { league: "PD" })[0]!.name, "Athletic");
   });
 });

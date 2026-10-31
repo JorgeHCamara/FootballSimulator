@@ -23,7 +23,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão, Premier League, La Liga, Bundesliga, Serie A e Ligue 1. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, La Liga, Bundesliga, Serie A e Ligue 1. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -79,11 +79,13 @@
     "libertadores": "Libertadores",
     "libertadoresQualifying": "Pré-Libertadores",
     "sudamericana": "Sul-Americana",
+    "promotion": "Acesso",
+    "promotionPlayoff": "Playoff de acesso",
     "relegationPlayoff": "Playoff de rebaixamento",
     "relegation": "Rebaixamento"
   },
   "Footer": {
-    "attribution": "Dados de futebol fornecidos pela API Football-Data.org.",
+    "attribution": "Dados de futebol fornecidos pela API Football-Data.org. Dados da Série B: ESPN.",
     "disclaimer": "O Foot Simu não tem vínculo com nenhuma liga ou clube. As simulações são apenas para entretenimento."
   },
   "NotFound": {
@@ -130,7 +132,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Série A, Premier League, La Liga, Bundesliga, Serie A e Ligue 1, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, La Liga, Bundesliga, Serie A e Ligue 1, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",

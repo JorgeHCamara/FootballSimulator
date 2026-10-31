@@ -8,6 +8,8 @@ export type ZoneKind =
   | "libertadores"
   | "libertadoresQualifying"
   | "sudamericana"
+  | "promotion"
+  | "promotionPlayoff"
   | "relegationPlayoff"
   | "relegation";
 
@@ -18,8 +20,11 @@ export interface Zone {
   to: number;
 }
 
-/** football-data.org competition codes for the launch leagues. */
-export type CompetitionCode = "PL" | "PD" | "BL1" | "SA" | "FL1" | "BSA";
+/** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B). */
+export type CompetitionCode = "PL" | "PD" | "BL1" | "SA" | "FL1" | "BSA" | "BSB";
+
+/** Where a league's real data comes from. */
+export type DataSource = { provider: "football-data" } | { provider: "espn"; slug: string };
 
 export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "br";
 
@@ -36,6 +41,8 @@ export interface LeagueConfig {
   /** How people also search for the league, e.g. "Campeonato Brasileiro". */
   aka: Record<SiteLocale, string>;
   teams: number;
+  /** Defaults to football-data.org with `code` as the competition code. */
+  source?: DataSource;
   tiebreakers: readonly Tiebreaker[];
   /**
    * Default qualification/relegation zones. Real allocations shift with domestic
@@ -161,6 +168,24 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "libertadores", from: 1, to: 4 },
       { kind: "libertadoresQualifying", from: 5, to: 5 },
       { kind: "sudamericana", from: 6, to: 11 },
+      { kind: "relegation", from: 17, to: 20 },
+    ],
+  },
+  {
+    code: "BSB",
+    slug: "brasileirao-serie-b",
+    name: "Brasileirão Série B",
+    country: "Brazil",
+    flag: "br",
+    simulatorName: { en: "Série B Simulator", pt: "Simulador da Série B", es: "Simulador de la Série B" },
+    aka: { en: "Brasileirão Série B", pt: "Campeonato Brasileiro Série B", es: "Serie B de Brasil" },
+    teams: 20,
+    // football-data.org's free tier doesn't include Série B.
+    source: { provider: "espn", slug: "bra.2" },
+    tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadPoints"],
+    zones: [
+      { kind: "promotion", from: 1, to: 2 },
+      { kind: "promotionPlayoff", from: 3, to: 6 },
       { kind: "relegation", from: 17, to: 20 },
     ],
   },

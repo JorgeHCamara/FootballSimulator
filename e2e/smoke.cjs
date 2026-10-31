@@ -39,9 +39,9 @@ async function step(name, fn) {
     let initialPoints = 0;
     let simulatedOrder = [];
 
-    await step("home page lists the six leagues", async () => {
+    await step("home page lists the seven leagues", async () => {
       await page.goto(`${BASE_URL}/en`);
-      assert.equal(await page.locator("main ul").first().locator("li").count(), 6);
+      assert.equal(await page.locator("main ul").first().locator("li").count(), 7);
     });
 
     await step("league table renders 18 teams", async () => {

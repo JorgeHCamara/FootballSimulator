@@ -23,7 +23,7 @@
     "heading": "Football Simulator",
     "tagline": "Simulate the season before it happens",
     "aboutTitle": "A free football simulator for the top leagues",
-    "aboutBody": "Foot Simu is a free football simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
+    "aboutBody": "Foot Simu is a free football simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão Série A and Série B. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
   },
   "Simulator": {
     "table": "Table",
@@ -79,11 +79,13 @@
     "libertadores": "Libertadores",
     "libertadoresQualifying": "Libertadores qualifying",
     "sudamericana": "Sudamericana",
+    "promotion": "Promotion",
+    "promotionPlayoff": "Promotion play-off",
     "relegationPlayoff": "Relegation play-off",
     "relegation": "Relegation"
   },
   "Footer": {
-    "attribution": "Football data provided by the Football-Data.org API.",
+    "attribution": "Football data provided by the Football-Data.org API. Série B data from ESPN.",
     "disclaimer": "Foot Simu is not affiliated with any league or club. Simulations are for entertainment only."
   },
   "NotFound": {
@@ -130,7 +132,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão Série A, with real fixtures and results for the current season."
+        "a": "The Premier League, La Liga, Bundesliga, Serie A, Ligue 1, Brasileirão Série A and Série B, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",

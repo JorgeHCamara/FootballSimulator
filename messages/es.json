@@ -23,7 +23,7 @@
     "heading": "Simulador de Fútbol",
     "tagline": "Simula la temporada antes de que ocurra",
     "aboutTitle": "Un simulador de fútbol gratis para las mejores ligas",
-    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Premier League, Bundesliga, Serie A, Ligue 1 y Brasileirão. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
+    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Premier League, Bundesliga, Serie A, Ligue 1 y Brasileirão Série A y B. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
   },
   "Simulator": {
     "table": "Clasificación",
@@ -79,11 +79,13 @@
     "libertadores": "Libertadores",
     "libertadoresQualifying": "Fase previa de Libertadores",
     "sudamericana": "Sudamericana",
+    "promotion": "Ascenso",
+    "promotionPlayoff": "Playoff de ascenso",
     "relegationPlayoff": "Promoción de descenso",
     "relegation": "Descenso"
   },
   "Footer": {
-    "attribution": "Datos de fútbol proporcionados por la API de Football-Data.org.",
+    "attribution": "Datos de fútbol proporcionados por la API de Football-Data.org. Datos de la Série B: ESPN.",
     "disclaimer": "Foot Simu no está afiliado a ninguna liga ni club. Las simulaciones son solo para entretenimiento."
   },
   "NotFound": {
@@ -130,7 +132,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Premier League, Bundesliga, Serie A, Ligue 1 y Brasileirão Série A, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Premier League, Bundesliga, Serie A, Ligue 1 y Brasileirão Série A y Série B, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",

@@ -1,6 +1,7 @@
 import type { LeagueConfig } from "../config/leagues.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
+import { EspnError, espnFixtures, espnTeams, fetchEspnSeason } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
 
@@ -47,12 +48,36 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
     endDate: fixtures.at(-1)!.utcDate,
   };
   return {
-    teams: applyTeamOverrides(teamsFromMatches(matches)),
+    teams: applyTeamOverrides(teamsFromMatches(matches), { league: league.code }),
     fixtures,
     season: seasonLabel(season),
     seasonKey: `${league.code}:${season.id || season.startDate.slice(0, 4)}`,
     source: "live",
   };
+}
+
+/**
+ * Leagues outside football-data.org's free tier come from ESPN's public feed.
+ * Brazilian seasons follow the calendar year; before a new season's fixtures are
+ * published, the previous season is shown.
+ */
+async function loadEspn(league: LeagueConfig, slug: string): Promise<LeagueData> {
+  const init = { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
+  const thisYear = new Date().getUTCFullYear();
+  for (const year of [thisYear, thisYear - 1]) {
+    const { events } = await fetchEspnSeason(slug, year, init);
+    const fixtures = espnFixtures(events);
+    // A season has teams × (teams − 1) games; skip a year until at least half are published.
+    if (fixtures.length < (league.teams * (league.teams - 1)) / 2) continue;
+    return {
+      teams: applyTeamOverrides(espnTeams(events), { league: league.code }),
+      fixtures,
+      season: String(year),
+      seasonKey: `${league.code}:${year}`,
+      source: "live",
+    };
+  }
+  throw new Error(`No ${league.code} fixtures on ESPN for ${thisYear} or ${thisYear - 1}`);
 }
 
 function loadSample(league: LeagueConfig): LeagueData {
@@ -68,7 +93,8 @@ function loadSample(league: LeagueConfig): LeagueData {
 }
 
 /**
- * Real data from football-data.org when FOOTBALL_DATA_API_KEY is set, otherwise a
+ * Real data from football-data.org when FOOTBALL_DATA_API_KEY is set (or from ESPN
+ * for leagues configured with that source), otherwise a
  * generated sample league so the site still runs locally. If the API fails during
  * a build the sample league is used; during runtime regeneration the error is
  * thrown so the previously generated (real) page stays in place.
@@ -89,20 +115,28 @@ export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
 }
 
 async function loadLeagueData(league: LeagueConfig): Promise<LeagueData> {
-  const apiKey = process.env.FOOTBALL_DATA_API_KEY;
-  if (!apiKey && process.env.NODE_ENV === "production" && !warnedMissingKey) {
-    warnedMissingKey = true;
-    console.warn("FOOTBALL_DATA_API_KEY is not set: serving generated sample leagues instead of real data.");
+  const source = league.source ?? { provider: "football-data" };
+  let loadReal: (() => Promise<LeagueData>) | undefined;
+  if (source.provider === "espn") {
+    loadReal = () => loadEspn(league, source.slug);
+  } else {
+    const apiKey = process.env.FOOTBALL_DATA_API_KEY;
+    if (!apiKey && process.env.NODE_ENV === "production" && !warnedMissingKey) {
+      warnedMissingKey = true;
+      console.warn("FOOTBALL_DATA_API_KEY is not set: serving generated sample leagues instead of real data.");
+    }
+    if (apiKey) loadReal = () => loadLive(league, apiKey);
   }
-  if (apiKey) {
+
+  if (loadReal) {
     try {
-      return await loadLive(league, apiKey);
+      return await loadReal();
     } catch (error) {
-      const reason = error instanceof FootballDataError ? `HTTP ${error.status}` : String(error);
+      const reason = error instanceof FootballDataError || error instanceof EspnError ? `HTTP ${error.status}` : String(error);
       // At runtime (hourly regeneration) fail instead: Next.js keeps serving the
       // last good page rather than caching sample data over real data.
       if (process.env.NODE_ENV === "production" && !isBuildPhase()) {
-        throw new Error(`football-data.org failed for ${league.code} (${reason}); keeping the previous page`);
+        throw new Error(`${source.provider} failed for ${league.code} (${reason}); keeping the previous page`);
       }
       console.error(`Falling back to sample data for ${league.code} (${reason}):`, error);
     }

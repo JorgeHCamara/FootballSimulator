@@ -2,12 +2,12 @@
 
 [footsimu.com](https://footsimu.com) is a free football simulator: a web platform for simulating real-world football leagues. Pick a league, see the current table and fixtures, then predict or simulate the remaining matches while the table updates live.
 
-- **Phase 1:** league simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão Série A. Available in EN, PT and ES. No accounts: progress is saved in the browser and can be shared by link.
+- **Phase 1:** league simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão Séries A and B. Available in EN, PT and ES. No accounts: progress is saved in the browser and can be shared by link.
 - **Phase 2:** career / mini-game mode. Users pick leagues and play through their own seasons.
 
 ## Stack
 
-Next.js 16 (App Router) + TypeScript, Tailwind CSS 4, next-intl and Zustand, hosted on Vercel. Phase 1 has no database: pages read football-data.org directly and cache it for an hour. Postgres arrives in phase 2 with accounts. Real fixtures and results come from [football-data.org](https://www.football-data.org/) (free tier).
+Next.js 16 (App Router) + TypeScript, Tailwind CSS 4, next-intl and Zustand, hosted on Vercel. Phase 1 has no database: pages read football-data.org directly and cache it for an hour. Postgres arrives in phase 2 with accounts. Real fixtures and results come from [football-data.org](https://www.football-data.org/) (free tier). Brasileirão Série B isn't in that tier, so it comes from ESPN's public site feed (no key needed; unofficial, so it may change without notice) — see `src/lib/espn.ts`. A league's source is set with `source` in `src/config/leagues.ts`.
 
 ## Deploy
 
