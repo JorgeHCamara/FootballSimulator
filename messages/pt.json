@@ -1,0 +1,87 @@
+{
+  "Metadata": {
+    "homeTitle": "FootballSimulator: simule os campeonatos de futebol",
+    "homeDescription": "Preveja ou simule todos os jogos restantes da Premier League, La Liga, Bundesliga, Serie A, Ligue 1 e Brasileirão, e veja a tabela mudar ao vivo.",
+    "leagueTitle": "Simulador {league} {season}",
+    "leagueDescription": "Simule o resto da temporada {season} do {league}: digite seus placares ou deixe o simulador jogar, e veja as chances de título, vaga continental e rebaixamento."
+  },
+  "Nav": {
+    "home": "Início",
+    "language": "Idioma"
+  },
+  "Home": {
+    "heading": "Simule a temporada antes que ela aconteça",
+    "subheading": "Escolha um campeonato, digite seus palpites ou deixe o simulador jogar as partidas restantes, e veja a tabela mudar ao vivo.",
+    "teams": "{count} times",
+    "open": "Simular",
+    "featurePredictTitle": "Seus palpites",
+    "featurePredictBody": "Digite qualquer placar em qualquer jogo. A tabela e os critérios de desempate atualizam na hora.",
+    "featureSimulateTitle": "Simulação realista",
+    "featureSimulateBody": "Os resultados seguem o ataque e a defesa de cada time nesta temporada, com vantagem de jogar em casa.",
+    "featureChancesTitle": "Chances na temporada",
+    "featureChancesBody": "10.000 temporadas simuladas mostram as chances de título, vaga continental e rebaixamento."
+  },
+  "Simulator": {
+    "table": "Tabela",
+    "chances": "Chances",
+    "fixtures": "Jogos",
+    "matchday": "Rodada {number}",
+    "previous": "Rodada anterior",
+    "next": "Próxima rodada",
+    "simulateMatch": "Simular este jogo",
+    "simulateMatchday": "Simular rodada",
+    "simulateRest": "Simular resto da temporada",
+    "reset": "Reiniciar",
+    "resetConfirm": "Apagar todos os seus palpites deste campeonato?",
+    "undo": "Desfazer",
+    "share": "Compartilhar",
+    "linkCopied": "Link copiado",
+    "sampleBanner": "Dados de exemplo: estes times e resultados são gerados. Defina FOOTBALL_DATA_API_KEY para carregar a temporada real.",
+    "liveSource": "Jogos e resultados reais, atualizados a cada hora",
+    "editResult": "Alterar este resultado",
+    "realResult": "Final",
+    "predicted": "Seu",
+    "position": "#",
+    "team": "Time",
+    "played": "J",
+    "won": "V",
+    "drawn": "E",
+    "lost": "D",
+    "goalsFor": "GP",
+    "goalsAgainst": "GC",
+    "goalDifference": "SG",
+    "points": "Pts",
+    "form": "Últimos",
+    "homeGoals": "Gols do mandante {team}",
+    "awayGoals": "Gols do visitante {team}",
+    "odds": "Mandante {home}% · Empate {draw}% · Visitante {away}%",
+    "calculating": "Calculando…",
+    "basedOn": "Baseado em {count} temporadas simuladas a partir da tabela atual, incluindo seus palpites.",
+    "averagePoints": "Pts méd.",
+    "titleChance": "Título",
+    "relegationChance": "Rebaixamento",
+    "positionHeatmap": "Chance de cada posição final",
+    "replacedNotice": "{count, plural, one {# palpite foi substituído} other {# palpites foram substituídos}} por resultados reais.",
+    "sharedLoaded": "Simulação compartilhada carregada.",
+    "dismiss": "Fechar"
+  },
+  "Zones": {
+    "championsLeague": "Champions League",
+    "championsLeagueQualifying": "Pré-eliminatória da Champions",
+    "europaLeague": "Europa League",
+    "conferenceLeague": "Conference League",
+    "libertadores": "Libertadores",
+    "libertadoresQualifying": "Pré-Libertadores",
+    "sudamericana": "Sul-Americana",
+    "relegationPlayoff": "Playoff de rebaixamento",
+    "relegation": "Rebaixamento"
+  },
+  "Footer": {
+    "attribution": "Dados de futebol fornecidos pela API Football-Data.org.",
+    "disclaimer": "O FootballSimulator não tem vínculo com nenhuma liga ou clube. As simulações são apenas para entretenimento."
+  },
+  "NotFound": {
+    "title": "Página não encontrada",
+    "back": "Voltar aos campeonatos"
+  }
+}

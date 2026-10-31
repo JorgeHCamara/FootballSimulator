@@ -2,16 +2,67 @@
 
 A web platform for simulating real-world football leagues. Pick a league, see the current table and fixtures, then predict or simulate the remaining matches while the table updates live.
 
-- **Phase 1 (in progress):** league simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão Série A. Available in EN, PT and ES. No accounts: progress is saved in the browser and can be shared by link.
+- **Phase 1:** league simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão Série A. Available in EN, PT and ES. No accounts: progress is saved in the browser and can be shared by link.
 - **Phase 2:** career / mini-game mode. Users pick leagues and play through their own seasons.
 
 ## Stack
 
-Next.js (App Router) + TypeScript, Tailwind + shadcn/ui, next-intl, Zustand, Postgres + Drizzle, and Vercel (hosting + cron). Real fixtures and results come from [football-data.org](https://www.football-data.org/) (free tier).
+Next.js 16 (App Router) + TypeScript, Tailwind CSS 4, next-intl and Zustand, hosted on Vercel. Phase 1 has no database: pages read football-data.org directly and cache it for an hour. Postgres arrives in phase 2 with accounts. Real fixtures and results come from [football-data.org](https://www.football-data.org/) (free tier).
 
-## What's here so far
+## Run locally
 
-`src/engine/` holds the simulation engine. It is plain TypeScript with no framework dependencies, so it can run in the browser, in a Web Worker, or on the server.
+Requires **Node.js 22.18 or newer** (`node -v`).
+
+```bash
+git checkout claude/youthful-lamport-0m3vrq
+```
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000. You'll be redirected to `/en`; `/pt` and `/es` work too.
+
+Without an API key the site runs on **generated sample leagues** (fictional teams, clearly labelled). To load the real season:
+
+1. Get a free key at https://www.football-data.org/client/register
+2. Copy `.env.example` to `.env.local` and set `FOOTBALL_DATA_API_KEY=your-key`
+3. Restart `npm run dev`
+
+Real data is cached for an hour, which stays well inside the free tier's limit of 10 requests per minute.
+
+### Other commands
+
+| Command | What it does |
+|---|---|
+| `npm run build && npm start` | Production build and server |
+| `npm test` | Engine and library unit tests |
+| `npm run typecheck` | TypeScript check |
+| `npm run test:e2e` | Browser test against a running server (needs Playwright: `npx playwright install chromium`) |
+
+![League page](docs/screenshots/league.png)
+
+## Project layout
+
+| Path | Purpose |
+|---|---|
+| `src/app/[locale]/` | Home page and `[league]` simulator page (pre-rendered, refreshed hourly) |
+| `src/components/` | `LeagueSimulator`, `StandingsTable`, `FixtureList`, `ProbabilityGrid`, header/footer |
+| `src/store/simStore.ts` | Predictions per league and season, saved in the browser, with undo |
+| `src/workers/montecarlo.worker.ts` | Runs the 10,000-season simulation off the main thread |
+| `src/lib/leagueData.ts` | Loads football-data.org data, or the sample league when there's no key |
+| `src/lib/shareCodec.ts` | Compact URL encoding of predictions for share links |
+| `src/config/leagues.ts` | Tiebreakers and qualification/relegation zones per league |
+| `src/i18n/`, `messages/` | Routing and translations (EN, PT, ES) |
+| `src/engine/` | Framework-free simulation engine (see below) |
+
+### Simulation engine
+
+`src/engine/` is plain TypeScript with no framework dependencies, so phase 2 can reuse it on the server.
 
 | Module | Purpose |
 |---|---|
@@ -20,34 +71,6 @@ Next.js (App Router) + TypeScript, Tailwind + shadcn/ui, next-intl, Zustand, Pos
 | `match.ts` | Expected goals per fixture, Poisson score sampling, and exact home/draw/away probabilities |
 | `standings.ts` | League table with per-league tiebreakers (including head-to-head mini-leagues) and points deductions |
 | `montecarlo.ts` | Simulates the rest of the season N times to get the probability of each final position |
-| `schedule.ts` | Double round-robin fixture generator (used by tests and by phase 2) |
-
-Other modules:
-
-- `src/config/leagues.ts`: tiebreaker order and qualification/relegation zones for each league.
-- `src/lib/shareCodec.ts`: compact URL encoding of a user's predictions.
-- `src/lib/footballData.ts`: typed football-data.org client and the mapping from its data to engine types.
-
-## Development
-
-Requires Node ≥ 22.18, which runs TypeScript natively.
-
-```bash
-npm install
-```
-
-```bash
-npm test
-```
-
-```bash
-npm run typecheck
-```
-
-Environment variables (once the app and sync are in place):
-
-- `FOOTBALL_DATA_API_KEY`: free key from football-data.org
-- `DATABASE_URL`: Postgres connection string
-- `CRON_SECRET`: protects the sync endpoint
+| `schedule.ts` | Double round-robin fixture generator (sample leagues, tests, phase 2) |
 
 Data provided by football-data.org.

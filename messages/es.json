@@ -1,0 +1,87 @@
+{
+  "Metadata": {
+    "homeTitle": "FootballSimulator: simula las ligas de fútbol",
+    "homeDescription": "Predice o simula todos los partidos restantes de la Premier League, LaLiga, Bundesliga, Serie A, Ligue 1 y Brasileirão, y mira cómo cambia la clasificación en directo.",
+    "leagueTitle": "Simulador de {league} {season}",
+    "leagueDescription": "Simula el resto de la temporada {season} de {league}: escribe tus marcadores o deja que el simulador los juegue, y mira las probabilidades de título, Europa y descenso."
+  },
+  "Nav": {
+    "home": "Inicio",
+    "language": "Idioma"
+  },
+  "Home": {
+    "heading": "Simula la temporada antes de que ocurra",
+    "subheading": "Elige una liga, escribe tus pronósticos o deja que el simulador juegue los partidos restantes, y mira cómo cambia la clasificación en directo.",
+    "teams": "{count} equipos",
+    "open": "Simular",
+    "featurePredictTitle": "Tus pronósticos",
+    "featurePredictBody": "Escribe cualquier marcador en cualquier partido. La tabla y los desempates se actualizan al instante.",
+    "featureSimulateTitle": "Simulación realista",
+    "featureSimulateBody": "Los resultados siguen el ataque y la defensa de cada equipo esta temporada, con ventaja de local.",
+    "featureChancesTitle": "Probabilidades de la temporada",
+    "featureChancesBody": "10.000 temporadas simuladas muestran las probabilidades de título, Europa y descenso."
+  },
+  "Simulator": {
+    "table": "Clasificación",
+    "chances": "Probabilidades",
+    "fixtures": "Partidos",
+    "matchday": "Jornada {number}",
+    "previous": "Jornada anterior",
+    "next": "Siguiente jornada",
+    "simulateMatch": "Simular este partido",
+    "simulateMatchday": "Simular jornada",
+    "simulateRest": "Simular resto de temporada",
+    "reset": "Reiniciar",
+    "resetConfirm": "¿Borrar todos tus pronósticos de esta liga?",
+    "undo": "Deshacer",
+    "share": "Compartir",
+    "linkCopied": "Enlace copiado",
+    "sampleBanner": "Datos de ejemplo: estos equipos y resultados son generados. Define FOOTBALL_DATA_API_KEY para cargar la temporada real.",
+    "liveSource": "Partidos y resultados reales, actualizados cada hora",
+    "editResult": "Cambiar este resultado",
+    "realResult": "Final",
+    "predicted": "Tuyo",
+    "position": "#",
+    "team": "Equipo",
+    "played": "PJ",
+    "won": "G",
+    "drawn": "E",
+    "lost": "P",
+    "goalsFor": "GF",
+    "goalsAgainst": "GC",
+    "goalDifference": "DG",
+    "points": "Pts",
+    "form": "Racha",
+    "homeGoals": "Goles del local {team}",
+    "awayGoals": "Goles del visitante {team}",
+    "odds": "Local {home}% · Empate {draw}% · Visitante {away}%",
+    "calculating": "Calculando…",
+    "basedOn": "Basado en {count} temporadas simuladas desde la clasificación actual, incluidos tus pronósticos.",
+    "averagePoints": "Pts med.",
+    "titleChance": "Título",
+    "relegationChance": "Descenso",
+    "positionHeatmap": "Probabilidad de cada posición final",
+    "replacedNotice": "{count, plural, one {# pronóstico fue sustituido} other {# pronósticos fueron sustituidos}} por resultados reales.",
+    "sharedLoaded": "Simulación compartida cargada.",
+    "dismiss": "Cerrar"
+  },
+  "Zones": {
+    "championsLeague": "Champions League",
+    "championsLeagueQualifying": "Previa de Champions",
+    "europaLeague": "Europa League",
+    "conferenceLeague": "Conference League",
+    "libertadores": "Libertadores",
+    "libertadoresQualifying": "Fase previa de Libertadores",
+    "sudamericana": "Sudamericana",
+    "relegationPlayoff": "Promoción de descenso",
+    "relegation": "Descenso"
+  },
+  "Footer": {
+    "attribution": "Datos de fútbol proporcionados por la API de Football-Data.org.",
+    "disclaimer": "FootballSimulator no está afiliado a ninguna liga ni club. Las simulaciones son solo para entretenimiento."
+  },
+  "NotFound": {
+    "title": "Página no encontrada",
+    "back": "Volver a las ligas"
+  }
+}

@@ -58,17 +58,20 @@ export class FootballDataError extends Error {
   }
 }
 
-async function request<T>(path: string, apiKey: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, { headers: { "X-Auth-Token": apiKey } });
+async function request<T>(path: string, apiKey: string, init: RequestInit = {}): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    ...init,
+    headers: { ...init.headers, "X-Auth-Token": apiKey },
+  });
   if (!res.ok) throw new FootballDataError(res.status, `football-data.org ${path}: HTTP ${res.status}`);
   return (await res.json()) as T;
 }
 
-export const fetchTeams = (code: string, apiKey: string) =>
-  request<ApiTeamsResponse>(`/competitions/${code}/teams`, apiKey);
+export const fetchTeams = (code: string, apiKey: string, init?: RequestInit) =>
+  request<ApiTeamsResponse>(`/competitions/${code}/teams`, apiKey, init);
 
-export const fetchMatches = (code: string, apiKey: string) =>
-  request<ApiMatchesResponse>(`/competitions/${code}/matches`, apiKey);
+export const fetchMatches = (code: string, apiKey: string, init?: RequestInit) =>
+  request<ApiMatchesResponse>(`/competitions/${code}/matches`, apiKey, init);
 
 export function mapTeam(t: ApiTeam): Team {
   return {

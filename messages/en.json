@@ -1,0 +1,87 @@
+{
+  "Metadata": {
+    "homeTitle": "FootballSimulator: simulate the football leagues",
+    "homeDescription": "Predict or simulate every remaining match of the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão, and watch the table update live.",
+    "leagueTitle": "{league} simulator {season}",
+    "leagueDescription": "Simulate the rest of the {league} {season} season: enter your own scores or let the simulator play them, then see title, Europe and relegation chances."
+  },
+  "Nav": {
+    "home": "Home",
+    "language": "Language"
+  },
+  "Home": {
+    "heading": "Simulate the season before it happens",
+    "subheading": "Pick a league, enter your predictions or let the simulator play the remaining matches, and watch the table change live.",
+    "teams": "{count} teams",
+    "open": "Simulate",
+    "featurePredictTitle": "Your predictions",
+    "featurePredictBody": "Type any score for any match. The table and tiebreakers update instantly.",
+    "featureSimulateTitle": "Realistic simulation",
+    "featureSimulateBody": "Results are drawn from each team's attack and defence this season, with home advantage.",
+    "featureChancesTitle": "Season chances",
+    "featureChancesBody": "10,000 simulated seasons show the odds of the title, Europe and relegation."
+  },
+  "Simulator": {
+    "table": "Table",
+    "chances": "Chances",
+    "fixtures": "Fixtures",
+    "matchday": "Matchday {number}",
+    "previous": "Previous matchday",
+    "next": "Next matchday",
+    "simulateMatch": "Simulate this match",
+    "simulateMatchday": "Simulate matchday",
+    "simulateRest": "Simulate rest of season",
+    "reset": "Reset",
+    "resetConfirm": "Clear all your predictions for this league?",
+    "undo": "Undo",
+    "share": "Share",
+    "linkCopied": "Link copied",
+    "sampleBanner": "Sample data: these teams and results are generated. Set FOOTBALL_DATA_API_KEY to load the real season.",
+    "liveSource": "Real fixtures and results, updated hourly",
+    "editResult": "Change this result",
+    "realResult": "Final",
+    "predicted": "Yours",
+    "position": "#",
+    "team": "Team",
+    "played": "P",
+    "won": "W",
+    "drawn": "D",
+    "lost": "L",
+    "goalsFor": "GF",
+    "goalsAgainst": "GA",
+    "goalDifference": "GD",
+    "points": "Pts",
+    "form": "Form",
+    "homeGoals": "Home goals for {team}",
+    "awayGoals": "Away goals for {team}",
+    "odds": "Home {home}% · Draw {draw}% · Away {away}%",
+    "calculating": "Calculating…",
+    "basedOn": "Based on {count} simulated seasons from the current table, including your predictions.",
+    "averagePoints": "Avg pts",
+    "titleChance": "Title",
+    "relegationChance": "Relegation",
+    "positionHeatmap": "Chance of each final position",
+    "replacedNotice": "{count, plural, one {# prediction was} other {# predictions were}} replaced by real results.",
+    "sharedLoaded": "Loaded a shared simulation.",
+    "dismiss": "Dismiss"
+  },
+  "Zones": {
+    "championsLeague": "Champions League",
+    "championsLeagueQualifying": "Champions League qualifying",
+    "europaLeague": "Europa League",
+    "conferenceLeague": "Conference League",
+    "libertadores": "Libertadores",
+    "libertadoresQualifying": "Libertadores qualifying",
+    "sudamericana": "Sudamericana",
+    "relegationPlayoff": "Relegation play-off",
+    "relegation": "Relegation"
+  },
+  "Footer": {
+    "attribution": "Football data provided by the Football-Data.org API.",
+    "disclaimer": "FootballSimulator is not affiliated with any league or club. Simulations are for entertainment only."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "back": "Back to the leagues"
+  }
+}
