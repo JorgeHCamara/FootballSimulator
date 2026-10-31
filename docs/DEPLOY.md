@@ -51,8 +51,9 @@ Redeploy after changing variables: **Deployments → … → Redeploy**.
 
 ## 6. Check the live site
 
+- **footsimu.com must be the primary domain.** `https://footsimu.com/pt` should load directly, and `https://www.footsimu.com/pt` should redirect (308) to it. If it's the other way round, Google sees every page's canonical address pointing at a redirect and may not index the site. Fix it under **Settings → Domains**: `footsimu.com` with no redirect, `www.footsimu.com` redirecting to `footsimu.com`. Check with `curl -I https://footsimu.com/pt` (expect `200`) and `curl -I https://www.footsimu.com/pt` (expect `308`).
 - `https://footsimu.com` redirects to your language (for example `/pt` on a Portuguese browser).
-- League pages show real teams, with no "Sample data" banner.
+- League pages show real teams.
 - `https://footsimu.com/sitemap.xml` and `/robots.txt` list footsimu.com URLs.
 - Pasting a league link into WhatsApp or X shows the preview image.
 
@@ -61,7 +62,10 @@ Redeploy after changing variables: **Deployments → … → Redeploy**.
 1. Go to https://search.google.com/search-console → **Add property** → **URL prefix** → `https://footsimu.com`.
 2. Choose the **HTML tag** method. Copy only the `content="…"` value into `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, then redeploy.
 3. Click **Verify**, then open **Sitemaps** and submit `https://footsimu.com/sitemap.xml`.
-4. Optional: do the same in [Bing Webmaster Tools](https://www.bing.com/webmasters), which can import directly from Search Console.
+   - Alternative: add a **Domain** property for `footsimu.com` instead, verified with a DNS TXT record at your registrar. It covers www and needs no redeploy.
+4. Speed up the first crawl: **URL Inspection** → paste `https://footsimu.com/pt` → **Request indexing**. Repeat for `/en`, `/pt/brasileirao` and `/en/premier-league`.
+5. Expect brand searches ("foot simu") to show the site within days of indexing, league searches ("simulador série b") within weeks, and broad terms ("football simulator") only over time and with links from other sites. Search Console's **Pages** and **Performance** reports show the progress.
+6. Optional: do the same in [Bing Webmaster Tools](https://www.bing.com/webmasters), which can import directly from Search Console.
 
 ## Day to day
 
