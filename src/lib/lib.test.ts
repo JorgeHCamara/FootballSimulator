@@ -99,6 +99,17 @@ describe("league config", () => {
     assert.equal(zoneForPosition(bundesliga, 16)?.kind, "relegationPlayoff");
     assert.equal(zoneForPosition(bundesliga, 10), undefined);
   });
+
+  it("uses the current Brasileirão qualification zones", () => {
+    const brasileirao = getLeagueBySlug("brasileirao")!;
+    const kind = (p: number) => zoneForPosition(brasileirao, p)?.kind;
+    assert.equal(kind(4), "libertadores");
+    assert.equal(kind(5), "libertadoresQualifying");
+    assert.equal(kind(6), "sudamericana");
+    assert.equal(kind(11), "sudamericana");
+    assert.equal(kind(12), undefined);
+    assert.equal(kind(17), "relegation");
+  });
 });
 
 describe("team name overrides", () => {

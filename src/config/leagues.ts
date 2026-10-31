@@ -159,8 +159,8 @@ export const LEAGUES: readonly LeagueConfig[] = [
     tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadPoints"],
     zones: [
       { kind: "libertadores", from: 1, to: 4 },
-      { kind: "libertadoresQualifying", from: 5, to: 6 },
-      { kind: "sudamericana", from: 7, to: 12 },
+      { kind: "libertadoresQualifying", from: 5, to: 5 },
+      { kind: "sudamericana", from: 6, to: 11 },
       { kind: "relegation", from: 17, to: 20 },
     ],
   },
