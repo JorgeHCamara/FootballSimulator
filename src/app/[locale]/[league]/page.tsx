@@ -68,7 +68,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
   const lang = locale as SiteLocale;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-source={data.source}>
       <JsonLd
         data={[
           {
@@ -114,11 +114,6 @@ export default async function LeaguePage({ params }: { params: Params }) {
         {data.source === "live" && <p className="text-xs text-zinc-500">{t("liveSource")}</p>}
       </header>
 
-      {data.source === "sample" && (
-        <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200" data-testid="sample-banner">
-          {t("sampleBanner")}
-        </p>
-      )}
 
       <LeagueSimulator league={league} teams={data.teams} fixtures={data.fixtures} seasonKey={data.seasonKey} />
 

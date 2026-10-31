@@ -43,7 +43,6 @@
     "undo": "Undo",
     "share": "Share",
     "linkCopied": "Link copied",
-    "sampleBanner": "Sample data: these teams and results are generated. Set FOOTBALL_DATA_API_KEY to load the real season.",
     "liveSource": "Real fixtures and results, updated hourly",
     "editResult": "Change this result",
     "realResult": "Final",

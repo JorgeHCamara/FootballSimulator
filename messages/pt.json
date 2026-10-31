@@ -43,7 +43,6 @@
     "undo": "Desfazer",
     "share": "Compartilhar",
     "linkCopied": "Link copiado",
-    "sampleBanner": "Dados de exemplo: estes times e resultados são gerados. Defina FOOTBALL_DATA_API_KEY para carregar a temporada real.",
     "liveSource": "Jogos e resultados reais, atualizados a cada hora",
     "editResult": "Alterar este resultado",
     "realResult": "Final",

@@ -31,7 +31,7 @@ npm run dev
 
 Open http://localhost:3000. You'll be redirected to `/en`; `/pt` and `/es` work too.
 
-Without an API key the site runs on **generated sample leagues** (fictional teams, clearly labelled). To load the real season:
+Without an API key the site runs on **generated sample leagues** with fictional team names (no banner is shown to visitors). To load the real season:
 
 1. Get a free key at https://www.football-data.org/client/register
 2. Copy `.env.example` to `.env.local` and set `FOOTBALL_DATA_API_KEY=your-key`
