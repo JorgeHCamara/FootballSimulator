@@ -52,7 +52,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     country: "England",
     flag: "gb-eng",
     simulatorName: { en: "Premier League Simulator", pt: "Simulador da Premier League", es: "Simulador de la Premier League" },
-    aka: { en: "English Premier League", pt: "Campeonato Inglês", es: "Liga inglesa" },
+    aka: { en: "Premier League", pt: "Campeonato Inglês", es: "Liga inglesa" },
     teams: 20,
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadAwayGoalsFor"],
     zones: [
