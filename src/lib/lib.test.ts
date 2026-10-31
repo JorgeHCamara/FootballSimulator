@@ -106,13 +106,19 @@ describe("team name overrides", () => {
   const flamengo = { id: 1783, name: "CR Flamengo", shortName: "Flamengo", tla: "FLA" };
 
   it("renames Athletico Paranaense with the default list", () => {
-    const [renamed, untouched] = applyTeamOverrides([paranaense, flamengo]);
+    const unknown = { id: 9999, name: "Example FC", shortName: "Example", tla: "EXA" };
+    const [renamed, untouched] = applyTeamOverrides([paranaense, unknown]);
     assert.equal(renamed!.name, "Athletico Paranaense");
     assert.equal(renamed!.shortName, "Athletico-PR");
     assert.equal(renamed!.id, 1776);
     assert.equal(renamed!.crest, paranaense.crest);
-    assert.equal(untouched, flamengo);
+    assert.equal(untouched, unknown);
     assert.ok(TEAM_OVERRIDES.length > 0);
+  });
+
+  it("has no duplicate matches in the default list", () => {
+    const keys = TEAM_OVERRIDES.map((o) => String(o.match).toLowerCase());
+    assert.equal(new Set(keys).size, keys.length);
   });
 
   it("matches by id, by name case-insensitively, and by short name", () => {
