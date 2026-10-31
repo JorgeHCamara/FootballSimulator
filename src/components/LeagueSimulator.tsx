@@ -12,6 +12,7 @@ import { computeStandings, sortFixtures } from "../engine/standings.ts";
 import type { Fixture, Score, Team } from "../engine/types.ts";
 import { decodeResults, encodeResults } from "../lib/shareCodec.ts";
 import { emptySeason, useSimStore } from "../store/simStore.ts";
+import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList } from "./FixtureList.tsx";
 import { ITERATIONS, ProbabilityGrid } from "./ProbabilityGrid.tsx";
 import { StandingsTable } from "./StandingsTable.tsx";
@@ -108,8 +109,10 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const [confirmReset, setConfirmReset] = useState(false);
   const onReset = () => {
-    if (Object.keys(season.predictions).length === 0 || window.confirm(t("resetConfirm"))) reset(seasonKey);
+    if (Object.keys(season.predictions).length === 0) reset(seasonKey);
+    else setConfirmReset(true);
   };
 
   const monteCarloInput = useMemo<MonteCarloInput | null>(
@@ -181,6 +184,19 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
           onSimulate={simulateOne}
         />
       </div>
+      <ConfirmDialog
+        open={confirmReset}
+        danger
+        title={t("resetTitle")}
+        message={t("resetConfirm")}
+        confirmLabel={t("resetAction")}
+        cancelLabel={t("cancel")}
+        onCancel={() => setConfirmReset(false)}
+        onConfirm={() => {
+          reset(seasonKey);
+          setConfirmReset(false);
+        }}
+      />
     </div>
   );
 }

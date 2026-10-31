@@ -39,14 +39,14 @@ export function FixtureList(props: Props) {
           ‹
         </button>
         <select
-          className="rounded-md bg-transparent px-2 py-1 text-sm font-semibold"
+          className="cursor-pointer rounded-md border border-transparent bg-white px-2 py-1 text-sm font-semibold text-zinc-900 hover:border-zinc-300 focus:border-pitch-500 focus:outline-none dark:bg-zinc-900 dark:text-zinc-100 dark:[color-scheme:dark] dark:hover:border-zinc-700"
           value={matchday}
           onChange={(e) => onMatchdayChange(Number(e.target.value))}
           data-testid="matchday-select"
           aria-label={t("fixtures")}
         >
           {matchdays.map((md) => (
-            <option key={md} value={md}>
+            <option key={md} value={md} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
               {t("matchday", { number: md })}
             </option>
           ))}
