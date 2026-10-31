@@ -24,13 +24,23 @@ export type ApiMatchStatus =
   | "CANCELLED"
   | "AWARDED";
 
+/** Team as embedded in a match; fields are null for undecided slots. */
+export interface ApiMatchTeam {
+  id: number | null;
+  name?: string | null;
+  shortName?: string | null;
+  tla?: string | null;
+  crest?: string | null;
+}
+
 export interface ApiMatch {
   id: number;
   utcDate: string;
   status: ApiMatchStatus;
   matchday: number | null;
-  homeTeam: { id: number | null };
-  awayTeam: { id: number | null };
+  season?: Pick<ApiSeason, "id" | "startDate" | "endDate">;
+  homeTeam: ApiMatchTeam;
+  awayTeam: ApiMatchTeam;
   score: { fullTime: { home: number | null; away: number | null } };
 }
 
@@ -39,11 +49,6 @@ export interface ApiSeason {
   startDate: string;
   endDate: string;
   currentMatchday: number | null;
-}
-
-export interface ApiTeamsResponse {
-  season: ApiSeason;
-  teams: ApiTeam[];
 }
 
 export interface ApiMatchesResponse {
@@ -58,20 +63,45 @@ export class FootballDataError extends Error {
   }
 }
 
-async function request<T>(path: string, apiKey: string, init: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...init,
-    headers: { ...init.headers, "X-Auth-Token": apiKey },
-  });
-  if (!res.ok) throw new FootballDataError(res.status, `football-data.org ${path}: HTTP ${res.status}`);
-  return (await res.json()) as T;
+const MAX_RETRIES = 2;
+const MAX_WAIT_SECONDS = 65;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * GET with the API key. On HTTP 429 (free tier: 10 requests/minute) waits until
+ * the counter resets, as reported in X-RequestCounter-Reset, and retries.
+ */
+export async function request<T>(
+  path: string,
+  apiKey: string,
+  init: RequestInit = {},
+  fetchImpl: typeof fetch = fetch,
+  maxRetries = MAX_RETRIES,
+): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetchImpl(`${BASE_URL}${path}`, {
+      ...init,
+      headers: { ...init.headers, "X-Auth-Token": apiKey },
+    });
+    if (res.status === 429 && attempt < maxRetries) {
+      const reset = Number(res.headers.get("X-RequestCounter-Reset"));
+      const seconds = Number.isFinite(reset) && reset >= 0 ? Math.min(reset + 1, MAX_WAIT_SECONDS) : MAX_WAIT_SECONDS;
+      console.warn(`football-data.org rate limit on ${path}; retrying in ${seconds}s`);
+      await sleep(seconds * 1000);
+      continue;
+    }
+    if (!res.ok) throw new FootballDataError(res.status, `football-data.org ${path}: HTTP ${res.status}`);
+    return (await res.json()) as T;
+  }
 }
 
-export const fetchTeams = (code: string, apiKey: string, init?: RequestInit) =>
-  request<ApiTeamsResponse>(`/competitions/${code}/teams`, apiKey, init);
-
-export const fetchMatches = (code: string, apiKey: string, init?: RequestInit) =>
-  request<ApiMatchesResponse>(`/competitions/${code}/matches`, apiKey, init);
+export const fetchMatches = (
+  code: string,
+  apiKey: string,
+  init?: RequestInit,
+  options: { fetchImpl?: typeof fetch; maxRetries?: number } = {},
+) => request<ApiMatchesResponse>(`/competitions/${code}/matches`, apiKey, init, options.fetchImpl, options.maxRetries);
 
 export function mapTeam(t: ApiTeam): Team {
   return {
@@ -81,6 +111,26 @@ export function mapTeam(t: ApiTeam): Team {
     tla: t.tla ?? t.name.slice(0, 3).toUpperCase(),
     ...(t.crest ? { crest: t.crest } : {}),
   };
+}
+
+/**
+ * Builds the league's team list from its matches, so one request per league is
+ * enough (the /teams endpoint would double the rate-limit cost).
+ */
+export function teamsFromMatches(matches: readonly ApiMatch[]): Team[] {
+  const teams = new Map<number, Team>();
+  for (const m of matches) {
+    for (const t of [m.homeTeam, m.awayTeam]) {
+      if (t.id === null || !t.name || teams.has(t.id)) continue;
+      teams.set(t.id, mapTeam({ id: t.id, name: t.name, shortName: t.shortName ?? null, tla: t.tla ?? null, crest: t.crest ?? null }));
+    }
+  }
+  return [...teams.values()];
+}
+
+/** The season the matches belong to (they all share it). */
+export function seasonOf(matches: readonly ApiMatch[]): ApiMatch["season"] {
+  return matches.find((m) => m.season)?.season;
 }
 
 /**

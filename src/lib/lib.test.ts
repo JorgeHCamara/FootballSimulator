@@ -4,7 +4,7 @@ import { LEAGUES, getLeagueBySlug, zoneForPosition } from "../config/leagues.ts"
 import { TEAM_OVERRIDES, applyTeamOverrides } from "../config/teamOverrides.ts";
 import { doubleRoundRobin } from "../engine/schedule.ts";
 import type { ResultMap } from "../engine/types.ts";
-import { mapMatches, mapTeam, type ApiMatch } from "./footballData.ts";
+import { mapMatches, mapTeam, request, seasonOf, teamsFromMatches, type ApiMatch } from "./footballData.ts";
 import { decodeResults, encodeResults } from "./shareCodec.ts";
 
 describe("shareCodec", () => {
@@ -124,5 +124,46 @@ describe("team name overrides", () => {
   it("replaces only the fields given", () => {
     const [team] = applyTeamOverrides([flamengo], [{ match: 1783, tla: "CRF" }]);
     assert.deepEqual(team, { ...flamengo, tla: "CRF" });
+  });
+});
+
+describe("football-data single-request loading", () => {
+  const team = (id: number, name: string, extra = {}) => ({ id, name, shortName: name.split(" ").at(-1), tla: name.slice(0, 3).toUpperCase(), crest: `https://crests/${id}.png`, ...extra });
+  const season = { id: 2400, startDate: "2026-08-21", endDate: "2027-05-22" };
+  const matches: ApiMatch[] = [
+    { id: 1, utcDate: "2026-08-21T18:30:00Z", status: "FINISHED", matchday: 1, season, homeTeam: team(5, "FC Bayern München"), awayTeam: team(4, "Borussia Dortmund"), score: { fullTime: { home: 2, away: 1 } } },
+    { id: 2, utcDate: "2026-08-28T18:30:00Z", status: "TIMED", matchday: 2, season, homeTeam: team(4, "Borussia Dortmund"), awayTeam: team(3, "Bayer 04 Leverkusen", { shortName: null }), score: { fullTime: { home: null, away: null } } },
+    { id: 3, utcDate: "2027-05-22T13:30:00Z", status: "TIMED", matchday: 3, season, homeTeam: { id: null }, awayTeam: { id: null }, score: { fullTime: { home: null, away: null } } },
+  ];
+
+  it("builds the team list from the matches", () => {
+    const teams = teamsFromMatches(matches);
+    assert.deepEqual(teams.map((t) => t.id).sort(), [3, 4, 5]);
+    const leverkusen = teams.find((t) => t.id === 3)!;
+    assert.equal(leverkusen.shortName, "Bayer 04 Leverkusen");
+    assert.equal(teams.find((t) => t.id === 5)!.crest, "https://crests/5.png");
+  });
+
+  it("reads the season and still maps fixtures", () => {
+    assert.deepEqual(seasonOf(matches), season);
+    assert.equal(mapMatches(matches).length, 2);
+  });
+
+  it("retries after HTTP 429 using X-RequestCounter-Reset", async () => {
+    const calls: string[] = [];
+    const fakeFetch = (async (url: string) => {
+      calls.push(url);
+      return calls.length === 1
+        ? new Response("{}", { status: 429, headers: { "X-RequestCounter-Reset": "0" } })
+        : Response.json({ matches: [] });
+    }) as unknown as typeof fetch;
+    const result = await request<{ matches: unknown[] }>("/competitions/BL1/matches", "key", {}, fakeFetch);
+    assert.deepEqual(result, { matches: [] });
+    assert.equal(calls.length, 2);
+  });
+
+  it("gives up with the status code after repeated errors", async () => {
+    const fakeFetch = (async () => new Response("{}", { status: 403 })) as unknown as typeof fetch;
+    await assert.rejects(request("/competitions/BSA/matches", "key", {}, fakeFetch), /HTTP 403/);
   });
 });
