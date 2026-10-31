@@ -173,6 +173,24 @@ async function step(name, fn) {
       await ctx.close();
     });
 
+    await step("kick-off times follow the visitor's time zone", async () => {
+      const shown = {};
+      for (const timezoneId of ["America/Sao_Paulo", "Europe/Lisbon"]) {
+        const ctx = await browser.newContext({ timezoneId, locale: "en-US" });
+        const p = await ctx.newPage();
+        await p.goto(LEAGUE);
+        const kickoff = p.locator('[data-testid="kickoff"]').first();
+        await kickoff.waitFor();
+        const utc = await kickoff.getAttribute("data-utc");
+        const text = await kickoff.innerText();
+        const hour = new Intl.DateTimeFormat("en-US", { hour: "2-digit", minute: "2-digit", timeZone: timezoneId }).format(new Date(utc));
+        assert.ok(text.includes(hour), `${timezoneId}: expected ${hour} in "${text}"`);
+        shown[timezoneId] = text;
+        await ctx.close();
+      }
+      assert.notEqual(shown["America/Sao_Paulo"], shown["Europe/Lisbon"]);
+    });
+
     await step("layout: actions sit between table and fixtures on phones", async () => {
       const box = async (p, selector) => (await p.locator(selector).first().boundingBox());
       const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });

@@ -204,15 +204,26 @@ function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate 
   );
 }
 
-/** Rendered after mount so the viewer's own time zone is used without a hydration mismatch. */
+/**
+ * Kick-off in the viewer's own time zone. next-intl would otherwise use the
+ * server's zone (UTC on Vercel), so the browser's zone is passed explicitly.
+ * Rendered after mount so server and first client render match.
+ */
 function KickOff({ utcDate }: { utcDate: string }) {
   const format = useFormatter();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return <span>&nbsp;</span>;
+  const [timeZone, setTimeZone] = useState<string | null>(null);
+  useEffect(() => setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone), []);
+  if (!timeZone) return <span>&nbsp;</span>;
   return (
-    <span>
-      {format.dateTime(new Date(utcDate), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+    <span data-testid="kickoff" data-utc={utcDate}>
+      {format.dateTime(new Date(utcDate), {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone,
+      })}
     </span>
   );
 }
