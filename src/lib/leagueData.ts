@@ -21,6 +21,8 @@ let warnedMissingKey = false;
 
 const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 
+const inflight = new Map<string, Promise<LeagueData>>();
+
 export function seasonLabel(season: Pick<ApiSeason, "startDate" | "endDate">): string {
   const start = season.startDate.slice(0, 4);
   const end = season.endDate.slice(0, 4);
@@ -71,7 +73,22 @@ function loadSample(league: LeagueConfig): LeagueData {
  * a build the sample league is used; during runtime regeneration the error is
  * thrown so the previously generated (real) page stays in place.
  */
-export async function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
+export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
+  // Share one request per league across the 3 language versions of its page and
+  // their metadata. During a build the result is kept for the whole build; at
+  // runtime only while the request is in flight, so hourly refreshes still fetch.
+  const pending = inflight.get(league.code);
+  if (pending) return pending;
+  const promise = loadLeagueData(league);
+  inflight.set(league.code, promise);
+  const forget = () => {
+    if (!isBuildPhase()) inflight.delete(league.code);
+  };
+  promise.then(forget, () => inflight.delete(league.code));
+  return promise;
+}
+
+async function loadLeagueData(league: LeagueConfig): Promise<LeagueData> {
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
   if (!apiKey && process.env.NODE_ENV === "production" && !warnedMissingKey) {
     warnedMissingKey = true;
