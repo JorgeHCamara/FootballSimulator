@@ -129,7 +129,6 @@ function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate 
       <div className="mb-1 flex items-center justify-between text-[11px] text-zinc-500">
         <KickOff utcDate={fixture.utcDate} />
         {fixture.result && !prediction && <span className="font-semibold uppercase tracking-wide">{t("realResult")}</span>}
-        {prediction && <span className="font-semibold uppercase tracking-wide text-pitch-600">{t("predicted")}</span>}
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <span className="flex min-w-0 items-center justify-end gap-2 text-right text-sm font-medium">
