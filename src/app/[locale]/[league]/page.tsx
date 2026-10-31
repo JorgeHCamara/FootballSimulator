@@ -115,7 +115,14 @@ export default async function LeaguePage({ params }: { params: Params }) {
       </header>
 
 
-      <LeagueSimulator league={league} teams={data.teams} fixtures={data.fixtures} seasonKey={data.seasonKey} />
+      <LeagueSimulator
+        league={league}
+        teams={data.teams}
+        fixtures={data.fixtures}
+        seasonKey={data.seasonKey}
+        season={data.season}
+        {...(data.postseason ? { postseason: data.postseason } : {})}
+      />
 
       <div className="grid gap-8 pt-8 lg:grid-cols-2">
         <section className="space-y-3">

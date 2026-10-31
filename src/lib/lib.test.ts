@@ -6,7 +6,7 @@ import { doubleRoundRobin } from "../engine/schedule.ts";
 import type { ResultMap } from "../engine/types.ts";
 import { mapMatches, mapTeam, request, seasonOf, teamsFromMatches, type ApiMatch } from "./footballData.ts";
 import { decodeResults, encodeResults } from "./shareCodec.ts";
-import { espnFixtures, espnTeams, type EspnEvent } from "./espn.ts";
+import { espnFixtures, espnSplitSeason, espnTeams, type EspnEvent } from "./espn.ts";
 
 describe("shareCodec", () => {
   const fixtures = doubleRoundRobin(Array.from({ length: 20 }, (_, i) => i + 1)).map((f) => ({
@@ -231,6 +231,20 @@ describe("ESPN feed mapping", () => {
     assert.deepEqual(byId[10], { home: 2, away: 1 });
     assert.deepEqual(byId[13], { home: 0, away: 0 });
     assert.equal(byId[14], null);
+  });
+
+  it("keeps play-off games out of the league once teams have played their league games", () => {
+    // Each club plays 2 league games here; the third game (A v B) is a play-off.
+    const season = [
+      game("1", "2026-04-01T19:00Z", A, B, done, ["1", "0"]),
+      game("2", "2026-04-01T19:00Z", C, D, done, ["0", "0"]),
+      game("3", "2026-04-08T19:00Z", A, C, done, ["2", "2"]),
+      game("4", "2026-04-08T19:00Z", B, D, done, ["1", "1"]),
+      game("5", "2026-11-21T20:00Z", B, A, later),
+    ];
+    const { league, postseason } = espnSplitSeason(season, 2);
+    assert.deepEqual(league.map((e) => e.id), ["1", "2", "3", "4"]);
+    assert.deepEqual(postseason.map((e) => e.id), ["5"]);
   });
 
   it("applies league-scoped renames only in that league", () => {

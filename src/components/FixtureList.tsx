@@ -80,6 +80,8 @@ export function FixtureList(props: Props) {
 }
 
 interface RowProps {
+  /** Read-only (e.g. a projected play-off before the season ends). */
+  disabled?: boolean;
   fixture: Fixture;
   home: Team;
   away: Team;
@@ -94,7 +96,7 @@ function parseGoals(text: string): number | null {
   return Number(text);
 }
 
-function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate, disabled = false }: RowProps) {
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
   const locked = fixture.result !== null && prediction === undefined;
@@ -144,7 +146,8 @@ function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate 
                 min={0}
                 max={99}
                 aria-label={t("homeGoals", { team: home.name })}
-                className={`${scoreBox} ${inputTone}`}
+                className={`${scoreBox} ${inputTone} disabled:cursor-not-allowed disabled:opacity-50`}
+                disabled={disabled}
                 value={draft.home}
                 onChange={(e) => update("home", e.target.value)}
               />
@@ -155,7 +158,8 @@ function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate 
                 min={0}
                 max={99}
                 aria-label={t("awayGoals", { team: away.name })}
-                className={`${scoreBox} ${inputTone}`}
+                className={`${scoreBox} ${inputTone} disabled:cursor-not-allowed disabled:opacity-50`}
+                disabled={disabled}
                 value={draft.away}
                 onChange={(e) => update("away", e.target.value)}
               />
@@ -164,7 +168,7 @@ function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate 
             <button
               type="button"
               title={t("editResult")}
-              onClick={() => setEditing(true)}
+              onClick={() => !disabled && setEditing(true)}
               className="flex h-9 items-center gap-1 rounded-md bg-zinc-100 px-3 text-base font-bold tabular-nums dark:bg-zinc-800"
             >
               {shown!.home} <span className="text-zinc-400">–</span> {shown!.away}
@@ -188,7 +192,7 @@ function MatchRow({ fixture, home, away, prediction, model, onScore, onSimulate 
         <span className="w-24 text-right text-[10px] tabular-nums text-zinc-500">
           {pct(odds.home)} · {pct(odds.draw)} · {pct(odds.away)}
         </span>
-        {showInputs && (
+        {showInputs && !disabled && (
           <button
             type="button"
             onClick={onSimulate}

@@ -43,6 +43,16 @@ export interface LeagueConfig {
   teams: number;
   /** Defaults to football-data.org with `code` as the competition code. */
   source?: DataSource;
+  /**
+   * End-of-season two-legged promotion play-off: table positions paired
+   * better-placed first; that club hosts the second leg and goes through on a
+   * level aggregate. `directPromotion` are the positions promoted without it.
+   */
+  playoff?: {
+    ties: readonly (readonly [number, number])[];
+    directPromotion: readonly number[];
+    promotedTo: string;
+  };
   tiebreakers: readonly Tiebreaker[];
   /**
    * Default qualification/relegation zones. Real allocations shift with domestic
@@ -182,6 +192,8 @@ export const LEAGUES: readonly LeagueConfig[] = [
     teams: 20,
     // football-data.org's free tier doesn't include Série B.
     source: { provider: "espn", slug: "bra.2" },
+    // Série B 2026: 3rd v 6th and 4th v 5th; the winners join 1st and 2nd in Série A.
+    playoff: { ties: [[3, 6], [4, 5]], directPromotion: [1, 2], promotedTo: "Série A" },
     tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadPoints"],
     zones: [
       { kind: "promotion", from: 1, to: 2 },

@@ -127,3 +127,26 @@ export function espnFixtures(events: readonly EspnEvent[]): Fixture[] {
     };
   });
 }
+
+/**
+ * Splits a season into league games and the knockout games played after them
+ * (e.g. a promotion play-off), using each club's game count: once a club has
+ * played `leagueGamesPerTeam`, its later games are post-season.
+ */
+export function espnSplitSeason(events: readonly EspnEvent[], leagueGamesPerTeam: number) {
+  const played = new Map<string, number>();
+  const league: EspnEvent[] = [];
+  const postseason: EspnEvent[] = [];
+  const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date) || Number(a.id) - Number(b.id));
+  for (const event of sorted) {
+    const ids = (event.competitions[0]?.competitors ?? []).map((c) => c.team.id);
+    const isLeague = ids.length === 2 && ids.every((id) => (played.get(id) ?? 0) < leagueGamesPerTeam);
+    if (isLeague) {
+      for (const id of ids) played.set(id, (played.get(id) ?? 0) + 1);
+      league.push(event);
+    } else {
+      postseason.push(event);
+    }
+  }
+  return { league, postseason };
+}

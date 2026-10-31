@@ -1,20 +1,22 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { LeagueConfig } from "../config/leagues.ts";
 import { simulateFixtures, simulateScore, expectedGoals } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel } from "../engine/ratings.ts";
+import { buildTwoLeggedTies, playoffLegIds } from "../engine/playoffs.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
-import type { Fixture, Score, Team } from "../engine/types.ts";
+import type { Fixture, ResultMap, Score, StandingRow, Team } from "../engine/types.ts";
 import { decodeResults, encodeResults } from "../lib/shareCodec.ts";
 import { emptySeason, useSimStore } from "../store/simStore.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList } from "./FixtureList.tsx";
 import { ITERATIONS, ProbabilityGrid } from "./ProbabilityGrid.tsx";
+import { PromotionPlayoff } from "./PromotionPlayoff.tsx";
 import { StandingsTable } from "./StandingsTable.tsx";
 
 interface Props {
@@ -22,11 +24,15 @@ interface Props {
   teams: Team[];
   fixtures: Fixture[];
   seasonKey: string;
+  /** Season label, e.g. "2026"; the play-off promotes to the next one. */
+  season: string;
+  /** Real post-season games from the feed (play-off legs once known). */
+  postseason?: Fixture[];
 }
 
 type Tab = "table" | "chances";
 
-export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
+export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason }: Props) {
   const t = useTranslations("Simulator");
   const [hydrated, setHydrated] = useState(false);
   const [tab, setTab] = useState<Tab>("table");
@@ -35,7 +41,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
 
   const season = useSimStore((s) => (hydrated ? s.seasons[seasonKey] : undefined) ?? emptySeason);
   const canUndo = useSimStore((s) => (s.history[seasonKey]?.length ?? 0) > 0);
-  const { setScore, applyResults, replace, reset, undo, reconcile } = useSimStore.getState();
+  const { setScore, applyResults, replace, reset, undo, reconcile, drop } = useSimStore.getState();
 
   const ordered = useMemo(() => sortFixtures(fixtures), [fixtures]);
   const teamMap = useMemo(() => new Map(teams.map((tm) => [tm.id, tm])), [teams]);
@@ -46,6 +52,38 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
 
   const effective = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
   const rows = useMemo(() => computeStandings(teams, ordered, effective, standingsOptions), [teams, ordered, effective, standingsOptions]);
+
+  // Promotion play-off (Série B): seeded from the table once every league match has a score.
+  const playoff = league.playoff;
+  const legIds = useMemo(() => playoffLegIds(playoff?.ties.length ?? 0), [playoff]);
+  // The share codec only needs the ids, which don't depend on who qualifies.
+  const shareFixtures = useMemo<Fixture[]>(
+    () => [...fixtures, ...legIds.map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null }))],
+    [fixtures, legIds],
+  );
+  const seasonComplete = useMemo(() => fixtures.every((f) => effective[f.id]), [fixtures, effective]);
+  const buildTies = (table: StandingRow[]) =>
+    playoff
+      ? buildTwoLeggedTies(table, playoff.ties, {
+          afterMatchday: ordered.at(-1)?.matchday ?? 0,
+          afterDate: ordered.at(-1)?.utcDate ?? "",
+          ...(postseason ? { real: postseason } : {}),
+        })
+      : [];
+  const ties = useMemo(() => buildTies(rows), [rows, playoff, ordered, postseason]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Play-off scores belong to one pairing: drop them if the seeding changes or
+  // the season is no longer complete (e.g. after editing a league result).
+  const seeding = seasonComplete ? ties.map((tie) => `${tie.higher}-${tie.lower}`).join(",") : null;
+  const lastSeeding = useRef<string | null>(null);
+  useEffect(() => {
+    if (!hydrated || !playoff) return;
+    if (seeding === null || (lastSeeding.current !== null && lastSeeding.current !== seeding)) drop(seasonKey, legIds);
+    lastSeeding.current = seeding;
+  }, [hydrated, seeding]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const simulatePlayoffLegs = (table: StandingRow[], known: ResultMap): ResultMap =>
+    simulateFixtures(buildTies(table).flatMap((tie) => [tie.leg1, tie.leg2]).filter((leg) => !leg.result), known, model, createRng(randomSeed()));
 
   const matchdays = useMemo(() => [...new Set(ordered.map((f) => f.matchday))], [ordered]);
   const [matchday, setMatchday] = useState(() => {
@@ -62,7 +100,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
       const url = new URL(window.location.href);
       const shared = url.searchParams.get("r");
       if (shared !== null) {
-        const decoded = decodeResults(fixtures, shared);
+        const decoded = decodeResults(shareFixtures, shared);
         if (decoded) {
           replace(seasonKey, fixtures, decoded);
           setNotice(t("sharedLoaded"));
@@ -83,6 +121,17 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
   const simulate = (targets: readonly Fixture[]) =>
     applyResults(seasonKey, simulateFixtures(targets, effective, model, createRng(randomSeed())));
 
+  /** Rest of the league and, where there is one, the promotion play-off in one step. */
+  const simulateRest = () => {
+    const leagueResults = simulateFixtures(ordered, effective, model, createRng(randomSeed()));
+    if (!playoff) return applyResults(seasonKey, leagueResults);
+    const all = { ...effective, ...leagueResults };
+    const table = computeStandings(teams, ordered, all, standingsOptions);
+    applyResults(seasonKey, { ...leagueResults, ...simulatePlayoffLegs(table, { ...season.predictions, ...all }) });
+  };
+
+  const simulatePlayoff = () => applyResults(seasonKey, simulatePlayoffLegs(rows, season.predictions));
+
   const simulateOne = (fixture: Fixture) => {
     const score = simulateScore(expectedGoals(model, fixture.homeId, fixture.awayId), createRng(randomSeed()));
     setScore(seasonKey, fixture, score);
@@ -99,7 +148,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
 
   const share = async () => {
     const url = new URL(window.location.href);
-    url.searchParams.set("r", encodeResults(fixtures, season.predictions));
+    url.searchParams.set("r", encodeResults(shareFixtures, season.predictions));
     try {
       await navigator.clipboard.writeText(url.toString());
     } catch {
@@ -154,7 +203,24 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
 
         <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2">
           {tab === "table" ? (
-            <StandingsTable league={league} rows={rows} teams={teamMap} />
+            <>
+              <StandingsTable league={league} rows={rows} teams={teamMap} />
+              {playoff && ties.length > 0 && (
+                <PromotionPlayoff
+                  league={{ ...league, playoff }}
+                  ties={ties}
+                  rows={rows}
+                  teams={teamMap}
+                  predictions={season.predictions}
+                  model={model}
+                  seasonComplete={seasonComplete}
+                  nextSeason={/^\d{4}$/.test(seasonLabel) ? String(Number(seasonLabel) + 1) : ""}
+                  onScore={onScore}
+                  onSimulateLeg={simulateOne}
+                  onSimulatePlayoff={simulatePlayoff}
+                />
+              )}
+            </>
           ) : (
             <ProbabilityGrid league={league} input={monteCarloInput} rows={rows} teams={teamMap} />
           )}
@@ -164,7 +230,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey }: Props) {
           <button type="button" className={`${primaryButton} grow lg:grow-0`} onClick={() => simulate(matchdayFixtures)}>
             {t("simulateMatchday")}
           </button>
-          <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={() => simulate(ordered)}>
+          <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={simulateRest}>
             {t("simulateRest")}
           </button>
           <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={() => undo(seasonKey)} disabled={!canUndo}>

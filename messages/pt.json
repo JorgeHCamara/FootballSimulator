@@ -68,7 +68,18 @@
     "positionHeatmap": "Chance de cada posição final",
     "replacedNotice": "{count, plural, one {# palpite foi substituído} other {# palpites foram substituídos}} por resultados reais.",
     "sharedLoaded": "Simulação compartilhada carregada.",
-    "dismiss": "Fechar"
+    "dismiss": "Fechar",
+    "playoffTitle": "Playoff de acesso",
+    "simulatePlayoff": "Simular playoff",
+    "playoffProjected": "Projeção pela tabela atual. Os placares do playoff são liberados quando todos os jogos da temporada tiverem resultado.",
+    "playoffTie": "{higherPos}º x {lowerPos}º",
+    "playoffRule": "{higher} faz o jogo de volta em casa e avança com empate no agregado.",
+    "playoffAggregate": "Agregado: {higher} {hg}–{lg} {lower}. {winner} sobe para a {promotedTo}.",
+    "promotedTitle": "Promovidos à {league} {year}",
+    "promotedPending": "Complete a temporada e o playoff para ver os quatro clubes promovidos.",
+    "promotedChampion": "Campeão",
+    "promotedRunnerUp": "Vice-campeão",
+    "promotedPlayoff": "Vencedor do playoff"
   },
   "Zones": {
     "championsLeague": "Champions League",

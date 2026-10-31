@@ -6,3 +6,4 @@ export * from "./ratings.ts";
 export * from "./match.ts";
 export * from "./montecarlo.ts";
 export * from "./schedule.ts";
+export * from "./playoffs.ts";

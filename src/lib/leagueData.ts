@@ -1,7 +1,7 @@
 import type { LeagueConfig } from "../config/leagues.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
-import { EspnError, espnFixtures, espnTeams, fetchEspnSeason } from "./espn.ts";
+import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnSeason } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
 
@@ -13,6 +13,8 @@ export interface LeagueData {
   /** Stable key for saved predictions: a new season starts with a clean slate. */
   seasonKey: string;
   source: "live" | "sample";
+  /** Real post-season games (e.g. play-off legs) once the feed lists them. */
+  postseason?: Fixture[];
 }
 
 /** Server responses are cached for an hour, well inside the free tier's rate limit. */
@@ -65,7 +67,11 @@ async function loadEspn(league: LeagueConfig, slug: string): Promise<LeagueData>
   const init = { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
   const thisYear = new Date().getUTCFullYear();
   for (const year of [thisYear, thisYear - 1]) {
-    const { events } = await fetchEspnSeason(slug, year, init);
+    const { events: all } = await fetchEspnSeason(slug, year, init);
+    // Keep play-off games out of the league table once their clubs are known.
+    const { league: events, postseason } = league.playoff
+      ? espnSplitSeason(all, (league.teams - 1) * 2)
+      : { league: all, postseason: [] };
     const fixtures = espnFixtures(events);
     // A season has teams × (teams − 1) games; skip a year until at least half are published.
     if (fixtures.length < (league.teams * (league.teams - 1)) / 2) continue;
@@ -75,6 +81,7 @@ async function loadEspn(league: LeagueConfig, slug: string): Promise<LeagueData>
       season: String(year),
       seasonKey: `${league.code}:${year}`,
       source: "live",
+      ...(postseason.length ? { postseason: espnFixtures(postseason) } : {}),
     };
   }
   throw new Error(`No ${league.code} fixtures on ESPN for ${thisYear} or ${thisYear - 1}`);

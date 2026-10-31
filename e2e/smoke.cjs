@@ -173,6 +173,29 @@ async function step(name, fn) {
       await ctx.close();
     });
 
+    await step("Série B play-off decides the four promoted clubs", async () => {
+      const ctx = await browser.newContext();
+      const p = await ctx.newPage();
+      await p.goto(`${BASE_URL}/en/brasileirao-serie-b`);
+      await p.locator('[data-testid="playoff"]').waitFor();
+      assert.equal(await p.locator('[data-testid="playoff-tie"]').count(), 2);
+      assert.equal(await p.locator('[data-testid="promoted-team"]').count(), 0, "nothing promoted before the season ends");
+
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="promoted-team"]').first().waitFor();
+      const promoted = await p.locator('[data-testid="promoted-team"]').allInnerTexts();
+      assert.equal(promoted.length, 4);
+      assert.equal(await p.locator('[data-testid="playoff-result"]').count(), 2);
+
+      // 1st and 2nd go up directly; each play-off winner is one of its tie's two clubs.
+      const names = await p.locator('[data-testid="standings-row"] td:nth-child(2)').allInnerTexts();
+      assert.ok(promoted[0].includes(names[0]) && promoted[1].includes(names[1]), "1st and 2nd promoted");
+      const winners = promoted.slice(2).map((x) => x.split("\n")[0]);
+      assert.ok([names[2], names[5]].some((n) => winners[0].includes(n) || n.includes(winners[0])), "3v6 winner");
+      assert.ok([names[3], names[4]].some((n) => winners[1].includes(n) || n.includes(winners[1])), "4v5 winner");
+      await ctx.close();
+    });
+
     await step("kick-off times follow the visitor's time zone", async () => {
       const shown = {};
       for (const timezoneId of ["America/Sao_Paulo", "Europe/Lisbon"]) {

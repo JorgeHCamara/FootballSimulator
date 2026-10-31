@@ -25,6 +25,8 @@ interface SimStore {
   replace: (key: string, fixtures: readonly Fixture[], predictions: ResultMap) => void;
   reset: (key: string) => void;
   undo: (key: string) => void;
+  /** Removes predictions for these fixtures without an undo step (e.g. stale play-off legs). */
+  drop: (key: string, ids: readonly FixtureId[]) => void;
   /** Drops predictions that real results have superseded; returns how many. */
   reconcile: (key: string, fixtures: readonly Fixture[]) => number;
 }
@@ -83,6 +85,14 @@ export const useSimStore = create<SimStore>()(
               history: { ...s.history, [key]: stack.slice(0, -1) },
             };
           }),
+
+        drop: (key, ids) => {
+          const current = get().seasons[key];
+          if (!current || !ids.some((id) => current.predictions[id])) return;
+          const predictions = { ...current.predictions };
+          for (const id of ids) delete predictions[id];
+          set((s) => ({ seasons: { ...s.seasons, [key]: { ...current, predictions } } }));
+        },
 
         reconcile: (key, fixtures) => {
           const current = get().seasons[key];
