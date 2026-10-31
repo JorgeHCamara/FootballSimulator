@@ -183,6 +183,12 @@ async function step(name, fn) {
       await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Play-off" });
       await p.locator('[data-testid="fixtures"] [data-testid="playoff"]').waitFor();
       assert.equal(await p.locator('[data-testid="playoff-tie"]').count(), 2);
+      // Before the league ends the legs show positions, not clubs.
+      const placeholders = await p.locator('[data-testid="playoff-placeholder"]').allInnerTexts();
+      assert.equal(placeholders.length, 4);
+      assert.match(placeholders[0], /6th place[\s\S]*3rd place/);
+      assert.match(placeholders[1], /3rd place[\s\S]*6th place/);
+      assert.match(placeholders[2], /5th place[\s\S]*4th place/);
       assert.equal(await p.getByRole("button", { name: "Simulate matchday" }).isDisabled(), true, "play-off locked until the season ends");
       assert.equal(await p.locator('[data-testid="promoted-team"]').count(), 0, "nothing promoted before the season ends");
 

@@ -69,7 +69,7 @@
     "replacedNotice": "{count, plural, one {# pronóstico fue sustituido} other {# pronósticos fueron sustituidos}} por resultados reales.",
     "sharedLoaded": "Simulación compartida cargada.",
     "dismiss": "Cerrar",
-    "playoffProjected": "Proyección según la clasificación actual. Los marcadores del playoff se habilitan cuando todos los partidos de la liga tengan resultado.",
+    "playoffProjected": "Los cruces se definen cuando terminen las 38 jornadas.",
     "playoffTie": "{higherPos}.º vs {lowerPos}.º",
     "playoffRule": "{higher} juega la vuelta en casa y pasa si el global termina empatado.",
     "playoffAggregate": "Global: {higher} {hg}–{lg} {lower}. {winner} asciende a la {promotedTo}.",
@@ -78,7 +78,8 @@
     "promotedChampion": "Campeón",
     "promotedRunnerUp": "Subcampeón",
     "promotedPlayoff": "Ganador del playoff",
-    "playoffs": "Playoff"
+    "playoffs": "Playoff",
+    "playoffPlace": "{position}.º clasificado"
   },
   "Zones": {
     "championsLeague": "Champions League",

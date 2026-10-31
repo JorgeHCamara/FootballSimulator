@@ -69,7 +69,7 @@
     "replacedNotice": "{count, plural, one {# prediction was} other {# predictions were}} replaced by real results.",
     "sharedLoaded": "Loaded a shared simulation.",
     "dismiss": "Dismiss",
-    "playoffProjected": "Projected from the current table. Play-off scores open once every league match has a result.",
+    "playoffProjected": "The pairings are set once all 38 matchdays have been played.",
     "playoffTie": "{higherPos, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} v {lowerPos, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
     "playoffRule": "{higher} hosts the 2nd leg and goes through if the aggregate is level.",
     "playoffAggregate": "Aggregate: {higher} {hg}–{lg} {lower}. {winner} goes up to {promotedTo}.",
@@ -78,7 +78,8 @@
     "promotedChampion": "Champion",
     "promotedRunnerUp": "Runner-up",
     "promotedPlayoff": "Play-off winner",
-    "playoffs": "Play-off"
+    "playoffs": "Play-off",
+    "playoffPlace": "{position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place"
   },
   "Zones": {
     "championsLeague": "Champions League",

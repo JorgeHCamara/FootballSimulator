@@ -98,7 +98,9 @@ export function FixtureList(props: Props) {
 /** Two-legged play-off ties: both legs, the rule and the aggregate once decided. */
 function PlayoffTies({ playoff, teams, predictions, model, onScore, onSimulate }: Props & { playoff: PlayoffView }) {
   const t = useTranslations("Simulator");
-  const name = (id: TeamId) => teams.get(id)?.shortName ?? "";
+  const done = playoff.seasonComplete;
+  // Until the league is finished the pairings aren't known: show positions, not clubs.
+  const name = (id: TeamId, position: number) => (done ? (teams.get(id)?.shortName ?? "") : t("playoffPlace", { position }));
   return (
     <div data-testid="playoff">
       {!playoff.seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t("playoffProjected")}</p>}
@@ -109,15 +111,25 @@ function PlayoffTies({ playoff, teams, predictions, model, onScore, onSimulate }
             <div className="px-3 pt-3">
               <h3 className="text-sm font-semibold">
                 {t("playoffTie", { higherPos: tie.seeds[0], lowerPos: tie.seeds[1] })}
-                <span className="font-normal text-zinc-500">
-                  {" "}
-                  · {name(tie.higher)} × {name(tie.lower)}
-                </span>
+                {done && (
+                  <span className="font-normal text-zinc-500">
+                    {" "}
+                    · {name(tie.higher, tie.seeds[0])} × {name(tie.lower, tie.seeds[1])}
+                  </span>
+                )}
               </h3>
-              <p className="text-xs text-zinc-500">{t("playoffRule", { higher: name(tie.higher) })}</p>
+              <p className="text-xs text-zinc-500">{t("playoffRule", { higher: name(tie.higher, tie.seeds[0]) })}</p>
             </div>
             <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {[tie.leg1, tie.leg2].map((leg) => (
+              {[tie.leg1, tie.leg2].map((leg) =>
+                !done ? (
+                  <PlaceholderRow
+                    key={leg.id}
+                    utcDate={leg.utcDate}
+                    home={name(leg.homeId, leg.homeId === tie.higher ? tie.seeds[0] : tie.seeds[1])}
+                    away={name(leg.awayId, leg.awayId === tie.higher ? tie.seeds[0] : tie.seeds[1])}
+                  />
+                ) : (
                 <MatchRow
                   key={`${leg.id}-${leg.homeId}-${leg.awayId}`}
                   fixture={leg}
@@ -125,20 +137,20 @@ function PlayoffTies({ playoff, teams, predictions, model, onScore, onSimulate }
                   away={teams.get(leg.awayId)!}
                   prediction={predictions[leg.id]}
                   model={model}
-                  disabled={!playoff.seasonComplete}
                   onScore={(score) => onScore(leg, score)}
                   onSimulate={() => onSimulate(leg)}
                 />
-              ))}
+                ),
+              )}
             </ul>
             {outcome && (
               <p className="bg-pitch-50 px-3 py-2 text-sm font-medium text-pitch-900 dark:bg-pitch-900/30 dark:text-pitch-100" data-testid="playoff-result">
                 {t("playoffAggregate", {
-                  higher: name(tie.higher),
-                  lower: name(tie.lower),
+                  higher: name(tie.higher, tie.seeds[0]),
+                  lower: name(tie.lower, tie.seeds[1]),
                   hg: outcome.higherGoals,
                   lg: outcome.lowerGoals,
-                  winner: name(outcome.winner),
+                  winner: name(outcome.winner, outcome.winner === tie.higher ? tie.seeds[0] : tie.seeds[1]),
                   promotedTo: playoff.promotedTo,
                 })}
               </p>
@@ -274,6 +286,27 @@ export function MatchRow({ fixture, home, away, prediction, model, onScore, onSi
             🎲
           </button>
         )}
+      </div>
+    </li>
+  );
+}
+
+/** A play-off leg whose clubs aren't decided yet, e.g. "6th place × 3rd place". */
+function PlaceholderRow({ utcDate, home, away }: { utcDate: string; home: string; away: string }) {
+  const box = "h-9 w-10 rounded-md border border-dashed border-zinc-300 dark:border-zinc-700";
+  return (
+    <li className="px-3 py-2.5" data-testid="playoff-placeholder">
+      <div className="mb-1 text-[11px] text-zinc-500">
+        <KickOff utcDate={utcDate} />
+      </div>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm font-medium text-zinc-500">
+        <span className="truncate text-right">{home}</span>
+        <span className="flex items-center gap-1" aria-hidden>
+          <span className={box} />
+          <span className="text-zinc-400">–</span>
+          <span className={box} />
+        </span>
+        <span className="truncate">{away}</span>
       </div>
     </li>
   );
