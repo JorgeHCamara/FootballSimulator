@@ -139,7 +139,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
     return config.noExtraTime ? t("playoffRuleOneLegPenalties", { higher }) : t("playoffRuleOneLeg", { higher });
   };
 
-  const scoreRow = (fixture: Fixture, label?: string) => (
+  const scoreRow = (fixture: Fixture, label?: string, layout: { attached?: boolean; joinsNext?: boolean } = {}) => (
     <MatchRow
       key={`${fixture.id}-${fixture.homeId}-${fixture.awayId}`}
       fixture={fixture}
@@ -147,6 +147,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
       away={teams.get(fixture.awayId)!}
       prediction={predictions[fixture.id]}
       {...(label ? { label } : {})}
+      {...layout}
       onScore={(score) => onScore(fixture, score)}
       onSimulate={() => onSimulate(fixture)}
     />
@@ -194,11 +195,19 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                       ? // A series: each game still needed, with its own shoot-out when drawn.
                         seriesGames(tie, predictions)
                           .filter((g) => g.needed)
-                          .flatMap((g, n) => [
-                            scoreRow(g.game, t("playoffGame", { number: n + 1 })),
-                            ...(g.needsPenalties || predictions[g.shootout.id] ? [scoreRow(g.shootout, t("penalties"))] : []),
-                          ])
-                      : tie.legs.map((leg) => scoreRow(leg, leg.neutral && tie.config.venue ? tie.config.venue : undefined))}
+                          .flatMap((g, n) => {
+                            // A drawn game's shoot-out decides that game, so it sits right under it.
+                            const pens = g.needsPenalties || predictions[g.shootout.id] !== undefined;
+                            return [
+                              scoreRow(g.game, t("playoffGame", { number: n + 1 }), { joinsNext: pens }),
+                              ...(pens ? [scoreRow(g.shootout, t("playoffGamePenalties", { number: n + 1 }), { attached: true })] : []),
+                            ];
+                          })
+                      : tie.legs.map((leg, i) =>
+                          scoreRow(leg, leg.neutral && tie.config.venue ? tie.config.venue : undefined, {
+                            joinsNext: Boolean(showShootout) && i === tie.legs.length - 1,
+                          }),
+                        )}
                   {showShootout && tie.shootout && (
                     <MatchRow
                       key={`${tie.shootout.id}-${tie.shootout.homeId}-${tie.shootout.awayId}`}
@@ -207,6 +216,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                       away={teams.get(tie.shootout.awayId)!}
                       prediction={predictions[tie.shootout.id]}
                       label={t("penalties")}
+                      attached
                       onScore={(score) => onScore(tie.shootout!, score)}
                       onSimulate={() => onSimulate(tie.shootout!)}
                     />
@@ -256,6 +266,13 @@ interface RowProps {
   disabled?: boolean;
   /** Shown above the match, after the kick-off time (e.g. "Wembley", "Penalties"). */
   label?: string;
+  /**
+   * Continues the game above (its penalty shoot-out): no kick-off time and no
+   * divider between the two, so it reads as part of that game.
+   */
+  attached?: boolean;
+  /** The next row is attached to this one: no divider below. */
+  joinsNext?: boolean;
   fixture: Fixture;
   home: Team;
   away: Team;
@@ -269,7 +286,7 @@ function parseGoals(text: string): number | null {
   return Number(text);
 }
 
-export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false }: RowProps) {
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
   const locked = fixture.result !== null && prediction === undefined;
@@ -298,12 +315,21 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
     : "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950";
 
   return (
-    <li className="px-3 py-2.5" data-testid="match-row" data-fixture={fixture.id}>
+    <li
+      className={`px-3 ${attached ? "pt-0 pb-2.5" : "py-2.5"} ${joinsNext ? "border-b-0" : ""}`}
+      data-testid="match-row"
+      data-fixture={fixture.id}
+      {...(attached ? { "data-attached": "true" } : {})}
+    >
       <div className="mb-1 flex items-center justify-between text-[11px] text-zinc-500">
-        <span>
-          <KickOff utcDate={fixture.utcDate} />
-          {label && <span className="font-semibold"> · {label}</span>}
-        </span>
+        {attached ? (
+          <span className="font-semibold">{label}</span>
+        ) : (
+          <span>
+            <KickOff utcDate={fixture.utcDate} />
+            {label && <span className="font-semibold"> · {label}</span>}
+          </span>
+        )}
         {fixture.result && !prediction && <span className="font-semibold uppercase tracking-wide">{t("realResult")}</span>}
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">

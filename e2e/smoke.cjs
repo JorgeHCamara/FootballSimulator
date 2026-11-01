@@ -290,6 +290,17 @@ async function step(name, fn) {
       assert.equal(series.length, 8);
       for (const r of series) assert.match(r, /(2–[01]|[01]–2) /, r);
       assert.match(results.at(-1), /wins the MLS Cup!/);
+      // A drawn series game's shoot-out sits right under that game, labelled with it.
+      const aSeries = playoff.locator('[data-testid="playoff-tie"]').filter({ hasText: "Best of three" }).first();
+      const game2 = aSeries.locator('[data-testid="match-row"]').filter({ hasText: "Game 2" }).first();
+      const inputs = game2.locator("input");
+      if ((await inputs.count()) === 0) await game2.getByRole("button").first().click();
+      await game2.locator("input").first().fill("1");
+      await game2.locator("input").last().fill("1");
+      const pens = aSeries.locator('[data-testid="match-row"][data-attached="true"]');
+      await pens.filter({ hasText: "Game 2: penalties" }).waitFor();
+      const order = await aSeries.locator('[data-testid="match-row"]').evaluateAll((rows) => rows.map((r) => (r.dataset.attached ? "pens" : r.innerText.match(/Game \d/)?.[0])));
+      assert.equal(order[order.indexOf("Game 2") + 1], "pens", `order: ${order.join(", ")}`);
       await p.close();
     });
 
