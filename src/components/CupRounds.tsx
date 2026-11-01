@@ -181,7 +181,7 @@ export function CupRounds(props: RoundsProps) {
       )}
 
       {bracketFrom >= 0 && roundIndex >= bracketFrom ? (
-        <CupBracket {...props} rounds={rounds.slice(bracketFrom)} highlight={roundIndex - bracketFrom} />
+        <CupBracket {...props} rounds={rounds.slice(bracketFrom)} fullRounds={rounds} highlight={roundIndex - bracketFrom} />
       ) : round.drawn === "pending" && round.ties.length === 0 ? (
         <PendingRound cup={cup} round={round} rounds={rounds} />
       ) : (

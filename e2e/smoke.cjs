@@ -404,6 +404,11 @@ async function step(name, fn) {
       assert.equal(await p.locator('[data-testid="bracket-round"]').count(), 3);
       assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Wembley/);
       assert.equal(await p.locator('[data-testid="cup-tie"]').count(), 7, "4 quarter-finals, 2 semis, 1 final");
+      // The bracket follows the draw: each semi-final's quarter-finals sit beside it, home side's first.
+      const column = (i) => p.locator('[data-testid="bracket-round"]').nth(i).locator('[data-testid="cup-tie"]').evaluateAll((els) => els.map((e) => ({ home: e.dataset.home, away: e.dataset.away, winner: e.dataset.winner })));
+      const [qf, sf, fin] = [await column(0), await column(1), await column(2)];
+      assert.deepEqual(qf.map((t) => t.winner), sf.flatMap((t) => [t.home, t.away]), "quarter-finals ordered by the semi-final draw");
+      assert.deepEqual(sf.map((t) => t.winner), [fin[0].home, fin[0].away], "semi-finals ordered by the final");
       const champion = await p.locator('[data-testid="champion"]').innerText();
       assert.match(champion, /FA Cup \d{4}\/\d{2} winner/);
       assert.match(champion, /Third Round: \d+–\d+ v /);
