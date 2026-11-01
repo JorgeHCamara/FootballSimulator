@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { SiteFooter } from "../../components/SiteFooter.tsx";
 import { SiteHeader } from "../../components/SiteHeader.tsx";
 import { routing } from "../../i18n/routing.ts";
-import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../lib/site.ts";
+import { GOOGLE_SITE_VERIFICATION, HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../lib/site.ts";
 import "../globals.css";
 
 const CLIENT_NAMESPACES = ["Nav", "Simulator", "Zones"];
@@ -23,7 +23,6 @@ export const viewport: Viewport = {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Metadata" });
-  const verification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
   return {
     metadataBase: new URL(SITE_URL),
     title: { default: t("homeTitle"), template: `%s | ${SITE_NAME}` },
@@ -41,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     },
     twitter: { card: "summary_large_image", title: t("homeTitle"), description: t("homeDescription") },
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
-    ...(verification ? { verification: { google: verification } } : {}),
+    verification: { google: GOOGLE_SITE_VERIFICATION },
   };
 }
 

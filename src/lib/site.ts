@@ -1,6 +1,10 @@
 import { routing } from "../i18n/routing.ts";
 
 export const SITE_NAME = "Foot Simu";
+/** Google Search Console HTML-tag verification for https://footsimu.com (public by design). */
+export const GOOGLE_SITE_VERIFICATION =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "NNYCQH90rIGoWobSE23pk7USI5FSAfXfFxO2-Y_Jzr0";
+
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://footsimu.com").replace(/\/$/, "");
 
 /** hreflang codes: Portuguese content is written for Brazil. */
