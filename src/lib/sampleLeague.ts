@@ -14,7 +14,7 @@ const TOWNS = [
   "Westmere", "Oakhurst", "Ravenford", "Silverton", "Eastwick", "Highcliff",
   "Lakeside", "Brightwater", "Thornbury", "Fairhaven", "Greywood", "Port Alder",
   "Elmstead", "Copperfield", "Marlow Heath", "Dunmore", "Westbury", "Hollowmere",
-  "Kestrel Bay", "Ironbridge",
+  "Kestrel Bay", "Ironbridge", "Cedar Falls", "Pinecrest", "Harborview", "Granite Ridge",
 ];
 const SUFFIXES = ["FC", "United", "City", "Athletic", "Rovers", "Wanderers", "Town", "Albion"];
 

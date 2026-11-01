@@ -234,6 +234,12 @@ export const TEAM_OVERRIDES: readonly TeamOverride[] = [
   { match: "Académico de Viseu", league: "PPL", name: "Académico de Viseu", shortName: "Académico Viseu" },
   { match: "Ajax Amsterdam", league: "DED", name: "Ajax", shortName: "Ajax" },
   { match: "SC Cambuur", league: "DED", name: "Cambuur", shortName: "Cambuur" },
+  // MLS (names from ESPN)
+  { match: "Red Bull New York", league: "MLS", name: "New York Red Bulls", shortName: "NY Red Bulls" },
+  { match: "St. Louis CITY SC", league: "MLS", name: "St. Louis City SC", shortName: "St. Louis" },
+  { match: "Inter Miami CF", league: "MLS", shortName: "Inter Miami" },
+  { match: "Sporting Kansas City", league: "MLS", shortName: "Sporting KC" },
+  { match: "Real Salt Lake", league: "MLS", shortName: "Real Salt Lake" },
 ];
 
 const normalize = (text: string) => text.trim().toLowerCase();

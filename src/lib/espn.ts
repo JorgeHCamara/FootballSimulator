@@ -47,6 +47,25 @@ export async function fetchEspnYear(slug: string, year: number, init: RequestIni
   return (await res.json()) as EspnScoreboard;
 }
 
+interface EspnStandings {
+  children?: { name: string; standings?: { entries?: { team: { id: string } }[] } }[];
+}
+
+/** Separate tables of a league (MLS conferences) from ESPN's standings feed. */
+export async function fetchEspnGroups(
+  slug: string,
+  year: number,
+  init: RequestInit = {},
+): Promise<{ name: string; teamIds: number[] }[]> {
+  const res = await fetch(`https://site.api.espn.com/apis/v2/sports/soccer/${slug}/standings?season=${year}`, init);
+  if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} standings ${year}: HTTP ${res.status}`);
+  const data = (await res.json()) as EspnStandings;
+  return (data.children ?? []).map((group) => ({
+    name: group.name,
+    teamIds: (group.standings?.entries ?? []).map((e) => Number(e.team.id)),
+  }));
+}
+
 /**
  * Every event of the season starting in `year`. A split season (2026/27) spans
  * two calendar years, each of which also holds games of a neighbouring season,
@@ -240,11 +259,29 @@ export function assignRounds(games: readonly Game[], roundCount: number): number
 }
 
 /**
- * Maps ESPN events to fixtures. ESPN doesn't say which round a game belongs to,
- * so rounds are rebuilt: with `roundCount` (a league's full schedule) by
- * expected round dates, otherwise in kick-off order.
+ * Calendar weeks (Monday to Sunday, UTC) numbered from the first week with a
+ * game; weeks without games (e.g. a World Cup break) are skipped.
  */
-export function espnFixtures(events: readonly EspnEvent[], roundCount?: number): Fixture[] {
+function weeklyRounds(games: readonly Game[]): number[] {
+  const weekOf = (time: number) => Math.floor((time / DAY_MS + 3) / 7); // the Unix epoch was a Thursday
+  const weeks = [...new Set(games.map((g) => weekOf(g.time)))].sort((a, b) => a - b);
+  const index = new Map(weeks.map((w, i) => [w, i]));
+  return games.map((g) => index.get(weekOf(g.time))!);
+}
+
+export interface EspnFixtureOptions {
+  /** A league's full number of rounds: rounds are rebuilt by expected round dates. */
+  roundCount?: number;
+  /** Group by calendar week instead (leagues without fixed rounds, like MLS). */
+  weekly?: boolean;
+}
+
+/**
+ * Maps ESPN events to fixtures. ESPN doesn't say which round a game belongs to,
+ * so rounds are rebuilt: by calendar week, with `roundCount` by expected round
+ * dates, otherwise in kick-off order.
+ */
+export function espnFixtures(events: readonly EspnEvent[], { roundCount, weekly }: EspnFixtureOptions = {}): Fixture[] {
   const matches = leagueMatches(dropReplacedPostponements(events)).sort(
     (a, b) => a.event.date.localeCompare(b.event.date) || Number(a.event.id) - Number(b.event.id),
   );
@@ -253,7 +290,7 @@ export function espnFixtures(events: readonly EspnEvent[], roundCount?: number):
     away: Number(away.team.id),
     time: Date.parse(event.date),
   }));
-  const rounds = roundCount ? assignRounds(games, roundCount) : greedyRounds(games);
+  const rounds = weekly ? weeklyRounds(games) : roundCount ? assignRounds(games, roundCount) : greedyRounds(games);
 
   return matches.map(({ event, home, away }, i) => {
     const finished = event.status.type.completed && event.status.type.state === "post";

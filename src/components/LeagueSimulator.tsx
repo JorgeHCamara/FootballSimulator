@@ -1,8 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { LeagueConfig } from "../config/leagues.ts";
+import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel } from "../engine/ratings.ts";
@@ -28,6 +28,8 @@ interface Props {
   season: string;
   /** Real post-season games from the feed (play-off legs once known). */
   postseason?: Fixture[];
+  /** Clubs of each separate table (MLS conferences), matching `league.groups`. */
+  groups?: { id: string; teamIds: number[] }[];
 }
 
 type Tab = "table" | "chances";
@@ -41,10 +43,21 @@ function nextSeasonLabel(season: string): string {
   return "";
 }
 
-export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason }: Props) {
+export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason, groups }: Props) {
   const t = useTranslations("Simulator");
+  const lang = useLocale() as SiteLocale;
   const [hydrated, setHydrated] = useState(false);
   const [tab, setTab] = useState<Tab>("table");
+  // Leagues split into separate tables (MLS conferences) show one at a time.
+  const groupTabs = useMemo(
+    () => (league.groups ?? []).flatMap((g) => {
+      const members = groups?.find((m) => m.id === g.id);
+      return members ? [{ id: g.id, name: g.name[lang], teamIds: members.teamIds }] : [];
+    }),
+    [league.groups, groups, lang],
+  );
+  const [groupId, setGroupId] = useState(groupTabs[0]?.id);
+  const group = groupTabs.find((g) => g.id === groupId) ?? groupTabs[0];
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -60,7 +73,14 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
   const standingsOptions = useMemo(() => ({ tiebreakers: league.tiebreakers }), [league.tiebreakers]);
 
   const effective = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
-  const rows = useMemo(() => computeStandings(teams, ordered, effective, standingsOptions), [teams, ordered, effective, standingsOptions]);
+  const tableTeams = useMemo(
+    () => (group ? group.teamIds.flatMap((id) => teamMap.get(id) ?? []) : teams),
+    [group, teamMap, teams],
+  );
+  const rows = useMemo(
+    () => computeStandings(tableTeams, ordered, effective, standingsOptions),
+    [tableTeams, ordered, effective, standingsOptions],
+  );
 
   // Promotion play-off (Série B, Championship): seeded from the table once every
   // league match has a score, then round by round from the results entered.
@@ -201,9 +221,18 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
   const monteCarloInput = useMemo<MonteCarloInput | null>(
     () =>
       tab === "chances" && hydrated
-        ? { teams, fixtures, fixed: effective, model, standings: standingsOptions, iterations: ITERATIONS, seed: 2026 }
+        ? {
+            teams,
+            fixtures,
+            fixed: effective,
+            model,
+            standings: standingsOptions,
+            iterations: ITERATIONS,
+            seed: 2026,
+            ...(groupTabs.length ? { groups: groupTabs.map((g) => g.teamIds) } : {}),
+          }
         : null,
-    [tab, hydrated, teams, fixtures, effective, model, standingsOptions],
+    [tab, hydrated, teams, fixtures, effective, model, standingsOptions, groupTabs],
   );
 
   const actionButton =
@@ -226,13 +255,30 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
       {/* Phones: tabs, table, actions, fixtures. Desktop: tabs and actions on one
           row above the table and fixtures columns. */}
       <div className="grid gap-4 lg:grid-cols-[auto_minmax(0,1fr)_400px] lg:items-start">
-        <div className="flex self-start rounded-lg bg-zinc-200/70 p-1 justify-self-start dark:bg-zinc-800 lg:col-start-1 lg:row-start-1" role="tablist">
-          <button type="button" role="tab" aria-selected={tab === "table"} className={tabButton(tab === "table")} onClick={() => setTab("table")}>
-            {t("table")}
-          </button>
-          <button type="button" role="tab" aria-selected={tab === "chances"} className={tabButton(tab === "chances")} onClick={() => setTab("chances")}>
-            {t("chances")}
-          </button>
+        <div className="flex flex-wrap items-center gap-2 self-start justify-self-start lg:col-start-1 lg:row-start-1">
+          <div className="flex rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="tablist">
+            <button type="button" role="tab" aria-selected={tab === "table"} className={tabButton(tab === "table")} onClick={() => setTab("table")}>
+              {t("table")}
+            </button>
+            <button type="button" role="tab" aria-selected={tab === "chances"} className={tabButton(tab === "chances")} onClick={() => setTab("chances")}>
+              {t("chances")}
+            </button>
+          </div>
+          {groupTabs.length > 1 && (
+            <div className="flex rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="group" aria-label={t("conference")} data-testid="group-switch">
+              {groupTabs.map((g) => (
+                <button
+                  key={g.id}
+                  type="button"
+                  aria-pressed={g.id === group?.id}
+                  className={`whitespace-nowrap ${tabButton(g.id === group?.id)}`}
+                  onClick={() => setGroupId(g.id)}
+                >
+                  {g.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2">

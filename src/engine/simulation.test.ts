@@ -196,4 +196,16 @@ describe("runMonteCarlo", () => {
     const mc = runMonteCarlo({ teams, fixtures, fixed, model: gradedModel(teams), standings, iterations: 20, seed: 1 });
     for (const row of table) assert.equal(probabilityInRange(mc, row.teamId, row.position, row.position), 1);
   });
+
+  it("ranks each group (MLS conference) on its own", () => {
+    const groups = [[1, 3, 5, 7, 9], [2, 4, 6, 8, 10]];
+    const mc = runMonteCarlo({ teams, fixtures, fixed: {}, model: gradedModel(teams), standings, iterations: 200, seed: 9, groups });
+    for (const group of groups) {
+      for (const id of group) {
+        assert.equal(mc.positionCounts[id]!.length, 5, "positions within the group only");
+        assert.equal(mc.positionCounts[id]!.reduce((x, y) => x + y, 0), 200);
+      }
+      for (let p = 0; p < 5; p++) assert.equal(group.reduce((n, id) => n + mc.positionCounts[id]![p]!, 0), 200);
+    }
+  });
 });

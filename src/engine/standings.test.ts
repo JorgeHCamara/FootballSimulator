@@ -23,6 +23,20 @@ const tiebreakers = (code: string): readonly Tiebreaker[] => getLeagueByCode(cod
 const order = (rows: { teamId: number }[]) => rows.map((r) => r.teamId);
 
 describe("computeStandings", () => {
+  it("counts matches against clubs outside the table (MLS conferences)", () => {
+    // Alpha and Bravo are East; Charlie is West.
+    const { fixtures, results } = games([
+      [1, 3, 2, 0],
+      [3, 2, 1, 1],
+      [1, 2, 0, 1],
+    ]);
+    const east = computeStandings([teams[0]!, teams[1]!], fixtures, results, { tiebreakers: tiebreakers("MLS") });
+    assert.deepEqual(
+      east.map((r) => [r.teamId, r.played, r.points]),
+      [[2, 2, 4], [1, 2, 3]],
+    );
+  });
+
   // Alpha and Bravo finish level on 6 points. Alpha has the better goal
   // difference, Bravo won the head-to-head.
   const levelOnPoints = games([

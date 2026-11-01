@@ -39,9 +39,10 @@ async function step(name, fn) {
     let initialPoints = 0;
     let simulatedOrder = [];
 
-    await step("home page lists the ten leagues", async () => {
+    await step("home page lists the nine featured leagues", async () => {
       await page.goto(`${BASE_URL}/en`);
-      assert.equal(await page.locator("main ul").first().locator("li").count(), 10);
+      const cards = (await page.locator("main ul").first().locator("li a > span > span:first-child").allInnerTexts()).map((x) => x.trim());
+      assert.deepEqual(cards, ["Premier League", "Championship", "La Liga", "Bundesliga", "Serie A", "Ligue 1", "Primeira Liga", "Brasileirão Série A", "MLS"]);
     });
 
     await step("league table renders 18 teams", async () => {
@@ -229,14 +230,38 @@ async function step(name, fn) {
       await ctx.close();
     });
 
-    await step("new leagues and shorter Série B name on the home page", async () => {
-      const p = await browser.newPage();
+    await step("Primeira Liga and Eredivisie pages; Série B and Eredivisie stay in the menu", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 800 } });
       for (const slug of ["primeira-liga", "eredivisie"]) {
         await p.goto(`${BASE_URL}/en/${slug}`);
         assert.equal(await p.locator('[data-testid="standings-row"]').count(), 18, slug);
       }
       await p.goto(`${BASE_URL}/pt`);
-      assert.match(await p.locator("main").innerText(), /Brasileiro Série B\s+20 times/);
+      const menu = p.locator('[data-testid="league-menu"]');
+      await menu.getByRole("button", { name: "Brasil" }).click();
+      assert.deepEqual((await menu.locator("#menu-br a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B"]);
+      await p.close();
+    });
+
+    await step("MLS: East/West conference tables, playoff zones and chances", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/mls`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.equal(await rows.count(), 15, "one conference at a time");
+      const zones = await rows.evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.deepEqual(zones.slice(0, 10), [...Array(7).fill("playoffs"), "playoffWildCard", "playoffWildCard", ""]);
+      const switcher = p.locator('[data-testid="group-switch"]');
+      const east = await rows.allInnerTexts();
+      await switcher.getByRole("button", { name: "Western Conference" }).click();
+      await p.waitForFunction((before) => document.querySelector('[data-testid="standings-row"]')?.textContent !== before, east[0]);
+      const west = await rows.allInnerTexts();
+      assert.equal(west.length, 15);
+      assert.ok(west.every((r) => !east.includes(r)), "different clubs in the West");
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="playoff-chance"]').first().waitFor({ timeout: 30000 });
+      assert.equal(await p.locator('[data-testid="playoff-chance"]').count(), 15);
+      assert.match(await p.locator("main").innerText(), /playoff and wild-card places/);
+      assert.doesNotMatch(await p.locator("main").innerText(), /relegation/i);
       await p.close();
     });
 
@@ -245,7 +270,7 @@ async function step(name, fn) {
       await desktop.goto(`${BASE_URL}/en`);
       const menu = desktop.locator('[data-testid="league-menu"]');
       const countries = (await menu.locator(":scope > li > button").allInnerTexts()).map((x) => x.trim());
-      assert.deepEqual(countries, ["Brazil", "England", "France", "Germany", "Italy", "Netherlands", "Portugal", "Spain"]);
+      assert.deepEqual(countries, ["Brazil", "England", "France", "Germany", "Italy", "Netherlands", "Portugal", "Spain", "USA"]);
       const overflow = await menu.evaluate((el) => el.scrollWidth - el.clientWidth);
       assert.equal(overflow, 0, "no horizontal scroll in the menu");
 
@@ -272,7 +297,7 @@ async function step(name, fn) {
       const panel = phone.locator('[data-testid="mobile-menu"]');
       await panel.waitFor();
       const headings = (await panel.locator(":scope > ul > li > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["brazil", "england", "france", "germany", "italy", "netherlands", "portugal", "spain"]);
+      assert.deepEqual(headings, ["brazil", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "usa"]);
       await phone.keyboard.press("Escape");
       await panel.waitFor({ state: "detached" });
       await burger.tap();

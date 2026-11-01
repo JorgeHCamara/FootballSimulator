@@ -24,6 +24,9 @@ function seoValues(league: LeagueConfig, locale: string, season: string) {
   return { simulator: league.simulatorName[lang], league: league.name, aka: league.aka[lang], season };
 }
 
+/** Leagues decided by playoffs rather than relegation and European places (MLS) get their own wording. */
+const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, league: slug } = await params;
   const league = getLeagueBySlug(slug);
@@ -32,7 +35,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const t = await getTranslations({ locale, namespace: "Metadata" });
   const values = seoValues(league, locale, season);
   const title = t("leagueTitle", values);
-  const description = t("leagueDescription", values);
+  const description = t(playoffWording(league) ? "leagueDescriptionPlayoffs" : "leagueDescription", values);
   return {
     title,
     description,
@@ -63,7 +66,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
     getTranslations("Metadata"),
   ]);
   const values = seoValues(league, locale, data.season);
-  const faq = (faqT.raw("league") as FaqItem[]).map((item) => ({ q: fill(item.q, values), a: fill(item.a, values) }));
+  const playoffs = playoffWording(league);
+  const faq = (faqT.raw(playoffs ? "leaguePlayoffs" : "league") as FaqItem[]).map((item) => ({ q: fill(item.q, values), a: fill(item.a, values) }));
   const pageUrl = `${SITE_URL}/${locale}/${league.slug}`;
   const lang = locale as SiteLocale;
 
@@ -75,7 +79,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
             "@type": "WebApplication",
             name: `${values.simulator} ${data.season}`,
             url: pageUrl,
-            description: meta("leagueDescription", values),
+            description: meta(playoffWording(league) ? "leagueDescriptionPlayoffs" : "leagueDescription", values),
             applicationCategory: "GameApplication",
             applicationSubCategory: "Sports simulation",
             operatingSystem: "Web",
@@ -110,7 +114,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
             {values.simulator} <span className="font-semibold text-zinc-500 dark:text-zinc-400">{data.season}</span>
           </span>
         </h1>
-        <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{seo("intro", values)}</p>
+        <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{seo(playoffs ? "introPlayoffs" : "intro", values)}</p>
         {data.source === "live" && <p className="text-xs text-zinc-500">{t("liveSource")}</p>}
       </header>
 
@@ -122,6 +126,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
         seasonKey={data.seasonKey}
         season={data.season}
         {...(data.postseason ? { postseason: data.postseason } : {})}
+        {...(data.groups ? { groups: data.groups } : {})}
       />
 
       <div className="grid gap-8 pt-8 lg:grid-cols-2">
@@ -131,7 +136,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
             {(["step1", "step2", "step3"] as const).map((step, i) => (
               <li key={step} className="flex gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pitch-600 text-xs font-bold text-white">{i + 1}</span>
-                <span className="pt-0.5">{seo(step)}</span>
+                <span className="pt-0.5">{seo(step === "step3" && playoffs ? "step3Playoffs" : step)}</span>
               </li>
             ))}
           </ol>

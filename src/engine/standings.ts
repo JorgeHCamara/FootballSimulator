@@ -41,29 +41,37 @@ function accumulate(matches: readonly PlayedMatch[], teamIds: Iterable<TeamId>):
   const totals = new Map<TeamId, Totals>();
   for (const id of teamIds) totals.set(id, emptyTotals());
   for (const m of matches) {
+    // A table can hold only some of the league's clubs (an MLS conference): a
+    // match against a club outside it still counts for the club inside.
     const h = totals.get(m.homeId);
     const a = totals.get(m.awayId);
-    if (!h || !a) continue;
-    h.played++;
-    a.played++;
-    h.goalsFor += m.home;
-    h.goalsAgainst += m.away;
-    a.goalsFor += m.away;
-    a.goalsAgainst += m.home;
-    a.awayGoalsFor += m.away;
-    if (m.home > m.away) {
-      h.won++;
-      h.points += 3;
-      a.lost++;
-    } else if (m.home < m.away) {
-      a.won++;
-      a.points += 3;
-      h.lost++;
-    } else {
-      h.drawn++;
-      a.drawn++;
-      h.points++;
-      a.points++;
+    if (!h && !a) continue;
+    if (h) {
+      h.played++;
+      h.goalsFor += m.home;
+      h.goalsAgainst += m.away;
+      if (m.home > m.away) {
+        h.won++;
+        h.points += 3;
+      } else if (m.home < m.away) h.lost++;
+      else {
+        h.drawn++;
+        h.points++;
+      }
+    }
+    if (a) {
+      a.played++;
+      a.goalsFor += m.away;
+      a.goalsAgainst += m.home;
+      a.awayGoalsFor += m.away;
+      if (m.away > m.home) {
+        a.won++;
+        a.points += 3;
+      } else if (m.away < m.home) a.lost++;
+      else {
+        a.drawn++;
+        a.points++;
+      }
     }
   }
   return totals;

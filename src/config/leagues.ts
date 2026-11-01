@@ -12,7 +12,9 @@ export type ZoneKind =
   | "promotion"
   | "promotionPlayoff"
   | "relegationPlayoff"
-  | "relegation";
+  | "relegation"
+  | "playoffs"
+  | "playoffWildCard";
 
 export interface Zone {
   kind: ZoneKind;
@@ -21,8 +23,8 @@ export interface Zone {
   to: number;
 }
 
-/** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B). */
-export type CompetitionCode = "PL" | "ELC" | "PD" | "BL1" | "SA" | "FL1" | "PPL" | "DED" | "BSA" | "BSB";
+/** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
+export type CompetitionCode = "PL" | "ELC" | "PD" | "BL1" | "SA" | "FL1" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -30,9 +32,22 @@ export interface EspnFeed {
   slug: string;
   /** "split" seasons run August–May (2026/27); "calendar" seasons run within one year. */
   seasons: "split" | "calendar";
+  /**
+   * Leagues without fixed rounds (MLS: unbalanced schedule, midweek games) list
+   * fixtures by calendar week instead of rebuilt rounds.
+   */
+  weeklyRounds?: boolean;
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br";
+/** A separate table within a league, e.g. an MLS conference. */
+export interface LeagueGroup {
+  id: string;
+  /** Matched against the group names in ESPN's standings feed. */
+  espnName: string;
+  name: Record<SiteLocale, string>;
+}
+
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -47,6 +62,10 @@ export interface LeagueConfig {
   /** How people also search for the league, e.g. "Campeonato Brasileiro". */
   aka: Record<SiteLocale, string>;
   teams: number;
+  /** League games per club; defaults to a double round robin, (teams − 1) × 2. */
+  gamesPerTeam?: number;
+  /** Separate tables (MLS conferences); zones then apply within each group. */
+  groups?: readonly LeagueGroup[];
   /**
    * Real data comes from ESPN and falls back to football-data.org (with `code`
    * as the competition code); leagues outside football-data.org's free tier set
@@ -285,7 +304,38 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "relegation", from: 17, to: 20 },
     ],
   },
+  {
+    code: "MLS",
+    slug: "mls",
+    name: "MLS",
+    country: "USA",
+    flag: "us",
+    simulatorName: { en: "MLS Simulator", pt: "Simulador da MLS", es: "Simulador de la MLS" },
+    aka: { en: "Major League Soccer", pt: "Major League Soccer", es: "Major League Soccer" },
+    teams: 30,
+    // Unbalanced schedule: 34 games each, more of them against the own conference.
+    gamesPerTeam: 34,
+    groups: [
+      { id: "east", espnName: "Eastern", name: { en: "Eastern Conference", pt: "Conferência Leste", es: "Conferencia Este" } },
+      { id: "west", espnName: "Western", name: { en: "Western Conference", pt: "Conferência Oeste", es: "Conferencia Oeste" } },
+    ],
+    // football-data.org's free tier doesn't include MLS.
+    espn: { slug: "usa.1", seasons: "calendar", weeklyRounds: true },
+    espnOnly: true,
+    // Official order continues with disciplinary points, which the feed doesn't have.
+    tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "awayGoalsFor"],
+    // Per conference: 1st–7th go straight to the MLS Cup playoffs, 8th v 9th play a wild-card match.
+    zones: [
+      { kind: "playoffs", from: 1, to: 7 },
+      { kind: "playoffWildCard", from: 8, to: 9 },
+    ],
+  },
 ];
+
+/** League games each club plays in a season. */
+export function gamesPerTeam(league: LeagueConfig): number {
+  return league.gamesPerTeam ?? (league.teams - 1) * 2;
+}
 
 export interface CountryGroup {
   /** English country name, also the translation key (Countries.<country>). */

@@ -2,9 +2,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Faq } from "../../components/Faq.tsx";
 import { Flag } from "../../components/Flag.tsx";
 import { JsonLd } from "../../components/JsonLd.tsx";
-import { LEAGUES, type SiteLocale } from "../../config/leagues.ts";
+import { LEAGUES, type CompetitionCode, type SiteLocale } from "../../config/leagues.ts";
 import { Link } from "../../i18n/navigation.ts";
 import { HREFLANG, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem } from "../../lib/site.ts";
+
+/** Leagues with a card on the home page; every league is still in the header menu and footer. */
+const HOME_LEAGUES: readonly CompetitionCode[] = ["PL", "ELC", "PD", "BL1", "SA", "FL1", "PPL", "BSA", "MLS"];
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -63,7 +66,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </section>
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {LEAGUES.map((l) => (
+        {HOME_LEAGUES.flatMap((code) => LEAGUES.filter((l) => l.code === code)).map((l) => (
           <li key={l.code}>
             <Link
               href={`/${l.slug}`}

@@ -53,6 +53,21 @@ function shapes(code: FlagCode) {
           <circle cx="12" cy="10" r="2.2" fill="#da291c" />
         </>
       );
+    case "us":
+      // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
+      return (
+        <>
+          <rect width="30" height="20" fill="#ffffff" />
+          <rect y="0.0" width="30" height="1.538" fill="#b22234" />
+          <rect y="3.077" width="30" height="1.538" fill="#b22234" />
+          <rect y="6.154" width="30" height="1.538" fill="#b22234" />
+          <rect y="9.231" width="30" height="1.538" fill="#b22234" />
+          <rect y="12.308" width="30" height="1.538" fill="#b22234" />
+          <rect y="15.385" width="30" height="1.538" fill="#b22234" />
+          <rect y="18.462" width="30" height="1.538" fill="#b22234" />
+          <rect width="12" height="10.77" fill="#3c3b6e" />
+        </>
+      );
     case "nl":
       return (
         <>

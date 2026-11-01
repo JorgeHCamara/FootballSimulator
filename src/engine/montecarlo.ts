@@ -13,17 +13,26 @@ export interface MonteCarloInput {
   standings: StandingsOptions;
   iterations: number;
   seed: number;
+  /**
+   * Separate tables within the league (MLS conferences): each run ranks every
+   * group on its own, and positions are within the team's group.
+   */
+  groups?: readonly (readonly TeamId[])[];
 }
 
 export interface MonteCarloResult {
   iterations: number;
-  /** positionCounts[teamId][p] = number of runs the team finished in position p+1. */
+  /** positionCounts[teamId][p] = number of runs the team finished in position p+1 (within its group, if any). */
   positionCounts: Record<TeamId, number[]>;
   averagePoints: Record<TeamId, number>;
 }
 
 export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
   const { teams, fixtures, fixed, model, standings, iterations } = input;
+  const byId = new Map(teams.map((t) => [t.id, t]));
+  const tables = input.groups?.length
+    ? input.groups.map((ids) => ids.flatMap((id) => byId.get(id) ?? []))
+    : [teams];
   const rng = createRng(input.seed);
   const remaining = fixtures
     .filter((f) => !fixed[f.id])
@@ -32,7 +41,8 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
   const positionCounts: Record<TeamId, number[]> = {};
   const pointsTotal: Record<TeamId, number> = {};
   for (const t of teams) {
-    positionCounts[t.id] = new Array<number>(teams.length).fill(0);
+    const size = tables.find((table) => table.includes(t))?.length ?? teams.length;
+    positionCounts[t.id] = new Array<number>(size).fill(0);
     pointsTotal[t.id] = 0;
   }
 
@@ -40,10 +50,11 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
   const results: ResultMap = { ...fixed };
   for (let i = 0; i < iterations; i++) {
     for (const r of remaining) results[r.id] = simulateScore(r.xg, rng);
-    const table = computeStandings(teams, fixtures, results, tableOptions);
-    for (const row of table) {
-      positionCounts[row.teamId]![row.position - 1]!++;
-      pointsTotal[row.teamId]! += row.points;
+    for (const group of tables) {
+      for (const row of computeStandings(group, fixtures, results, tableOptions)) {
+        positionCounts[row.teamId]![row.position - 1]!++;
+        pointsTotal[row.teamId]! += row.points;
+      }
     }
   }
 

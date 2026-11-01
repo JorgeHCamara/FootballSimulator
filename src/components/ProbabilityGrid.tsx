@@ -52,6 +52,11 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
   const format = useFormatter();
   const result = useMonteCarlo(input);
   const relegation = league.zones.find((z) => z.kind === "relegation");
+  // MLS: the chance of any playoff place, wild card included.
+  const playoffZones = league.zones.filter((z) => z.kind === "playoffs" || z.kind === "playoffWildCard");
+  const playoffs = playoffZones.length
+    ? { from: Math.min(...playoffZones.map((z) => z.from)), to: Math.max(...playoffZones.map((z) => z.to)) }
+    : undefined;
   const positions = Array.from({ length: rows.length }, (_, i) => i + 1);
   const pct = (p: number) => (p === 0 ? "–" : p < 0.001 ? "<0.1%" : format.number(p, { style: "percent", maximumFractionDigits: p < 0.1 ? 1 : 0 }));
 
@@ -74,7 +79,9 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
             <tr>
               <th className="py-2 pl-3 text-left">{t("team")}</th>
               <th className="px-2 text-right">{t("averagePoints")}</th>
-              <th className="px-2 text-right">{t("titleChance")}</th>
+              {/* In a league of separate tables, 1st in a conference isn't the title. */}
+              <th className="px-2 text-right">{league.groups ? t("firstPlaceChance") : t("titleChance")}</th>
+              {playoffs && <th className="px-2 text-right">{t("playoffChance")}</th>}
               {relegation && <th className="px-2 text-right">{t("relegationChance")}</th>}
               <th className="hidden pr-3 pl-4 text-left md:table-cell">{t("positionHeatmap")}</th>
             </tr>
@@ -95,6 +102,11 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                   <td className="px-2 text-right font-semibold tabular-nums" data-testid="title-chance">
                     {pct(probabilityInRange(result, row.teamId, 1, 1))}
                   </td>
+                  {playoffs && (
+                    <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="playoff-chance">
+                      {pct(probabilityInRange(result, row.teamId, playoffs.from, playoffs.to))}
+                    </td>
+                  )}
                   {relegation && (
                     <td className="px-2 text-right tabular-nums text-red-600 dark:text-red-400">
                       {pct(probabilityInRange(result, row.teamId, relegation.from, relegation.to))}

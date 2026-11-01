@@ -1,9 +1,10 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Fútbol – Simula LaLiga, Premier League, Brasileirão y más",
-    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie y Brasileirão. Clasificación en directo y probabilidades de título, Europa y descenso.",
+    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie, Brasileirão y MLS. Clasificación en directo y probabilidades de título, Europa y descenso.",
     "leagueTitle": "{simulator} {season} – Predice la Clasificación",
     "leagueDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Europa y descenso.",
+    "leagueDescriptionPlayoffs": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira las clasificaciones de las conferencias en directo y las probabilidades de cada equipo de llegar a los playoffs.",
     "ogTagline": "Pronósticos · Simula la temporada · Probabilidades de título y descenso"
   },
   "Nav": {
@@ -26,7 +27,7 @@
     "heading": "Simulador de Fútbol",
     "tagline": "Simula la temporada antes de que ocurra",
     "aboutTitle": "Un simulador de fútbol gratis para las mejores ligas",
-    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie y Brasileirão Série A y B. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
+    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie, Brasileirão Série A y B y MLS. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
   },
   "Simulator": {
     "table": "Clasificación",
@@ -66,6 +67,8 @@
     "basedOn": "Basado en {count} temporadas simuladas desde la clasificación actual, incluidos tus pronósticos.",
     "averagePoints": "Pts med.",
     "titleChance": "Título",
+    "firstPlaceChance": "1.er puesto",
+    "playoffChance": "Playoffs",
     "relegationChance": "Descenso",
     "positionHeatmap": "Probabilidad de cada posición final",
     "replacedNotice": "{count, plural, one {# pronóstico fue sustituido} other {# pronósticos fueron sustituidos}} por resultados reales.",
@@ -89,7 +92,8 @@
     "playoffOnPenalties": "{winner} gana {wp}–{lp} en los penaltis.",
     "playoffAdvances": "{winner} pasa de ronda.",
     "playoffPromoted": "{winner} asciende a la {promotedTo}.",
-    "penalties": "Penaltis"
+    "penalties": "Penaltis",
+    "conference": "Conferencia"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -102,7 +106,9 @@
     "promotion": "Ascenso",
     "promotionPlayoff": "Playoff de ascenso",
     "relegationPlayoff": "Promoción de descenso",
-    "relegation": "Descenso"
+    "relegation": "Descenso",
+    "playoffs": "Playoffs de la MLS Cup",
+    "playoffWildCard": "Comodín (wild card)"
   },
   "Footer": {
     "attribution": "Datos: football-data.org",
@@ -114,10 +120,12 @@
   },
   "Seo": {
     "intro": "Usa el {simulator} para predecir el resto de la temporada {season} ({aka}). Escribe tus marcadores o simula los partidos restantes: la clasificación se actualiza al instante con los desempates oficiales y las zonas de clasificación y descenso.",
+    "introPlayoffs": "Usa el {simulator} para predecir el resto de la temporada {season} ({aka}). Escribe tus marcadores o simula los partidos restantes: las clasificaciones de las conferencias Este y Oeste se actualizan al instante con los desempates oficiales y las plazas de playoffs y comodín.",
     "howTitle": "Cómo funciona el {simulator}",
     "step1": "Elige una jornada y escribe el marcador de cada partido, o usa el dado para simularlo.",
     "step2": "Pulsa Simular jornada o Simular resto de temporada para jugar los partidos restantes con un clic.",
     "step3": "Abre la pestaña Probabilidades para ver las opciones de cada equipo de título, Europa y descenso.",
+    "step3Playoffs": "Abre la pestaña Probabilidades para ver las opciones de cada equipo de terminar primero en su conferencia y de llegar a los playoffs.",
     "faqTitle": "Preguntas frecuentes",
     "otherLeagues": "Otros simuladores de ligas",
     "breadcrumbHome": "Simulador de Fútbol"
@@ -145,6 +153,28 @@
         "a": "Sí. Foot Simu es totalmente gratis y no necesitas cuenta."
       }
     ],
+    "leaguePlayoffs": [
+      {
+        "q": "¿Cómo funciona el {simulator}?",
+        "a": "Empieza con la clasificación y los partidos reales de la temporada {season}. Escribe el marcador de cualquier partido restante o pulsa Simular: cada resultado sigue el ataque y la defensa que cada equipo ha mostrado esta temporada, con ventaja de local. La clasificación se actualiza al instante con los desempates oficiales."
+      },
+      {
+        "q": "¿Cómo se calculan las probabilidades de playoffs?",
+        "a": "La pestaña Probabilidades juega el resto de la temporada 10.000 veces desde la clasificación actual, incluidos tus pronósticos, y cuenta cuántas veces termina cada equipo en cada posición."
+      },
+      {
+        "q": "¿Se guardan mis pronósticos?",
+        "a": "Sí. Tus pronósticos se guardan en tu navegador y siguen ahí cuando vuelvas. Usa Compartir para enviar un enlace con tu clasificación."
+      },
+      {
+        "q": "¿Puedo cambiar resultados de partidos ya jugados?",
+        "a": "Sí. Haz clic en un marcador final para cambiarlo y ver cómo quedaría la clasificación con otro resultado."
+      },
+      {
+        "q": "¿Foot Simu es gratis?",
+        "a": "Sí. Foot Simu es totalmente gratis y no necesitas cuenta."
+      }
+    ],
     "home": [
       {
         "q": "¿Qué es Foot Simu?",
@@ -152,7 +182,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie y Brasileirão Série A y Série B, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie, Brasileirão Série A y Série B y MLS, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",
@@ -172,6 +202,7 @@
     "France": "Francia",
     "Portugal": "Portugal",
     "Netherlands": "Países Bajos",
-    "Brazil": "Brasil"
+    "Brazil": "Brasil",
+    "USA": "EE. UU."
   }
 }

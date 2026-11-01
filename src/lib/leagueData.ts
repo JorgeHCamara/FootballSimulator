@@ -1,7 +1,7 @@
-import type { LeagueConfig } from "../config/leagues.ts";
+import { gamesPerTeam, type LeagueConfig } from "../config/leagues.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
-import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnSeason } from "./espn.ts";
+import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnGroups, fetchEspnSeason } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
 
@@ -15,6 +15,8 @@ export interface LeagueData {
   source: "live" | "sample";
   /** Real post-season games (e.g. play-off legs) once the feed lists them. */
   postseason?: Fixture[];
+  /** Clubs of each separate table (MLS conferences), in the league config's group order. */
+  groups?: { id: string; teamIds: number[] }[];
 }
 
 /** Server responses are cached for an hour, well inside the free tier's rate limit. */
@@ -75,17 +77,25 @@ function currentSeasonYear(league: LeagueConfig, now = new Date()): number {
  * season is shown.
  */
 async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
-  const { slug, seasons } = league.espn;
+  const { slug, seasons, weeklyRounds } = league.espn;
   const init = { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
+  const perTeam = gamesPerTeam(league);
   const current = currentSeasonYear(league);
   for (const year of [current, current - 1]) {
-    const all = await fetchEspnSeason(slug, year, seasons, init);
+    let all = await fetchEspnSeason(slug, year, seasons, init);
+    const groups = league.groups ? await loadEspnGroups(league, year, init) : undefined;
+    if (groups) {
+      // Only games between member clubs: drops exhibitions such as the MLS All-Star game.
+      const members = new Set(groups.flatMap((g) => g.teamIds));
+      const isMember = (id: string | undefined) => members.has(Number(id));
+      all = all.filter((e) => (e.competitions[0]?.competitors ?? []).every((c) => isMember(c.team.id)));
+    }
     // Games after a club's full league schedule are post-season (play-offs);
     // they feed the play-off bracket, or are left out when the site has none.
-    const { league: events, postseason } = espnSplitSeason(all, (league.teams - 1) * 2);
-    const fixtures = espnFixtures(events, (league.teams - 1) * 2);
-    // A season has teams × (teams − 1) games; skip a year until at least half are published.
-    if (fixtures.length < (league.teams * (league.teams - 1)) / 2) continue;
+    const { league: events, postseason } = espnSplitSeason(all, perTeam);
+    const fixtures = espnFixtures(events, weeklyRounds ? { weekly: true } : { roundCount: perTeam });
+    // Skip a year until at least half of its games are published.
+    if (fixtures.length < (league.teams * perTeam) / 4) continue;
     const label = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
     return {
       teams: applyTeamOverrides(espnTeams(events), { league: league.code }),
@@ -96,20 +106,35 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       seasonKey: league.espnOnly ? `${league.code}:${year}` : `${league.code}:espn:${year}`,
       source: "live",
       ...(league.playoff && postseason.length ? { postseason: espnFixtures(postseason) } : {}),
+      ...(groups ? { groups } : {}),
     };
   }
   throw new Error(`No ${league.code} fixtures on ESPN for ${current} or ${current - 1}`);
 }
 
+/** The league's groups (conferences) with their clubs, matched to the config by ESPN's group names. */
+async function loadEspnGroups(league: LeagueConfig, year: number, init: RequestInit) {
+  const espnGroups = await fetchEspnGroups(league.espn.slug, year, init);
+  return league.groups!.map((group) => {
+    const found = espnGroups.find((g) => g.name.includes(group.espnName));
+    if (!found || found.teamIds.length === 0) throw new Error(`${league.code}: no "${group.espnName}" group in ESPN standings for ${year}`);
+    return { id: group.id, teamIds: found.teamIds };
+  });
+}
+
 function loadSample(league: LeagueConfig): LeagueData {
   const { teams, fixtures } = sampleLeague(league);
   const year = new Date().getUTCFullYear();
+  // Sample groups: the clubs split evenly, in order.
+  const size = league.groups ? Math.ceil(teams.length / league.groups.length) : 0;
+  const groups = league.groups?.map((g, i) => ({ id: g.id, teamIds: teams.slice(i * size, (i + 1) * size).map((t) => t.id) }));
   return {
     teams,
     fixtures,
     season: `${year}`,
     seasonKey: `${league.code}:sample`,
     source: "sample",
+    ...(groups ? { groups } : {}),
   };
 }
 

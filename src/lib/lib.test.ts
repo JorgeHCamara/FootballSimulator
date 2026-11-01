@@ -6,7 +6,7 @@ import { doubleRoundRobin } from "../engine/schedule.ts";
 import type { ResultMap } from "../engine/types.ts";
 import { mapMatches, mapTeam, request, seasonOf, teamsFromMatches, type ApiMatch } from "./footballData.ts";
 import { decodeResults, encodeResults } from "./shareCodec.ts";
-import { assignRounds, espnFixtures, espnSplitSeason, espnTeams, fetchEspnSeason, type EspnEvent } from "./espn.ts";
+import { assignRounds, espnFixtures, espnSplitSeason, espnTeams, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 
 describe("shareCodec", () => {
   const fixtures = doubleRoundRobin(Array.from({ length: 20 }, (_, i) => i + 1)).map((f) => ({
@@ -296,6 +296,38 @@ describe("ESPN feed mapping", () => {
       assert.deepEqual(events.map((e) => e.id).sort(), ["2", "3"]);
       assert.equal(urls.length, 2);
       assert.ok(urls.every((u) => u.includes("/eng.1/scoreboard")));
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
+  it("groups a league without fixed rounds by calendar week, skipping empty weeks", () => {
+    const weekly = [
+      game("1", "2026-02-21T19:00Z", A, B, later), // Saturday, week 1
+      game("2", "2026-02-25T23:00Z", C, D, later), // Wednesday, week 2
+      game("3", "2026-03-01T19:00Z", A, C, later), // Sunday, still week 2
+      game("4", "2026-03-30T19:00Z", B, D, later), // Monday five weeks on: week 3
+    ];
+    const round = Object.fromEntries(espnFixtures(weekly, { weekly: true }).map((f) => [f.id, f.matchday]));
+    assert.deepEqual(round, { 1: 1, 2: 2, 3: 2, 4: 3 });
+  });
+
+  it("reads conferences from ESPN's standings feed", async () => {
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (async () =>
+      new Response(
+        JSON.stringify({
+          children: [
+            { name: "Eastern Conference", standings: { entries: [{ team: { id: "182" } }, { team: { id: "183" } }] } },
+            { name: "Western Conference", standings: { entries: [{ team: { id: "184" } }] } },
+          ],
+        }),
+      )) as typeof fetch;
+    try {
+      assert.deepEqual(await fetchEspnGroups("usa.1", 2026), [
+        { name: "Eastern Conference", teamIds: [182, 183] },
+        { name: "Western Conference", teamIds: [184] },
+      ]);
     } finally {
       globalThis.fetch = realFetch;
     }
