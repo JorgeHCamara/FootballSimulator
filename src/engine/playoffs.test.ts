@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { getLeagueByCode } from "../config/leagues.ts";
 import { createRng } from "./rng.ts";
 import {
   PLAYOFF_ID_BASE,
@@ -12,6 +13,7 @@ import {
   simulatePlayoff,
   tieOutcome,
   type PlayoffConfig,
+  type PlayoffTie,
 } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
 import type { Fixture, ResultMap, StandingRow } from "./types.ts";
@@ -267,3 +269,21 @@ const mlsModel: LeagueModel = {
   avgAwayGoals: 1.2,
   strengths: new Map([...Array(15).keys()].flatMap((i) => [[201 + i, { attack: 1, defence: 1 }], [301 + i, { attack: 1, defence: 1 }]] as const)),
 };
+
+describe("League Two play-off (4th–7th, three promoted directly)", () => {
+  const leagueTwo = getLeagueByCode("EL2")!.playoff!;
+
+  it("pairs 4th v 7th and 5th v 6th, with a Wembley final", () => {
+    const [semis, [final]] = buildBracket(rows, leagueTwo, {}, options) as [PlayoffTie[], PlayoffTie[]];
+    assert.deepEqual(semis.map((t) => [t.higher.teamId, t.lower.teamId]), [[104, 107], [105, 106]]);
+    assert.equal(final!.config.venue, "Wembley");
+  });
+
+  it("promotes four clubs: 1st–3rd plus the play-off winner", () => {
+    const results = simulatePlayoff(rows, leagueTwo, {}, model, createRng(5), options);
+    const [winner] = playoffWinners(buildBracket(rows, leagueTwo, results, options), results);
+    assert.ok(winner !== null && [104, 105, 106, 107].includes(winner!));
+    assert.deepEqual(leagueTwo.directPromotion, [1, 2, 3]);
+    assert.equal(leagueTwo.promotedTo, "League One");
+  });
+});

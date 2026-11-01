@@ -24,7 +24,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "PD" | "BL1" | "SA" | "FL1" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "BL1" | "SA" | "FL1" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -133,6 +133,62 @@ export const LEAGUES: readonly LeagueConfig[] = [
       directPromotion: [1, 2],
       promotedTo: "Premier League",
     },
+  },
+  {
+    code: "EL1",
+    slug: "league-one",
+    name: "League One",
+    country: "England",
+    flag: "gb-eng",
+    simulatorName: { en: "League One Simulator", pt: "Simulador da League One", es: "Simulador de la League One" },
+    aka: { en: "EFL League One", pt: "Terceira divisão inglesa", es: "Tercera división inglesa" },
+    teams: 24,
+    // football-data.org's free tier doesn't include League One.
+    espn: { slug: "eng.3", seasons: "split" },
+    espnOnly: true,
+    // 2026/27: 1st and 2nd go up; 3rd–6th play two-legged semi-finals (3v6, 4v5) and a Wembley final.
+    playoff: {
+      rounds: [
+        { key: "semiFinals", legs: 2, levelTie: "penalties", pairs: [[3, 6], [4, 5]] },
+        { key: "final", legs: 1, levelTie: "penalties", venue: "Wembley" },
+      ],
+      directPromotion: [1, 2],
+      promotedTo: "Championship",
+    },
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadAwayGoalsFor"],
+    zones: [
+      { kind: "promotion", from: 1, to: 2 },
+      { kind: "promotionPlayoff", from: 3, to: 6 },
+      { kind: "relegation", from: 21, to: 24 },
+    ],
+  },
+  {
+    code: "EL2",
+    slug: "league-two",
+    name: "League Two",
+    country: "England",
+    flag: "gb-eng",
+    simulatorName: { en: "League Two Simulator", pt: "Simulador da League Two", es: "Simulador de la League Two" },
+    aka: { en: "EFL League Two", pt: "Quarta divisão inglesa", es: "Cuarta división inglesa" },
+    teams: 24,
+    // football-data.org's free tier doesn't include League Two.
+    espn: { slug: "eng.4", seasons: "split" },
+    espnOnly: true,
+    // 2026/27: 1st–3rd go up; 4th–7th play two-legged semi-finals (4v7, 5v6) and a Wembley final; 23rd and 24th drop to the National League.
+    playoff: {
+      rounds: [
+        { key: "semiFinals", legs: 2, levelTie: "penalties", pairs: [[4, 7], [5, 6]] },
+        { key: "final", legs: 1, levelTie: "penalties", venue: "Wembley" },
+      ],
+      directPromotion: [1, 2, 3],
+      promotedTo: "League One",
+    },
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadAwayGoalsFor"],
+    zones: [
+      { kind: "promotion", from: 1, to: 3 },
+      { kind: "promotionPlayoff", from: 4, to: 7 },
+      { kind: "relegation", from: 23, to: 24 },
+    ],
   },
   {
     code: "PD",

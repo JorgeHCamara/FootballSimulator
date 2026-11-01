@@ -243,6 +243,27 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("League One and League Two: 24 clubs, zones and play-offs", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const expected = {
+        "league-one": { promotion: [1, 2], promotionPlayoff: [3, 6], relegation: [21, 24], semi: /3rd place × 6th place/ },
+        "league-two": { promotion: [1, 3], promotionPlayoff: [4, 7], relegation: [23, 24], semi: /4th place × 7th place/ },
+      };
+      for (const [slug, zones] of Object.entries(expected)) {
+        await p.goto(`${BASE_URL}/en/${slug}`);
+        const kinds = await p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
+        assert.equal(kinds.length, 24, slug);
+        for (const kind of ["promotion", "promotionPlayoff", "relegation"]) {
+          const [from, to] = zones[kind];
+          const at = kinds.flatMap((k, i) => (k === kind ? [i + 1] : []));
+          assert.deepEqual([at[0], at.at(-1), at.length], [from, to, to - from + 1], `${slug} ${kind}`);
+        }
+        await p.locator('[data-testid="matchday-select"]').selectOption("-1");
+        assert.match(await p.locator('[data-testid="playoff"]').innerText(), zones.semi, slug);
+      }
+      await p.close();
+    });
+
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/mls`);
@@ -316,7 +337,7 @@ async function step(name, fn) {
       await menu.getByRole("button", { name: "England" }).hover();
       const england = menu.locator("#menu-gb-eng");
       await england.waitFor();
-      assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship"]);
+      assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship", "League One", "League Two"]);
       await england.getByRole("link", { name: "Championship" }).click();
       await desktop.waitForURL(/\/en\/championship$/);
       await desktop.close();

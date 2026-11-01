@@ -173,6 +173,9 @@ export const TEAM_OVERRIDES: readonly TeamOverride[] = [
   { match: "Burnley FC", name: "Burnley", shortName: "Burnley" },
   { match: "Derby County FC", name: "Derby County", shortName: "Derby County" },
   { match: "Preston North End FC", name: "Preston North End", shortName: "Preston" },
+  // League One and League Two (names from ESPN; unscoped, clubs move between divisions)
+  { match: "Milton Keynes Dons", name: "MK Dons", shortName: "MK Dons" },
+  { match: "Sheffield Wednesday", name: "Sheffield Wednesday", shortName: "Sheffield Wed" },
   // Primeira Liga
   { match: "FC Porto", league: "PPL", name: "Porto", shortName: "Porto" },
   { match: "Sport Lisboa e Benfica", league: "PPL", name: "Benfica", shortName: "Benfica" },

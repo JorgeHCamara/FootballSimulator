@@ -26,7 +26,11 @@ export function PromotedClubs({ bracket, rows, teams, predictions, seasonComplet
           ...directPromotion
             .map((position) => rows.find((r) => r.position === position))
             .filter((r): r is StandingRow => r !== undefined)
-            .map((r) => ({ teamId: r.teamId, label: r.position === 1 ? t("promotedChampion") : t("promotedRunnerUp") })),
+            .map((r) => ({
+              teamId: r.teamId,
+              label:
+                r.position === 1 ? t("promotedChampion") : r.position === 2 ? t("promotedRunnerUp") : t("playoffPlace", { position: r.position }),
+            })),
           ...winners.map((teamId) => ({ teamId: teamId!, label: t("promotedPlayoff") })),
         ]
       : null;
