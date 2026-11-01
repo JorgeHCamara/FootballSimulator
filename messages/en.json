@@ -9,7 +9,9 @@
   "Nav": {
     "home": "Home",
     "language": "Language",
-    "leagues": "Leagues"
+    "leagues": "Leagues",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "Home": {
     "subheading": "Pick a league, enter your predictions or let the simulator play the remaining matches, and watch the table change live.",

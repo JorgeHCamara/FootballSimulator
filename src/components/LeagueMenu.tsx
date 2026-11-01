@@ -8,15 +8,22 @@ import { Flag } from "./Flag.tsx";
 
 const CLOSE_DELAY_MS = 150;
 
+/** Countries with their leagues, alphabetical in the current language. */
+export function useCountryGroups() {
+  const t = useTranslations("Countries");
+  const locale = useLocale();
+  return useMemo(() => countries().sort((a, b) => t(a.country).localeCompare(t(b.country), locale)), [t, locale]);
+}
+
 /**
  * Header menu: one entry per country (alphabetical in the current language),
  * each opening a submenu with that country's leagues. Opens on mouse hover, or
  * on click/tap/Enter; closes on leaving, Esc, an outside click or choosing a league.
+ * Shown on wide screens; phones and small tablets use MobileMenu instead.
  */
 export function LeagueMenu() {
   const t = useTranslations("Countries");
   const nav = useTranslations("Nav");
-  const locale = useLocale();
   const pathname = usePathname();
   const [open, setOpen] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -24,10 +31,7 @@ export function LeagueMenu() {
   const openedByHover = useRef(false);
   const menuRef = useRef<HTMLUListElement>(null);
 
-  const groups = useMemo(
-    () => countries().sort((a, b) => t(a.country).localeCompare(t(b.country), locale)),
-    [t, locale],
-  );
+  const groups = useCountryGroups();
 
   const cancelClose = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -57,7 +61,7 @@ export function LeagueMenu() {
   useEffect(() => setOpen(null), [pathname]);
 
   return (
-    <nav aria-label={nav("leagues")} className="border-t border-white/10 bg-pitch-900/40">
+    <nav aria-label={nav("leagues")} className="hidden border-t border-white/10 bg-pitch-900/40 lg:block">
       <ul ref={menuRef} className="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-1 gap-y-0.5 px-2 py-1.5 text-sm" data-testid="league-menu">
         {groups.map((group, i) => {
           const isOpen = open === group.country;

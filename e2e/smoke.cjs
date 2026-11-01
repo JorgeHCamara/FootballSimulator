@@ -266,12 +266,19 @@ async function step(name, fn) {
 
       const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })).newPage();
       await phone.goto(`${BASE_URL}/en`);
-      await phone.locator('[data-testid="league-menu"]').getByRole("button", { name: "Brazil" }).tap();
-      const brazil = phone.locator("#menu-br");
-      await brazil.waitFor();
-      assert.deepEqual((await brazil.locator("a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B"]);
+      assert.equal(await phone.locator('[data-testid="league-menu"]').isVisible(), false, "country bar hidden on phones");
+      const burger = phone.locator('[data-testid="mobile-menu-button"]');
+      await burger.tap();
+      const panel = phone.locator('[data-testid="mobile-menu"]');
+      await panel.waitFor();
+      const headings = (await panel.locator(":scope > ul > li > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
+      assert.deepEqual(headings, ["brazil", "england", "france", "germany", "italy", "netherlands", "portugal", "spain"]);
       await phone.keyboard.press("Escape");
-      await brazil.waitFor({ state: "detached" });
+      await panel.waitFor({ state: "detached" });
+      await burger.tap();
+      await panel.getByRole("link", { name: "Brasileirão Série B" }).tap();
+      await phone.waitForURL(/\/en\/brasileirao-serie-b$/);
+      await panel.waitFor({ state: "detached" });
       assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, "no horizontal page scroll");
       await phone.context().close();
     });

@@ -9,7 +9,9 @@
   "Nav": {
     "home": "Inicio",
     "language": "Idioma",
-    "leagues": "Ligas"
+    "leagues": "Ligas",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
   },
   "Home": {
     "subheading": "Elige una liga, escribe tus pronósticos o deja que el simulador juegue los partidos restantes, y mira cómo cambia la clasificación en directo.",

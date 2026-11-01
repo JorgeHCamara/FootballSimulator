@@ -9,7 +9,9 @@
   "Nav": {
     "home": "Início",
     "language": "Idioma",
-    "leagues": "Campeonatos"
+    "leagues": "Campeonatos",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu"
   },
   "Home": {
     "subheading": "Escolha um campeonato, digite seus palpites ou deixe o simulador jogar as partidas restantes, e veja a tabela mudar ao vivo.",
