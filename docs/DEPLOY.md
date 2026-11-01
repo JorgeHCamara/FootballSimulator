@@ -59,10 +59,16 @@ Redeploy after changing variables: **Deployments → … → Redeploy**.
 
 ## 7. Google Search Console
 
+footsimu.com is verified as a **URL prefix** property (`https://footsimu.com`) with the **HTML tag** method, and its sitemap is submitted.
+
+- The verification code is in `src/lib/site.ts` (`GOOGLE_SITE_VERIFICATION`) and is added to every page. **Don't remove it**: Google re-checks the tag and the property would lose its verification.
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` is only needed to override it, for example when deploying to another domain.
+
+To set it up again from scratch:
+
 1. Go to https://search.google.com/search-console → **Add property** → **URL prefix** → `https://footsimu.com`.
-2. Choose the **HTML tag** method. Copy only the `content="…"` value into `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, then redeploy.
+2. Choose the **HTML tag** method and put the `content="…"` value in `GOOGLE_SITE_VERIFICATION` (or the env var), then deploy.
 3. Click **Verify**, then open **Sitemaps** and submit `https://footsimu.com/sitemap.xml`.
-   - Alternative: add a **Domain** property for `footsimu.com` instead, verified with a DNS TXT record at your registrar. It covers www and needs no redeploy.
 4. Speed up the first crawl: **URL Inspection** → paste `https://footsimu.com/pt` → **Request indexing**. Repeat for `/en`, `/pt/brasileirao` and `/en/premier-league`.
 5. Expect brand searches ("foot simu") to show the site within days of indexing, league searches ("simulador série b") within weeks, and broad terms ("football simulator") only over time and with links from other sites. Search Console's **Pages** and **Performance** reports show the progress.
 6. Optional: do the same in [Bing Webmaster Tools](https://www.bing.com/webmasters), which can import directly from Search Console.
