@@ -4,6 +4,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import type { CupConfig } from "../config/cups.ts";
 import type { CompetitionCode } from "../config/leagues.ts";
 import { needsShootout, tieWinner, type CupRound, type CupTie } from "../engine/cup.ts";
+import { useEffect, useState } from "react";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { CupBracket } from "./CupBracket.tsx";
 import { MatchRow } from "./FixtureList.tsx";
@@ -29,7 +30,6 @@ export function useDivisionTag(divisions: Record<TeamId, CompetitionCode>) {
 
 /** One tie as a card: the game, its shoot-out when level, the winner in bold. */
 export function TieCard({ tie, teams, predictions, divisions, onScore, onSimulate, compact = false }: Omit<CupViewProps, "cup" | "rounds"> & { tie: CupTie; compact?: boolean }) {
-  const t = useTranslations("Simulator");
   const tag = useDivisionTag(divisions);
   const winner = tieWinner(tie, predictions);
   const pens = needsShootout(tie, predictions) || predictions[tie.shootout.id] !== undefined;
@@ -38,7 +38,7 @@ export function TieCard({ tie, teams, predictions, divisions, onScore, onSimulat
   if (!home || !away) return null;
   return (
     <ul
-      className={`rounded-xl border bg-white dark:bg-zinc-900 ${winner !== null ? "border-pitch-300 dark:border-pitch-800" : "border-zinc-200 dark:border-zinc-800"} ${compact ? "text-sm" : ""}`}
+      className={`flex h-full flex-col rounded-xl border bg-white dark:bg-zinc-900 ${winner !== null ? "border-pitch-300 dark:border-pitch-900" : "border-zinc-200 dark:border-zinc-800"} ${compact ? "text-sm" : ""}`}
       data-testid="cup-tie"
       data-round={tie.round}
       data-home={tie.homeId}
@@ -53,23 +53,70 @@ export function TieCard({ tie, teams, predictions, divisions, onScore, onSimulat
         {...(compact ? {} : { tags: { home: tag(tie.homeId), away: tag(tie.awayId) } })}
         winner={winner}
         joinsNext={pens}
+        inlineDice
         onScore={(score) => onScore(tie.game, score)}
         onSimulate={() => onSimulate(tie.game)}
       />
       {pens && (
-        <MatchRow
+        <ShootoutLine
           fixture={tie.shootout}
-          home={home}
-          away={away}
           prediction={predictions[tie.shootout.id]}
-          label={t("penalties")}
-          attached
-          winner={winner}
           onScore={(score) => onScore(tie.shootout, score)}
           onSimulate={() => onSimulate(tie.shootout)}
         />
       )}
     </ul>
+  );
+}
+
+/**
+ * A level game's penalty shoot-out, as one compact line under the score
+ * (small boxes aligned with the score above) so a card with penalties is
+ * only slightly taller than its neighbours.
+ */
+function ShootoutLine({ fixture, prediction, onScore, onSimulate }: { fixture: Fixture; prediction: Score | undefined; onScore: (score: Score | null) => void; onSimulate: () => void }) {
+  const t = useTranslations("Simulator");
+  const shown = prediction ?? fixture.result ?? null;
+  const locked = fixture.result !== null && prediction === undefined;
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState({ home: shown ? String(shown.home) : "", away: shown ? String(shown.away) : "" });
+  useEffect(() => {
+    setDraft({ home: shown ? String(shown.home) : "", away: shown ? String(shown.away) : "" });
+  }, [shown?.home, shown?.away]); // eslint-disable-line react-hooks/exhaustive-deps
+  const update = (side: "home" | "away", value: string) => {
+    const next = { ...draft, [side]: value.replace(/\D/g, "").slice(0, 2) };
+    setDraft(next);
+    const ok = (x: string) => /^\d{1,2}$/.test(x);
+    if (ok(next.home) && ok(next.away)) onScore({ home: Number(next.home), away: Number(next.away) });
+    else if (next.home === "" && next.away === "" && prediction) onScore(null);
+  };
+  const box = `h-7 w-8 rounded-md border text-center text-sm font-bold tabular-nums outline-none focus:border-pitch-500 focus:ring-2 focus:ring-pitch-500/30 ${
+    prediction ? "border-pitch-500/60 bg-pitch-50 dark:bg-pitch-900/40" : "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950"
+  }`;
+  return (
+    <li className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 pb-2.5" data-testid="shootout-line" data-fixture={fixture.id}>
+      <span className="text-right text-[11px] font-semibold uppercase tracking-wide text-zinc-500">{t("penalties")}</span>
+      <span className="flex items-center gap-1">
+        {locked && !editing ? (
+          <button type="button" title={t("editResult")} onClick={() => setEditing(true)} className="flex h-7 items-center gap-1 rounded-md bg-zinc-100 px-2.5 text-sm font-bold tabular-nums dark:bg-zinc-800">
+            {shown!.home} <span className="text-zinc-400">–</span> {shown!.away}
+          </button>
+        ) : (
+          <>
+            <input type="number" inputMode="numeric" min={0} max={99} aria-label={t("penalties")} className={box} value={draft.home} onChange={(e) => update("home", e.target.value)} />
+            <span className="text-zinc-400">–</span>
+            <input type="number" inputMode="numeric" min={0} max={99} aria-label={t("penalties")} className={box} value={draft.away} onChange={(e) => update("away", e.target.value)} />
+          </>
+        )}
+      </span>
+      <span>
+        {!(locked && !editing) && (
+          <button type="button" onClick={onSimulate} title={t("simulateMatch")} aria-label={t("simulateMatch")} className="rounded-md px-1 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800">
+            🎲
+          </button>
+        )}
+      </span>
+    </li>
   );
 }
 
@@ -137,7 +184,7 @@ export function CupRounds(props: RoundsProps) {
       ) : round.drawn === "pending" && round.ties.length === 0 ? (
         <PendingRound cup={cup} round={round} rounds={rounds} />
       ) : (
-        <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3" data-testid="round-grid">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" data-testid="round-grid">
           {round.ties.map((tie) => (
             <TieCard key={tie.game.id} tie={tie} {...props} />
           ))}

@@ -290,6 +290,8 @@ interface RowProps {
   tags?: { home?: string; away?: string };
   /** Decided knockout game: the winner's name is bold, the loser's dimmed. */
   winner?: TeamId | null;
+  /** The dice sits in the date line instead of its own line below (cup cards). */
+  inlineDice?: boolean;
   fixture: Fixture;
   home: Team;
   away: Team;
@@ -298,12 +300,15 @@ interface RowProps {
   onSimulate: () => void;
 }
 
+/** Same rule as MatchRow's `showInputs`: no real result, a prediction, or being edited. */
+const showInputsFor = (fixture: Fixture, prediction: Score | undefined, editing: boolean) => !(fixture.result !== null && prediction === undefined) || editing;
+
 function parseGoals(text: string): number | null {
   if (!/^\d{1,2}$/.test(text)) return null;
   return Number(text);
 }
 
-export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false }: RowProps) {
   const side = (id: TeamId) => (winner == null ? "" : winner === id ? "font-bold" : "opacity-60");
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
@@ -349,6 +354,17 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
           </span>
         )}
         {fixture.result && !prediction && <span className="font-semibold uppercase tracking-wide">{t("realResult")}</span>}
+        {inlineDice && showInputsFor(fixture, prediction, editing) && !disabled && (
+          <button
+            type="button"
+            onClick={onSimulate}
+            title={t("simulateMatch")}
+            aria-label={t("simulateMatch")}
+            className="-my-1 rounded-md px-1 text-sm leading-none hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          >
+            🎲
+          </button>
+        )}
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <span className={`flex min-w-0 items-center justify-end gap-2 text-right text-sm font-medium ${side(home.id)}`}>
@@ -400,7 +416,7 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
           {tags?.away && <Tag label={tags.away} />}
         </span>
       </div>
-      {showInputs && !disabled && (
+      {showInputs && !disabled && !inlineDice && (
         <div className="mt-1 flex justify-end">
           <button
             type="button"
