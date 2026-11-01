@@ -2,7 +2,7 @@
 
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { needsShootout, tieOutcome, type PlayoffSide, type PlayoffTie } from "../engine/playoffs.ts";
+import { needsShootout, seriesGames, tieOutcome, type PlayoffSide, type PlayoffTie } from "../engine/playoffs.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 
@@ -13,7 +13,12 @@ export interface PlayoffView {
   bracket: PlayoffTie[][];
   /** Every league match has a score, so the seeding is final and legs can be edited. */
   seasonComplete: boolean;
-  promotedTo: string;
+  /** Promotion play-off: the league the winners go up to. */
+  promotedTo?: string;
+  /** Title play-off: the competition its winner is champion of (e.g. "MLS Cup"). */
+  title?: string;
+  /** Short group (conference) names, for slots like "1st in the East". */
+  groupNames?: string[];
 }
 
 interface Props {
@@ -99,19 +104,53 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
 
   // A side is a club once known; before that its table position (league not
   // finished) or "Semi-final winner" style text (earlier round not decided).
+  /** Table positions that can fill a side: its own, or those of the earlier tie it comes from. */
+  const seeds = (side: PlayoffSide): number[] => {
+    if (side.from) {
+      const tie = bracket[side.from.round]?.find((x) => x.index === side.from!.tie);
+      return tie ? [...seeds(tie.higher), ...seeds(tie.lower)].sort((a, b) => a - b) : [];
+    }
+    return side.position !== null ? [side.position] : [];
+  };
+  const groupName = (group: number | undefined) => (group !== undefined ? playoff.groupNames?.[group] : undefined);
   const label = (side: PlayoffSide) => {
     if (side.teamId !== null) return teams.get(side.teamId)?.shortName ?? "";
-    if (side.from) return t("playoffWinnerOf", { round: bracket[side.from.round]![0]!.config.key });
-    return t("playoffPlace", { position: side.position ?? 0 });
+    const group = groupName(side.group);
+    if (side.from) {
+      // Conference brackets: name the seeds that can still come through, e.g. "Winner 1/8/9 (East)".
+      const possible = seeds(side);
+      const winnerOf =
+        group && possible.length > 1 && possible.length <= 3
+          ? t("playoffSeedsWinner", { seeds: possible.join("/") })
+          : t("playoffWinnerOf", { round: bracket[side.from.round]![0]!.config.key });
+      return group ? `${winnerOf} (${group})` : winnerOf;
+    }
+    return group ? t("playoffGroupPlace", { position: side.position ?? 0, group }) : t("playoffPlace", { position: side.position ?? 0 });
   };
 
   const rule = (tie: PlayoffTie) => {
     const { config } = tie;
-    const higher = label(tie.higher);
+    // Before an earlier round decides it, the host is just "the higher seed".
+    const higher = tie.higher.teamId === null && tie.higher.from ? t("playoffHigherSeed") : label(tie.higher);
+    if (config.bestOf) return t("playoffRuleSeries", { higher });
     if (config.levelTie === "betterPlaced") return t("playoffRule", { higher });
     if (config.venue) return t("playoffRuleFinal", { venue: config.venue });
-    return config.legs === 2 ? t("playoffRuleTwoLegs", { higher }) : t("playoffRuleOneLeg", { higher });
+    if (config.legs === 2) return t("playoffRuleTwoLegs", { higher });
+    return config.noExtraTime ? t("playoffRuleOneLegPenalties", { higher }) : t("playoffRuleOneLeg", { higher });
   };
+
+  const scoreRow = (fixture: Fixture, label?: string) => (
+    <MatchRow
+      key={`${fixture.id}-${fixture.homeId}-${fixture.awayId}`}
+      fixture={fixture}
+      home={teams.get(fixture.homeId)!}
+      away={teams.get(fixture.awayId)!}
+      prediction={predictions[fixture.id]}
+      {...(label ? { label } : {})}
+      onScore={(score) => onScore(fixture, score)}
+      onSimulate={() => onSimulate(fixture)}
+    />
+  );
 
   return (
     <div data-testid="playoff">
@@ -123,13 +162,21 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
               {t("playoffRound", { round: round[0]!.config.key })}
             </h3>
           )}
-          {round.map((tie) => {
+          {round.map((tie, i) => {
             const outcome = tieOutcome(tie, predictions);
+            // Conference rounds: a sub-heading before each conference's ties.
+            const group = groupName(tie.group);
+            const groupHeading = group && round[i - 1]?.group !== tie.group;
             const known = tie.legs.length > 0;
             const showShootout = tie.shootout && (needsShootout(tie, predictions) || predictions[tie.shootout.id]);
             const pens = tie.shootout ? (predictions[tie.shootout.id] ?? tie.shootout.result) : null;
             return (
               <div key={tie.index} className="border-b border-zinc-100 last:border-b-0 dark:border-zinc-800" data-testid="playoff-tie">
+                {groupHeading && (
+                  <p className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wide text-pitch-700 dark:text-pitch-100" data-testid="playoff-group">
+                    {group}
+                  </p>
+                )}
                 <div className="px-3 pt-3">
                   <h4 className="text-sm font-semibold">
                     {label(tie.higher)} × {label(tie.lower)}
@@ -143,18 +190,15 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                         const [home, away] = tie.config.legs === 2 && i === 0 ? [tie.lower, tie.higher] : [tie.higher, tie.lower];
                         return <PlaceholderRow key={i} utcDate="" home={label(home)} away={label(away)} />;
                       })
-                    : tie.legs.map((leg) => (
-                        <MatchRow
-                          key={`${leg.id}-${leg.homeId}-${leg.awayId}`}
-                          fixture={leg}
-                          home={teams.get(leg.homeId)!}
-                          away={teams.get(leg.awayId)!}
-                          prediction={predictions[leg.id]}
-                          {...(leg.neutral && tie.config.venue ? { label: tie.config.venue } : {})}
-                          onScore={(score) => onScore(leg, score)}
-                          onSimulate={() => onSimulate(leg)}
-                        />
-                      ))}
+                    : tie.config.bestOf
+                      ? // A series: each game still needed, with its own shoot-out when drawn.
+                        seriesGames(tie, predictions)
+                          .filter((g) => g.needed)
+                          .flatMap((g, n) => [
+                            scoreRow(g.game, t("playoffGame", { number: n + 1 })),
+                            ...(g.needsPenalties || predictions[g.shootout.id] ? [scoreRow(g.shootout, t("penalties"))] : []),
+                          ])
+                      : tie.legs.map((leg) => scoreRow(leg, leg.neutral && tie.config.venue ? tie.config.venue : undefined))}
                   {showShootout && tie.shootout && (
                     <MatchRow
                       key={`${tie.shootout.id}-${tie.shootout.homeId}-${tie.shootout.awayId}`}
@@ -170,6 +214,13 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                 </ul>
                 {outcome && (
                   <p className="bg-pitch-50 px-3 py-2 text-sm font-medium text-pitch-900 dark:bg-pitch-900/30 dark:text-pitch-100" data-testid="playoff-result">
+                    {tie.config.bestOf &&
+                      t("playoffSeries", {
+                        higher: label(tie.higher),
+                        lower: label(tie.lower),
+                        hw: outcome.higherGoals,
+                        lw: outcome.lowerGoals,
+                      }) + " "}
                     {tie.config.legs === 2 &&
                       t("playoffAggregate", {
                         higher: label(tie.higher),
@@ -184,9 +235,11 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                         wp: Math.max(pens.home, pens.away),
                         lp: Math.min(pens.home, pens.away),
                       }) + " "}
-                    {r === lastRound
-                      ? t("playoffPromoted", { winner: teams.get(outcome.winner)?.shortName ?? "", promotedTo: playoff.promotedTo })
-                      : t("playoffAdvances", { winner: teams.get(outcome.winner)?.shortName ?? "" })}
+                    {r === lastRound && playoff.title
+                      ? t("playoffChampion", { winner: teams.get(outcome.winner)?.shortName ?? "", title: playoff.title })
+                      : r === lastRound && playoff.promotedTo
+                        ? t("playoffPromoted", { winner: teams.get(outcome.winner)?.shortName ?? "", promotedTo: playoff.promotedTo })
+                        : t("playoffAdvances", { winner: teams.get(outcome.winner)?.shortName ?? "" })}
                   </p>
                 )}
               </div>

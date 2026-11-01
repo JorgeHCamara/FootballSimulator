@@ -8,27 +8,61 @@ import type { Fixture, ResultMap, Score, StandingRow, TeamId } from "./types.ts"
 //   through on a level aggregate;
 // - Championship 2026/27: single-leg eliminators (5th v 8th, 6th v 7th),
 //   two-legged semi-finals with 3rd and 4th, then a single final at Wembley;
-//   level ties go to extra time and penalties.
+//   level ties go to extra time and penalties;
+// - MLS Cup: within each conference a wild card (8th v 9th), best-of-three
+//   Round One series, then single-game semifinals and final along a fixed
+//   bracket; the two conference champions meet in MLS Cup.
+
+export type PlayoffRoundKey =
+  | "eliminators"
+  | "semiFinals"
+  | "final"
+  | "wildCard"
+  | "roundOne"
+  | "conferenceSemiFinals"
+  | "conferenceFinal"
+  | "mlsCup";
 
 export interface PlayoffRoundConfig {
-  key: "eliminators" | "semiFinals" | "final";
+  key: PlayoffRoundKey;
   /** Two legs: the better-placed club hosts the second. One leg: it hosts the match (unless `venue`). */
   legs: 1 | 2;
+  /**
+   * Best-of-three series (MLS Round One): the better-placed club hosts games 1
+   * and 3, the first to win two goes through, and a drawn game goes to penalties.
+   */
+  bestOf?: 3;
   /** What decides a level tie: the better league position, or a penalty shoot-out. */
   levelTie: "betterPlaced" | "penalties";
+  /** A level game goes straight to penalties, without extra time (only changes the rule shown). */
+  noExtraTime?: boolean;
   /** Single match at a neutral ground, e.g. "Wembley". */
   venue?: string;
   /** Fixed pairings by table position (first round). */
   pairs?: readonly (readonly [number, number])[];
   /** Positions that join in this round, alongside the previous round's winners. */
   entrants?: readonly number[];
+  /**
+   * Previous winners keep their bracket path (first tie's winner v last tie's
+   * winner, and so on) instead of being re-seeded by table position.
+   */
+  fixedBracket?: boolean;
 }
 
 export interface PlayoffConfig {
   rounds: readonly PlayoffRoundConfig[];
   /** Positions promoted without the play-off. */
-  directPromotion: readonly number[];
-  promotedTo: string;
+  directPromotion?: readonly number[];
+  /** League the winners go up to (promotion play-offs). */
+  promotedTo?: string;
+  /** Competition the winner is champion of (title play-offs, e.g. "MLS Cup"). */
+  title?: string;
+  /**
+   * The first `rounds` rounds are played within each of `count` groups (MLS
+   * conferences), seeded by the group's table; later rounds bring the groups'
+   * winners together, seeded by the overall table.
+   */
+  groupStage?: { count: number; rounds: number };
 }
 
 /** Play-off legs get synthetic fixture ids far above any real one. */
@@ -36,19 +70,29 @@ export const PLAYOFF_ID_BASE = 2_000_000_000;
 
 const legId = (round: number, tie: number, leg: 1 | 2) => PLAYOFF_ID_BASE + round * 100 + tie * 2 + leg;
 const shootoutId = (round: number, tie: number) => PLAYOFF_ID_BASE + round * 100 + 50 + tie;
+// Best-of-three series: three games per tie, each with its own shoot-out.
+const gameId = (round: number, tie: number, game: number) => PLAYOFF_ID_BASE + round * 100 + tie * 3 + game;
+const gameShootoutId = (round: number, tie: number, game: number) => PLAYOFF_ID_BASE + round * 100 + 50 + tie * 3 + game - 1;
 
 function tieCounts(config: PlayoffConfig): number[] {
   const counts: number[] = [];
+  const groups = config.groupStage;
   config.rounds.forEach((round, r) => {
-    const fromPrevious = r === 0 ? 0 : counts[r - 1]!;
-    const participants = (round.pairs?.length ?? 0) * 2 + (round.entrants?.length ?? 0) + fromPrevious;
-    counts.push(Math.floor(participants / 2));
+    const inGroups = groups !== undefined && r < groups.rounds;
+    const sets = inGroups ? groups.count : 1;
+    const previous = r === 0 ? 0 : counts[r - 1]!;
+    const previousPerSet = inGroups ? previous / groups.count : previous;
+    const participants = (round.pairs?.length ?? 0) * 2 + (round.entrants?.length ?? 0) + previousPerSet;
+    counts.push(Math.floor(participants / 2) * sets);
   });
   return counts;
 }
 
-/** Ids belonging to one tie (its legs and shoot-out), whether or not its clubs are known yet. */
+/** Ids belonging to one tie (its legs or games, and shoot-outs), whether or not its clubs are known yet. */
 export function tieIds(round: number, tie: number, config: PlayoffRoundConfig): number[] {
+  if (config.bestOf) {
+    return [1, 2, 3].flatMap((g) => [gameId(round, tie, g), gameShootoutId(round, tie, g)]);
+  }
   return [
     legId(round, tie, 1),
     ...(config.legs === 2 ? [legId(round, tie, 2)] : []),
@@ -60,16 +104,7 @@ export const isShootoutId = (id: number) => id > PLAYOFF_ID_BASE && (id - PLAYOF
 
 /** Every synthetic id the play-off can use (legs and shoot-outs), for share links and clean-up. */
 export function playoffIds(config: PlayoffConfig): number[] {
-  const ids: number[] = [];
-  tieCounts(config).forEach((count, r) => {
-    const round = config.rounds[r]!;
-    for (let t = 0; t < count; t++) {
-      ids.push(legId(r, t, 1));
-      if (round.legs === 2) ids.push(legId(r, t, 2));
-      if (round.levelTie === "penalties") ids.push(shootoutId(r, t));
-    }
-  });
-  return ids;
+  return tieCounts(config).flatMap((count, r) => Array.from({ length: count }, (_, t) => tieIds(r, t, config.rounds[r]!)).flat());
 }
 
 /** A club in a tie: known once the table (or the previous round) decides it. */
@@ -79,38 +114,96 @@ export interface PlayoffSide {
   position: number | null;
   /** For an undecided winner of an earlier tie: which one. */
   from?: { round: number; tie: number };
+  /** Group (conference) the slot or the earlier tie belongs to. */
+  group?: number;
 }
 
 export interface PlayoffTie {
   round: number;
   index: number;
   config: PlayoffRoundConfig;
+  /** Group (conference) the tie is played in, during a group stage. */
+  group?: number;
   higher: PlayoffSide;
   lower: PlayoffSide;
-  /** Only when both clubs are known. */
+  /** Legs, or a series' games; only when both clubs are known. */
   legs: Fixture[];
   /** Penalty shoot-out pseudo-fixture (higher = home); only for `penalties` rounds with known clubs. */
   shootout: Fixture | null;
+  /** Best-of-three series: one shoot-out per game (same home side as the game), aligned with `legs`. */
+  gameShootouts: Fixture[];
 }
 
 export interface TieOutcome {
+  /** Goals on aggregate, or games won in a series. */
   higherGoals: number;
   lowerGoals: number;
   winner: TeamId;
   onPenalties: boolean;
 }
 
+const scoreOf = (fixture: Fixture, results: ResultMap) => results[fixture.id] ?? fixture.result;
+
+export interface SeriesGame {
+  game: Fixture;
+  shootout: Fixture;
+  /** Still to be played: the series isn't decided before this game. */
+  needed: boolean;
+  /** Drawn, so its shoot-out decides the game. */
+  needsPenalties: boolean;
+}
+
+/** The games of a best-of-three series, and which of them are still needed. */
+export function seriesGames(tie: PlayoffTie, results: ResultMap): SeriesGame[] {
+  const toWin = Math.ceil((tie.config.bestOf ?? 1) / 2);
+  let higherWins = 0;
+  let lowerWins = 0;
+  let unknown = false;
+  return tie.legs.map((game, i) => {
+    const shootout = tie.gameShootouts[i]!;
+    const needed = higherWins < toWin && lowerWins < toWin;
+    const score = scoreOf(game, results);
+    const drawn = score !== null && score.home === score.away;
+    if (needed && !unknown) {
+      const winnerIsHome = !score ? null : !drawn ? score.home > score.away : penaltyWinnerIsHome(scoreOf(shootout, results));
+      if (winnerIsHome === null) unknown = true;
+      else if ((game.homeId === tie.higher.teamId) === winnerIsHome) higherWins++;
+      else lowerWins++;
+    }
+    return { game, shootout, needed, needsPenalties: needed && drawn };
+  });
+}
+
+const penaltyWinnerIsHome = (pens: Score | null) => (!pens || pens.home === pens.away ? null : pens.home > pens.away);
+
 /**
- * Result of a tie: aggregate, then draw advantage or the shoot-out. Null while a
- * leg is missing, or when level and the shoot-out hasn't been entered.
+ * Result of a tie: aggregate, then draw advantage or the shoot-out; for a
+ * series, games won. Null while a game is missing, or when level and the
+ * shoot-out hasn't been entered.
  */
 export function tieOutcome(tie: PlayoffTie, results: ResultMap): TieOutcome | null {
   const { higher, lower } = tie;
   if (higher.teamId === null || lower.teamId === null || tie.legs.length === 0) return null;
+  if (tie.config.bestOf) {
+    const toWin = Math.ceil(tie.config.bestOf / 2);
+    let higherWins = 0;
+    let lowerWins = 0;
+    for (const { game, shootout, needed } of seriesGames(tie, results)) {
+      if (!needed) break;
+      const score = scoreOf(game, results);
+      if (!score) return null;
+      const homeWon = score.home !== score.away ? score.home > score.away : penaltyWinnerIsHome(scoreOf(shootout, results));
+      if (homeWon === null) return null;
+      if ((game.homeId === higher.teamId) === homeWon) higherWins++;
+      else lowerWins++;
+    }
+    if (higherWins < toWin && lowerWins < toWin) return null;
+    return { higherGoals: higherWins, lowerGoals: lowerWins, winner: higherWins > lowerWins ? higher.teamId : lower.teamId, onPenalties: false };
+  }
   let higherGoals = 0;
   let lowerGoals = 0;
   for (const leg of tie.legs) {
-    const score = results[leg.id] ?? leg.result;
+    const score = scoreOf(leg, results);
     if (!score) return null;
     const higherHome = leg.homeId === higher.teamId;
     higherGoals += higherHome ? score.home : score.away;
@@ -122,17 +215,17 @@ export function tieOutcome(tie: PlayoffTie, results: ResultMap): TieOutcome | nu
   if (tie.config.levelTie === "betterPlaced") {
     return { higherGoals, lowerGoals, winner: higher.teamId, onPenalties: false };
   }
-  const pens = tie.shootout ? (results[tie.shootout.id] ?? tie.shootout.result) : null;
-  if (!pens || pens.home === pens.away) return null;
-  return { higherGoals, lowerGoals, winner: pens.home > pens.away ? higher.teamId : lower.teamId, onPenalties: true };
+  const homeWon = tie.shootout ? penaltyWinnerIsHome(scoreOf(tie.shootout, results)) : null;
+  if (homeWon === null) return null;
+  return { higherGoals, lowerGoals, winner: homeWon ? higher.teamId : lower.teamId, onPenalties: true };
 }
 
-/** True when all legs are played and level, so a shoot-out is needed. */
+/** True when all legs are played and level, so a shoot-out is needed (not for series: see seriesGames). */
 export function needsShootout(tie: PlayoffTie, results: ResultMap): boolean {
   if (tie.config.levelTie !== "penalties" || !tie.shootout) return false;
   const withoutPens = { ...results };
   delete withoutPens[tie.shootout.id];
-  const legsDone = tie.legs.every((leg) => results[leg.id] ?? leg.result);
+  const legsDone = tie.legs.every((leg) => scoreOf(leg, results));
   return legsDone && tieOutcome({ ...tie, shootout: null }, withoutPens) === null;
 }
 
@@ -143,7 +236,14 @@ export interface BracketOptions {
   afterDate: string;
   /** Real play-off games from the data feed; a leg takes the result of the same pairing. */
   real?: readonly Fixture[];
+  /**
+   * With a `groupStage`: each group's table (positions within the group), in
+   * group order; `rows` is then the overall table.
+   */
+  groups?: readonly (readonly StandingRow[])[];
 }
+
+const DAY = 24 * 60 * 60 * 1000;
 
 export function buildBracket(
   rows: readonly StandingRow[],
@@ -151,71 +251,112 @@ export function buildBracket(
   results: ResultMap,
   options: BracketOptions,
 ): PlayoffTie[][] {
-  const positionOf = new Map(rows.map((r) => [r.teamId, r.position]));
-  const teamAt = (position: number) => (options.seasonComplete ? (rows.find((r) => r.position === position)?.teamId ?? null) : null);
-  const bySlot = (position: number): PlayoffSide => ({ teamId: teamAt(position), position });
-  const week = 7 * 24 * 60 * 60 * 1000;
+  const grouped = config.groupStage !== undefined && (options.groups?.length ?? 0) > 0;
+  const groupRounds = grouped ? config.groupStage!.rounds : 0;
   const start = Date.parse(options.afterDate) || Date.now();
-  const findReal = (homeId: TeamId, awayId: TeamId, neutral: boolean) =>
-    options.real?.find(
-      (f) => (f.homeId === homeId && f.awayId === awayId) || (neutral && f.homeId === awayId && f.awayId === homeId),
-    );
+  const used = new Set<number>();
+  /** Real games between two clubs, oldest first, not yet given to another leg. */
+  const realBetween = (a: TeamId, b: TeamId) =>
+    (options.real ?? [])
+      .filter((f) => !used.has(f.id) && ((f.homeId === a && f.awayId === b) || (f.homeId === b && f.awayId === a)))
+      .sort((x, y) => x.utcDate.localeCompare(y.utcDate));
 
   const rounds: PlayoffTie[][] = [];
   let weekOffset = 0;
   config.rounds.forEach((round, r) => {
-    // Who plays: fixed pairs, or entrants plus the previous round's winners.
-    let pairs: [PlayoffSide, PlayoffSide][];
-    if (round.pairs) {
-      pairs = round.pairs.map(([a, b]) => [bySlot(a), bySlot(b)]);
-    } else {
-      const winners: PlayoffSide[] = (rounds[r - 1] ?? []).map((tie, t) => {
-        const outcome = tieOutcome(tie, results);
-        return outcome
-          ? { teamId: outcome.winner, position: positionOf.get(outcome.winner) ?? null }
-          : { teamId: null, position: null, from: { round: r - 1, tie: t } };
-      });
-      const entrants = (round.entrants ?? []).map(bySlot);
-      const all = [...entrants, ...winners];
-      // Re-seed once everyone is known: best-placed v lowest-placed, and so on.
-      const known = all.every((s) => s.teamId !== null);
-      const ordered = known ? [...all].sort((a, b) => a.position! - b.position!) : all;
-      const half = Math.floor(ordered.length / 2);
-      pairs = Array.from({ length: half }, (_, i) => [ordered[i]!, ordered[ordered.length - 1 - i]!]);
-    }
+    // During the group stage each group plays its own ties; afterwards one set.
+    const sets =
+      r < groupRounds
+        ? options.groups!.map((table, g) => ({ group: g as number | undefined, table, previous: (rounds[r - 1] ?? []).filter((t) => t.group === g) }))
+        : [{ group: undefined, table: rows, previous: rounds[r - 1] ?? [] }];
 
-    rounds.push(
-      pairs.map(([a, b], t) => {
+    const ties: PlayoffTie[] = [];
+    for (const { group, table, previous } of sets) {
+      const positionOf = new Map(table.map((row) => [row.teamId, row.position]));
+      const teamAt = (position: number) => (options.seasonComplete ? (table.find((row) => row.position === position)?.teamId ?? null) : null);
+      const bySlot = (position: number): PlayoffSide => ({ teamId: teamAt(position), position, ...(group !== undefined ? { group } : {}) });
+
+      // Who plays: fixed pairs, or entrants plus the previous round's winners.
+      let pairs: [PlayoffSide, PlayoffSide][];
+      if (round.pairs) {
+        pairs = round.pairs.map(([a, b]) => [bySlot(a), bySlot(b)]);
+      } else {
+        const winners: PlayoffSide[] = previous.map((tie) => {
+          const outcome = tieOutcome(tie, results);
+          const tieGroup = tie.group !== undefined ? { group: tie.group } : {};
+          return outcome
+            ? { teamId: outcome.winner, position: positionOf.get(outcome.winner) ?? null, ...tieGroup }
+            : { teamId: null, position: null, from: { round: r - 1, tie: tie.index }, ...tieGroup };
+        });
+        const all = [...(round.entrants ?? []).map(bySlot), ...winners];
+        // Re-seed once everyone is known (best-placed v lowest-placed), unless the bracket is fixed.
+        const known = all.every((s) => s.teamId !== null);
+        const ordered = known && !round.fixedBracket ? [...all].sort((a, b) => a.position! - b.position!) : all;
+        const half = Math.floor(ordered.length / 2);
+        pairs = Array.from({ length: half }, (_, i) => [ordered[i]!, ordered[ordered.length - 1 - i]!]);
+      }
+
+      for (const [a, b] of pairs) {
         // Better-placed side is "higher"; unknown winners count as lower-placed.
         const [higher, lower] = (b.position ?? Infinity) < (a.position ?? Infinity) ? [b, a] : [a, b];
-        const tie: PlayoffTie = { round: r, index: t, config: round, higher, lower, legs: [], shootout: null };
-        if (higher.teamId === null || lower.teamId === null) return tie;
+        const t = ties.length;
+        const tie: PlayoffTie = { round: r, index: t, config: round, ...(group !== undefined ? { group } : {}), higher, lower, legs: [], shootout: null, gameShootouts: [] };
+        ties.push(tie);
+        if (higher.teamId === null || lower.teamId === null) continue;
         const neutral = Boolean(round.venue);
-        const leg = (n: 1 | 2, homeId: TeamId, awayId: TeamId): Fixture => {
-          const real = findReal(homeId, awayId, neutral);
-          const flipped = real && real.homeId !== homeId;
+        const reals = realBetween(higher.teamId, lower.teamId);
+        // A leg: the real game between the two clubs when the feed has it (in date
+        // order for a series; same home side otherwise, either way at a neutral venue).
+        const game = (id: number, n: number, homeId: TeamId, awayId: TeamId, utcDate: string): Fixture => {
+          const real = round.bestOf
+            ? reals[n - 1]
+            : reals.find((f) => f.homeId === homeId || neutral);
+          if (real) used.add(real.id);
+          const flipped = real !== undefined && real.homeId !== homeId;
+          const flip = (s: Score) => (flipped ? { home: s.away, away: s.home } : s);
           return {
-            id: legId(r, t, n),
-            matchday: options.afterMatchday + weekOffset + n,
-            utcDate: real?.utcDate ?? new Date(start + (weekOffset + n) * week).toISOString(),
+            id,
+            matchday: options.afterMatchday + weekOffset + (round.bestOf ? 1 : n),
+            utcDate: real?.utcDate ?? utcDate,
             homeId,
             awayId,
-            result: real?.result ? (flipped ? { home: real.result.away, away: real.result.home } : real.result) : null,
+            result: real?.result ? flip(real.result) : null,
+            ...(real?.penalties ? { penalties: flip(real.penalties) } : {}),
             ...(neutral ? { neutral: true } : {}),
           };
         };
-        tie.legs =
-          round.legs === 2
-            ? [leg(1, lower.teamId, higher.teamId), leg(2, higher.teamId, lower.teamId)]
-            : [leg(1, higher.teamId, lower.teamId)];
-        if (round.levelTie === "penalties") {
-          const last = tie.legs.at(-1)!;
-          tie.shootout = { ...last, id: shootoutId(r, t), homeId: higher.teamId, awayId: lower.teamId, result: null };
+        const shootoutFor = (leg: Fixture, id: number): Fixture => {
+          const { penalties, ...rest } = leg;
+          return { ...rest, id, result: penalties ?? null };
+        };
+        const date = (days: number) => new Date(start + (weekOffset * 7 + days) * DAY).toISOString();
+        if (round.bestOf) {
+          // Better-placed club hosts games 1 and 3.
+          tie.legs = [1, 2, 3].map((n) => {
+            const [home, away] = n === 2 ? [lower.teamId!, higher.teamId!] : [higher.teamId!, lower.teamId!];
+            return game(gameId(r, t, n), n, home, away, date(7 + (n - 1) * 3));
+          });
+          tie.gameShootouts = tie.legs.map((leg, i) => shootoutFor(leg, gameShootoutId(r, t, i + 1)));
+        } else {
+          tie.legs =
+            round.legs === 2
+              ? [
+                  game(legId(r, t, 1), 1, lower.teamId, higher.teamId, date(7)),
+                  game(legId(r, t, 2), 2, higher.teamId, lower.teamId, date(14)),
+                ]
+              : [game(legId(r, t, 1), 1, higher.teamId, lower.teamId, date(7))];
+          if (round.levelTie === "penalties") {
+            const last = tie.legs.at(-1)!;
+            const pens = last.homeId === higher.teamId ? last.penalties : last.penalties && { home: last.penalties.away, away: last.penalties.home };
+            tie.shootout = { ...shootoutFor(last, shootoutId(r, t)), homeId: higher.teamId, awayId: lower.teamId, result: pens ?? null };
+          }
         }
-        return tie;
-      }),
-    );
-    weekOffset += round.legs;
+        // Keep the leg/game fixtures free of the feed-only penalties field.
+        tie.legs = tie.legs.map(({ penalties: _p, ...leg }) => leg);
+      }
+    }
+    rounds.push(ties);
+    weekOffset += round.bestOf ? 2 : round.legs;
   });
   return rounds;
 }
@@ -236,6 +377,7 @@ export function simulatePenalties(rng: Rng): Score {
 /**
  * Simulates the play-off round by round (each round's winners make the next
  * round's ties), filling only legs and shoot-outs without a result in `known`.
+ * A series stops once a club has won it.
  */
 export function simulatePlayoff(
   rows: readonly StandingRow[],
@@ -246,14 +388,25 @@ export function simulatePlayoff(
   options: Omit<BracketOptions, "seasonComplete">,
 ): ResultMap {
   const added: ResultMap = {};
+  const now = () => ({ ...known, ...added });
   for (let r = 0; r < config.rounds.length; r++) {
-    const results = { ...known, ...added };
-    const ties = buildBracket(rows, config, results, { ...options, seasonComplete: true })[r] ?? [];
+    const ties = buildBracket(rows, config, now(), { ...options, seasonComplete: true })[r] ?? [];
     for (const tie of ties) {
+      if (tie.config.bestOf) {
+        for (let i = 0; i < tie.legs.length; i++) {
+          let state = seriesGames(tie, now())[i]!;
+          if (!state.needed) break;
+          if (!scoreOf(state.game, now())) Object.assign(added, simulateFixtures([state.game], now(), model, rng));
+          state = seriesGames(tie, now())[i]!;
+          if (state.needsPenalties && !scoreOf(state.shootout, now())) added[state.shootout.id] = simulatePenalties(rng);
+        }
+        continue;
+      }
       const legs = tie.legs.filter((leg) => !leg.result);
-      Object.assign(added, simulateFixtures(legs, { ...known, ...added }, model, rng));
-      const now = { ...known, ...added };
-      if (tie.shootout && !now[tie.shootout.id] && needsShootout(tie, now)) added[tie.shootout.id] = simulatePenalties(rng);
+      Object.assign(added, simulateFixtures(legs, now(), model, rng));
+      if (tie.shootout && !now()[tie.shootout.id] && !tie.shootout.result && needsShootout(tie, now())) {
+        added[tie.shootout.id] = simulatePenalties(rng);
+      }
     }
   }
   return added;

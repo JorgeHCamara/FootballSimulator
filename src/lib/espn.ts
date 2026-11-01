@@ -10,6 +10,8 @@ const BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer";
 export interface EspnCompetitor {
   homeAway: "home" | "away";
   score?: string;
+  /** Penalty shoot-out goals, for a knockout game decided on penalties. */
+  shootoutScore?: number | string;
   team: {
     id: string;
     displayName: string;
@@ -304,6 +306,9 @@ export function espnFixtures(events: readonly EspnEvent[], { roundCount, weekly 
       homeId: games[i]!.home,
       awayId: games[i]!.away,
       result: finished && hasScore ? { home: homeGoals, away: awayGoals } : null,
+      ...(finished && hasScore && homeGoals === awayGoals && home.shootoutScore != null && away.shootoutScore != null
+        ? { penalties: { home: Number(home.shootoutScore), away: Number(away.shootoutScore) } }
+        : {}),
     };
   });
 }

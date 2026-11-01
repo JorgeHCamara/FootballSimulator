@@ -7,6 +7,7 @@ import {
   needsShootout,
   playoffIds,
   playoffWinners,
+  seriesGames,
   simulatePenalties,
   simulatePlayoff,
   tieOutcome,
@@ -147,3 +148,122 @@ describe("penalty shoot-out", () => {
     }
   });
 });
+
+describe("MLS Cup playoffs (conferences, best-of-three, fixed bracket)", () => {
+  // East clubs are 201–215 and West clubs 301–315 (id = conference base + position).
+  // Overall table alternates West and East: 301 is 1st overall, 201 2nd, 302 3rd…
+  const east = Array.from({ length: 15 }, (_, i) => row(i + 1, 201 + i));
+  const west = Array.from({ length: 15 }, (_, i) => row(i + 1, 301 + i));
+  const overall = Array.from({ length: 30 }, (_, i) => row(i + 1, (i % 2 === 0 ? 301 : 201) + Math.floor(i / 2)));
+  const mls: PlayoffConfig = {
+    groupStage: { count: 2, rounds: 4 },
+    rounds: [
+      { key: "wildCard", legs: 1, levelTie: "penalties", noExtraTime: true, pairs: [[8, 9]] },
+      { key: "roundOne", legs: 1, bestOf: 3, levelTie: "penalties", noExtraTime: true, entrants: [1, 2, 3, 4, 5, 6, 7] },
+      { key: "conferenceSemiFinals", legs: 1, levelTie: "penalties", fixedBracket: true },
+      { key: "conferenceFinal", legs: 1, levelTie: "penalties", fixedBracket: true },
+      { key: "mlsCup", legs: 1, levelTie: "penalties" },
+    ],
+    title: "MLS Cup",
+  };
+  const mlsOptions = { ...options, afterMatchday: 34, groups: [east, west] };
+  const bracket = (results: ResultMap, seasonComplete = true) => buildBracket(overall, mls, results, { ...mlsOptions, seasonComplete });
+  /** A score for `fixture` that `winner` wins (by `margin`; 0 = a draw). */
+  const win = (fixture: Fixture, winner: number, margin = 1) =>
+    fixture.homeId === winner ? { home: 1 + margin, away: 1 } : { home: 1, away: 1 + margin };
+  const tieOf = (b: ReturnType<typeof bracket>, round: number, higher: number) => b[round]!.find((t) => t.higher.teamId === higher)!;
+
+  it("has two wild cards, eight Round One series, four semifinals, two finals and MLS Cup, with unique ids", () => {
+    assert.deepEqual(bracket({}).map((r) => r.length), [2, 8, 4, 2, 1]);
+    const ids = playoffIds(mls);
+    assert.equal(ids.length, 2 * 2 + 8 * 6 + 4 * 2 + 2 * 2 + 2);
+    assert.equal(new Set(ids).size, ids.length);
+  });
+
+  it("shows conference slots before the season ends", () => {
+    const [wildCards, roundOne] = bracket({}, false);
+    assert.deepEqual(wildCards!.map((t) => [t.group, t.higher.position, t.lower.position]), [[0, 8, 9], [1, 8, 9]]);
+    assert.deepEqual(roundOne![0]!.higher, { teamId: null, position: 1, group: 0 });
+    assert.deepEqual(roundOne![0]!.lower, { teamId: null, position: null, from: { round: 0, tie: 0 }, group: 0 });
+    assert.equal(roundOne![0]!.legs.length, 0);
+  });
+
+  it("puts the wild-card winner against 1st, then 2v7, 3v6, 4v5", () => {
+    const eastWildCard = bracket({})[0]![0];
+    // 9th wins a draw on penalties (no extra time).
+    const results: ResultMap = { [eastWildCard!.legs[0]!.id]: { home: 0, away: 0 }, [eastWildCard!.shootout!.id]: { home: 3, away: 4 } };
+    assert.equal(tieOutcome(eastWildCard!, results)?.winner, 209);
+    const roundOne = bracket(results)[1]!.filter((t) => t.group === 0);
+    assert.deepEqual(roundOne.map((t) => [t.higher.teamId, t.lower.teamId]), [[201, 209], [202, 207], [203, 206], [204, 205]]);
+  });
+
+  it("plays Round One as best of three: higher seed hosts games 1 and 3, drawn games go to penalties", () => {
+    const series = tieOf(bracket({}), 1, 202);
+    assert.deepEqual(series.legs.map((g) => g.homeId), [202, 207, 202]);
+    const [g1, g2, g3] = series.legs;
+    // 2–0 sweep: game 3 isn't needed.
+    const sweep: ResultMap = { [g1!.id]: win(g1!, 207), [g2!.id]: win(g2!, 207) };
+    assert.deepEqual(seriesGames(series, sweep).map((g) => g.needed), [true, true, false]);
+    assert.deepEqual(tieOutcome(series, sweep), { higherGoals: 0, lowerGoals: 2, winner: 207, onPenalties: false });
+    // 1–1, then a drawn game 3 decided by its own shoot-out.
+    const decider: ResultMap = { [g1!.id]: win(g1!, 202), [g2!.id]: win(g2!, 207), [g3!.id]: { home: 2, away: 2 } };
+    assert.equal(tieOutcome(series, decider), null);
+    assert.equal(seriesGames(series, decider)[2]!.needsPenalties, true);
+    decider[series.gameShootouts[2]!.id] = { home: 5, away: 4 };
+    assert.equal(tieOutcome(series, decider)?.winner, 202);
+  });
+
+  it("follows the fixed bracket (1/8/9 v 4/5, 2/7 v 3/6) and hosts MLS Cup at the better overall record", () => {
+    const results: ResultMap = {};
+    const play = (round: number, winners: Record<number, number>) => {
+      for (const tie of bracket(results)[round]!) {
+        const winner = winners[tie.higher.teamId!] ?? tie.higher.teamId!;
+        for (const game of tie.legs) {
+          if (!seriesGames(tie, results).find((g) => g.game.id === game.id)?.needed && tie.config.bestOf) continue;
+          results[game.id] = win(game, winner);
+        }
+      }
+    };
+    play(0, {}); // 8th seeds win the wild cards
+    play(1, { 202: 207, 204: 205 }); // 7th beats 2nd, 5th beats 4th in the East
+    const semis = bracket(results)[2]!.filter((t) => t.group === 0);
+    assert.deepEqual(semis.map((t) => [t.higher.teamId, t.lower.teamId]), [[201, 205], [203, 207]]);
+    play(2, {});
+    play(3, {});
+    const cup = bracket(results)[4]![0];
+    // East champion 201 is 2nd overall; West champion 301 is 1st overall and hosts.
+    assert.deepEqual([cup!.higher.teamId, cup!.lower.teamId, cup!.legs[0]!.homeId], [301, 201, 301]);
+  });
+
+  it("simulates the whole playoff to one MLS Cup winner, stopping series once decided", () => {
+    const simulated = simulatePlayoff(overall, mls, {}, mlsModel, createRng(11), mlsOptions);
+    const ids = new Set(playoffIds(mls));
+    assert.ok(Object.keys(simulated).every((id) => ids.has(Number(id))));
+    const final = buildBracket(overall, mls, simulated, { ...mlsOptions, seasonComplete: true });
+    const [champion] = playoffWinners(final, simulated);
+    assert.ok(champion !== null && champion !== undefined);
+    for (const series of final[1]!) {
+      for (const g of seriesGames(series, simulated)) assert.equal(simulated[g.game.id] !== undefined, g.needed);
+    }
+  });
+
+  it("takes real results from the feed, including a series' shoot-out", () => {
+    const series = tieOf(bracket({}), 1, 203);
+    const real: Fixture[] = [
+      { id: 9001, matchday: 0, utcDate: "2026-11-20T00:00Z", homeId: 203, awayId: 206, result: { home: 1, away: 1 }, penalties: { home: 4, away: 2 } },
+      { id: 9002, matchday: 0, utcDate: "2026-11-27T00:00Z", homeId: 206, awayId: 203, result: { home: 0, away: 2 } },
+    ];
+    const withReal = buildBracket(overall, mls, {}, { ...mlsOptions, seasonComplete: true, real });
+    const s = tieOf(withReal, 1, 203);
+    assert.deepEqual(s.legs.map((g) => g.result), [{ home: 1, away: 1 }, { home: 0, away: 2 }, null]);
+    assert.deepEqual(s.gameShootouts[0]!.result, { home: 4, away: 2 });
+    assert.equal(tieOutcome(s, {})?.winner, 203);
+    assert.equal(series.legs.length, 3);
+  });
+});
+
+const mlsModel: LeagueModel = {
+  avgHomeGoals: 1.5,
+  avgAwayGoals: 1.2,
+  strengths: new Map([...Array(15).keys()].flatMap((i) => [[201 + i, { attack: 1, defence: 1 }], [301 + i, { attack: 1, defence: 1 }]] as const)),
+};

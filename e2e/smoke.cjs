@@ -265,6 +265,34 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("MLS Cup playoffs: conference brackets, best-of-three Round One, one champion", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/mls`);
+      await p.locator('[data-testid="matchday-select"]').selectOption("-1");
+      const playoff = p.locator('[data-testid="playoff"]');
+      await playoff.waitFor();
+      assert.deepEqual(
+        (await playoff.locator('[data-testid="playoff-round"] h3').allInnerTexts()).map((x) => x.trim().toLowerCase()),
+        ["wild card", "round one", "conference semifinals", "conference final", "mls cup"],
+      );
+      const text = await playoff.innerText();
+      assert.match(text, /8th in the East × 9th in the East/);
+      assert.match(text, /1st in the West × Winner 8\/9 \(West\)/);
+      assert.match(text, /Winner 1\/8\/9 \(East\) × Winner 4\/5 \(East\)/);
+      assert.match(text, /Single match at the higher seed's ground/);
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /MLS Cup \d{4} champion/);
+
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      const results = await playoff.locator('[data-testid="playoff-result"]').allInnerTexts();
+      assert.equal(results.length, 2 + 8 + 4 + 2 + 1, "every tie decided");
+      const series = results.filter((r) => r.startsWith("Series:"));
+      assert.equal(series.length, 8);
+      for (const r of series) assert.match(r, /(2–[01]|[01]–2) /, r);
+      assert.match(results.at(-1), /wins the MLS Cup!/);
+      await p.close();
+    });
+
     await step("header menu: countries A–Z with league submenus, no scrollbar", async () => {
       const desktop = await browser.newPage({ viewport: { width: 1280, height: 800 } });
       await desktop.goto(`${BASE_URL}/en`);

@@ -42,6 +42,8 @@ export interface EspnFeed {
 /** A separate table within a league, e.g. an MLS conference. */
 export interface LeagueGroup {
   id: string;
+  /** Short name for play-off slots, e.g. "1st in the East". */
+  shortName: Record<SiteLocale, string>;
   /** Matched against the group names in ESPN's standings feed. */
   espnName: string;
   name: Record<SiteLocale, string>;
@@ -316,14 +318,41 @@ export const LEAGUES: readonly LeagueConfig[] = [
     // Unbalanced schedule: 34 games each, more of them against the own conference.
     gamesPerTeam: 34,
     groups: [
-      { id: "east", espnName: "Eastern", name: { en: "Eastern Conference", pt: "Conferência Leste", es: "Conferencia Este" } },
-      { id: "west", espnName: "Western", name: { en: "Western Conference", pt: "Conferência Oeste", es: "Conferencia Oeste" } },
+      {
+        id: "east",
+        espnName: "Eastern",
+        name: { en: "Eastern Conference", pt: "Conferência Leste", es: "Conferencia Este" },
+        shortName: { en: "East", pt: "Leste", es: "Este" },
+      },
+      {
+        id: "west",
+        espnName: "Western",
+        name: { en: "Western Conference", pt: "Conferência Oeste", es: "Conferencia Oeste" },
+        shortName: { en: "West", pt: "Oeste", es: "Oeste" },
+      },
     ],
     // football-data.org's free tier doesn't include MLS.
     espn: { slug: "usa.1", seasons: "calendar", weeklyRounds: true },
     espnOnly: true,
     // Official order continues with disciplinary points, which the feed doesn't have.
     tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "awayGoalsFor"],
+    // MLS Cup playoffs (2023– format), within each conference: wild card 8th v
+    // 9th (level: straight to penalties); Round One best of three, 1st v the
+    // wild-card winner, 2v7, 3v6, 4v5 (higher seed hosts games 1 and 3, a drawn
+    // game goes to penalties); then single games along a fixed bracket (1/8/9 v
+    // 4/5, 2/7 v 3/6) at the higher seed. MLS Cup: the conference champions, at
+    // the club with the better regular-season record.
+    playoff: {
+      groupStage: { count: 2, rounds: 4 },
+      rounds: [
+        { key: "wildCard", legs: 1, levelTie: "penalties", noExtraTime: true, pairs: [[8, 9]] },
+        { key: "roundOne", legs: 1, bestOf: 3, levelTie: "penalties", noExtraTime: true, entrants: [1, 2, 3, 4, 5, 6, 7] },
+        { key: "conferenceSemiFinals", legs: 1, levelTie: "penalties", fixedBracket: true },
+        { key: "conferenceFinal", legs: 1, levelTie: "penalties", fixedBracket: true },
+        { key: "mlsCup", legs: 1, levelTie: "penalties" },
+      ],
+      title: "MLS Cup",
+    },
     // Per conference: 1st–7th go straight to the MLS Cup playoffs, 8th v 9th play a wild-card match.
     zones: [
       { kind: "playoffs", from: 1, to: 7 },

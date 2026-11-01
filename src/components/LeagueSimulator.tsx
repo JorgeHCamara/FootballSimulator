@@ -16,6 +16,7 @@ import { emptySeason, useSimStore } from "../store/simStore.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
 import { ITERATIONS, ProbabilityGrid } from "./ProbabilityGrid.tsx";
+import { PlayoffChampion } from "./PlayoffChampion.tsx";
 import { PromotedClubs } from "./PromotedClubs.tsx";
 import { StandingsTable } from "./StandingsTable.tsx";
 
@@ -82,6 +83,17 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
     [tableTeams, ordered, effective, standingsOptions],
   );
 
+  // Play-offs across separate tables (MLS Cup) are seeded from every group's
+  // table, plus the overall table for games between the groups' winners.
+  const tablesFor = (results: ResultMap) => {
+    const overall = computeStandings(teams, ordered, results, standingsOptions);
+    if (!groupTabs.length) return { overall, groups: undefined };
+    const groupTables = groupTabs.map((g) =>
+      computeStandings(g.teamIds.flatMap((id) => teamMap.get(id) ?? []), ordered, results, standingsOptions),
+    );
+    return { overall, groups: groupTables };
+  };
+
   // Promotion play-off (Série B, Championship): seeded from the table once every
   // league match has a score, then round by round from the results entered.
   const playoff = league.playoff;
@@ -100,10 +112,12 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
     }),
     [ordered, postseason],
   );
-  const bracket = useMemo(
-    () => (playoff ? buildBracket(rows, playoff, season.predictions, { ...bracketOptions, seasonComplete }) : []),
-    [rows, playoff, season.predictions, bracketOptions, seasonComplete],
-  );
+  const bracket = useMemo(() => {
+    if (!playoff) return [];
+    if (!groupTabs.length) return buildBracket(rows, playoff, season.predictions, { ...bracketOptions, seasonComplete });
+    const { overall, groups: groupTables } = tablesFor(effective);
+    return buildBracket(overall, playoff, season.predictions, { ...bracketOptions, seasonComplete, ...(groupTables ? { groups: groupTables } : {}) });
+  }, [rows, playoff, season.predictions, bracketOptions, seasonComplete, groupTabs, effective]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Play-off scores belong to one pairing: when a tie's clubs change (a league or
   // earlier-round result was edited), its scores are dropped. All of them go if
@@ -172,13 +186,25 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
     const leagueResults = simulateFixtures(ordered, effective, model, rng);
     if (!playoff) return applyResults(seasonKey, leagueResults);
     const all = { ...effective, ...leagueResults };
-    const table = computeStandings(teams, ordered, all, standingsOptions);
-    const playoffResults = simulatePlayoff(table, playoff, { ...season.predictions, ...all }, model, rng, bracketOptions);
+    const { overall, groups: groupTables } = tablesFor(all);
+    const playoffResults = simulatePlayoff(overall, playoff, { ...season.predictions, ...all }, model, rng, {
+      ...bracketOptions,
+      ...(groupTables ? { groups: groupTables } : {}),
+    });
     applyResults(seasonKey, { ...leagueResults, ...playoffResults });
   };
 
-  const simulateWholePlayoff = () =>
-    playoff && applyResults(seasonKey, simulatePlayoff(rows, playoff, season.predictions, model, createRng(randomSeed()), bracketOptions));
+  const simulateWholePlayoff = () => {
+    if (!playoff) return;
+    const { overall, groups: groupTables } = groupTabs.length ? tablesFor(effective) : { overall: rows, groups: undefined };
+    applyResults(
+      seasonKey,
+      simulatePlayoff(overall, playoff, season.predictions, model, createRng(randomSeed()), {
+        ...bracketOptions,
+        ...(groupTables ? { groups: groupTables } : {}),
+      }),
+    );
+  };
 
   const simulateOne = (fixture: Fixture) => {
     const rng = createRng(randomSeed());
@@ -285,14 +311,24 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
           {tab === "table" ? (
             <>
               <StandingsTable league={league} rows={rows} teams={teamMap} />
-              {playoff && bracket.length > 0 && (
+              {playoff?.title && bracket.length > 0 && (
+                <PlayoffChampion
+                  bracket={bracket}
+                  teams={teamMap}
+                  predictions={season.predictions}
+                  seasonComplete={seasonComplete}
+                  title={playoff.title}
+                  season={seasonLabel}
+                />
+              )}
+              {playoff?.promotedTo && bracket.length > 0 && (
                 <PromotedClubs
                   bracket={bracket}
                   rows={rows}
                   teams={teamMap}
                   predictions={season.predictions}
                   seasonComplete={seasonComplete}
-                  directPromotion={playoff.directPromotion}
+                  directPromotion={playoff.directPromotion ?? []}
                   promotedTo={playoff.promotedTo}
                   nextSeason={nextSeasonLabel(seasonLabel)}
                 />
@@ -336,7 +372,17 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             predictions={season.predictions}
             onScore={onScore}
             onSimulate={simulateOne}
-            {...(playoff ? { playoff: { bracket, seasonComplete, promotedTo: playoff.promotedTo } } : {})}
+            {...(playoff
+              ? {
+                  playoff: {
+                    bracket,
+                    seasonComplete,
+                    ...(playoff.promotedTo ? { promotedTo: playoff.promotedTo } : {}),
+                    ...(playoff.title ? { title: playoff.title } : {}),
+                    groupNames: (league.groups ?? []).map((g) => g.shortName[lang]),
+                  },
+                }
+              : {})}
           />
         </div>
       </div>

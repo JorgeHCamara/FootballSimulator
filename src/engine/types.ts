@@ -28,6 +28,8 @@ export interface Fixture {
   result: Score | null;
   /** Played at a neutral ground (e.g. a play-off final): no home advantage. */
   neutral?: boolean;
+  /** Real penalty shoot-out score (home first), for a knockout game decided on penalties. */
+  penalties?: Score;
 }
 
 /** Scores keyed by fixture id (user predictions, simulated results, or both). */

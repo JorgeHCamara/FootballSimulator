@@ -105,7 +105,10 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       // its own saved predictions (Série B has only ever used ESPN).
       seasonKey: league.espnOnly ? `${league.code}:${year}` : `${league.code}:espn:${year}`,
       source: "live",
-      ...(league.playoff && postseason.length ? { postseason: espnFixtures(postseason) } : {}),
+      // Cancelled play-off games (e.g. a series' unneeded game 3) are left out.
+      ...(league.playoff && postseason.length
+        ? { postseason: espnFixtures(postseason.filter((e) => e.status.type.name !== "STATUS_CANCELED")) }
+        : {}),
       ...(groups ? { groups } : {}),
     };
   }
