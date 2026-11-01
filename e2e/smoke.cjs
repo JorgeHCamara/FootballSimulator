@@ -251,12 +251,22 @@ async function step(name, fn) {
       const zones = await rows.evaluateAll((r) => r.map((x) => x.dataset.zone));
       assert.deepEqual(zones.slice(0, 10), [...Array(7).fill("playoffs"), "playoffWildCard", "playoffWildCard", ""]);
       const switcher = p.locator('[data-testid="group-switch"]');
+      // The fixture list shows only matches of the selected conference's clubs.
+      const towns = (rowTexts) => rowTexts.map((r) => r.split("\t").map((x) => x.trim()).filter(Boolean)[1].split("\n").at(-1).split(" ").slice(0, -1).join(" "));
+      const checkFixtures = async (rowTexts, label) => {
+        const clubs = towns(rowTexts);
+        const matches = await p.locator('[data-testid="match-row"]').allInnerTexts();
+        assert.ok(matches.length > 0 && matches.length < 15, `${label}: ${matches.length} matches, not the whole league's`);
+        for (const m of matches) assert.ok(clubs.some((c) => m.includes(c)), `${label} fixture without a ${label} club: ${m}`);
+      };
       const east = await rows.allInnerTexts();
+      await checkFixtures(east, "East");
       await switcher.getByRole("button", { name: "Western Conference" }).click();
       await p.waitForFunction((before) => document.querySelector('[data-testid="standings-row"]')?.textContent !== before, east[0]);
       const west = await rows.allInnerTexts();
       assert.equal(west.length, 15);
       assert.ok(west.every((r) => !east.includes(r)), "different clubs in the West");
+      await checkFixtures(west, "West");
       await p.getByRole("tab", { name: "Chances" }).click();
       await p.locator('[data-testid="playoff-chance"]').first().waitFor({ timeout: 30000 });
       assert.equal(await p.locator('[data-testid="playoff-chance"]').count(), 15);

@@ -125,17 +125,30 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
     lastPairings.current = seasonComplete ? pairings : null;
   }, [hydrated, pairingKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // With separate tables (MLS conferences), the fixture list shows only games of
+  // the selected group's clubs; a game between groups appears under both.
+  const fixturesOf = (g: { teamIds: number[] } | undefined) => {
+    if (!g) return ordered;
+    const members = new Set(g.teamIds);
+    return ordered.filter((f) => members.has(f.homeId) || members.has(f.awayId));
+  };
+  const groupFixtures = useMemo(() => fixturesOf(group), [ordered, group]); // eslint-disable-line react-hooks/exhaustive-deps
+  /** First matchday with a game still to play, else the play-off, else the last matchday. */
+  const currentMatchday = (list: readonly Fixture[]) =>
+    list.find((f) => !f.result)?.matchday ?? (playoff ? PLAYOFF_MATCHDAY : (list.at(-1)?.matchday ?? 1));
+
   // The play-off is listed as one more entry after the last matchday.
   const matchdays = useMemo(
-    () => [...new Set(ordered.map((f) => f.matchday)), ...(playoff ? [PLAYOFF_MATCHDAY] : [])],
-    [ordered, playoff],
+    () => [...new Set(groupFixtures.map((f) => f.matchday)), ...(playoff ? [PLAYOFF_MATCHDAY] : [])],
+    [groupFixtures, playoff],
   );
-  const [matchday, setMatchday] = useState(() => {
-    const next = ordered.find((f) => !f.result);
-    return next?.matchday ?? matchdays.at(-1) ?? 1;
-  });
+  const [matchday, setMatchday] = useState(() => currentMatchday(groupFixtures));
   const onPlayoff = matchday === PLAYOFF_MATCHDAY;
-  const matchdayFixtures = useMemo(() => ordered.filter((f) => f.matchday === matchday), [ordered, matchday]);
+  const matchdayFixtures = useMemo(() => groupFixtures.filter((f) => f.matchday === matchday), [groupFixtures, matchday]);
+  const selectGroup = (id: string) => {
+    setGroupId(id);
+    setMatchday(currentMatchday(fixturesOf(groupTabs.find((g) => g.id === id))));
+  };
 
   // Load saved predictions, then apply a shared link (?r=...) if present.
   useEffect(() => {
@@ -272,7 +285,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
                   type="button"
                   aria-pressed={g.id === group?.id}
                   className={`whitespace-nowrap ${tabButton(g.id === group?.id)}`}
-                  onClick={() => setGroupId(g.id)}
+                  onClick={() => selectGroup(g.id)}
                 >
                   {g.name}
                 </button>
