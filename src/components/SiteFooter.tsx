@@ -22,13 +22,13 @@ export function SiteFooter() {
             ))}
           </ul>
         </nav>
-        <p className="mt-6 text-center">
-          <a href="https://www.football-data.org/" className="underline hover:text-zinc-700 dark:hover:text-zinc-300" rel="noopener">
+        <p className="mt-6 text-center">{t("disclaimer")}</p>
+        <p className="mt-1 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
+          © {new Date().getFullYear()} Foot Simu ·{" "}
+          <a href="https://www.football-data.org/" className="hover:text-zinc-600 hover:underline dark:hover:text-zinc-300" rel="noopener">
             {t("attribution")}
           </a>
         </p>
-        <p className="mt-1 text-center">{t("disclaimer")}</p>
-        <p className="mt-1 text-center">© {new Date().getFullYear()} Foot Simu</p>
       </div>
     </footer>
   );

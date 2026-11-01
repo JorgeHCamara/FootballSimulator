@@ -94,7 +94,7 @@
     "relegation": "Rebaixamento"
   },
   "Footer": {
-    "attribution": "Dados de futebol fornecidos pela API Football-Data.org. Dados da Série B: ESPN.",
+    "attribution": "Dados: football-data.org",
     "disclaimer": "O Foot Simu não tem vínculo com nenhuma liga ou clube. As simulações são apenas para entretenimento."
   },
   "NotFound": {

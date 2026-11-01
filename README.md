@@ -7,7 +7,7 @@
 
 ## Stack
 
-Next.js 16 (App Router) + TypeScript, Tailwind CSS 4, next-intl and Zustand, hosted on Vercel. Phase 1 has no database: pages read football-data.org directly and cache it for an hour. Postgres arrives in phase 2 with accounts. Real fixtures and results come from [football-data.org](https://www.football-data.org/) (free tier). Brasileirão Série B isn't in that tier, so it comes from ESPN's public site feed (no key needed; unofficial, so it may change without notice) — see `src/lib/espn.ts`. A league's source is set with `source` in `src/config/leagues.ts`.
+Next.js 16 (App Router) + TypeScript, Tailwind CSS 4, next-intl and Zustand, hosted on Vercel. Phase 1 has no database: pages read football-data.org directly and cache it for an hour. Postgres arrives in phase 2 with accounts. Real fixtures and results come from [football-data.org](https://www.football-data.org/) (free tier). Brasileirão Série B isn't in that tier, so it comes from ESPN's public site feed (no key needed; unofficial, so it may change without notice) — see `src/lib/espn.ts`. The site footer credits football-data.org only; ESPN's feed has no attribution terms. A league's source is set with `source` in `src/config/leagues.ts`.
 
 ## Deploy
 
