@@ -71,7 +71,8 @@ export async function fetchEspnSeason(
 /** Placeholder sides for knockout games whose teams aren't decided yet. */
 const isPlaceholder = (c: EspnCompetitor) => /^TBD\b/i.test(c.team.displayName) || !/^\d+$/.test(c.team.id);
 
-const DROPPED_STATUSES = new Set(["STATUS_CANCELED", "STATUS_ABANDONED", "STATUS_FORFEIT"]);
+/** Games that may be listed again under a new date. */
+const REPLACEABLE_STATUSES = new Set(["STATUS_POSTPONED", "STATUS_CANCELED", "STATUS_ABANDONED", "STATUS_SUSPENDED"]);
 
 interface LeagueMatch {
   event: EspnEvent;
@@ -79,11 +80,10 @@ interface LeagueMatch {
   away: EspnCompetitor;
 }
 
-/** League games only: both sides known, not cancelled. */
+/** Games with both sides known (abandoned or postponed ones stay, without a result). */
 function leagueMatches(events: readonly EspnEvent[]): LeagueMatch[] {
   const out: LeagueMatch[] = [];
   for (const event of events) {
-    if (DROPPED_STATUSES.has(event.status.type.name)) continue;
     const competitors = event.competitions[0]?.competitors ?? [];
     const home = competitors.find((c) => c.homeAway === "home");
     const away = competitors.find((c) => c.homeAway === "away");
@@ -112,40 +112,160 @@ export function espnTeams(events: readonly EspnEvent[]): Team[] {
 }
 
 /**
- * Maps ESPN events to fixtures. ESPN doesn't say which round a game belongs to,
- * so rounds are rebuilt in kick-off order: each game goes in the earliest round
- * where neither team has played yet. A postponed game therefore returns to its
- * original round instead of creating a new one.
+ * ESPN sometimes keeps a postponed, abandoned or cancelled game next to its
+ * rescheduled replacement. Drops such a game when the same home/away pairing appears again later
+ * (a play-off rematch of a league pairing is a different, later game, so it stays).
  */
-export function espnFixtures(events: readonly EspnEvent[]): Fixture[] {
-  const matches = leagueMatches(events).sort(
+export function dropReplacedPostponements(events: readonly EspnEvent[]): EspnEvent[] {
+  const pairing = (e: EspnEvent) => {
+    const competitors = e.competitions[0]?.competitors ?? [];
+    const side = (s: "home" | "away") => competitors.find((c) => c.homeAway === s)?.team.id;
+    return `${side("home")}-${side("away")}`;
+  };
+  const latest = new Map<string, string>();
+  for (const e of events) {
+    const key = pairing(e);
+    if ((latest.get(key) ?? "") < e.date) latest.set(key, e.date);
+  }
+  return events.filter((e) => !REPLACEABLE_STATUSES.has(e.status.type.name) || latest.get(pairing(e))! <= e.date);
+}
+
+interface Game {
+  home: number;
+  away: number;
+  time: number;
+}
+
+/** Each game in the earliest round where neither team has played yet. */
+function greedyRounds(games: readonly Game[]): number[] {
+  const busy = new Map<number, Set<number>>();
+  const rounds = (team: number) => busy.get(team) ?? busy.set(team, new Set()).get(team)!;
+  return games.map((g) => {
+    let round = 0;
+    while (rounds(g.home).has(round) || rounds(g.away).has(round)) round++;
+    rounds(g.home).add(round);
+    rounds(g.away).add(round);
+    return round;
+  });
+}
+
+const DAY_MS = 86_400_000;
+
+/**
+ * Rebuilds a league's rounds (0-based) when the number of rounds is known.
+ * ESPN doesn't publish round numbers, and games moved for cup ties or TV are
+ * played out of order, so each round gets an expected date (the median date of
+ * every club's n-th game) and each game goes to the closest round in which
+ * neither club already plays. Games left over are placed by swapping two rounds
+ * along a chain of games (a Kempe chain), keeping every club to one game per round.
+ */
+export function assignRounds(games: readonly Game[], roundCount: number): number[] {
+  const teams = [...new Set(games.flatMap((g) => [g.home, g.away]))];
+  const datesByTeam = new Map(teams.map((t) => [t, [] as number[]]));
+  for (const g of games) {
+    datesByTeam.get(g.home)!.push(g.time);
+    datesByTeam.get(g.away)!.push(g.time);
+  }
+  for (const dates of datesByTeam.values()) dates.sort((a, b) => a - b);
+
+  const anchors: number[] = [];
+  for (let r = 0; r < roundCount; r++) {
+    const nth = [...datesByTeam.values()].flatMap((d) => (r < d.length ? [d[r]!] : [])).sort((a, b) => a - b);
+    const median = nth.length ? nth[Math.floor(nth.length / 2)]! : (anchors[r - 1] ?? 0) + 7 * DAY_MS;
+    anchors.push(Math.max(median, anchors[r - 1] ?? -Infinity));
+  }
+  const cost = (g: Game, r: number) => Math.abs(g.time - anchors[r]!);
+
+  /** slot.get(team)[round] = index of the game that team plays in that round. */
+  const slot = new Map(teams.map((t) => [t, new Array<number | undefined>(roundCount)]));
+  const round = new Array<number>(games.length).fill(-1);
+  const place = (i: number, r: number) => {
+    round[i] = r;
+    slot.get(games[i]!.home)![r] = i;
+    slot.get(games[i]!.away)![r] = i;
+  };
+  const isFree = (team: number, r: number) => slot.get(team)![r] === undefined;
+
+  // 1. Closest free round first, over every (game, round) pair.
+  const options: [number, number, number][] = [];
+  games.forEach((g, i) => {
+    for (let r = 0; r < roundCount; r++) options.push([cost(g, r), i, r]);
+  });
+  options.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]);
+  for (const [, i, r] of options) {
+    if (round[i] === -1 && isFree(games[i]!.home, r) && isFree(games[i]!.away, r)) place(i, r);
+  }
+
+  // 2. Leftovers: free a common round by swapping rounds a and b along a chain.
+  const byCost = (g: Game) => [...Array(roundCount).keys()].sort((x, y) => cost(g, x) - cost(g, y));
+  for (let i = 0; i < games.length; i++) {
+    if (round[i] !== -1) continue;
+    const g = games[i]!;
+    const freeHome = byCost(g).filter((r) => isFree(g.home, r));
+    const freeAway = byCost(g).filter((r) => isFree(g.away, r));
+    const common = freeHome.find((r) => isFree(g.away, r));
+    if (common !== undefined) {
+      place(i, common);
+      continue;
+    }
+    swap: for (const a of freeHome) {
+      tryB: for (const b of freeAway) {
+        // Walk from the away club: its round-a game, then the next club's round-b game, …
+        const chain: number[] = [];
+        let team = g.away;
+        let colour = a;
+        while (true) {
+          const j = slot.get(team)![colour];
+          if (j === undefined) break;
+          if (chain.includes(j) || chain.length > games.length) continue tryB;
+          chain.push(j);
+          const other = games[j]!.home === team ? games[j]!.away : games[j]!.home;
+          if (other === g.home) continue tryB; // would clash with the home club
+          team = other;
+          colour = colour === a ? b : a;
+        }
+        for (const j of chain) {
+          slot.get(games[j]!.home)![round[j]!] = undefined;
+          slot.get(games[j]!.away)![round[j]!] = undefined;
+        }
+        for (const j of chain) place(j, round[j] === a ? b : a);
+        place(i, a);
+        break swap;
+      }
+    }
+    // 3. Never happens for a valid schedule; keep the game in its closest round.
+    if (round[i] === -1) round[i] = byCost(g)[0]!;
+  }
+  return round;
+}
+
+/**
+ * Maps ESPN events to fixtures. ESPN doesn't say which round a game belongs to,
+ * so rounds are rebuilt: with `roundCount` (a league's full schedule) by
+ * expected round dates, otherwise in kick-off order.
+ */
+export function espnFixtures(events: readonly EspnEvent[], roundCount?: number): Fixture[] {
+  const matches = leagueMatches(dropReplacedPostponements(events)).sort(
     (a, b) => a.event.date.localeCompare(b.event.date) || Number(a.event.id) - Number(b.event.id),
   );
-  const roundsByTeam = new Map<number, Set<number>>();
-  const busy = (teamId: number) => {
-    let rounds = roundsByTeam.get(teamId);
-    if (!rounds) roundsByTeam.set(teamId, (rounds = new Set()));
-    return rounds;
-  };
+  const games = matches.map(({ event, home, away }) => ({
+    home: Number(home.team.id),
+    away: Number(away.team.id),
+    time: Date.parse(event.date),
+  }));
+  const rounds = roundCount ? assignRounds(games, roundCount) : greedyRounds(games);
 
-  return matches.map(({ event, home, away }) => {
-    const homeId = Number(home.team.id);
-    const awayId = Number(away.team.id);
-    let round = 1;
-    while (busy(homeId).has(round) || busy(awayId).has(round)) round++;
-    busy(homeId).add(round);
-    busy(awayId).add(round);
-
+  return matches.map(({ event, home, away }, i) => {
     const finished = event.status.type.completed && event.status.type.state === "post";
     const homeGoals = Number(home.score);
     const awayGoals = Number(away.score);
     const hasScore = home.score !== undefined && away.score !== undefined && Number.isFinite(homeGoals) && Number.isFinite(awayGoals);
     return {
       id: Number(event.id),
-      matchday: round,
+      matchday: rounds[i]! + 1,
       utcDate: event.date,
-      homeId,
-      awayId,
+      homeId: games[i]!.home,
+      awayId: games[i]!.away,
       result: finished && hasScore ? { home: homeGoals, away: awayGoals } : null,
     };
   });
@@ -158,6 +278,7 @@ export function espnFixtures(events: readonly EspnEvent[]): Fixture[] {
  */
 export function espnSplitSeason(events: readonly EspnEvent[], leagueGamesPerTeam: number) {
   const played = new Map<string, number>();
+  events = dropReplacedPostponements(events);
   const league: EspnEvent[] = [];
   const postseason: EspnEvent[] = [];
   const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date) || Number(a.id) - Number(b.id));

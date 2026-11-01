@@ -6,7 +6,7 @@ import { doubleRoundRobin } from "../engine/schedule.ts";
 import type { ResultMap } from "../engine/types.ts";
 import { mapMatches, mapTeam, request, seasonOf, teamsFromMatches, type ApiMatch } from "./footballData.ts";
 import { decodeResults, encodeResults } from "./shareCodec.ts";
-import { espnFixtures, espnSplitSeason, espnTeams, fetchEspnSeason, type EspnEvent } from "./espn.ts";
+import { assignRounds, espnFixtures, espnSplitSeason, espnTeams, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 
 describe("shareCodec", () => {
   const fixtures = doubleRoundRobin(Array.from({ length: 20 }, (_, i) => i + 1)).map((f) => ({
@@ -212,18 +212,50 @@ describe("ESPN feed mapping", () => {
     game("12", "2026-04-11T19:00Z", B, D, done, ["3", "0"]),
     game("14", "2026-04-25T19:00Z", A, D, later),
     game("15", "2026-11-21T20:00Z", ["131556", "TBD Home"], ["131554", "TBD Away"], later),
-    game("16", "2026-04-25T19:00Z", B, C, { type: { name: "STATUS_CANCELED", state: "post", completed: false } }),
+    // B v C was postponed; ESPN lists the rescheduled game as a new event.
+    game("16", "2026-04-25T19:00Z", B, C, { type: { name: "STATUS_POSTPONED", state: "pre", completed: false } }),
+    game("17", "2026-04-29T19:00Z", B, C, later),
   ];
 
-  it("skips undecided play-off slots and cancelled games", () => {
+  it("skips undecided play-off slots and postponed games that were rescheduled", () => {
     const ids = espnFixtures(events).map((f) => f.id).sort();
-    assert.deepEqual(ids, [10, 11, 12, 13, 14]);
+    assert.deepEqual(ids, [10, 11, 12, 13, 14, 17]);
     assert.deepEqual(espnTeams(events).map((t) => t.name).sort(), ["Avaí", "Ceará", "Goiás", "Sport"]);
   });
 
   it("rebuilds rounds, putting postponed games back in their original round", () => {
     const round = Object.fromEntries(espnFixtures(events).map((f) => [f.id, f.matchday]));
-    assert.deepEqual(round, { 10: 1, 13: 1, 11: 2, 12: 2, 14: 3 });
+    assert.deepEqual(round, { 10: 1, 13: 1, 11: 2, 12: 2, 14: 3, 17: 3 });
+  });
+
+  it("keeps an abandoned game that wasn't rescheduled, without a result", () => {
+    const abandoned = game("18", "2026-04-25T19:00Z", B, C, { type: { name: "STATUS_ABANDONED", state: "post", completed: false } }, ["1", "0"]);
+    const fixture = espnFixtures([abandoned]).find((f) => f.id === 18);
+    assert.equal(fixture?.result, null);
+  });
+
+  it("keeps a full schedule to its real number of rounds when games are moved", () => {
+    // A 20-team season, one round a week; then 12 games are moved weeks earlier
+    // or later (cup ties, TV), which used to push games into rounds 39, 40, …
+    const teams = Array.from({ length: 20 }, (_, i) => i + 1);
+    const schedule = doubleRoundRobin(teams);
+    const week = 7 * 86_400_000;
+    const start = Date.parse("2026-01-31T19:00Z");
+    const moved = new Map<number, number>();
+    schedule.forEach((f, i) => {
+      if (i % 31 === 7) moved.set(f.id, (i % 2 ? 3 : -4) * week + 86_400_000);
+    });
+    const games = schedule.map((f) => ({ home: f.homeId, away: f.awayId, time: start + (f.matchday - 1) * week + (moved.get(f.id) ?? 0) }));
+    const rounds = assignRounds(games, 38);
+    assert.ok(Math.max(...rounds) <= 37, "no round after 38");
+    for (let r = 0; r < 38; r++) {
+      const inRound = games.filter((_, i) => rounds[i] === r).flatMap((g) => [g.home, g.away]);
+      assert.equal(new Set(inRound).size, inRound.length, `no club twice in round ${r + 1}`);
+      assert.equal(inRound.length, 20, `round ${r + 1} is complete`);
+    }
+    const unmoved = schedule.filter((f) => !moved.has(f.id));
+    const kept = unmoved.filter((f) => rounds[schedule.indexOf(f)] === f.matchday - 1).length;
+    assert.ok(kept / unmoved.length > 0.95, `most games keep their round (${kept}/${unmoved.length})`);
   });
 
   it("keeps scores only for finished games", () => {

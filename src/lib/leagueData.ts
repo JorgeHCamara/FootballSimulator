@@ -20,8 +20,6 @@ export interface LeagueData {
 /** Server responses are cached for an hour, well inside the free tier's rate limit. */
 const REVALIDATE_SECONDS = 3600;
 
-let warnedMissingKey = false;
-
 const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 
 const inflight = new Map<string, Promise<LeagueData>>();
@@ -71,8 +69,8 @@ function currentSeasonYear(league: LeagueConfig, now = new Date()): number {
 }
 
 /**
- * ESPN's public feed (the same one Série B uses): the only source for leagues
- * outside football-data.org's free tier and the fallback for all the others.
+ * ESPN's public feed: the main source for every league (no key, no tight rate
+ * limit). football-data.org is the fallback, except for Série B.
  * Until at least half of a new season's fixtures are published, the previous
  * season is shown.
  */
@@ -85,7 +83,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
     // Games after a club's full league schedule are post-season (play-offs);
     // they feed the play-off bracket, or are left out when the site has none.
     const { league: events, postseason } = espnSplitSeason(all, (league.teams - 1) * 2);
-    const fixtures = espnFixtures(events);
+    const fixtures = espnFixtures(events, (league.teams - 1) * 2);
     // A season has teams × (teams − 1) games; skip a year until at least half are published.
     if (fixtures.length < (league.teams * (league.teams - 1)) / 2) continue;
     const label = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
@@ -116,8 +114,8 @@ function loadSample(league: LeagueConfig): LeagueData {
 }
 
 /**
- * Real data, in order of preference: football-data.org (when FOOTBALL_DATA_API_KEY
- * is set and the league is in its free tier), then ESPN's public feed. Generated
+ * Real data, in order of preference: ESPN's public feed, then football-data.org
+ * (when FOOTBALL_DATA_API_KEY is set and the league is in its free tier). Generated
  * sample leagues are only used for local development and tests (offline, or
  * FOOTSIMU_SAMPLE_DATA=1). If every source fails during runtime regeneration the
  * error is thrown, so the previously generated (real) page stays in place; on a
@@ -141,17 +139,9 @@ export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
 async function loadLeagueData(league: LeagueConfig): Promise<LeagueData> {
   if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return loadSample(league);
 
-  const sources: { name: string; load: () => Promise<LeagueData> }[] = [];
+  const sources: { name: string; load: () => Promise<LeagueData> }[] = [{ name: "ESPN", load: () => loadEspn(league) }];
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
-  if (!league.espnOnly) {
-    if (apiKey) {
-      sources.push({ name: "football-data.org", load: () => loadLive(league, apiKey) });
-    } else if (process.env.NODE_ENV === "production" && !warnedMissingKey) {
-      warnedMissingKey = true;
-      console.warn("FOOTBALL_DATA_API_KEY is not set: loading leagues from ESPN only.");
-    }
-  }
-  sources.push({ name: "ESPN", load: () => loadEspn(league) });
+  if (apiKey && !league.espnOnly) sources.push({ name: "football-data.org", load: () => loadLive(league, apiKey) });
 
   const failures: string[] = [];
   for (const source of sources) {

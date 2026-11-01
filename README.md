@@ -7,7 +7,7 @@
 
 ## Stack
 
-Next.js 16 (App Router) + TypeScript, Tailwind CSS 4, next-intl and Zustand, hosted on Vercel. Phase 1 has no database: pages read football-data.org directly and cache it for an hour. Postgres arrives in phase 2 with accounts. Real fixtures and results come from [football-data.org](https://www.football-data.org/) (free tier). Every league also has ESPN's public site feed as a fallback (no key needed; unofficial, so it may change without notice) — see `src/lib/espn.ts`. When football-data.org fails or rate-limits a request, the league loads from ESPN instead, so visitors never see made-up clubs. Brasileirão Série B isn't in football-data.org's free tier, so it always comes from ESPN. The site footer credits football-data.org only; ESPN's feed has no attribution terms. Each league's ESPN feed (`espn`) and `espnOnly` are set in `src/config/leagues.ts`.
+Next.js 16 (App Router) + TypeScript, Tailwind CSS 4, next-intl and Zustand, hosted on Vercel. Phase 1 has no database: pages read football-data.org directly and cache it for an hour. Postgres arrives in phase 2 with accounts. Real fixtures and results come from ESPN's public site feed (no key needed; unofficial, so it may change without notice) — see `src/lib/espn.ts`. ESPN doesn't publish round numbers, so rounds are rebuilt from kick-off dates, keeping each league to its real number of rounds. [football-data.org](https://www.football-data.org/) (free tier) is the fallback when ESPN fails; Brasileirão Série B isn't in its free tier, so it has no fallback. Either way visitors never see made-up clubs. The site footer credits football-data.org only; ESPN's feed has no attribution terms. Each league's ESPN feed (`espn`) and `espnOnly` are set in `src/config/leagues.ts`.
 
 ## Deploy
 
@@ -31,7 +31,7 @@ npm run dev
 
 Open http://localhost:3000. You'll be redirected to `/en`; `/pt` and `/es` work too.
 
-Without an API key every league loads from ESPN's feed. Generated sample leagues with fictional team names are only used when no source can be reached (e.g. offline) in local development, or when `FOOTSIMU_SAMPLE_DATA=1` is set (the e2e test uses this). A production build on Vercel fails instead of publishing sample data, so the previous deployment stays live. To use football-data.org as the main source:
+Every league loads from ESPN's feed, with or without an API key. Generated sample leagues with fictional team names are only used when no source can be reached (e.g. offline) in local development, or when `FOOTSIMU_SAMPLE_DATA=1` is set (the e2e test uses this). A production build on Vercel fails instead of publishing sample data, so the previous deployment stays live. To add football-data.org as the fallback source:
 
 1. Get a free key at https://www.football-data.org/client/register
 2. Copy `.env.example` to `.env.local` and set `FOOTBALL_DATA_API_KEY=your-key`
@@ -79,7 +79,7 @@ After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_
 | `src/components/` | `LeagueSimulator`, `StandingsTable`, `FixtureList`, `ProbabilityGrid`, header/footer |
 | `src/store/simStore.ts` | Predictions per league and season, saved in the browser, with undo |
 | `src/workers/montecarlo.worker.ts` | Runs the 10,000-season simulation off the main thread |
-| `src/lib/leagueData.ts` | Loads football-data.org data, falls back to ESPN, or the sample league in local development |
+| `src/lib/leagueData.ts` | Loads ESPN data, falls back to football-data.org, or the sample league in local development |
 | `src/lib/shareCodec.ts` | Compact URL encoding of predictions for share links |
 | `src/config/leagues.ts` | Tiebreakers and qualification/relegation zones per league |
 | `src/i18n/`, `messages/` | Routing and translations (EN, PT, ES) |

@@ -48,8 +48,8 @@ export interface LeagueConfig {
   aka: Record<SiteLocale, string>;
   teams: number;
   /**
-   * Real data comes from football-data.org (with `code` as the competition code)
-   * and falls back to ESPN; leagues outside football-data.org's free tier set
+   * Real data comes from ESPN and falls back to football-data.org (with `code`
+   * as the competition code); leagues outside football-data.org's free tier set
    * `espnOnly`.
    */
   espn: EspnFeed;
