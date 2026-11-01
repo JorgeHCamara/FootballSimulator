@@ -6,7 +6,7 @@ import { doubleRoundRobin } from "../engine/schedule.ts";
 import type { ResultMap } from "../engine/types.ts";
 import { mapMatches, mapTeam, request, seasonOf, teamsFromMatches, type ApiMatch } from "./footballData.ts";
 import { decodeResults, encodeResults } from "./shareCodec.ts";
-import { espnFixtures, espnSplitSeason, espnTeams, type EspnEvent } from "./espn.ts";
+import { espnFixtures, espnSplitSeason, espnTeams, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 
 describe("shareCodec", () => {
   const fixtures = doubleRoundRobin(Array.from({ length: 20 }, (_, i) => i + 1)).map((f) => ({
@@ -245,6 +245,39 @@ describe("ESPN feed mapping", () => {
     const { league, postseason } = espnSplitSeason(season, 2);
     assert.deepEqual(league.map((e) => e.id), ["1", "2", "3", "4"]);
     assert.deepEqual(postseason.map((e) => e.id), ["5"]);
+  });
+
+  it("fetches a split season from both calendar years, keeping only its own games", async () => {
+    const tagged = (id: string, date: string, year: number) => ({ ...game(id, date, A, B, later), season: { year } });
+    const byYear: Record<string, EspnEvent[]> = {
+      "2026": [tagged("1", "2026-05-20T15:00Z", 2025), tagged("2", "2026-08-22T15:00Z", 2026)],
+      "2027": [tagged("3", "2027-05-23T15:00Z", 2026)],
+    };
+    const urls: string[] = [];
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string) => {
+      urls.push(url);
+      return new Response(JSON.stringify({ events: byYear[/dates=(\d+)/.exec(url)![1]!] }));
+    }) as typeof fetch;
+    try {
+      const events = await fetchEspnSeason("eng.1", 2026, "split");
+      assert.deepEqual(events.map((e) => e.id).sort(), ["2", "3"]);
+      assert.equal(urls.length, 2);
+      assert.ok(urls.every((u) => u.includes("/eng.1/scoreboard")));
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
+  it("every league has an ESPN feed as fallback", () => {
+    for (const league of LEAGUES) assert.match(league.espn.slug, /^[a-z]{3}\.\d$/, league.code);
+  });
+
+  it("gives ESPN club names the same display names as football-data.org", () => {
+    const cologne = { id: 1, name: "FC Cologne", shortName: "Cologne", tla: "KOE" };
+    const athletico = { id: 2, name: "Athletico-PR", shortName: "Athletico-PR", tla: "CAP" };
+    assert.equal(applyTeamOverrides([cologne], { league: "BL1" })[0]!.name, "FC Köln");
+    assert.equal(applyTeamOverrides([athletico], { league: "BSA" })[0]!.name, "Athletico Paranaense");
   });
 
   it("applies league-scoped renames only in that league", () => {

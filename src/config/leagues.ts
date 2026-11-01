@@ -24,8 +24,13 @@ export interface Zone {
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B). */
 export type CompetitionCode = "PL" | "ELC" | "PD" | "BL1" | "SA" | "FL1" | "PPL" | "DED" | "BSA" | "BSB";
 
-/** Where a league's real data comes from. */
-export type DataSource = { provider: "football-data" } | { provider: "espn"; slug: string };
+/** A league on ESPN's public feed. */
+export interface EspnFeed {
+  /** ESPN's league slug, e.g. "eng.1". */
+  slug: string;
+  /** "split" seasons run August–May (2026/27); "calendar" seasons run within one year. */
+  seasons: "split" | "calendar";
+}
 
 export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br";
 
@@ -42,8 +47,13 @@ export interface LeagueConfig {
   /** How people also search for the league, e.g. "Campeonato Brasileiro". */
   aka: Record<SiteLocale, string>;
   teams: number;
-  /** Defaults to football-data.org with `code` as the competition code. */
-  source?: DataSource;
+  /**
+   * Real data comes from football-data.org (with `code` as the competition code)
+   * and falls back to ESPN; leagues outside football-data.org's free tier set
+   * `espnOnly`.
+   */
+  espn: EspnFeed;
+  espnOnly?: boolean;
   /** End-of-season promotion play-off (see src/engine/playoffs.ts). */
   playoff?: PlayoffConfig;
   tiebreakers: readonly Tiebreaker[];
@@ -64,6 +74,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "Premier League Simulator", pt: "Simulador da Premier League", es: "Simulador de la Premier League" },
     aka: { en: "Premier League", pt: "Campeonato Inglês", es: "Liga inglesa" },
     teams: 20,
+    espn: { slug: "eng.1", seasons: "split" },
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadAwayGoalsFor"],
     zones: [
       { kind: "championsLeague", from: 1, to: 4 },
@@ -81,6 +92,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "Championship Simulator", pt: "Simulador da Championship", es: "Simulador de la Championship" },
     aka: { en: "EFL Championship", pt: "Segunda divisão inglesa", es: "Segunda división inglesa" },
     teams: 24,
+    espn: { slug: "eng.2", seasons: "split" },
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadAwayGoalsFor"],
     zones: [
       { kind: "promotion", from: 1, to: 2 },
@@ -110,6 +122,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "La Liga Simulator", pt: "Simulador da La Liga", es: "Simulador de LaLiga" },
     aka: { en: "Spanish La Liga", pt: "Campeonato Espanhol", es: "Liga española" },
     teams: 20,
+    espn: { slug: "esp.1", seasons: "split" },
     tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
     zones: [
       { kind: "championsLeague", from: 1, to: 4 },
@@ -127,6 +140,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "Bundesliga Simulator", pt: "Simulador da Bundesliga", es: "Simulador de la Bundesliga" },
     aka: { en: "German Bundesliga", pt: "Campeonato Alemão", es: "Liga alemana" },
     teams: 18,
+    espn: { slug: "ger.1", seasons: "split" },
     tiebreakers: [
       "points",
       "goalDifference",
@@ -152,6 +166,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "Serie A Simulator", pt: "Simulador da Serie A", es: "Simulador de la Serie A" },
     aka: { en: "Italian Serie A", pt: "Campeonato Italiano", es: "Liga italiana" },
     teams: 20,
+    espn: { slug: "ita.1", seasons: "split" },
     tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
     zones: [
       { kind: "championsLeague", from: 1, to: 4 },
@@ -169,6 +184,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "Ligue 1 Simulator", pt: "Simulador da Ligue 1", es: "Simulador de la Ligue 1" },
     aka: { en: "French Ligue 1", pt: "Campeonato Francês", es: "Liga francesa" },
     teams: 18,
+    espn: { slug: "fra.1", seasons: "split" },
     tiebreakers: [
       "points",
       "goalDifference",
@@ -195,6 +211,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "Primeira Liga Simulator", pt: "Simulador da Primeira Liga", es: "Simulador de la Primeira Liga" },
     aka: { en: "Liga Portugal", pt: "Campeonato Português", es: "Liga portuguesa" },
     teams: 18,
+    espn: { slug: "por.1", seasons: "split" },
     tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
     zones: [
       { kind: "championsLeague", from: 1, to: 1 },
@@ -214,6 +231,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "Eredivisie Simulator", pt: "Simulador da Eredivisie", es: "Simulador de la Eredivisie" },
     aka: { en: "Dutch Eredivisie", pt: "Campeonato Holandês", es: "Liga neerlandesa" },
     teams: 18,
+    espn: { slug: "ned.1", seasons: "split" },
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadGoalDifference"],
     zones: [
       { kind: "championsLeague", from: 1, to: 1 },
@@ -233,6 +251,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     simulatorName: { en: "Brasileirão Simulator", pt: "Simulador do Brasileirão", es: "Simulador del Brasileirão" },
     aka: { en: "Brazilian Série A", pt: "Campeonato Brasileiro", es: "Liga brasileña" },
     teams: 20,
+    espn: { slug: "bra.1", seasons: "calendar" },
     tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadPoints"],
     zones: [
       { kind: "libertadores", from: 1, to: 4 },
@@ -251,7 +270,8 @@ export const LEAGUES: readonly LeagueConfig[] = [
     aka: { en: "Brasileirão Série B", pt: "Brasileiro Série B", es: "Serie B de Brasil" },
     teams: 20,
     // football-data.org's free tier doesn't include Série B.
-    source: { provider: "espn", slug: "bra.2" },
+    espn: { slug: "bra.2", seasons: "calendar" },
+    espnOnly: true,
     // Série B 2026: 3rd v 6th and 4th v 5th; the winners join 1st and 2nd in Série A.
     playoff: {
       rounds: [{ key: "semiFinals", legs: 2, levelTie: "betterPlaced", pairs: [[3, 6], [4, 5]] }],

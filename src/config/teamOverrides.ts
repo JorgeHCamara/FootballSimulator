@@ -1,8 +1,9 @@
 import type { Team } from "../engine/types.ts";
 import type { CompetitionCode } from "./leagues.ts";
 
-// Display-name overrides for clubs whose football-data.org name isn't the one
-// fans use. Only names, codes and crests change: simulations, saved predictions
+// Display-name overrides for clubs whose football-data.org or ESPN name isn't
+// the one fans use (ESPN is the fallback source, so a club should look the same
+// whichever source loaded). Only names, codes and crests change: simulations, saved predictions
 // and share links work on team ids, so they are unaffected.
 //
 // `match` can be:
@@ -206,6 +207,33 @@ export const TEAM_OVERRIDES: readonly TeamOverride[] = [
   { match: "Telstar 1963", league: "DED", name: "Telstar", shortName: "Telstar" },
   { match: "ADO Den Haag", league: "DED", name: "ADO Den Haag", shortName: "ADO" },
   { match: "Willem II Tilburg", league: "DED", name: "Willem II", shortName: "Willem II" },
+  // ESPN names (fallback source) that differ from the names above
+  { match: "Athletico-PR", league: "BSA", name: "Athletico Paranaense", shortName: "Athletico-PR", tla: "CAP" },
+  { match: "Atlético-MG", league: "BSA", name: "Atlético Mineiro", shortName: "Atlético-MG" },
+  { match: "Vasco da Gama", league: "BSA", name: "Vasco", shortName: "Vasco" },
+  { match: "Crystal Palace", name: "Crystal Palace", shortName: "Crystal Palace" },
+  { match: "Tottenham Hotspur", name: "Tottenham Hotspur", shortName: "Tottenham" },
+  { match: "Manchester United", name: "Manchester United", shortName: "Man United" },
+  { match: "Middlesbrough", name: "Middlesbrough", shortName: "Middlesbrough" },
+  { match: "Deportivo", league: "PD", name: "Deportivo La Coruña", shortName: "Deportivo" },
+  { match: "Hamburg SV", name: "Hamburger SV", shortName: "Hamburg" },
+  { match: "FC Cologne", name: "FC Köln", shortName: "Köln" },
+  { match: "Mainz", league: "BL1", name: "Mainz 05", shortName: "Mainz" },
+  { match: "TSG Hoffenheim", name: "Hoffenheim", shortName: "Hoffenheim" },
+  { match: "Werder Bremen", name: "Werder Bremen", shortName: "Werder Bremen" },
+  { match: "Internazionale", name: "Inter", shortName: "Inter" },
+  { match: "AS Monaco", name: "Monaco", shortName: "Monaco" },
+  { match: "Stade Rennais", name: "Rennes", shortName: "Rennes" },
+  { match: "Sporting CP", league: "PPL", name: "Sporting", shortName: "Sporting" },
+  { match: "C.D. Nacional", league: "PPL", name: "Nacional", shortName: "Nacional" },
+  { match: "FC Famalicao", league: "PPL", name: "Famalicão", shortName: "Famalicão" },
+  { match: "Maritimo", league: "PPL", name: "Marítimo", shortName: "Marítimo" },
+  { match: "Vitória de Guimaraes", league: "PPL", name: "Vitória de Guimarães", shortName: "V. Guimarães" },
+  { match: "Estoril", league: "PPL", name: "Estoril Praia", shortName: "Estoril" },
+  { match: "Estrela", league: "PPL", name: "Estrela da Amadora", shortName: "Estrela Amadora" },
+  { match: "Académico de Viseu", league: "PPL", name: "Académico de Viseu", shortName: "Académico Viseu" },
+  { match: "Ajax Amsterdam", league: "DED", name: "Ajax", shortName: "Ajax" },
+  { match: "SC Cambuur", league: "DED", name: "Cambuur", shortName: "Cambuur" },
 ];
 
 const normalize = (text: string) => text.trim().toLowerCase();

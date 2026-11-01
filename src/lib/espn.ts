@@ -1,8 +1,9 @@
 import type { Fixture, Team } from "../engine/types.ts";
 
-// Client for ESPN's public site API, used for competitions football-data.org's
-// free tier doesn't cover (Brasileirão Série B). The feed is unofficial and
-// undocumented: it needs no key, but its shape may change without notice.
+// Client for ESPN's public site API: the only source for competitions
+// football-data.org's free tier doesn't cover (Brasileirão Série B) and the
+// fallback for every other league. The feed is unofficial and undocumented: it
+// needs no key, but its shape may change without notice.
 
 const BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer";
 
@@ -21,7 +22,8 @@ export interface EspnCompetitor {
 export interface EspnEvent {
   id: string;
   date: string;
-  season?: { year: number };
+  /** The season the game belongs to, by its starting year (2026 = 2026/27). */
+  season?: { year: number; slug?: string };
   status: { type: { name: string; state: string; completed: boolean } };
   competitions: { competitors: EspnCompetitor[] }[];
 }
@@ -38,11 +40,32 @@ export class EspnError extends Error {
   }
 }
 
-/** Every event of one season (ESPN's "dates" filter accepts a plain year). */
-export async function fetchEspnSeason(slug: string, year: number, init: RequestInit = {}): Promise<EspnScoreboard> {
+/** Every event in one calendar year (ESPN's "dates" filter accepts a plain year, not a range). */
+export async function fetchEspnYear(slug: string, year: number, init: RequestInit = {}): Promise<EspnScoreboard> {
   const res = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${year}&limit=1000`, init);
   if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} ${year}: HTTP ${res.status}`);
   return (await res.json()) as EspnScoreboard;
+}
+
+/**
+ * Every event of the season starting in `year`. A split season (2026/27) spans
+ * two calendar years, each of which also holds games of a neighbouring season,
+ * so both years are fetched and filtered by the season ESPN tags each game with.
+ */
+export async function fetchEspnSeason(
+  slug: string,
+  year: number,
+  seasons: "split" | "calendar",
+  init: RequestInit = {},
+): Promise<EspnEvent[]> {
+  const years = seasons === "split" ? [year, year + 1] : [year];
+  const boards = await Promise.all(years.map((y) => fetchEspnYear(slug, y, init)));
+  const byId = new Map<string, EspnEvent>();
+  for (const event of boards.flatMap((b) => b.events ?? [])) {
+    if (event.season && event.season.year !== year) continue;
+    byId.set(event.id, event);
+  }
+  return [...byId.values()];
 }
 
 /** Placeholder sides for knockout games whose teams aren't decided yet. */

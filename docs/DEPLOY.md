@@ -30,7 +30,7 @@ In **Settings → Environment Variables**, add these for *Production* and *Previ
 
 | Name | Value |
 |---|---|
-| `FOOTBALL_DATA_API_KEY` | Your free key from https://www.football-data.org/client/register. Without it the site shows generated sample leagues. |
+| `FOOTBALL_DATA_API_KEY` | Your free key from https://www.football-data.org/client/register. Without it every league loads from ESPN's public feed (the fallback source). |
 | `NEXT_PUBLIC_SITE_URL` | `https://footsimu.com` |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Added in step 7 |
 

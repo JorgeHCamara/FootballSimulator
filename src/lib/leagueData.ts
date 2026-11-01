@@ -63,33 +63,44 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
   };
 }
 
+/** The season currently being played, by its starting year (2026 = 2026/27). */
+function currentSeasonYear(league: LeagueConfig, now = new Date()): number {
+  const year = now.getUTCFullYear();
+  // Split seasons start in August; from June on, try the new season first.
+  return league.espn.seasons === "split" && now.getUTCMonth() < 5 ? year - 1 : year;
+}
+
 /**
- * Leagues outside football-data.org's free tier come from ESPN's public feed.
- * Brazilian seasons follow the calendar year; before a new season's fixtures are
- * published, the previous season is shown.
+ * ESPN's public feed (the same one Série B uses): the only source for leagues
+ * outside football-data.org's free tier and the fallback for all the others.
+ * Until at least half of a new season's fixtures are published, the previous
+ * season is shown.
  */
-async function loadEspn(league: LeagueConfig, slug: string): Promise<LeagueData> {
+async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
+  const { slug, seasons } = league.espn;
   const init = { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
-  const thisYear = new Date().getUTCFullYear();
-  for (const year of [thisYear, thisYear - 1]) {
-    const { events: all } = await fetchEspnSeason(slug, year, init);
-    // Keep play-off games out of the league table once their clubs are known.
-    const { league: events, postseason } = league.playoff
-      ? espnSplitSeason(all, (league.teams - 1) * 2)
-      : { league: all, postseason: [] };
+  const current = currentSeasonYear(league);
+  for (const year of [current, current - 1]) {
+    const all = await fetchEspnSeason(slug, year, seasons, init);
+    // Games after a club's full league schedule are post-season (play-offs);
+    // they feed the play-off bracket, or are left out when the site has none.
+    const { league: events, postseason } = espnSplitSeason(all, (league.teams - 1) * 2);
     const fixtures = espnFixtures(events);
     // A season has teams × (teams − 1) games; skip a year until at least half are published.
     if (fixtures.length < (league.teams * (league.teams - 1)) / 2) continue;
+    const label = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
     return {
       teams: applyTeamOverrides(espnTeams(events), { league: league.code }),
       fixtures,
-      season: String(year),
-      seasonKey: `${league.code}:${year}`,
+      season: label,
+      // ESPN and football-data.org use different match ids, so each source keeps
+      // its own saved predictions (Série B has only ever used ESPN).
+      seasonKey: league.espnOnly ? `${league.code}:${year}` : `${league.code}:espn:${year}`,
       source: "live",
-      ...(postseason.length ? { postseason: espnFixtures(postseason) } : {}),
+      ...(league.playoff && postseason.length ? { postseason: espnFixtures(postseason) } : {}),
     };
   }
-  throw new Error(`No ${league.code} fixtures on ESPN for ${thisYear} or ${thisYear - 1}`);
+  throw new Error(`No ${league.code} fixtures on ESPN for ${current} or ${current - 1}`);
 }
 
 function loadSample(league: LeagueConfig): LeagueData {
@@ -105,11 +116,12 @@ function loadSample(league: LeagueConfig): LeagueData {
 }
 
 /**
- * Real data from football-data.org when FOOTBALL_DATA_API_KEY is set (or from ESPN
- * for leagues configured with that source), otherwise a
- * generated sample league so the site still runs locally. If the API fails during
- * a build the sample league is used; during runtime regeneration the error is
- * thrown so the previously generated (real) page stays in place.
+ * Real data, in order of preference: football-data.org (when FOOTBALL_DATA_API_KEY
+ * is set and the league is in its free tier), then ESPN's public feed. Generated
+ * sample leagues are only used for local development and tests (offline, or
+ * FOOTSIMU_SAMPLE_DATA=1). If every source fails during runtime regeneration the
+ * error is thrown, so the previously generated (real) page stays in place; on a
+ * Vercel build it fails the deployment, so the live site keeps its real data.
  */
 export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
   // Share one request per league across the 3 language versions of its page and
@@ -127,31 +139,38 @@ export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
 }
 
 async function loadLeagueData(league: LeagueConfig): Promise<LeagueData> {
-  const source = league.source ?? { provider: "football-data" };
-  let loadReal: (() => Promise<LeagueData>) | undefined;
-  if (source.provider === "espn") {
-    loadReal = () => loadEspn(league, source.slug);
-  } else {
-    const apiKey = process.env.FOOTBALL_DATA_API_KEY;
-    if (!apiKey && process.env.NODE_ENV === "production" && !warnedMissingKey) {
-      warnedMissingKey = true;
-      console.warn("FOOTBALL_DATA_API_KEY is not set: serving generated sample leagues instead of real data.");
-    }
-    if (apiKey) loadReal = () => loadLive(league, apiKey);
-  }
+  if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return loadSample(league);
 
-  if (loadReal) {
+  const sources: { name: string; load: () => Promise<LeagueData> }[] = [];
+  const apiKey = process.env.FOOTBALL_DATA_API_KEY;
+  if (!league.espnOnly) {
+    if (apiKey) {
+      sources.push({ name: "football-data.org", load: () => loadLive(league, apiKey) });
+    } else if (process.env.NODE_ENV === "production" && !warnedMissingKey) {
+      warnedMissingKey = true;
+      console.warn("FOOTBALL_DATA_API_KEY is not set: loading leagues from ESPN only.");
+    }
+  }
+  sources.push({ name: "ESPN", load: () => loadEspn(league) });
+
+  const failures: string[] = [];
+  for (const source of sources) {
     try {
-      return await loadReal();
+      const data = await source.load();
+      if (failures.length) console.warn(`${league.code}: using ${source.name} after ${failures.join("; ")}`);
+      return data;
     } catch (error) {
       const reason = error instanceof FootballDataError || error instanceof EspnError ? `HTTP ${error.status}` : String(error);
-      // At runtime (hourly regeneration) fail instead: Next.js keeps serving the
-      // last good page rather than caching sample data over real data.
-      if (process.env.NODE_ENV === "production" && !isBuildPhase()) {
-        throw new Error(`${source.provider} failed for ${league.code} (${reason}); keeping the previous page`);
-      }
-      console.error(`Falling back to sample data for ${league.code} (${reason}):`, error);
+      failures.push(`${source.name} failed (${reason})`);
     }
   }
+
+  const summary = `${league.code}: ${failures.join("; ")}`;
+  // Never publish made-up clubs: at runtime Next.js keeps serving the last good
+  // page, and a failed Vercel build keeps the current deployment live.
+  if (process.env.NODE_ENV === "production" && (!isBuildPhase() || process.env.VERCEL)) {
+    throw new Error(`No real data for ${summary}`);
+  }
+  console.error(`Falling back to sample data for ${summary}`);
   return loadSample(league);
 }
