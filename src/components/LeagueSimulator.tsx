@@ -6,7 +6,7 @@ import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel } from "../engine/ratings.ts";
-import { buildBracket, isShootoutId, playoffIds, simulatePenalties, simulatePlayoff, tieIds } from "../engine/playoffs.ts";
+import { buildBracket, isShootoutId, playoffCancelled, playoffIds, simulatePenalties, simulatePlayoff, tieIds } from "../engine/playoffs.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
@@ -104,6 +104,8 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
     [fixtures, legIds],
   );
   const seasonComplete = useMemo(() => fixtures.every((f) => effective[f.id]), [fixtures, effective]);
+  // Serie B: no play-off when 3rd finishes far enough clear of 4th.
+  const cancelled = Boolean(playoff && seasonComplete && playoffCancelled(playoff, rows));
   const bracketOptions = useMemo(
     () => ({
       afterMatchday: ordered.at(-1)?.matchday ?? 0,
@@ -321,9 +323,12 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
                   season={seasonLabel}
                 />
               )}
-              {playoff?.promotedTo && bracket.length > 0 && (
+              {playoff?.promotedTo && (bracket.length > 0 || cancelled) && (
                 <PromotedClubs
                   bracket={bracket}
+                  cancelled={cancelled}
+                  {...(playoff.directIfClear ? { clearPosition: playoff.directIfClear.position } : {})}
+                  {...(playoff.winnerPlays ? { winnerPlays: playoff.winnerPlays } : {})}
                   rows={rows}
                   teams={teamMap}
                   predictions={season.predictions}
@@ -379,6 +384,8 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
                     seasonComplete,
                     ...(playoff.promotedTo ? { promotedTo: playoff.promotedTo } : {}),
                     ...(playoff.title ? { title: playoff.title } : {}),
+                    ...(playoff.winnerPlays ? { winnerPlays: playoff.winnerPlays } : {}),
+                    ...(cancelled && playoff.directIfClear ? { cancelled: playoff.directIfClear } : {}),
                     groupNames: (league.groups ?? []).map((g) => g.shortName[lang]),
                   },
                 }

@@ -6,6 +6,7 @@ import {
   PLAYOFF_ID_BASE,
   buildBracket,
   needsShootout,
+  playoffCancelled,
   playoffIds,
   playoffWinners,
   seriesGames,
@@ -285,5 +286,47 @@ describe("League Two play-off (4th–7th, three promoted directly)", () => {
     assert.ok(winner !== null && [104, 105, 106, 107].includes(winner!));
     assert.deepEqual(leagueTwo.directPromotion, [1, 2, 3]);
     assert.equal(leagueTwo.promotedTo, "League One");
+  });
+});
+
+describe("Serie B play-off (preliminaries, fixed semi-finals, draw advantage)", () => {
+  const serieB = getLeagueByCode("SB")!.playoff!;
+  const table = rows.slice(0, 20);
+  /** A score for `fixture` that `winner` wins. */
+  const win = (fixture: Fixture, winner: number) => (fixture.homeId === winner ? { home: 2, away: 1 } : { home: 1, away: 2 });
+
+  it("plays 5v8 and 6v7 at the better-placed club; a draw sends it through", () => {
+    const [prelims] = buildBracket(table, serieB, {}, options);
+    assert.deepEqual(prelims!.map((t) => [t.higher.teamId, t.lower.teamId, t.legs[0]!.homeId]), [[105, 108, 105], [106, 107, 106]]);
+    assert.equal(tieOutcome(prelims![0]!, { [prelims![0]!.legs[0]!.id]: { home: 1, away: 1 } })?.winner, 105);
+  });
+
+  it("pairs 3rd with the 6/7 winner and 4th with the 5/8 winner, even after upsets", () => {
+    const [prelims] = buildBracket(table, serieB, {}, options);
+    // 8th beats 5th, 7th beats 6th.
+    const results: ResultMap = { [prelims![0]!.legs[0]!.id]: win(prelims![0]!.legs[0]!, 108), [prelims![1]!.legs[0]!.id]: win(prelims![1]!.legs[0]!, 107) };
+    const semis = buildBracket(table, serieB, results, options)[1]!;
+    assert.deepEqual(semis.map((t) => [t.higher.teamId, t.lower.teamId]), [[103, 107], [104, 108]]);
+    assert.equal(semis[0]!.config.legs, 2);
+  });
+
+  it("is not played when 3rd finishes more than 14 points clear of 4th", () => {
+    const withPoints = (third: number, fourth: number) => table.map((r) => ({ ...r, points: r.position === 3 ? third : r.position === 4 ? fourth : 40 }));
+    assert.equal(playoffCancelled(serieB, withPoints(75, 61)), false, "14 points: play-off held");
+    assert.equal(playoffCancelled(serieB, withPoints(76, 61)), true, "15 points: 3rd goes up");
+    assert.deepEqual(buildBracket(withPoints(76, 61), serieB, {}, options), []);
+    assert.deepEqual(simulatePlayoff(withPoints(76, 61), serieB, {}, model, createRng(1), options), {});
+  });
+});
+
+describe("Ligue 2 play-off (4th v 5th, winner at 3rd, then v Ligue 1's 16th)", () => {
+  const ligue2 = getLeagueByCode("FL2")!.playoff!;
+
+  it("plays 4th v 5th, then the winner at 3rd's ground; a draw goes to penalties", () => {
+    const [[first], [second]] = buildBracket(rows.slice(0, 18), ligue2, {}, options) as [PlayoffTie[], PlayoffTie[]];
+    assert.deepEqual([first!.higher.teamId, first!.lower.teamId], [104, 105]);
+    assert.ok(first!.shootout);
+    assert.deepEqual([second!.higher.teamId, second!.lower.from], [103, { round: 0, tie: 0 }]);
+    assert.deepEqual(ligue2.winnerPlays, { league: "Ligue 1", position: 16 });
   });
 });

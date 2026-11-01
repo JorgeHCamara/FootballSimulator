@@ -14,6 +14,9 @@ import type { Fixture, ResultMap, Score, StandingRow, TeamId } from "./types.ts"
 //   bracket; the two conference champions meet in MLS Cup.
 
 export type PlayoffRoundKey =
+  | "preliminary"
+  | "playOff1"
+  | "playOff2"
   | "eliminators"
   | "semiFinals"
   | "final"
@@ -57,6 +60,17 @@ export interface PlayoffConfig {
   promotedTo?: string;
   /** Competition the winner is champion of (title play-offs, e.g. "MLS Cup"). */
   title?: string;
+  /**
+   * The play-off isn't held when `position` finishes more than `points` points
+   * clear of `over`: that club goes up directly (Serie B: 3rd more than 14
+   * points clear of 4th).
+   */
+  directIfClear?: { position: number; over: number; points: number };
+  /**
+   * The winner isn't promoted yet: it plays `position` of `league` over two legs
+   * (Ligue 2: v Ligue 1's 16th). Not simulated, the opponent is in another league.
+   */
+  winnerPlays?: { league: string; position: number };
   /**
    * The first `rounds` rounds are played within each of `count` groups (MLS
    * conferences), seeded by the group's table; later rounds bring the groups'
@@ -245,12 +259,22 @@ export interface BracketOptions {
 
 const DAY = 24 * 60 * 60 * 1000;
 
+/** True once the table makes the play-off unnecessary (see `directIfClear`). */
+export function playoffCancelled(config: PlayoffConfig, rows: readonly StandingRow[]): boolean {
+  const rule = config.directIfClear;
+  if (!rule) return false;
+  const leader = rows.find((r) => r.position === rule.position);
+  const next = rows.find((r) => r.position === rule.over);
+  return leader !== undefined && next !== undefined && leader.points - next.points > rule.points;
+}
+
 export function buildBracket(
   rows: readonly StandingRow[],
   config: PlayoffConfig,
   results: ResultMap,
   options: BracketOptions,
 ): PlayoffTie[][] {
+  if (options.seasonComplete && playoffCancelled(config, rows)) return [];
   const grouped = config.groupStage !== undefined && (options.groups?.length ?? 0) > 0;
   const groupRounds = grouped ? config.groupStage!.rounds : 0;
   const start = Date.parse(options.afterDate) || Date.now();

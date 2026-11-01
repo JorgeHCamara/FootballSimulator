@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Football Simulator – Simulate the Premier League, La Liga, Brasileirão and more",
-    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie, Brasileirão and MLS. Live table plus title, Europe and relegation chances.",
+    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Brasileirão and MLS. Live table plus title, Europe and relegation chances.",
     "leagueTitle": "{simulator} {season} – Predict the Table",
     "leagueDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Europe and relegation chances.",
     "leagueDescriptionPlayoffs": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the conference tables update live and see every club's playoff chances.",
@@ -27,7 +27,7 @@
     "heading": "Football Simulator",
     "tagline": "Simulate the season before it happens",
     "aboutTitle": "A free football simulator for the top leagues",
-    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie, Brasileirão Série A and Série B, and MLS. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
+    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Brasileirão Série A and Série B, and MLS. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
   },
   "Simulator": {
     "table": "Table",
@@ -82,12 +82,14 @@
     "promotedChampion": "Champion",
     "promotedRunnerUp": "Runner-up",
     "promotedPlayoff": "Play-off winner",
+    "promotedBarrage": "{winner} won the play-off and now plays {league}'s {position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} over two legs for a place in {league}.",
     "playoffs": "Play-off",
     "playoffPlace": "{position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place",
-    "playoffRound": "{round, select, eliminators {Eliminators} semiFinals {Semi-finals} final {Final} wildCard {Wild card} roundOne {Round One} conferenceSemiFinals {Conference semifinals} conferenceFinal {Conference final} mlsCup {MLS Cup} other {Play-off}}",
-    "playoffWinnerOf": "{round, select, eliminators {Eliminator winner} semiFinals {Semi-final winner} wildCard {Wild-card winner} roundOne {Round One winner} conferenceSemiFinals {Semifinal winner} conferenceFinal {Conference champion} other {Winner}}",
+    "playoffRound": "{round, select, eliminators {Eliminators} semiFinals {Semi-finals} final {Final} wildCard {Wild card} roundOne {Round One} conferenceSemiFinals {Conference semifinals} conferenceFinal {Conference final} mlsCup {MLS Cup} preliminary {Preliminary round} playOff1 {Play-off 1} playOff2 {Play-off 2} other {Play-off}}",
+    "playoffWinnerOf": "{round, select, eliminators {Eliminator winner} semiFinals {Semi-final winner} wildCard {Wild-card winner} roundOne {Round One winner} conferenceSemiFinals {Semifinal winner} conferenceFinal {Conference champion} preliminary {Preliminary winner} playOff1 {Play-off 1 winner} playOff2 {Play-off 2 winner} other {Winner}}",
     "playoffRuleTwoLegs": "{higher} hosts the 2nd leg. Level on aggregate: extra time and penalties.",
     "playoffRuleOneLeg": "Single match at {higher}'s ground. If level: extra time and penalties.",
+    "playoffRuleOneLegBetterPlaced": "Single match at {higher}'s ground. If level after extra time, {higher} goes through.",
     "playoffRuleFinal": "Single match at {venue}. If level: extra time and penalties.",
     "playoffOnPenalties": "{winner} wins {wp}–{lp} on penalties.",
     "playoffAdvances": "{winner} goes through.",
@@ -103,6 +105,8 @@
     "championTitle": "{title} {year} champion",
     "championPending": "Complete the season and the playoffs to see the champion.",
     "playoffPromoted": "{winner} goes up to {promotedTo}.",
+    "playoffToBarrage": "{winner} goes on to a two-legged play-off against {league}'s {position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}.",
+    "playoffCancelled": "No play-off this season: {position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} finished more than {points} points clear of {over, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} and goes up directly.",
     "penalties": "Penalties",
     "conference": "Conference"
   },
@@ -193,7 +197,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, Championship, League One, League Two, La Liga, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie, Brasileirão Série A and Série B, and MLS, with real fixtures and results for the current season."
+        "a": "The Premier League, Championship, League One, League Two, La Liga, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Brasileirão Série A and Série B, and MLS, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",

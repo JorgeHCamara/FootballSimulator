@@ -176,6 +176,20 @@ export const TEAM_OVERRIDES: readonly TeamOverride[] = [
   // League One and League Two (names from ESPN; unscoped, clubs move between divisions)
   { match: "Milton Keynes Dons", name: "MK Dons", shortName: "MK Dons" },
   { match: "Sheffield Wednesday", name: "Sheffield Wednesday", shortName: "Sheffield Wed" },
+  // 2. Bundesliga, Serie B and Ligue 2 (names from ESPN)
+  { match: "SpVgg Greuther Fürth", name: "Greuther Fürth", shortName: "Greuther Fürth" },
+  { match: "VfL Osnabruck", name: "VfL Osnabrück", shortName: "Osnabrück" },
+  { match: "TSV Eintracht Braunschweig", name: "Eintracht Braunschweig", shortName: "Braunschweig" },
+  { match: "Dynamo Dresden", name: "Dynamo Dresden", shortName: "Dynamo Dresden" },
+  { match: "1. FC Heidenheim 1846", name: "1. FC Heidenheim", shortName: "Heidenheim" },
+  { match: "Hertha Berlin", name: "Hertha BSC", shortName: "Hertha BSC" },
+  { match: "1. FC Nürnberg", name: "1. FC Nürnberg", shortName: "Nürnberg" },
+  { match: "Sudtirol", name: "Südtirol", shortName: "Südtirol" },
+  { match: "US Avellino", name: "Avellino", shortName: "Avellino" },
+  { match: "Red Star FC 93", name: "Red Star", shortName: "Red Star" },
+  { match: "Rodez Aveyron", name: "Rodez", shortName: "Rodez" },
+  { match: "Dijon FCO", name: "Dijon", shortName: "Dijon" },
+  { match: "Stade Laval", name: "Laval", shortName: "Laval" },
   // Primeira Liga
   { match: "FC Porto", league: "PPL", name: "Porto", shortName: "Porto" },
   { match: "Sport Lisboa e Benfica", league: "PPL", name: "Benfica", shortName: "Benfica" },

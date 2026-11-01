@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie, Championship, League One, League Two e MLS. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Championship, League One, League Two e MLS. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
@@ -27,7 +27,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie e MLS. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie e MLS. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -82,12 +82,14 @@
     "promotedChampion": "Campeão",
     "promotedRunnerUp": "Vice-campeão",
     "promotedPlayoff": "Vencedor do playoff",
+    "promotedBarrage": "{winner} venceu o playoff e agora enfrenta o {position}º da {league} em ida e volta por uma vaga na {league}.",
     "playoffs": "Playoff",
     "playoffPlace": "{position}º colocado",
-    "playoffRound": "{round, select, eliminators {Eliminatórias} semiFinals {Semifinais} final {Final} wildCard {Repescagem (wild card)} roundOne {Primeira fase} conferenceSemiFinals {Semifinais de conferência} conferenceFinal {Final de conferência} mlsCup {MLS Cup} other {Playoff}}",
-    "playoffWinnerOf": "{round, select, eliminators {Vencedor da eliminatória} semiFinals {Vencedor da semifinal} wildCard {Vencedor da repescagem} roundOne {Vencedor da primeira fase} conferenceSemiFinals {Vencedor da semifinal} conferenceFinal {Campeão da conferência} other {Vencedor}}",
+    "playoffRound": "{round, select, eliminators {Eliminatórias} semiFinals {Semifinais} final {Final} wildCard {Repescagem (wild card)} roundOne {Primeira fase} conferenceSemiFinals {Semifinais de conferência} conferenceFinal {Final de conferência} mlsCup {MLS Cup} preliminary {Fase preliminar} playOff1 {Playoff 1} playOff2 {Playoff 2} other {Playoff}}",
+    "playoffWinnerOf": "{round, select, eliminators {Vencedor da eliminatória} semiFinals {Vencedor da semifinal} wildCard {Vencedor da repescagem} roundOne {Vencedor da primeira fase} conferenceSemiFinals {Vencedor da semifinal} conferenceFinal {Campeão da conferência} preliminary {Vencedor da preliminar} playOff1 {Vencedor do playoff 1} playOff2 {Vencedor do playoff 2} other {Vencedor}}",
     "playoffRuleTwoLegs": "{higher} faz o jogo de volta em casa. Empate no agregado: prorrogação e pênaltis.",
     "playoffRuleOneLeg": "Jogo único no estádio do {higher}. Empate: prorrogação e pênaltis.",
+    "playoffRuleOneLegBetterPlaced": "Jogo único no estádio do {higher}. Empate após a prorrogação: o {higher} avança.",
     "playoffRuleFinal": "Jogo único em {venue}. Empate: prorrogação e pênaltis.",
     "playoffOnPenalties": "{winner} vence por {wp}–{lp} nos pênaltis.",
     "playoffAdvances": "{winner} avança.",
@@ -103,6 +105,8 @@
     "championTitle": "Campeão da {title} {year}",
     "championPending": "Complete a temporada e os playoffs para ver o campeão.",
     "playoffPromoted": "{winner} sobe para a {promotedTo}.",
+    "playoffToBarrage": "{winner} vai para o playoff em ida e volta contra o {position}º da {league}.",
+    "playoffCancelled": "Sem playoff nesta temporada: o {position}º terminou mais de {points} pontos à frente do {over}º e sobe direto.",
     "penalties": "Pênaltis",
     "conference": "Conferência"
   },
@@ -193,7 +197,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie e MLS, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie e MLS, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",

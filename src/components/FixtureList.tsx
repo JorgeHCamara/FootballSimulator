@@ -19,6 +19,10 @@ export interface PlayoffView {
   title?: string;
   /** Short group (conference) names, for slots like "1st in the East". */
   groupNames?: string[];
+  /** The winner goes on to play another league's club (Ligue 2 v Ligue 1's 16th). */
+  winnerPlays?: { league: string; position: number };
+  /** Not held this season (Serie B: 3rd finished far enough clear of 4th). */
+  cancelled?: { position: number; over: number; points: number };
 }
 
 interface Props {
@@ -133,7 +137,9 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
     // Before an earlier round decides it, the host is just "the higher seed".
     const higher = tie.higher.teamId === null && tie.higher.from ? t("playoffHigherSeed") : label(tie.higher);
     if (config.bestOf) return t("playoffRuleSeries", { higher });
-    if (config.levelTie === "betterPlaced") return t("playoffRule", { higher });
+    if (config.levelTie === "betterPlaced") {
+      return config.legs === 2 ? t("playoffRule", { higher }) : t("playoffRuleOneLegBetterPlaced", { higher });
+    }
     if (config.venue) return t("playoffRuleFinal", { venue: config.venue });
     if (config.legs === 2) return t("playoffRuleTwoLegs", { higher });
     return config.noExtraTime ? t("playoffRuleOneLegPenalties", { higher }) : t("playoffRuleOneLeg", { higher });
@@ -156,6 +162,11 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
   return (
     <div data-testid="playoff">
       {!seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t("playoffProjected")}</p>}
+      {playoff.cancelled && (
+        <p className="px-3 py-3 text-sm text-zinc-600 dark:text-zinc-300" data-testid="playoff-cancelled">
+          {t("playoffCancelled", { ...playoff.cancelled })}
+        </p>
+      )}
       {bracket.map((round, r) => (
         <div key={r} data-testid="playoff-round">
           {bracket.length > 1 && (
@@ -247,7 +258,9 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                       }) + " "}
                     {r === lastRound && playoff.title
                       ? t("playoffChampion", { winner: teams.get(outcome.winner)?.shortName ?? "", title: playoff.title })
-                      : r === lastRound && playoff.promotedTo
+                      : r === lastRound && playoff.winnerPlays
+                        ? t("playoffToBarrage", { winner: teams.get(outcome.winner)?.shortName ?? "", ...playoff.winnerPlays })
+                        : r === lastRound && playoff.promotedTo
                         ? t("playoffPromoted", { winner: teams.get(outcome.winner)?.shortName ?? "", promotedTo: playoff.promotedTo })
                         : t("playoffAdvances", { winner: teams.get(outcome.winner)?.shortName ?? "" })}
                   </p>

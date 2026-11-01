@@ -24,7 +24,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "BL1" | "SA" | "FL1" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -235,6 +235,35 @@ export const LEAGUES: readonly LeagueConfig[] = [
     ],
   },
   {
+    code: "BL2",
+    slug: "2-bundesliga",
+    name: "2. Bundesliga",
+    country: "Germany",
+    flag: "de",
+    simulatorName: { en: "2. Bundesliga Simulator", pt: "Simulador da 2. Bundesliga", es: "Simulador de la 2. Bundesliga" },
+    aka: { en: "German 2. Bundesliga", pt: "Segunda divisão alemã", es: "Segunda división alemana" },
+    teams: 18,
+    // football-data.org's free tier doesn't include the 2. Bundesliga.
+    espn: { slug: "ger.2", seasons: "split" },
+    espnOnly: true,
+    tiebreakers: [
+      "points",
+      "goalDifference",
+      "goalsFor",
+      "headToHeadPoints",
+      "headToHeadAwayGoalsFor",
+      "awayGoalsFor",
+    ],
+    // 1st and 2nd go up; 3rd plays the Bundesliga's 16th and 16th plays the
+    // 3. Liga's 3rd, both over two legs (opponents from other leagues, so no bracket).
+    zones: [
+      { kind: "promotion", from: 1, to: 2 },
+      { kind: "promotionPlayoff", from: 3, to: 3 },
+      { kind: "relegationPlayoff", from: 16, to: 16 },
+      { kind: "relegation", from: 17, to: 18 },
+    ],
+  },
+  {
     code: "SA",
     slug: "serie-a",
     name: "Serie A",
@@ -249,6 +278,42 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "championsLeague", from: 1, to: 4 },
       { kind: "europaLeague", from: 5, to: 5 },
       { kind: "conferenceLeague", from: 6, to: 6 },
+      { kind: "relegation", from: 18, to: 20 },
+    ],
+  },
+  {
+    code: "SB",
+    slug: "serie-b",
+    name: "Serie B",
+    country: "Italy",
+    flag: "it",
+    simulatorName: { en: "Italian Serie B Simulator", pt: "Simulador da Serie B Italiana", es: "Simulador de la Serie B italiana" },
+    aka: { en: "Italian Serie B", pt: "Segunda divisão italiana", es: "Segunda división italiana" },
+    teams: 20,
+    // football-data.org's free tier doesn't include Serie B.
+    espn: { slug: "ita.2", seasons: "split" },
+    espnOnly: true,
+    // 1st and 2nd go up. 3rd–8th play off: single-game preliminaries 5v8 and 6v7
+    // at the better-placed club (level after extra time: it goes through), then
+    // two-legged semi-finals 3rd v the 6/7 winner and 4th v the 5/8 winner and a
+    // two-legged final; a level aggregate sends the better-placed club through.
+    // No play-off when 3rd finishes more than 14 points clear of 4th.
+    playoff: {
+      rounds: [
+        { key: "preliminary", legs: 1, levelTie: "betterPlaced", pairs: [[5, 8], [6, 7]] },
+        { key: "semiFinals", legs: 2, levelTie: "betterPlaced", entrants: [3, 4], fixedBracket: true },
+        { key: "final", legs: 2, levelTie: "betterPlaced" },
+      ],
+      directPromotion: [1, 2],
+      promotedTo: "Serie A",
+      directIfClear: { position: 3, over: 4, points: 14 },
+    },
+    tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
+    // 16th v 17th play out over two legs (not simulated); 18th–20th go down.
+    zones: [
+      { kind: "promotion", from: 1, to: 2 },
+      { kind: "promotionPlayoff", from: 3, to: 8 },
+      { kind: "relegationPlayoff", from: 16, to: 17 },
       { kind: "relegation", from: 18, to: 20 },
     ],
   },
@@ -275,6 +340,46 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "championsLeagueQualifying", from: 4, to: 4 },
       { kind: "europaLeague", from: 5, to: 5 },
       { kind: "conferenceLeague", from: 6, to: 6 },
+      { kind: "relegationPlayoff", from: 16, to: 16 },
+      { kind: "relegation", from: 17, to: 18 },
+    ],
+  },
+  {
+    code: "FL2",
+    slug: "ligue-2",
+    name: "Ligue 2",
+    country: "France",
+    flag: "fr",
+    simulatorName: { en: "Ligue 2 Simulator", pt: "Simulador da Ligue 2", es: "Simulador de la Ligue 2" },
+    aka: { en: "French Ligue 2", pt: "Segunda divisão francesa", es: "Segunda división francesa" },
+    teams: 18,
+    // football-data.org's free tier doesn't include Ligue 2.
+    espn: { slug: "fra.2", seasons: "split" },
+    espnOnly: true,
+    // 1st and 2nd go up. Play-off 1: 4th v 5th; play-off 2: the winner at 3rd;
+    // single games, level goes straight to penalties. The winner then plays
+    // Ligue 1's 16th over two legs. 16th plays National's play-off winner; 17th
+    // and 18th go down.
+    playoff: {
+      rounds: [
+        { key: "playOff1", legs: 1, levelTie: "penalties", noExtraTime: true, pairs: [[4, 5]] },
+        { key: "playOff2", legs: 1, levelTie: "penalties", noExtraTime: true, entrants: [3] },
+      ],
+      directPromotion: [1, 2],
+      promotedTo: "Ligue 1",
+      winnerPlays: { league: "Ligue 1", position: 16 },
+    },
+    tiebreakers: [
+      "points",
+      "goalDifference",
+      "headToHeadPoints",
+      "headToHeadGoalDifference",
+      "headToHeadGoalsFor",
+      "goalsFor",
+    ],
+    zones: [
+      { kind: "promotion", from: 1, to: 2 },
+      { kind: "promotionPlayoff", from: 3, to: 5 },
       { kind: "relegationPlayoff", from: 16, to: 16 },
       { kind: "relegation", from: 17, to: 18 },
     ],

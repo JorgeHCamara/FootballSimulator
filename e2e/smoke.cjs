@@ -264,6 +264,48 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("2. Bundesliga, Serie B and Ligue 2: zones, play-offs, menus", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const expected = {
+        "2-bundesliga": { rows: 18, zones: { promotion: [1, 2], promotionPlayoff: [3, 3], relegationPlayoff: [16, 16], relegation: [17, 18] } },
+        "serie-b": { rows: 20, zones: { promotion: [1, 2], promotionPlayoff: [3, 8], relegationPlayoff: [16, 17], relegation: [18, 20] }, rounds: ["preliminary round", "semi-finals", "final"], text: /5th place × 8th place/ },
+        "ligue-2": { rows: 18, zones: { promotion: [1, 2], promotionPlayoff: [3, 5], relegationPlayoff: [16, 16], relegation: [17, 18] }, rounds: ["play-off 1", "play-off 2"], text: /4th place × 5th place/ },
+      };
+      for (const [slug, e] of Object.entries(expected)) {
+        await p.goto(`${BASE_URL}/en/${slug}`);
+        const kinds = await p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
+        assert.equal(kinds.length, e.rows, slug);
+        for (const [kind, [from, to]] of Object.entries(e.zones)) {
+          const at = kinds.flatMap((k, i) => (k === kind ? [i + 1] : []));
+          assert.deepEqual([at[0], at.at(-1), at.length], [from, to, to - from + 1], `${slug} ${kind}`);
+        }
+        const options = await p.locator('[data-testid="matchday-select"] option').allInnerTexts();
+        if (!e.rounds) {
+          assert.ok(!options.includes("Play-off"), `${slug}: no bracket (play-offs against other leagues)`);
+          continue;
+        }
+        await p.locator('[data-testid="matchday-select"]').selectOption("-1");
+        const playoff = p.locator('[data-testid="playoff"]');
+        assert.deepEqual((await playoff.locator('[data-testid="playoff-round"] h3').allInnerTexts()).map((x) => x.trim().toLowerCase()), e.rounds, slug);
+        assert.match(await playoff.innerText(), e.text, slug);
+      }
+      // Ligue 2: the play-off winner isn't promoted yet, it faces Ligue 1's 16th.
+      await p.goto(`${BASE_URL}/en/ligue-2`);
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="promoted-contender"]').waitFor();
+      assert.equal(await p.locator('[data-testid="promoted-team"]').count(), 2);
+      assert.match(await p.locator('[data-testid="promoted-contender"]').innerText(), /plays Ligue 1's 16th over two legs/);
+      // Header: the second divisions sit under their country, top division first.
+      const menu = p.locator('[data-testid="league-menu"]');
+      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga"]], ["Italy", "it", ["Serie A", "Serie B"]], ["France", "fr", ["Ligue 1", "Ligue 2"]]]) {
+        await menu.getByRole("button", { name: country }).click();
+        await menu.locator(`#menu-${flag}`).waitFor();
+        assert.deepEqual((await menu.locator(`#menu-${flag} a`).allInnerTexts()).map((x) => x.trim()), leagues, country);
+        await p.keyboard.press("Escape");
+      }
+      await p.close();
+    });
+
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/mls`);
