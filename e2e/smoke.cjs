@@ -364,6 +364,28 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="pending-round"]').innerText(), /after the First Round/);
       await bar.nth(0).click();
 
+      // Penalties only while the game is level; a winner clears the shoot-out score.
+      const openTie = ties.filter({ has: p.locator("input") }).first();
+      const fixtureId = await openTie.locator('[data-testid="match-row"]').getAttribute("data-fixture");
+      const tie = p.locator(`[data-testid="cup-tie"]:has([data-fixture="${fixtureId}"])`);
+      await tie.locator("input").nth(0).fill("1");
+      await tie.locator("input").nth(1).fill("1");
+      const line = tie.locator('[data-testid="shootout-line"]');
+      await line.waitFor();
+      await line.locator("input").nth(0).fill("4");
+      await line.locator("input").nth(1).fill("3");
+      assert.equal(await tie.getAttribute("data-winner"), await tie.getAttribute("data-home"));
+      await tie.locator("input").nth(0).fill("2");
+      await line.waitFor({ state: "detached" });
+      assert.equal(await tie.getAttribute("data-winner"), await tie.getAttribute("data-home"));
+      await tie.locator("input").nth(0).fill("0");
+      await tie.locator("input").nth(1).fill("0");
+      await line.waitFor();
+      assert.deepEqual(await line.locator("input").evaluateAll((els) => els.map((e) => e.value)), ["", ""], "old shoot-out score cleared");
+      assert.equal(await tie.getAttribute("data-winner"), "");
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+
       // Simulate the first round: the second round is drawn, each winner once.
       await p.getByRole("button", { name: "Simulate round" }).click();
       await p.locator('[data-testid="simulated-draw-note"]').waitFor();
@@ -471,6 +493,20 @@ async function step(name, fn) {
       assert.equal(series.length, 8);
       for (const r of series) assert.match(r, /(2–[01]|[01]–2) /, r);
       assert.match(results.at(-1), /wins the MLS Cup!/);
+      // A series game's shoot-out goes away once the game has a winner.
+      {
+        const series = playoff.locator('[data-testid="playoff-tie"]').filter({ hasText: "Best of three" }).nth(2);
+        const g1 = series.locator('[data-testid="match-row"]').filter({ hasText: "Game 1" }).first();
+        if ((await g1.locator("input").count()) === 0) await g1.getByRole("button").first().click();
+        await g1.locator("input").nth(0).fill("2");
+        await g1.locator("input").nth(1).fill("2");
+        const pens1 = series.locator('[data-testid="match-row"][data-attached="true"]').filter({ hasText: "Game 1: penalties" });
+        await pens1.waitFor();
+        await pens1.locator("input").nth(0).fill("5");
+        await pens1.locator("input").nth(1).fill("4");
+        await g1.locator("input").nth(0).fill("3");
+        await pens1.waitFor({ state: "detached" });
+      }
       // A drawn series game's shoot-out sits right under that game, labelled with it.
       const aSeries = playoff.locator('[data-testid="playoff-tie"]').filter({ hasText: "Best of three" }).first();
       const game2 = aSeries.locator('[data-testid="match-row"]').filter({ hasText: "Game 2" }).first();

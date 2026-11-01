@@ -6,7 +6,7 @@ import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel } from "../engine/ratings.ts";
-import { buildBracket, isShootoutId, playoffCancelled, playoffIds, simulatePenalties, simulatePlayoff, tieIds } from "../engine/playoffs.ts";
+import { buildBracket, isShootoutId, needsShootout, playoffCancelled, playoffIds, seriesGames, simulatePenalties, simulatePlayoff, tieIds } from "../engine/playoffs.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
@@ -153,6 +153,20 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
     }
     lastPairings.current = seasonComplete ? pairings : null;
   }, [hydrated, pairingKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A shoot-out score belongs to a level tie (or, in a series, a drawn game):
+  // once it has a winner without penalties, the shoot-out score is cleared.
+  useEffect(() => {
+    if (!hydrated || !playoff) return;
+    const stale = bracket.flat().flatMap((tie) =>
+      tie.config.bestOf
+        ? seriesGames(tie, season.predictions).filter((g) => season.predictions[g.shootout.id] && !g.needsPenalties).map((g) => g.shootout.id)
+        : tie.shootout && season.predictions[tie.shootout.id] && !needsShootout(tie, season.predictions)
+          ? [tie.shootout.id]
+          : [],
+    );
+    if (stale.length) drop(seasonKey, stale);
+  }, [hydrated, bracket, season.predictions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The play-off is listed as one more entry after the last matchday.
   const matchdays = useMemo(

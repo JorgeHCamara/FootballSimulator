@@ -51,7 +51,7 @@ export function CupSimulator({ cup, data }: Props) {
 
   const season = useSimStore((s) => (hydrated ? s.seasons[seasonKey] : undefined) ?? emptySeason);
   const canUndo = useSimStore((s) => (s.history[seasonKey]?.length ?? 0) > 0);
-  const { setScore, applyResults, replace, reset, undo, reconcile, redraw, syncPairings } = useSimStore.getState();
+  const { setScore, applyResults, replace, reset, undo, reconcile, redraw, syncPairings, drop } = useSimStore.getState();
 
   const teamMap = useMemo(() => new Map(data.teams.map((team) => [team.id, team])), [data.teams]);
   const buildOptions = useMemo<CupBuildOptions>(
@@ -84,6 +84,14 @@ export function CupSimulator({ cup, data }: Props) {
     const removed = syncPairings(seasonKey, pairings);
     if (removed > 0) setNotice(t("redrawnNotice", { count: removed }));
   }, [hydrated, rounds]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A shoot-out score belongs to a level game: once the game has a winner
+  // (score changed, dice, simulate), its shoot-out score is cleared.
+  useEffect(() => {
+    if (!hydrated) return;
+    const stale = rounds.flatMap((r) => r.ties).filter((tie) => season.predictions[tie.shootout.id] && !needsShootout(tie, season.predictions));
+    if (stale.length) drop(seasonKey, stale.map((tie) => tie.shootout.id));
+  }, [hydrated, rounds, season.predictions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const firstOpen = useMemo(() => {
     const i = rounds.findIndex((r) => r.drawn === "pending" || r.ties.some((tie) => tieWinner(tie, season.predictions) === null));

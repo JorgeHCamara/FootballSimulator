@@ -32,7 +32,8 @@ export function useDivisionTag(divisions: Record<TeamId, CompetitionCode>) {
 export function TieCard({ tie, teams, predictions, divisions, onScore, onSimulate, compact = false }: Omit<CupViewProps, "cup" | "rounds"> & { tie: CupTie; compact?: boolean }) {
   const tag = useDivisionTag(divisions);
   const winner = tieWinner(tie, predictions);
-  const pens = needsShootout(tie, predictions) || predictions[tie.shootout.id] !== undefined;
+  // Only a level game has a shoot-out (a score left from an earlier draw is cleared by CupSimulator).
+  const pens = needsShootout(tie, predictions);
   const home = teams.get(tie.homeId);
   const away = teams.get(tie.awayId);
   if (!home || !away) return null;

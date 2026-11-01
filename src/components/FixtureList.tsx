@@ -180,7 +180,8 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
             const group = groupName(tie.group);
             const groupHeading = group && round[i - 1]?.group !== tie.group;
             const known = tie.legs.length > 0;
-            const showShootout = tie.shootout && (needsShootout(tie, predictions) || predictions[tie.shootout.id]);
+            // Only while the tie is level (a stale shoot-out score is cleared by LeagueSimulator).
+            const showShootout = tie.shootout && needsShootout(tie, predictions);
             const pens = tie.shootout ? (predictions[tie.shootout.id] ?? tie.shootout.result) : null;
             return (
               <div key={tie.index} className="border-b border-zinc-100 last:border-b-0 dark:border-zinc-800" data-testid="playoff-tie">
@@ -208,7 +209,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                           .filter((g) => g.needed)
                           .flatMap((g, n) => {
                             // A drawn game's shoot-out decides that game, so it sits right under it.
-                            const pens = g.needsPenalties || predictions[g.shootout.id] !== undefined;
+                            const pens = g.needsPenalties;
                             return [
                               scoreRow(g.game, t("playoffGame", { number: n + 1 }), { joinsNext: pens }),
                               ...(pens ? [scoreRow(g.shootout, t("playoffGamePenalties", { number: n + 1 }), { attached: true })] : []),
