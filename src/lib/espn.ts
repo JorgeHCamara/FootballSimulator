@@ -30,8 +30,19 @@ export interface EspnEvent {
   competitions: { competitors: EspnCompetitor[] }[];
 }
 
+export interface EspnCalendarEntry {
+  label: string;
+  startDate: string;
+  endDate: string;
+}
+
 export interface EspnScoreboard {
   events: EspnEvent[];
+  leagues?: {
+    season?: { year: number };
+    /** Cup rounds (or league phases) with their date windows. */
+    calendar?: { entries?: EspnCalendarEntry[] }[];
+  }[];
 }
 
 export class EspnError extends Error {

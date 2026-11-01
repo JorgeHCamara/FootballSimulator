@@ -1,11 +1,13 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two e MLS. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS e FA Cup. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
-    "ogTagline": "Palpites · Simulação da temporada · Chances de título e rebaixamento"
+    "ogTagline": "Palpites · Simulação da temporada · Chances de título e rebaixamento",
+    "cupTitle": "{simulator} {season} – Preveja o sorteio e a final",
+    "cupDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule todas as fases, da primeira fase à final em Wembley, com sorteio simulado para as fases ainda não sorteadas e as chances de cada clube de ganhar a copa."
   },
   "Nav": {
     "home": "Início",
@@ -27,7 +29,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie e MLS. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS e FA Cup. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -146,7 +148,11 @@
     "step3Playoffs": "Abra a aba Chances para ver as chances de cada time de terminar em primeiro na conferência e de chegar aos playoffs.",
     "faqTitle": "Perguntas frequentes",
     "otherLeagues": "Outros simuladores de campeonatos",
-    "breadcrumbHome": "Simulador de Futebol"
+    "breadcrumbHome": "Simulador de Futebol",
+    "introCup": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule cada fase: empate vai para os pênaltis, os vencedores entram no sorteio e as fases ainda não sorteadas ganham um sorteio simulado, substituído pelo real assim que for feito.",
+    "step1Cup": "Escolha uma fase e digite o placar de cada confronto, ou use o dado para simulá-lo. Empate vai para os pênaltis.",
+    "step2Cup": "Clique em Simular fase ou Simular até a final. A fase seguinte é sorteada entre os vencedores; Novo sorteio refaz um sorteio simulado.",
+    "step3Cup": "Abra a aba Chances para ver as chances de cada clube de chegar a cada fase e de ganhar a copa."
   },
   "Faq": {
     "league": [
@@ -200,7 +206,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie e MLS, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS e FA Cup, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -209,6 +215,28 @@
       {
         "q": "Preciso criar uma conta?",
         "a": "Não. O Foot Simu é grátis, seus palpites ficam salvos no navegador e você pode compartilhá-los com um link."
+      }
+    ],
+    "cup": [
+      {
+        "q": "Como funciona o {simulator}?",
+        "a": "Ele começa com o sorteio e os resultados reais da {league} {season}. A força de cada clube vem do seu próprio campeonato nesta temporada (Premier League, Championship, League One ou League Two), ajustada pela divisão; clubes fora das ligas profissionais ficam abaixo da League Two. Empate é decidido nos pênaltis, sem jogo de volta."
+      },
+      {
+        "q": "Como o sorteio é simulado?",
+        "a": "Quando uma fase termina, a fase seguinte é sorteada ao acaso entre os vencedores (e os clubes que entram). O sorteio simulado continua igual ao recarregar ou compartilhar a página; Novo sorteio refaz o sorteio, e o sorteio real substitui o simulado assim que for feito."
+      },
+      {
+        "q": "Como as chances são calculadas?",
+        "a": "A aba Chances joga o resto da copa 5.000 vezes a partir dos resultados atuais, sorteando de novo as fases não sorteadas, e conta quantas vezes cada clube chega a cada fase e ganha a copa."
+      },
+      {
+        "q": "Meus palpites ficam salvos?",
+        "a": "Sim. Seus palpites ficam salvos no navegador e continuam lá quando você voltar. Use Compartilhar para enviar um link que mostra exatamente o seu chaveamento."
+      },
+      {
+        "q": "O Foot Simu é grátis?",
+        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
       }
     ]
   },
@@ -222,5 +250,58 @@
     "Netherlands": "Holanda",
     "Brazil": "Brasil",
     "USA": "EUA"
+  },
+  "Cup": {
+    "fixtures": "Jogos",
+    "simulateRound": "Simular fase",
+    "simulateAll": "Simular até a final",
+    "newDraw": "Novo sorteio",
+    "round": {
+      "firstRound": "Primeira fase",
+      "secondRound": "Segunda fase",
+      "thirdRound": "Terceira fase",
+      "fourthRound": "Quarta fase",
+      "fifthRound": "Quinta fase",
+      "quarterFinals": "Quartas de final",
+      "semiFinals": "Semifinais",
+      "final": "Final"
+    },
+    "roundShort": {
+      "firstRound": "F1",
+      "secondRound": "F2",
+      "thirdRound": "F3",
+      "fourthRound": "F4",
+      "fifthRound": "F5",
+      "quarterFinals": "QF",
+      "semiFinals": "SF",
+      "final": "Final"
+    },
+    "drawPending": "Sorteio pendente",
+    "roundComplete": "Completa",
+    "simulatedDraw": "Sorteio simulado",
+    "simulatedDrawNote": "Estes confrontos são um sorteio simulado. O sorteio real substitui o simulado assim que for feito.",
+    "drawAfter": "O sorteio acontece depois da {round}.",
+    "drawClubs": "{count} clubes estarão no sorteio.",
+    "drawClubsEntering": "{count} clubes estarão no sorteio{entering}.",
+    "entrantsFrom": ", incluindo os clubes que entram da {leagues}",
+    "atVenue": "Jogo em {venue}, campo neutro.",
+    "redrawnNotice": "{count, plural, one {# palpite foi descartado} other {# palpites foram descartados}} porque o confronto mudou.",
+    "champion": "Campeão da {title} {year}",
+    "championPending": "Decida todas as fases para ver o campeão.",
+    "road": "Caminho até a final",
+    "onPenalties": "nos pênaltis",
+    "division": {
+      "PL": "PL",
+      "ELC": "CH",
+      "EL1": "L1",
+      "EL2": "L2",
+      "nonLeague": "NL"
+    },
+    "basedOn": "Com base em {count} copas simuladas a partir dos resultados atuais, incluindo seus palpites nos confrontos reais.",
+    "chancesNote": "As fases ainda não sorteadas são sorteadas de novo em cada simulação, então as chances incluem a sorte do sorteio.",
+    "reach": "Chegar à {round}",
+    "win": "Título",
+    "showAll": "Mostrar todos os {count} clubes",
+    "showFewer": "Mostrar menos"
   }
 }

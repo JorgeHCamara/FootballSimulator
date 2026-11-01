@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { countries } from "../config/leagues.ts";
+import { countries } from "../config/competitions.ts";
 import { Link, usePathname } from "../i18n/navigation.ts";
 import { Flag } from "./Flag.tsx";
 

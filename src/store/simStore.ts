@@ -14,6 +14,14 @@ interface SeasonState {
    * other predictions are dropped once the real result comes in.
    */
   overrides: FixtureId[];
+  /** Cups: bumps every "New draw", changing the simulated pairings. */
+  drawSalt?: number;
+  /**
+   * Cups: the pairing ("home-away") each predicted slot had. A slot whose
+   * pairing changes (new draw, real draw published, earlier upset) drops its
+   * prediction, which belonged to another tie.
+   */
+  pairings?: Record<FixtureId, string>;
 }
 
 interface SimStore {
@@ -22,7 +30,11 @@ interface SimStore {
   history: Record<string, SeasonState[]>;
   setScore: (key: string, fixture: Fixture, score: Score | null) => void;
   applyResults: (key: string, results: ResultMap) => void;
-  replace: (key: string, fixtures: readonly Fixture[], predictions: ResultMap) => void;
+  replace: (key: string, fixtures: readonly Fixture[], predictions: ResultMap, extra?: { drawSalt?: number }) => void;
+  /** Cups: a new simulated draw (undoable). */
+  redraw: (key: string) => void;
+  /** Cups: remembers the current pairings and drops predictions whose slot changed pairing; returns how many. */
+  syncPairings: (key: string, pairings: Record<FixtureId, string>) => number;
   reset: (key: string) => void;
   undo: (key: string) => void;
   /** Removes predictions for these fixtures without an undo step (e.g. stale play-off legs). */
@@ -68,9 +80,34 @@ export const useSimStore = create<SimStore>()(
           commit(key, { ...current, predictions: { ...current.predictions, ...results } });
         },
 
-        replace: (key, fixtures, predictions) => {
+        replace: (key, fixtures, predictions, extra) => {
           const overrides = fixtures.filter((f) => f.result && predictions[f.id]).map((f) => f.id);
-          commit(key, { predictions, overrides });
+          commit(key, { predictions, overrides, ...(extra?.drawSalt ? { drawSalt: extra.drawSalt } : {}) });
+        },
+
+        redraw: (key) => {
+          const current = get().seasons[key] ?? empty;
+          commit(key, { ...current, drawSalt: (current.drawSalt ?? 0) + 1 });
+        },
+
+        syncPairings: (key, pairings) => {
+          const current = get().seasons[key] ?? empty;
+          const predictions = { ...current.predictions };
+          let removed = 0;
+          for (const [id, pairing] of Object.entries(pairings)) {
+            const previous = current.pairings?.[Number(id)];
+            if (previous !== undefined && previous !== pairing && predictions[Number(id)]) {
+              delete predictions[Number(id)];
+              removed++;
+            }
+          }
+          const unchanged =
+            removed === 0 &&
+            current.pairings !== undefined &&
+            Object.keys(current.pairings).length === Object.keys(pairings).length &&
+            Object.entries(pairings).every(([id, p]) => current.pairings![Number(id)] === p);
+          if (!unchanged) set((s) => ({ seasons: { ...s.seasons, [key]: { ...current, predictions, pairings } } }));
+          return removed;
         },
 
         reset: (key) => commit(key, empty),

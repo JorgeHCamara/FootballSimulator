@@ -286,6 +286,10 @@ interface RowProps {
   attached?: boolean;
   /** The next row is attached to this one: no divider below. */
   joinsNext?: boolean;
+  /** Small pills after the club names (e.g. a cup club's division). */
+  tags?: { home?: string; away?: string };
+  /** Decided knockout game: the winner's name is bold, the loser's dimmed. */
+  winner?: TeamId | null;
   fixture: Fixture;
   home: Team;
   away: Team;
@@ -299,7 +303,8 @@ function parseGoals(text: string): number | null {
   return Number(text);
 }
 
-export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner }: RowProps) {
+  const side = (id: TeamId) => (winner == null ? "" : winner === id ? "font-bold" : "opacity-60");
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
   const locked = fixture.result !== null && prediction === undefined;
@@ -346,8 +351,9 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
         {fixture.result && !prediction && <span className="font-semibold uppercase tracking-wide">{t("realResult")}</span>}
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <span className="flex min-w-0 items-center justify-end gap-2 text-right text-sm font-medium">
+        <span className={`flex min-w-0 items-center justify-end gap-2 text-right text-sm font-medium ${side(home.id)}`}>
           <span className="truncate">{home.shortName}</span>
+          {tags?.home && <Tag label={tags.home} />}
           <TeamBadge team={home} size={22} />
         </span>
         <span className="flex items-center gap-1">
@@ -388,9 +394,10 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
             </button>
           )}
         </span>
-        <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
+        <span className={`flex min-w-0 items-center gap-2 text-sm font-medium ${side(away.id)}`}>
           <TeamBadge team={away} size={22} />
           <span className="truncate">{away.shortName}</span>
+          {tags?.away && <Tag label={tags.away} />}
         </span>
       </div>
       {showInputs && !disabled && (
@@ -408,6 +415,11 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
       )}
     </li>
   );
+}
+
+/** A small pill, e.g. a cup club's division. */
+function Tag({ label }: { label: string }) {
+  return <span className="shrink-0 rounded bg-zinc-200 px-1 text-[10px] font-semibold text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">{label}</span>;
 }
 
 /** A play-off leg whose clubs aren't decided yet, e.g. "6th place × 3rd place". */

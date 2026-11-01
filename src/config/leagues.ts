@@ -599,25 +599,6 @@ export function gamesPerTeam(league: LeagueConfig): number {
   return league.gamesPerTeam ?? (league.teams - 1) * 2;
 }
 
-export interface CountryGroup {
-  /** English country name, also the translation key (Countries.<country>). */
-  country: string;
-  flag: FlagCode;
-  /** In config order, which is top division first. */
-  leagues: LeagueConfig[];
-}
-
-/** Leagues grouped by country, for the header menu. */
-export function countries(): CountryGroup[] {
-  const groups = new Map<string, CountryGroup>();
-  for (const league of LEAGUES) {
-    const group = groups.get(league.country) ?? { country: league.country, flag: league.flag, leagues: [] };
-    group.leagues.push(league);
-    groups.set(league.country, group);
-  }
-  return [...groups.values()];
-}
-
 export function getLeagueBySlug(slug: string): LeagueConfig | undefined {
   return LEAGUES.find((l) => l.slug === slug);
 }

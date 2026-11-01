@@ -1,5 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
-import { LEAGUES, type SiteLocale } from "../config/leagues.ts";
+import { COMPETITIONS } from "../config/competitions.ts";
+import type { SiteLocale } from "../config/leagues.ts";
 import { Link } from "../i18n/navigation.ts";
 import { Flag } from "./Flag.tsx";
 
@@ -12,7 +13,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4">
         <nav aria-label={seo("otherLeagues")}>
           <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
-            {LEAGUES.map((l) => (
+            {COMPETITIONS.map((l) => (
               <li key={l.code}>
                 <Link href={`/${l.slug}`} className="flex items-center gap-1.5 text-zinc-600 hover:text-pitch-700 dark:text-zinc-400 dark:hover:text-pitch-100">
                   <Flag code={l.flag} width={16} />

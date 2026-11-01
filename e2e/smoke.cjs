@@ -347,6 +347,83 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("FA Cup: round cards, simulated draws, bracket, champion, chances, share", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/fa-cup`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["First Round", "Second Round", "Third Round", "Fourth Round", "Fifth Round", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 40, "40 first-round ties");
+      assert.equal(await ties.first().locator("input").count(), 0, "played ties show the result");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /L1|L2|NL/, "division tags");
+      await bar.nth(1).click();
+      await p.locator('[data-testid="pending-round"]').waitFor();
+      assert.match(await p.locator('[data-testid="pending-round"]').innerText(), /after the First Round/);
+      await bar.nth(0).click();
+
+      // Simulate the first round: the second round is drawn, each winner once.
+      await p.getByRole("button", { name: "Simulate round" }).click();
+      await p.locator('[data-testid="simulated-draw-note"]').waitFor();
+      assert.equal(await ties.count(), 20, "second round drawn");
+      const clubs = await ties.evaluateAll((els) => els.flatMap((e) => [e.dataset.home, e.dataset.away]));
+      assert.equal(new Set(clubs).size, 40, "every winner exactly once in the second round");
+      const before = await ties.evaluateAll((els) => els.map((e) => e.textContent));
+      await p.locator('[data-testid="new-draw"]').click();
+      await p.waitForTimeout(200);
+      const after = await ties.evaluateAll((els) => els.map((e) => e.textContent));
+      assert.notDeepEqual(before, after, "New draw reshuffles");
+
+      // Down to the final: bracket, Wembley, champion with a road to the final.
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      assert.equal(await p.locator('[data-testid="bracket-round"]').count(), 3);
+      assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Wembley/);
+      assert.equal(await p.locator('[data-testid="cup-tie"]').count(), 7, "4 quarter-finals, 2 semis, 1 final");
+      const champion = await p.locator('[data-testid="champion"]').innerText();
+      assert.match(champion, /FA Cup \d{4}\/\d{2} winner/);
+      assert.match(champion, /Third Round: \d+–\d+ v /);
+      assert.ok((await bar.allInnerTexts()).every((x) => x.includes("Complete")));
+
+      // Share link reproduces the bracket and champion in a fresh browser.
+      const shareUrl = await p.evaluate(async () => {
+        const original = navigator.clipboard.writeText;
+        let copied = "";
+        navigator.clipboard.writeText = async (text) => { copied = text; };
+        document.querySelector('[data-testid="actions"] button:last-child').click();
+        await new Promise((r) => setTimeout(r, 50));
+        navigator.clipboard.writeText = original;
+        return copied;
+      });
+      assert.match(shareUrl, /[?&]r=/);
+      const fresh = await (await browser.newContext()).newPage();
+      await fresh.goto(shareUrl);
+      await fresh.locator('[data-testid="champion-team"]').waitFor();
+      assert.equal(await fresh.locator('[data-testid="champion-team"]').innerText(), await p.locator('[data-testid="champion-team"]').innerText());
+      await fresh.context().close();
+
+      // Chances: every club still in (per the real results), win chances add up to about 100%.
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="cup-chances"]').waitFor({ timeout: 90000 });
+      await p.getByRole("button", { name: /Show all/ }).click();
+      const rows = await p.locator('[data-testid="cup-chance-row"]').count();
+      assert.equal(rows, 80 - 20 + 44, "60 first-round survivors/unplayed clubs plus 44 entrants");
+      const wins = await p.locator('[data-testid="cup-win-chance"]').allInnerTexts();
+      const total = wins.reduce((n, x) => n + (x === "–" ? 0 : x.startsWith("<") ? 0.05 : parseFloat(x)), 0);
+      assert.ok(total > 90 && total < 110, `win chances sum to ${total}%`);
+      await p.close();
+
+      // Phone: no horizontal scroll; header menu lists the cup under England.
+      const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      await phone.goto(`${BASE_URL}/en/fa-cup`);
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390);
+      await phone.close();
+    });
+
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/mls`);
@@ -420,7 +497,7 @@ async function step(name, fn) {
       await menu.getByRole("button", { name: "England" }).hover();
       const england = menu.locator("#menu-gb-eng");
       await england.waitFor();
-      assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship", "League One", "League Two"]);
+      assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship", "League One", "League Two", "FA Cup"]);
       await england.getByRole("link", { name: "Championship" }).click();
       await desktop.waitForURL(/\/en\/championship$/);
       await desktop.close();

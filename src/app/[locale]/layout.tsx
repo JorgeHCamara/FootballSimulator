@@ -10,7 +10,7 @@ import { routing } from "../../i18n/routing.ts";
 import { GOOGLE_SITE_VERIFICATION, HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../lib/site.ts";
 import "../globals.css";
 
-const CLIENT_NAMESPACES = ["Nav", "Simulator", "Zones", "Countries"];
+const CLIENT_NAMESPACES = ["Nav", "Simulator", "Zones", "Countries", "Cup"];
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

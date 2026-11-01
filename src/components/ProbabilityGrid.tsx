@@ -1,44 +1,14 @@
 "use client";
 
 import { useFormatter, useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
 import { zoneForPosition, type LeagueConfig } from "../config/leagues.ts";
-import { probabilityInRange, type MonteCarloInput, type MonteCarloResult } from "../engine/montecarlo.ts";
+import { probabilityInRange, type MonteCarloInput } from "../engine/montecarlo.ts";
 import type { StandingRow, Team, TeamId } from "../engine/types.ts";
-import type { MonteCarloRequest, MonteCarloResponse } from "../workers/montecarlo.worker.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
+import { ITERATIONS, useMonteCarlo } from "./useMonteCarlo.ts";
 import { ZONE_STYLES } from "./zones.ts";
 
-export const ITERATIONS = 10_000;
-
-/** Runs the Monte Carlo in a Web Worker, debounced, keeping only the latest answer. */
-function useMonteCarlo(input: MonteCarloInput | null): MonteCarloResult | null {
-  const [result, setResult] = useState<MonteCarloResult | null>(null);
-  const worker = useRef<Worker | null>(null);
-  const latest = useRef(0);
-
-  useEffect(() => {
-    const w = new Worker(new URL("../workers/montecarlo.worker.ts", import.meta.url), { type: "module" });
-    w.onmessage = (e: MessageEvent<MonteCarloResponse>) => {
-      if (e.data.id === latest.current) setResult(e.data.result);
-    };
-    worker.current = w;
-    return () => w.terminate();
-  }, []);
-
-  useEffect(() => {
-    if (!input) return;
-    const id = ++latest.current;
-    setResult(null);
-    const timer = setTimeout(() => {
-      const request: MonteCarloRequest = { id, input };
-      worker.current?.postMessage(request);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [input]);
-
-  return result;
-}
+export { ITERATIONS };
 
 interface Props {
   league: LeagueConfig;

@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
-import { LEAGUES } from "../config/leagues.ts";
+import { COMPETITIONS } from "../config/competitions.ts";
 import { routing } from "../i18n/routing.ts";
 import { HREFLANG, SITE_URL } from "../lib/site.ts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const paths = ["", ...LEAGUES.map((l) => `/${l.slug}`)];
+  const paths = ["", ...COMPETITIONS.map((c) => `/${c.slug}`)];
   return paths.flatMap((path) =>
     routing.locales.map((locale) => ({
       url: `${SITE_URL}/${locale}${path}`,
