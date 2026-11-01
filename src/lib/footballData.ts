@@ -38,6 +38,8 @@ export interface ApiMatch {
   utcDate: string;
   status: ApiMatchStatus;
   matchday: number | null;
+  /** e.g. "REGULAR_SEASON", "PLAYOFFS", "SEMI_FINALS", "FINAL". */
+  stage?: string;
   season?: Pick<ApiSeason, "id" | "startDate" | "endDate">;
   homeTeam: ApiMatchTeam;
   awayTeam: ApiMatchTeam;

@@ -13,7 +13,8 @@ const TOWNS = [
   "Northbridge", "Ashford Vale", "Kingsport", "Millbrook", "Redcastle", "Stonehaven",
   "Westmere", "Oakhurst", "Ravenford", "Silverton", "Eastwick", "Highcliff",
   "Lakeside", "Brightwater", "Thornbury", "Fairhaven", "Greywood", "Port Alder",
-  "Elmstead", "Copperfield",
+  "Elmstead", "Copperfield", "Marlow Heath", "Dunmore", "Westbury", "Hollowmere",
+  "Kestrel Bay", "Ironbridge",
 ];
 const SUFFIXES = ["FC", "United", "City", "Athletic", "Rovers", "Wanderers", "Town", "Albion"];
 

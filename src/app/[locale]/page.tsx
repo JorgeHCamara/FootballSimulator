@@ -71,11 +71,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               title={l.simulatorName[lang]}
             >
               <Flag code={l.flag} width={42} />
-              <span className="flex-1">
-                <span className="block font-bold">{l.name}</span>
-                <span className="text-xs text-zinc-500">
-                  {l.aka[lang]} · {t("teams", { count: l.teams })}
-                </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-bold">{l.name}</span>
+                <span className="block truncate text-xs text-zinc-500">{l.aka[lang]}</span>
+                <span className="block text-xs text-zinc-500">{t("teams", { count: l.teams })}</span>
               </span>
               <span className="rounded-lg bg-pitch-600 px-3 py-1.5 text-sm font-semibold text-white group-hover:bg-pitch-700">
                 {t("open")}

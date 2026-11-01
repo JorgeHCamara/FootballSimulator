@@ -42,7 +42,11 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
     { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } },
     { maxRetries: isBuildPhase() ? 2 : 0 },
   );
-  const fixtures = mapMatches(matches);
+  // Knockout games after the regular season (e.g. Championship play-offs) feed the
+  // play-off bracket instead of the table.
+  const isLeague = (m: (typeof matches)[number]) => !m.stage || m.stage === "REGULAR_SEASON";
+  const fixtures = mapMatches(matches.filter(isLeague));
+  const postseason = mapMatches(matches.filter((m) => !isLeague(m)).map((m) => ({ ...m, matchday: m.matchday ?? 0 })));
   if (fixtures.length === 0) throw new Error(`No fixtures returned for ${league.code}`);
   const season = seasonOf(matches) ?? {
     id: 0,
@@ -50,11 +54,12 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
     endDate: fixtures.at(-1)!.utcDate,
   };
   return {
-    teams: applyTeamOverrides(teamsFromMatches(matches), { league: league.code }),
+    teams: applyTeamOverrides(teamsFromMatches(matches.filter(isLeague)), { league: league.code }),
     fixtures,
     season: seasonLabel(season),
     seasonKey: `${league.code}:${season.id || season.startDate.slice(0, 4)}`,
     source: "live",
+    ...(postseason.length ? { postseason } : {}),
   };
 }
 

@@ -2,7 +2,7 @@
 
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { tieOutcome, type TwoLeggedTie } from "../engine/playoffs.ts";
+import { needsShootout, tieOutcome, type PlayoffSide, type PlayoffTie } from "../engine/playoffs.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 
@@ -10,7 +10,7 @@ import { TeamBadge } from "./TeamBadge.tsx";
 export const PLAYOFF_MATCHDAY = -1;
 
 export interface PlayoffView {
-  ties: TwoLeggedTie[];
+  bracket: PlayoffTie[][];
   /** Every league match has a score, so the seeding is final and legs can be edited. */
   seasonComplete: boolean;
   promotedTo: string;
@@ -94,65 +94,106 @@ export function FixtureList(props: Props) {
 /** Two-legged play-off ties: both legs, the rule and the aggregate once decided. */
 function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props & { playoff: PlayoffView }) {
   const t = useTranslations("Simulator");
-  const done = playoff.seasonComplete;
-  // Until the league is finished the pairings aren't known: show positions, not clubs.
-  const name = (id: TeamId, position: number) => (done ? (teams.get(id)?.shortName ?? "") : t("playoffPlace", { position }));
+  const { bracket, seasonComplete } = playoff;
+  const lastRound = bracket.length - 1;
+
+  // A side is a club once known; before that its table position (league not
+  // finished) or "Semi-final winner" style text (earlier round not decided).
+  const label = (side: PlayoffSide) => {
+    if (side.teamId !== null) return teams.get(side.teamId)?.shortName ?? "";
+    if (side.from) return t("playoffWinnerOf", { round: bracket[side.from.round]![0]!.config.key });
+    return t("playoffPlace", { position: side.position ?? 0 });
+  };
+
+  const rule = (tie: PlayoffTie) => {
+    const { config } = tie;
+    const higher = label(tie.higher);
+    if (config.levelTie === "betterPlaced") return t("playoffRule", { higher });
+    if (config.venue) return t("playoffRuleFinal", { venue: config.venue });
+    return config.legs === 2 ? t("playoffRuleTwoLegs", { higher }) : t("playoffRuleOneLeg", { higher });
+  };
+
   return (
     <div data-testid="playoff">
-      {!playoff.seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t("playoffProjected")}</p>}
-      {playoff.ties.map((tie) => {
-        const outcome = playoff.seasonComplete ? tieOutcome(tie, predictions) : null;
-        return (
-          <div key={tie.seeds.join("-")} className="border-b border-zinc-100 last:border-b-0 dark:border-zinc-800" data-testid="playoff-tie">
-            <div className="px-3 pt-3">
-              <h3 className="text-sm font-semibold">
-                {t("playoffTie", { higherPos: tie.seeds[0], lowerPos: tie.seeds[1] })}
-                {done && (
-                  <span className="font-normal text-zinc-500">
-                    {" "}
-                    · {name(tie.higher, tie.seeds[0])} × {name(tie.lower, tie.seeds[1])}
-                  </span>
+      {!seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t("playoffProjected")}</p>}
+      {bracket.map((round, r) => (
+        <div key={r} data-testid="playoff-round">
+          {bracket.length > 1 && (
+            <h3 className="border-b border-zinc-100 bg-zinc-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-zinc-600 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300">
+              {t("playoffRound", { round: round[0]!.config.key })}
+            </h3>
+          )}
+          {round.map((tie) => {
+            const outcome = tieOutcome(tie, predictions);
+            const known = tie.legs.length > 0;
+            const showShootout = tie.shootout && (needsShootout(tie, predictions) || predictions[tie.shootout.id]);
+            const pens = tie.shootout ? (predictions[tie.shootout.id] ?? tie.shootout.result) : null;
+            return (
+              <div key={tie.index} className="border-b border-zinc-100 last:border-b-0 dark:border-zinc-800" data-testid="playoff-tie">
+                <div className="px-3 pt-3">
+                  <h4 className="text-sm font-semibold">
+                    {label(tie.higher)} × {label(tie.lower)}
+                  </h4>
+                  <p className="text-xs text-zinc-500">{rule(tie)}</p>
+                </div>
+                <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                  {!known
+                    ? Array.from({ length: tie.config.legs }, (_, i) => {
+                        // Two legs: lower-placed side hosts the first.
+                        const [home, away] = tie.config.legs === 2 && i === 0 ? [tie.lower, tie.higher] : [tie.higher, tie.lower];
+                        return <PlaceholderRow key={i} utcDate="" home={label(home)} away={label(away)} />;
+                      })
+                    : tie.legs.map((leg) => (
+                        <MatchRow
+                          key={`${leg.id}-${leg.homeId}-${leg.awayId}`}
+                          fixture={leg}
+                          home={teams.get(leg.homeId)!}
+                          away={teams.get(leg.awayId)!}
+                          prediction={predictions[leg.id]}
+                          {...(leg.neutral && tie.config.venue ? { label: tie.config.venue } : {})}
+                          onScore={(score) => onScore(leg, score)}
+                          onSimulate={() => onSimulate(leg)}
+                        />
+                      ))}
+                  {showShootout && tie.shootout && (
+                    <MatchRow
+                      key={`${tie.shootout.id}-${tie.shootout.homeId}-${tie.shootout.awayId}`}
+                      fixture={tie.shootout}
+                      home={teams.get(tie.shootout.homeId)!}
+                      away={teams.get(tie.shootout.awayId)!}
+                      prediction={predictions[tie.shootout.id]}
+                      label={t("penalties")}
+                      onScore={(score) => onScore(tie.shootout!, score)}
+                      onSimulate={() => onSimulate(tie.shootout!)}
+                    />
+                  )}
+                </ul>
+                {outcome && (
+                  <p className="bg-pitch-50 px-3 py-2 text-sm font-medium text-pitch-900 dark:bg-pitch-900/30 dark:text-pitch-100" data-testid="playoff-result">
+                    {tie.config.legs === 2 &&
+                      t("playoffAggregate", {
+                        higher: label(tie.higher),
+                        lower: label(tie.lower),
+                        hg: outcome.higherGoals,
+                        lg: outcome.lowerGoals,
+                      }) + " "}
+                    {outcome.onPenalties &&
+                      pens &&
+                      t("playoffOnPenalties", {
+                        winner: teams.get(outcome.winner)?.shortName ?? "",
+                        wp: Math.max(pens.home, pens.away),
+                        lp: Math.min(pens.home, pens.away),
+                      }) + " "}
+                    {r === lastRound
+                      ? t("playoffPromoted", { winner: teams.get(outcome.winner)?.shortName ?? "", promotedTo: playoff.promotedTo })
+                      : t("playoffAdvances", { winner: teams.get(outcome.winner)?.shortName ?? "" })}
+                  </p>
                 )}
-              </h3>
-              <p className="text-xs text-zinc-500">{t("playoffRule", { higher: name(tie.higher, tie.seeds[0]) })}</p>
-            </div>
-            <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {[tie.leg1, tie.leg2].map((leg) =>
-                !done ? (
-                  <PlaceholderRow
-                    key={leg.id}
-                    utcDate={leg.utcDate}
-                    home={name(leg.homeId, leg.homeId === tie.higher ? tie.seeds[0] : tie.seeds[1])}
-                    away={name(leg.awayId, leg.awayId === tie.higher ? tie.seeds[0] : tie.seeds[1])}
-                  />
-                ) : (
-                <MatchRow
-                  key={`${leg.id}-${leg.homeId}-${leg.awayId}`}
-                  fixture={leg}
-                  home={teams.get(leg.homeId)!}
-                  away={teams.get(leg.awayId)!}
-                  prediction={predictions[leg.id]}
-                  onScore={(score) => onScore(leg, score)}
-                  onSimulate={() => onSimulate(leg)}
-                />
-                ),
-              )}
-            </ul>
-            {outcome && (
-              <p className="bg-pitch-50 px-3 py-2 text-sm font-medium text-pitch-900 dark:bg-pitch-900/30 dark:text-pitch-100" data-testid="playoff-result">
-                {t("playoffAggregate", {
-                  higher: name(tie.higher, tie.seeds[0]),
-                  lower: name(tie.lower, tie.seeds[1]),
-                  hg: outcome.higherGoals,
-                  lg: outcome.lowerGoals,
-                  winner: name(outcome.winner, outcome.winner === tie.higher ? tie.seeds[0] : tie.seeds[1]),
-                  promotedTo: playoff.promotedTo,
-                })}
-              </p>
-            )}
-          </div>
-        );
-      })}
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }
@@ -160,6 +201,8 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
 interface RowProps {
   /** Read-only (e.g. a projected play-off before the season ends). */
   disabled?: boolean;
+  /** Shown above the match, after the kick-off time (e.g. "Wembley", "Penalties"). */
+  label?: string;
   fixture: Fixture;
   home: Team;
   away: Team;
@@ -173,7 +216,7 @@ function parseGoals(text: string): number | null {
   return Number(text);
 }
 
-export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label }: RowProps) {
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
   const locked = fixture.result !== null && prediction === undefined;
@@ -204,7 +247,10 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
   return (
     <li className="px-3 py-2.5" data-testid="match-row" data-fixture={fixture.id}>
       <div className="mb-1 flex items-center justify-between text-[11px] text-zinc-500">
-        <KickOff utcDate={fixture.utcDate} />
+        <span>
+          <KickOff utcDate={fixture.utcDate} />
+          {label && <span className="font-semibold"> · {label}</span>}
+        </span>
         {fixture.result && !prediction && <span className="font-semibold uppercase tracking-wide">{t("realResult")}</span>}
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
@@ -302,7 +348,7 @@ function KickOff({ utcDate }: { utcDate: string }) {
   const format = useFormatter();
   const [timeZone, setTimeZone] = useState<string | null>(null);
   useEffect(() => setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone), []);
-  if (!timeZone) return <span>&nbsp;</span>;
+  if (!timeZone || Number.isNaN(Date.parse(utcDate))) return <span>&nbsp;</span>;
   return (
     <span data-testid="kickoff" data-utc={utcDate}>
       {format.dateTime(new Date(utcDate), {

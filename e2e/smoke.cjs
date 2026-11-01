@@ -39,9 +39,9 @@ async function step(name, fn) {
     let initialPoints = 0;
     let simulatedOrder = [];
 
-    await step("home page lists the seven leagues", async () => {
+    await step("home page lists the ten leagues", async () => {
       await page.goto(`${BASE_URL}/en`);
-      assert.equal(await page.locator("main ul").first().locator("li").count(), 7);
+      assert.equal(await page.locator("main ul").first().locator("li").count(), 10);
     });
 
     await step("league table renders 18 teams", async () => {
@@ -205,6 +205,39 @@ async function step(name, fn) {
       assert.ok([names[2], names[5]].some((n) => winners[0].includes(n) || n.includes(winners[0])), "3v6 winner");
       assert.ok([names[3], names[4]].some((n) => winners[1].includes(n) || n.includes(winners[1])), "4v5 winner");
       await ctx.close();
+    });
+
+    await step("Championship 2026/27 play-off: eliminators, semis, Wembley final, 3 promoted", async () => {
+      const ctx = await browser.newContext();
+      const p = await ctx.newPage();
+      await p.goto(`${BASE_URL}/en/championship`);
+      assert.equal(await p.locator('[data-testid="standings-row"]').count(), 24);
+      const options = await p.locator('[data-testid="matchday-select"] option').allInnerTexts();
+      assert.deepEqual(options.slice(-2), ["Matchday 46", "Play-off"]);
+      await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Play-off" });
+      const rounds = await p.locator('[data-testid="playoff-round"] h3').allInnerTexts();
+      assert.deepEqual(rounds.map((r) => r.toLowerCase()), ["eliminators", "semi-finals", "final"]);
+      const placeholders = await p.locator('[data-testid="playoff-placeholder"]').allInnerTexts();
+      assert.match(placeholders[0], /5th place[\s\S]*8th place/);
+
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="promoted-team"]').first().waitFor();
+      assert.equal(await p.locator('[data-testid="promoted-team"]').count(), 3);
+      assert.equal(await p.locator('[data-testid="playoff-result"]').count(), 5, "2 eliminators, 2 semis, 1 final");
+      assert.match(await p.locator('[data-testid="playoff-result"]').last().innerText(), /goes up to Premier League/);
+      assert.match(await p.locator('[data-testid="promoted"] h2').innerText(), /Premier League \d{4}/); // "2027/28" with real data
+      await ctx.close();
+    });
+
+    await step("new leagues and shorter Série B name on the home page", async () => {
+      const p = await browser.newPage();
+      for (const slug of ["primeira-liga", "eredivisie"]) {
+        await p.goto(`${BASE_URL}/en/${slug}`);
+        assert.equal(await p.locator('[data-testid="standings-row"]').count(), 18, slug);
+      }
+      await p.goto(`${BASE_URL}/pt`);
+      assert.match(await p.locator("main").innerText(), /Brasileiro Série B\s+20 times/);
+      await p.close();
     });
 
     await step("kick-off times follow the visitor's time zone", async () => {

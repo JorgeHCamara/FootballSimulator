@@ -44,6 +44,23 @@ function shapes(code: FlagCode) {
           <rect x="20" width="10" height="20" fill="#ef4135" />
         </>
       );
+    case "pt":
+      return (
+        <>
+          <rect width="30" height="20" fill="#da291c" />
+          <rect width="12" height="20" fill="#046a38" />
+          <circle cx="12" cy="10" r="3.6" fill="#ffe900" />
+          <circle cx="12" cy="10" r="2.2" fill="#da291c" />
+        </>
+      );
+    case "nl":
+      return (
+        <>
+          <rect width="30" height="6.67" fill="#ae1c28" />
+          <rect y="6.67" width="30" height="6.67" fill="#ffffff" />
+          <rect y="13.33" width="30" height="6.67" fill="#21468b" />
+        </>
+      );
     case "br":
       return (
         <>

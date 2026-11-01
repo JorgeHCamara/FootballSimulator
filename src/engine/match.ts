@@ -21,6 +21,14 @@ export function expectedGoals(model: LeagueModel, homeId: TeamId, awayId: TeamId
   };
 }
 
+/** Neutral ground: both sides get the league's average scoring rate, no home advantage. */
+export function expectedGoalsNeutral(model: LeagueModel, aId: TeamId, bId: TeamId): ExpectedGoals {
+  const base = (model.avgHomeGoals + model.avgAwayGoals) / 2;
+  const a = model.strengths.get(aId) ?? { attack: 1, defence: 1 };
+  const b = model.strengths.get(bId) ?? { attack: 1, defence: 1 };
+  return { home: clampRate(base * a.attack * b.defence), away: clampRate(base * b.attack * a.defence) };
+}
+
 /** Knuth's algorithm; fine for the small rates found in football. */
 export function samplePoisson(lambda: number, rng: Rng): number {
   const limit = Math.exp(-lambda);
@@ -78,7 +86,8 @@ export function simulateFixtures(
   const out: ResultMap = {};
   for (const f of fixtures) {
     if (known[f.id]) continue;
-    out[f.id] = simulateScore(expectedGoals(model, f.homeId, f.awayId), rng);
+    const xg = f.neutral ? expectedGoalsNeutral(model, f.homeId, f.awayId) : expectedGoals(model, f.homeId, f.awayId);
+    out[f.id] = simulateScore(xg, rng);
   }
   return out;
 }

@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Fútbol – Simula LaLiga, Premier League, Brasileirão y más",
-    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Premier League, Bundesliga, Serie A, Ligue 1 y Brasileirão. Clasificación en directo y probabilidades de título, Europa y descenso.",
+    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie y Brasileirão. Clasificación en directo y probabilidades de título, Europa y descenso.",
     "leagueTitle": "{simulator} {season} – Predice la Clasificación",
     "leagueDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Europa y descenso.",
     "ogTagline": "Pronósticos · Simula la temporada · Probabilidades de título y descenso"
@@ -23,7 +23,7 @@
     "heading": "Simulador de Fútbol",
     "tagline": "Simula la temporada antes de que ocurra",
     "aboutTitle": "Un simulador de fútbol gratis para las mejores ligas",
-    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Premier League, Bundesliga, Serie A, Ligue 1 y Brasileirão Série A y B. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
+    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie y Brasileirão Série A y B. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
   },
   "Simulator": {
     "table": "Clasificación",
@@ -68,17 +68,25 @@
     "replacedNotice": "{count, plural, one {# pronóstico fue sustituido} other {# pronósticos fueron sustituidos}} por resultados reales.",
     "sharedLoaded": "Simulación compartida cargada.",
     "dismiss": "Cerrar",
-    "playoffProjected": "Los cruces se definen cuando terminen las 38 jornadas.",
-    "playoffTie": "{higherPos}.º vs {lowerPos}.º",
+    "playoffProjected": "Los cruces se definen cuando termine la fase regular.",
     "playoffRule": "{higher} juega la vuelta en casa y pasa si el global termina empatado.",
-    "playoffAggregate": "Global: {higher} {hg}–{lg} {lower}. {winner} asciende a la {promotedTo}.",
+    "playoffAggregate": "Global: {higher} {hg}–{lg} {lower}.",
     "promotedTitle": "Ascendidos a la {league} {year}",
-    "promotedPending": "Completa la temporada y el playoff para ver los cuatro clubes ascendidos.",
+    "promotedPending": "Completa la temporada y el playoff para ver los clubes ascendidos.",
     "promotedChampion": "Campeón",
     "promotedRunnerUp": "Subcampeón",
     "promotedPlayoff": "Ganador del playoff",
     "playoffs": "Playoff",
-    "playoffPlace": "{position}.º clasificado"
+    "playoffPlace": "{position}.º clasificado",
+    "playoffRound": "{round, select, eliminators {Eliminatorias} semiFinals {Semifinales} final {Final} other {Playoff}}",
+    "playoffWinnerOf": "{round, select, eliminators {Ganador de la eliminatoria} semiFinals {Ganador de la semifinal} other {Ganador}}",
+    "playoffRuleTwoLegs": "{higher} juega la vuelta en casa. Si el global termina empatado: prórroga y penaltis.",
+    "playoffRuleOneLeg": "Partido único en el estadio de {higher}. Si hay empate: prórroga y penaltis.",
+    "playoffRuleFinal": "Partido único en {venue}. Si hay empate: prórroga y penaltis.",
+    "playoffOnPenalties": "{winner} gana {wp}–{lp} en los penaltis.",
+    "playoffAdvances": "{winner} pasa de ronda.",
+    "playoffPromoted": "{winner} asciende a la {promotedTo}.",
+    "penalties": "Penaltis"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -141,7 +149,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Premier League, Bundesliga, Serie A, Ligue 1 y Brasileirão Série A y Série B, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Premier League, Championship, Bundesliga, Serie A, Ligue 1, Primeira Liga, Eredivisie y Brasileirão Série A y Série B, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",

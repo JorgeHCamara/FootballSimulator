@@ -26,6 +26,8 @@ export interface Fixture {
   awayId: TeamId;
   /** Real-world result, present only once the match has finished. */
   result: Score | null;
+  /** Played at a neutral ground (e.g. a play-off final): no home advantage. */
+  neutral?: boolean;
 }
 
 /** Scores keyed by fixture id (user predictions, simulated results, or both). */

@@ -1,12 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { tieOutcome, type TwoLeggedTie } from "../engine/playoffs.ts";
+import { playoffWinners, type PlayoffTie } from "../engine/playoffs.ts";
 import type { ResultMap, StandingRow, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 
 interface Props {
-  ties: TwoLeggedTie[];
+  bracket: PlayoffTie[][];
   rows: StandingRow[];
   teams: Map<TeamId, Team>;
   predictions: ResultMap;
@@ -17,11 +17,11 @@ interface Props {
 }
 
 /** The clubs going up: direct promotion places plus the play-off winners. */
-export function PromotedClubs({ ties, rows, teams, predictions, seasonComplete, directPromotion, promotedTo, nextSeason }: Props) {
+export function PromotedClubs({ bracket, rows, teams, predictions, seasonComplete, directPromotion, promotedTo, nextSeason }: Props) {
   const t = useTranslations("Simulator");
-  const winners = ties.map((tie) => (seasonComplete ? tieOutcome(tie, predictions)?.winner : undefined));
+  const winners = seasonComplete ? playoffWinners(bracket, predictions) : [];
   const promoted =
-    seasonComplete && winners.every((w) => w !== undefined)
+    seasonComplete && winners.length > 0 && winners.every((w) => w !== null)
       ? [
           ...directPromotion
             .map((position) => rows.find((r) => r.position === position))

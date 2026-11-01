@@ -1,3 +1,4 @@
+import type { PlayoffConfig } from "../engine/playoffs.ts";
 import type { Tiebreaker } from "../engine/types.ts";
 
 export type ZoneKind =
@@ -21,12 +22,12 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B). */
-export type CompetitionCode = "PL" | "PD" | "BL1" | "SA" | "FL1" | "BSA" | "BSB";
+export type CompetitionCode = "PL" | "ELC" | "PD" | "BL1" | "SA" | "FL1" | "PPL" | "DED" | "BSA" | "BSB";
 
 /** Where a league's real data comes from. */
 export type DataSource = { provider: "football-data" } | { provider: "espn"; slug: string };
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "br";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -43,16 +44,8 @@ export interface LeagueConfig {
   teams: number;
   /** Defaults to football-data.org with `code` as the competition code. */
   source?: DataSource;
-  /**
-   * End-of-season two-legged promotion play-off: table positions paired
-   * better-placed first; that club hosts the second leg and goes through on a
-   * level aggregate. `directPromotion` are the positions promoted without it.
-   */
-  playoff?: {
-    ties: readonly (readonly [number, number])[];
-    directPromotion: readonly number[];
-    promotedTo: string;
-  };
+  /** End-of-season promotion play-off (see src/engine/playoffs.ts). */
+  playoff?: PlayoffConfig;
   tiebreakers: readonly Tiebreaker[];
   /**
    * Default qualification/relegation zones. Real allocations shift with domestic
@@ -78,6 +71,35 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "conferenceLeague", from: 6, to: 6 },
       { kind: "relegation", from: 18, to: 20 },
     ],
+  },
+  {
+    code: "ELC",
+    slug: "championship",
+    name: "Championship",
+    country: "England",
+    flag: "gb-eng",
+    simulatorName: { en: "Championship Simulator", pt: "Simulador da Championship", es: "Simulador de la Championship" },
+    aka: { en: "EFL Championship", pt: "Segunda divisão inglesa", es: "Segunda división inglesa" },
+    teams: 24,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadAwayGoalsFor"],
+    zones: [
+      { kind: "promotion", from: 1, to: 2 },
+      { kind: "promotionPlayoff", from: 3, to: 8 },
+      { kind: "relegation", from: 22, to: 24 },
+    ],
+    // 2026/27 format: 3rd–8th in the play-offs. Single-leg eliminators (5th v 8th,
+    // 6th v 7th) at the better-placed club; two-legged semi-finals with 3rd and 4th
+    // (3rd v the lowest-placed winner, 3rd/4th host the second leg); final at
+    // Wembley. Level ties: extra time and penalties.
+    playoff: {
+      rounds: [
+        { key: "eliminators", legs: 1, levelTie: "penalties", pairs: [[5, 8], [6, 7]] },
+        { key: "semiFinals", legs: 2, levelTie: "penalties", entrants: [3, 4] },
+        { key: "final", legs: 1, levelTie: "penalties", venue: "Wembley" },
+      ],
+      directPromotion: [1, 2],
+      promotedTo: "Premier League",
+    },
   },
   {
     code: "PD",
@@ -165,6 +187,44 @@ export const LEAGUES: readonly LeagueConfig[] = [
     ],
   },
   {
+    code: "PPL",
+    slug: "primeira-liga",
+    name: "Primeira Liga",
+    country: "Portugal",
+    flag: "pt",
+    simulatorName: { en: "Primeira Liga Simulator", pt: "Simulador da Primeira Liga", es: "Simulador de la Primeira Liga" },
+    aka: { en: "Liga Portugal", pt: "Campeonato Português", es: "Liga portuguesa" },
+    teams: 18,
+    tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
+    zones: [
+      { kind: "championsLeague", from: 1, to: 1 },
+      { kind: "championsLeagueQualifying", from: 2, to: 2 },
+      { kind: "europaLeague", from: 3, to: 3 },
+      { kind: "conferenceLeague", from: 4, to: 4 },
+      { kind: "relegationPlayoff", from: 16, to: 16 },
+      { kind: "relegation", from: 17, to: 18 },
+    ],
+  },
+  {
+    code: "DED",
+    slug: "eredivisie",
+    name: "Eredivisie",
+    country: "Netherlands",
+    flag: "nl",
+    simulatorName: { en: "Eredivisie Simulator", pt: "Simulador da Eredivisie", es: "Simulador de la Eredivisie" },
+    aka: { en: "Dutch Eredivisie", pt: "Campeonato Holandês", es: "Liga neerlandesa" },
+    teams: 18,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadGoalDifference"],
+    zones: [
+      { kind: "championsLeague", from: 1, to: 1 },
+      { kind: "championsLeagueQualifying", from: 2, to: 2 },
+      { kind: "europaLeague", from: 3, to: 3 },
+      { kind: "conferenceLeague", from: 4, to: 4 },
+      { kind: "relegationPlayoff", from: 16, to: 16 },
+      { kind: "relegation", from: 17, to: 18 },
+    ],
+  },
+  {
     code: "BSA",
     slug: "brasileirao",
     name: "Brasileirão Série A",
@@ -188,12 +248,16 @@ export const LEAGUES: readonly LeagueConfig[] = [
     country: "Brazil",
     flag: "br",
     simulatorName: { en: "Série B Simulator", pt: "Simulador da Série B", es: "Simulador de la Série B" },
-    aka: { en: "Brasileirão Série B", pt: "Campeonato Brasileiro Série B", es: "Serie B de Brasil" },
+    aka: { en: "Brasileirão Série B", pt: "Brasileiro Série B", es: "Serie B de Brasil" },
     teams: 20,
     // football-data.org's free tier doesn't include Série B.
     source: { provider: "espn", slug: "bra.2" },
     // Série B 2026: 3rd v 6th and 4th v 5th; the winners join 1st and 2nd in Série A.
-    playoff: { ties: [[3, 6], [4, 5]], directPromotion: [1, 2], promotedTo: "Série A" },
+    playoff: {
+      rounds: [{ key: "semiFinals", legs: 2, levelTie: "betterPlaced", pairs: [[3, 6], [4, 5]] }],
+      directPromotion: [1, 2],
+      promotedTo: "Série A",
+    },
     tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadPoints"],
     zones: [
       { kind: "promotion", from: 1, to: 2 },

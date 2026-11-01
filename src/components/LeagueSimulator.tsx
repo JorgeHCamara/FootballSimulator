@@ -3,10 +3,10 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { LeagueConfig } from "../config/leagues.ts";
-import { simulateFixtures, simulateScore, expectedGoals } from "../engine/match.ts";
+import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel } from "../engine/ratings.ts";
-import { buildTwoLeggedTies, playoffLegIds } from "../engine/playoffs.ts";
+import { buildBracket, isShootoutId, playoffIds, simulatePenalties, simulatePlayoff, tieIds } from "../engine/playoffs.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
@@ -32,6 +32,15 @@ interface Props {
 
 type Tab = "table" | "chances";
 
+/** "2026" → "2027", "2026/27" → "2027/28". */
+function nextSeasonLabel(season: string): string {
+  const single = /^(\d{4})$/.exec(season);
+  if (single) return String(Number(single[1]) + 1);
+  const split = /^(\d{4})\/(\d{2})$/.exec(season);
+  if (split) return `${Number(split[1]) + 1}/${String((Number(split[2]) + 1) % 100).padStart(2, "0")}`;
+  return "";
+}
+
 export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason }: Props) {
   const t = useTranslations("Simulator");
   const [hydrated, setHydrated] = useState(false);
@@ -53,37 +62,48 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
   const effective = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
   const rows = useMemo(() => computeStandings(teams, ordered, effective, standingsOptions), [teams, ordered, effective, standingsOptions]);
 
-  // Promotion play-off (Série B): seeded from the table once every league match has a score.
+  // Promotion play-off (Série B, Championship): seeded from the table once every
+  // league match has a score, then round by round from the results entered.
   const playoff = league.playoff;
-  const legIds = useMemo(() => playoffLegIds(playoff?.ties.length ?? 0), [playoff]);
+  const legIds = useMemo(() => (playoff ? playoffIds(playoff) : []), [playoff]);
   // The share codec only needs the ids, which don't depend on who qualifies.
   const shareFixtures = useMemo<Fixture[]>(
     () => [...fixtures, ...legIds.map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null }))],
     [fixtures, legIds],
   );
   const seasonComplete = useMemo(() => fixtures.every((f) => effective[f.id]), [fixtures, effective]);
-  const buildTies = (table: StandingRow[]) =>
-    playoff
-      ? buildTwoLeggedTies(table, playoff.ties, {
-          afterMatchday: ordered.at(-1)?.matchday ?? 0,
-          afterDate: ordered.at(-1)?.utcDate ?? "",
-          ...(postseason ? { real: postseason } : {}),
-        })
-      : [];
-  const ties = useMemo(() => buildTies(rows), [rows, playoff, ordered, postseason]); // eslint-disable-line react-hooks/exhaustive-deps
+  const bracketOptions = useMemo(
+    () => ({
+      afterMatchday: ordered.at(-1)?.matchday ?? 0,
+      afterDate: ordered.at(-1)?.utcDate ?? "",
+      ...(postseason ? { real: postseason } : {}),
+    }),
+    [ordered, postseason],
+  );
+  const bracket = useMemo(
+    () => (playoff ? buildBracket(rows, playoff, season.predictions, { ...bracketOptions, seasonComplete }) : []),
+    [rows, playoff, season.predictions, bracketOptions, seasonComplete],
+  );
 
-  // Play-off scores belong to one pairing: drop them if the seeding changes or
-  // the season is no longer complete (e.g. after editing a league result).
-  const seeding = seasonComplete ? ties.map((tie) => `${tie.higher}-${tie.lower}`).join(",") : null;
-  const lastSeeding = useRef<string | null>(null);
+  // Play-off scores belong to one pairing: when a tie's clubs change (a league or
+  // earlier-round result was edited), its scores are dropped. All of them go if
+  // the league is no longer complete.
+  const pairings = new Map(bracket.flat().map((tie) => [`${tie.round}-${tie.index}`, `${tie.higher.teamId}-${tie.lower.teamId}`]));
+  const pairingKey = seasonComplete ? [...pairings.values()].join(",") : null;
+  const lastPairings = useRef<Map<string, string> | null>(null);
   useEffect(() => {
     if (!hydrated || !playoff) return;
-    if (seeding === null || (lastSeeding.current !== null && lastSeeding.current !== seeding)) drop(seasonKey, legIds);
-    lastSeeding.current = seeding;
-  }, [hydrated, seeding]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const simulatePlayoffLegs = (table: StandingRow[], known: ResultMap): ResultMap =>
-    simulateFixtures(buildTies(table).flatMap((tie) => [tie.leg1, tie.leg2]).filter((leg) => !leg.result), known, model, createRng(randomSeed()));
+    if (!seasonComplete) {
+      drop(seasonKey, legIds);
+    } else if (lastPairings.current) {
+      const stale = bracket
+        .flat()
+        .filter((tie) => lastPairings.current!.get(`${tie.round}-${tie.index}`) !== pairings.get(`${tie.round}-${tie.index}`))
+        .flatMap((tie) => tieIds(tie.round, tie.index, tie.config));
+      if (stale.length) drop(seasonKey, stale);
+    }
+    lastPairings.current = seasonComplete ? pairings : null;
+  }, [hydrated, pairingKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The play-off is listed as one more entry after the last matchday.
   const matchdays = useMemo(
@@ -126,19 +146,28 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
   const simulate = (targets: readonly Fixture[]) =>
     applyResults(seasonKey, simulateFixtures(targets, effective, model, createRng(randomSeed())));
 
-  /** Rest of the league and, where there is one, the promotion play-off in one step. */
+  /** Rest of the league and, where there is one, the whole promotion play-off in one step. */
   const simulateRest = () => {
-    const leagueResults = simulateFixtures(ordered, effective, model, createRng(randomSeed()));
+    const rng = createRng(randomSeed());
+    const leagueResults = simulateFixtures(ordered, effective, model, rng);
     if (!playoff) return applyResults(seasonKey, leagueResults);
     const all = { ...effective, ...leagueResults };
     const table = computeStandings(teams, ordered, all, standingsOptions);
-    applyResults(seasonKey, { ...leagueResults, ...simulatePlayoffLegs(table, { ...season.predictions, ...all }) });
+    const playoffResults = simulatePlayoff(table, playoff, { ...season.predictions, ...all }, model, rng, bracketOptions);
+    applyResults(seasonKey, { ...leagueResults, ...playoffResults });
   };
 
-  const simulatePlayoff = () => applyResults(seasonKey, simulatePlayoffLegs(rows, season.predictions));
+  const simulateWholePlayoff = () =>
+    playoff && applyResults(seasonKey, simulatePlayoff(rows, playoff, season.predictions, model, createRng(randomSeed()), bracketOptions));
 
   const simulateOne = (fixture: Fixture) => {
-    const score = simulateScore(expectedGoals(model, fixture.homeId, fixture.awayId), createRng(randomSeed()));
+    const rng = createRng(randomSeed());
+    const score = isShootoutId(fixture.id)
+      ? simulatePenalties(rng)
+      : simulateScore(
+          fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId),
+          rng,
+        );
     setScore(seasonKey, fixture, score);
   };
 
@@ -210,16 +239,16 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
           {tab === "table" ? (
             <>
               <StandingsTable league={league} rows={rows} teams={teamMap} />
-              {playoff && ties.length > 0 && (
+              {playoff && bracket.length > 0 && (
                 <PromotedClubs
-                  ties={ties}
+                  bracket={bracket}
                   rows={rows}
                   teams={teamMap}
                   predictions={season.predictions}
                   seasonComplete={seasonComplete}
                   directPromotion={playoff.directPromotion}
                   promotedTo={playoff.promotedTo}
-                  nextSeason={/^\d{4}$/.test(seasonLabel) ? String(Number(seasonLabel) + 1) : ""}
+                  nextSeason={nextSeasonLabel(seasonLabel)}
                 />
               )}
             </>
@@ -232,7 +261,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
           <button
             type="button"
             className={`${primaryButton} grow disabled:opacity-40 lg:grow-0`}
-            onClick={() => (onPlayoff ? simulatePlayoff() : simulate(matchdayFixtures))}
+            onClick={() => (onPlayoff ? simulateWholePlayoff() : simulate(matchdayFixtures))}
             disabled={onPlayoff && !seasonComplete}
           >
             {t("simulateMatchday")}
@@ -261,7 +290,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             predictions={season.predictions}
             onScore={onScore}
             onSimulate={simulateOne}
-            {...(playoff ? { playoff: { ties, seasonComplete, promotedTo: playoff.promotedTo } } : {})}
+            {...(playoff ? { playoff: { bracket, seasonComplete, promotedTo: playoff.promotedTo } } : {})}
           />
         </div>
       </div>
