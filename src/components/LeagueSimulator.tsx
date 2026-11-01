@@ -85,16 +85,15 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
 
   // Reserve sides (Eerste Divisie's "Jong" teams) can't go up: promotion places
   // and play-off seeds count first teams only, renumbered 1, 2, 3…
-  const reservePrefix = league.reserveTeams;
+  const reserveNames = league.reserveTeams;
+  const isReserve = (id: number) => reserveNames?.some((start) => teamMap.get(id)?.name.startsWith(start)) ?? false;
   const firstTeams = (table: StandingRow[]) =>
-    reservePrefix
-      ? table.filter((r) => !teamMap.get(r.teamId)?.name.startsWith(reservePrefix)).map((r, i) => ({ ...r, position: i + 1 }))
-      : table;
+    reserveNames ? table.filter((r) => !isReserve(r.teamId)).map((r, i) => ({ ...r, position: i + 1 })) : table;
   const playoffRows = useMemo(() => firstTeams(rows), [rows]); // eslint-disable-line react-hooks/exhaustive-deps
   /** Position that decides each club's zone (none for a reserve side). */
   const zonePositions = useMemo(
-    () => (reservePrefix ? new Map(rows.map((r) => [r.teamId, playoffRows.find((p) => p.teamId === r.teamId)?.position ?? null])) : undefined),
-    [reservePrefix, rows, playoffRows],
+    () => (reserveNames ? new Map(rows.map((r) => [r.teamId, playoffRows.find((p) => p.teamId === r.teamId)?.position ?? null])) : undefined),
+    [reserveNames, rows, playoffRows],
   );
 
   // Play-offs across separate tables (MLS Cup) are seeded from every group's

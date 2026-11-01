@@ -339,6 +339,19 @@ describe("Eerste Divisie play-off (two-legged rounds, winner meets the Eredivisi
     assert.deepEqual(roundOne.map((t) => [t.higher.teamId, t.lower.teamId, t.legs.length]), [[105, 108, 2], [106, 107, 2]]);
     assert.deepEqual(semis.map((t) => t.higher.teamId), [103, 104]);
     assert.deepEqual(eerste.winnerPlays, { league: "Eredivisie", position: 16 });
-    assert.equal(getLeagueByCode("DJL")!.reserveTeams, "Jong ");
+    assert.deepEqual(getLeagueByCode("DJL")!.reserveTeams, ["Jong "]);
+  });
+});
+
+describe("Segunda División play-off (3rd–6th, two-legged rounds, draw advantage)", () => {
+  const segunda = getLeagueByCode("SD")!.playoff!;
+
+  it("pairs 3v6 and 4v5 over two legs, then a two-legged final; level aggregate sends the better-placed club through", () => {
+    const [semis, [final]] = buildBracket(rows.slice(0, 22), segunda, {}, options) as [PlayoffTie[], PlayoffTie[]];
+    assert.deepEqual(semis.map((t) => [t.higher.teamId, t.lower.teamId, t.legs.length]), [[103, 106, 2], [104, 105, 2]]);
+    const [first, second] = semis[0]!.legs;
+    assert.equal(tieOutcome(semis[0]!, { [first!.id]: { home: 1, away: 1 }, [second!.id]: { home: 0, away: 0 } })?.winner, 103);
+    assert.equal(final!.config.legs, 2);
+    assert.deepEqual(getLeagueByCode("SD")!.reserveTeams, ["Real Sociedad II", "RC Celta Fortuna"]);
   });
 });

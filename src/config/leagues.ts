@@ -24,7 +24,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -76,11 +76,11 @@ export interface LeagueConfig {
   espn: EspnFeed;
   espnOnly?: boolean;
   /**
-   * Name prefix of reserve sides, which can't be promoted or play the play-off
-   * (Eerste Divisie: "Jong "). Promotion places and play-off seeds then count
-   * first teams only.
+   * Reserve sides, which can't be promoted or play the play-off, by the start of
+   * their name (Eerste Divisie: "Jong "; Segunda División: "Real Sociedad II").
+   * Promotion places and play-off seeds then count first teams only.
    */
-  reserveTeams?: string;
+  reserveTeams?: readonly string[];
   /** End-of-season promotion play-off (see src/engine/playoffs.ts). */
   playoff?: PlayoffConfig;
   tiebreakers: readonly Tiebreaker[];
@@ -212,6 +212,38 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "europaLeague", from: 5, to: 6 },
       { kind: "conferenceLeague", from: 7, to: 7 },
       { kind: "relegation", from: 18, to: 20 },
+    ],
+  },
+  {
+    code: "SD",
+    slug: "segunda-division",
+    name: "Segunda División",
+    country: "Spain",
+    flag: "es",
+    simulatorName: { en: "Segunda División Simulator", pt: "Simulador da Segunda División", es: "Simulador de Segunda División" },
+    aka: { en: "LaLiga Hypermotion", pt: "Segunda divisão espanhola", es: "LaLiga Hypermotion" },
+    teams: 22,
+    // football-data.org's free tier doesn't include the Segunda División.
+    espn: { slug: "esp.2", seasons: "split" },
+    espnOnly: true,
+    // B teams can't go up to their first team's division (or play the play-off).
+    reserveTeams: ["Real Sociedad II", "RC Celta Fortuna"],
+    // 1st and 2nd go up; 3rd–6th play two-legged semi-finals (3v6, 4v5) and a
+    // two-legged final, the better-placed club hosting the second leg and going
+    // through on a level aggregate. 19th–22nd drop to Primera Federación.
+    playoff: {
+      rounds: [
+        { key: "semiFinals", legs: 2, levelTie: "betterPlaced", pairs: [[3, 6], [4, 5]] },
+        { key: "final", legs: 2, levelTie: "betterPlaced" },
+      ],
+      directPromotion: [1, 2],
+      promotedTo: "La Liga",
+    },
+    tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
+    zones: [
+      { kind: "promotion", from: 1, to: 2 },
+      { kind: "promotionPlayoff", from: 3, to: 6 },
+      { kind: "relegation", from: 19, to: 22 },
     ],
   },
   {
@@ -443,7 +475,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     espn: { slug: "ned.2", seasons: "split" },
     espnOnly: true,
     // Jong Ajax, Jong AZ, Jong PSV and Jong FC Utrecht can't go up.
-    reserveTeams: "Jong ",
+    reserveTeams: ["Jong "],
     // 2026/27: the two best first teams go up. Six more play off over two legs
     // (5v8 and 6v7, then 3rd and 4th join; level: extra time and penalties); the
     // winner meets the Eredivisie's 16th in a two-legged final. Officially the

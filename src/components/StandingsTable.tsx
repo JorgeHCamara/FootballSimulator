@@ -12,6 +12,8 @@ const FORM_STYLES: Record<FormResult, string> = {
   L: "bg-red-500",
 };
 
+const RELEGATION = new Set(["relegation", "relegationPlayoff"]);
+
 interface Props {
   league: LeagueConfig;
   rows: StandingRow[];
@@ -51,9 +53,17 @@ export function StandingsTable({ league, rows, teams, zonePositions }: Props) {
           <tbody>
             {rows.map((row) => {
               const team = teams.get(row.teamId)!;
+              // Relegation follows the real position (reserve sides go down too);
+              // promotion places follow the rank among first teams.
+              const real = zoneForPosition(league, row.position);
               const zonePosition = zonePositions ? zonePositions.get(row.teamId) : row.position;
-              const zone = zonePosition != null ? zoneForPosition(league, zonePosition) : undefined;
               const reserve = zonePositions !== undefined && zonePosition === null;
+              const zone =
+                real && RELEGATION.has(real.kind)
+                  ? real
+                  : zonePosition != null
+                    ? [zoneForPosition(league, zonePosition)].find((z) => z && !RELEGATION.has(z.kind))
+                    : undefined;
               return (
                 <tr
                   key={row.teamId}

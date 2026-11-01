@@ -190,6 +190,8 @@ export const TEAM_OVERRIDES: readonly TeamOverride[] = [
   { match: "Rodez Aveyron", name: "Rodez", shortName: "Rodez" },
   { match: "Dijon FCO", name: "Dijon", shortName: "Dijon" },
   { match: "Stade Laval", name: "Laval", shortName: "Laval" },
+  // Segunda División (names from ESPN)
+  { match: "Sporting Gijón", league: "SD", name: "Sporting Gijón", shortName: "Sporting Gijón" },
   // Eerste Divisie (names from ESPN)
   { match: "Helmond Sport", name: "Helmond Sport", shortName: "Helmond Sport" },
   { match: "MVV Maastricht", name: "MVV Maastricht", shortName: "MVV" },

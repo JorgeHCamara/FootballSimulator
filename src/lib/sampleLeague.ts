@@ -30,8 +30,13 @@ export function sampleLeague(league: LeagueConfig, playedShare = 0.4): SampleLea
   const offset = hash(league.code) % TOWNS.length;
   const teams: Team[] = Array.from({ length: league.teams }, (_, i) => {
     const town = TOWNS[(offset + i) % TOWNS.length]!;
-    // Leagues with reserve sides get two, so their promotion rules can be seen locally.
-    const name = league.reserveTeams && i < 2 ? `${league.reserveTeams}${town}` : `${town} ${SUFFIXES[(offset + i * 3) % SUFFIXES.length]}`;
+    // Leagues with reserve sides get two, so their promotion rules can be seen locally:
+    // a prefix ("Jong ") gets a town, a full name ("Real Sociedad II") is used as is.
+    const reserve = league.reserveTeams?.[i % league.reserveTeams.length];
+    const name =
+      reserve && i < 2 && (reserve.endsWith(" ") || i < league.reserveTeams!.length)
+        ? reserve.endsWith(" ") ? `${reserve}${town}` : reserve
+        : `${town} ${SUFFIXES[(offset + i * 3) % SUFFIXES.length]}`;
     return { id: i + 1, name, shortName: town, tla: town.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase() };
   });
 

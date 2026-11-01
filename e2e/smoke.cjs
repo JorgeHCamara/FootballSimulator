@@ -316,7 +316,7 @@ async function step(name, fn) {
       assert.ok(info.filter((r) => r.reserve).every((r) => r.zone === ""), "reserve sides have no zone");
       const firstTeams = info.filter((r) => !r.reserve).map((r) => r.zone);
       assert.deepEqual(firstTeams.slice(0, 9), ["promotion", "promotion", ...Array(6).fill("promotionPlayoff"), ""]);
-      assert.match(await p.locator("main").innerText(), /Reserve teams \(Jong\) can't be promoted/);
+      assert.match(await p.locator("main").innerText(), /Reserve teams can't be promoted/);
       await p.getByRole("button", { name: "Simulate rest of season" }).click();
       await p.locator('[data-testid="promoted-contender"]').waitFor();
       const promoted = await p.locator('[data-testid="promoted-team"]').allInnerTexts();
@@ -325,6 +325,25 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="promoted-contender"]').innerText(), /plays Eredivisie's 16th over two legs/);
       await p.locator('[data-testid="matchday-select"]').selectOption("-1");
       assert.doesNotMatch(await p.locator('[data-testid="playoff"]').innerText(), /^Jong /m);
+      await p.close();
+    });
+
+    await step("Segunda División: 22 clubs, B teams skipped, two-legged play-off", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/segunda-division`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.equal(await rows.count(), 22);
+      const info = await rows.evaluateAll((r) => r.map((x) => ({ zone: x.dataset.zone, reserve: !!x.querySelector('[data-testid="reserve-tag"]'), name: x.innerText })));
+      assert.deepEqual(info.filter((r) => r.reserve).map((r) => /Real Sociedad II|RC Celta Fortuna/.test(r.name)), [true, true]);
+      const firstTeams = info.filter((r) => !r.reserve).map((r) => r.zone);
+      assert.deepEqual(firstTeams.slice(0, 7), ["promotion", "promotion", ...Array(4).fill("promotionPlayoff"), ""]);
+      // Relegation follows the real position, reserve sides included: 19th–22nd.
+      assert.deepEqual(info.slice(18).map((r) => r.zone), Array(4).fill("relegation"));
+      assert.ok(info.slice(0, 18).every((r) => r.zone !== "relegation"));
+      await p.locator('[data-testid="matchday-select"]').selectOption("-1");
+      const text = await p.locator('[data-testid="playoff"]').innerText();
+      assert.match(text, /3rd place × 6th place/);
+      assert.match(text, /hosts the 2nd leg and goes through if the aggregate is level/);
       await p.close();
     });
 
