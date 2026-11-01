@@ -306,6 +306,28 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Eerste Divisie: reserve teams can't go up, places pass to first teams", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/eerste-divisie`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.equal(await rows.count(), 20);
+      const info = await rows.evaluateAll((r) => r.map((x) => ({ zone: x.dataset.zone, reserve: !!x.querySelector('[data-testid="reserve-tag"]') })));
+      assert.equal(info.filter((r) => r.reserve).length, 2, "two reserve sides in the sample");
+      assert.ok(info.filter((r) => r.reserve).every((r) => r.zone === ""), "reserve sides have no zone");
+      const firstTeams = info.filter((r) => !r.reserve).map((r) => r.zone);
+      assert.deepEqual(firstTeams.slice(0, 9), ["promotion", "promotion", ...Array(6).fill("promotionPlayoff"), ""]);
+      assert.match(await p.locator("main").innerText(), /Reserve teams \(Jong\) can't be promoted/);
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="promoted-contender"]').waitFor();
+      const promoted = await p.locator('[data-testid="promoted-team"]').allInnerTexts();
+      assert.equal(promoted.length, 2);
+      assert.ok(promoted.every((t) => !t.startsWith("Jong")), promoted.join(" | "));
+      assert.match(await p.locator('[data-testid="promoted-contender"]').innerText(), /plays Eredivisie's 16th over two legs/);
+      await p.locator('[data-testid="matchday-select"]').selectOption("-1");
+      assert.doesNotMatch(await p.locator('[data-testid="playoff"]').innerText(), /^Jong /m);
+      await p.close();
+    });
+
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/mls`);

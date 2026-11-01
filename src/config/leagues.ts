@@ -24,7 +24,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -75,6 +75,12 @@ export interface LeagueConfig {
    */
   espn: EspnFeed;
   espnOnly?: boolean;
+  /**
+   * Name prefix of reserve sides, which can't be promoted or play the play-off
+   * (Eerste Divisie: "Jong "). Promotion places and play-off seeds then count
+   * first teams only.
+   */
+  reserveTeams?: string;
   /** End-of-season promotion play-off (see src/engine/playoffs.ts). */
   playoff?: PlayoffConfig;
   tiebreakers: readonly Tiebreaker[];
@@ -422,6 +428,40 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "conferenceLeague", from: 4, to: 4 },
       { kind: "relegationPlayoff", from: 16, to: 16 },
       { kind: "relegation", from: 17, to: 18 },
+    ],
+  },
+  {
+    code: "DJL",
+    slug: "eerste-divisie",
+    name: "Eerste Divisie",
+    country: "Netherlands",
+    flag: "nl",
+    simulatorName: { en: "Eerste Divisie Simulator", pt: "Simulador da Eerste Divisie", es: "Simulador de la Eerste Divisie" },
+    aka: { en: "Keuken Kampioen Divisie", pt: "Segunda divisão holandesa", es: "Segunda división neerlandesa" },
+    teams: 20,
+    // football-data.org's free tier doesn't include the Eerste Divisie.
+    espn: { slug: "ned.2", seasons: "split" },
+    espnOnly: true,
+    // Jong Ajax, Jong AZ, Jong PSV and Jong FC Utrecht can't go up.
+    reserveTeams: "Jong ",
+    // 2026/27: the two best first teams go up. Six more play off over two legs
+    // (5v8 and 6v7, then 3rd and 4th join; level: extra time and penalties); the
+    // winner meets the Eredivisie's 16th in a two-legged final. Officially the
+    // four period champions take play-off places first; seeds here follow the
+    // final table. No relegation.
+    playoff: {
+      rounds: [
+        { key: "roundOne", legs: 2, levelTie: "penalties", pairs: [[5, 8], [6, 7]] },
+        { key: "semiFinals", legs: 2, levelTie: "penalties", entrants: [3, 4] },
+      ],
+      directPromotion: [1, 2],
+      promotedTo: "Eredivisie",
+      winnerPlays: { league: "Eredivisie", position: 16 },
+    },
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadGoalDifference"],
+    zones: [
+      { kind: "promotion", from: 1, to: 2 },
+      { kind: "promotionPlayoff", from: 3, to: 8 },
     ],
   },
   {

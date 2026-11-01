@@ -330,3 +330,15 @@ describe("Ligue 2 play-off (4th v 5th, winner at 3rd, then v Ligue 1's 16th)", (
     assert.deepEqual(ligue2.winnerPlays, { league: "Ligue 1", position: 16 });
   });
 });
+
+describe("Eerste Divisie play-off (two-legged rounds, winner meets the Eredivisie's 16th)", () => {
+  const eerste = getLeagueByCode("DJL")!.playoff!;
+
+  it("plays 5v8 and 6v7, then 3rd and 4th join; the winner goes on to face the Eredivisie's 16th", () => {
+    const [roundOne, semis] = buildBracket(rows.slice(0, 18), eerste, {}, options) as [PlayoffTie[], PlayoffTie[]];
+    assert.deepEqual(roundOne.map((t) => [t.higher.teamId, t.lower.teamId, t.legs.length]), [[105, 108, 2], [106, 107, 2]]);
+    assert.deepEqual(semis.map((t) => t.higher.teamId), [103, 104]);
+    assert.deepEqual(eerste.winnerPlays, { league: "Eredivisie", position: 16 });
+    assert.equal(getLeagueByCode("DJL")!.reserveTeams, "Jong ");
+  });
+});

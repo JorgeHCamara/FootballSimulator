@@ -16,9 +16,14 @@ interface Props {
   league: LeagueConfig;
   rows: StandingRow[];
   teams: Map<TeamId, Team>;
+  /**
+   * Leagues with reserve sides: the position each club's zone is based on
+   * (its rank among first teams), or null for a reserve side, which has none.
+   */
+  zonePositions?: Map<TeamId, number | null>;
 }
 
-export function StandingsTable({ league, rows, teams }: Props) {
+export function StandingsTable({ league, rows, teams, zonePositions }: Props) {
   const t = useTranslations("Simulator");
   const tz = useTranslations("Zones");
   const cell = "px-1.5 py-2 text-center tabular-nums";
@@ -46,7 +51,9 @@ export function StandingsTable({ league, rows, teams }: Props) {
           <tbody>
             {rows.map((row) => {
               const team = teams.get(row.teamId)!;
-              const zone = zoneForPosition(league, row.position);
+              const zonePosition = zonePositions ? zonePositions.get(row.teamId) : row.position;
+              const zone = zonePosition != null ? zoneForPosition(league, zonePosition) : undefined;
+              const reserve = zonePositions !== undefined && zonePosition === null;
               return (
                 <tr
                   key={row.teamId}
@@ -61,6 +68,11 @@ export function StandingsTable({ league, rows, teams }: Props) {
                       <TeamBadge team={team} />
                       <span className="truncate font-medium sm:hidden">{team.shortName}</span>
                       <span className="hidden truncate font-medium sm:inline">{team.name}</span>
+                      {reserve && (
+                        <span className="shrink-0 rounded bg-zinc-200 px-1 text-[10px] font-semibold uppercase text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300" title={t("reserveTeam")} data-testid="reserve-tag">
+                          {t("reserveTag")}
+                        </span>
+                      )}
                     </span>
                   </td>
                   <td className={cell}>{row.played}</td>
@@ -86,7 +98,7 @@ export function StandingsTable({ league, rows, teams }: Props) {
           </tbody>
         </table>
       </div>
-      <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+      <ul data-testid="zone-legend" className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-600 dark:text-zinc-400">
         {league.zones.map((z) => (
           <li key={z.kind} className="flex items-center gap-1.5">
             <span className={`h-3 w-3 rounded-sm ring-1 ring-zinc-300 dark:ring-zinc-600 ${ZONE_STYLES[z.kind].row}`} />
@@ -94,6 +106,7 @@ export function StandingsTable({ league, rows, teams }: Props) {
           </li>
         ))}
       </ul>
+      {zonePositions && <p className="mt-1 text-xs text-zinc-500">{t("reserveNote")}</p>}
     </div>
   );
 }
