@@ -8,7 +8,8 @@
   },
   "Nav": {
     "home": "Inicio",
-    "language": "Idioma"
+    "language": "Idioma",
+    "leagues": "Ligas"
   },
   "Home": {
     "subheading": "Elige una liga, escribe tus pronósticos o deja que el simulador juegue los partidos restantes, y mira cómo cambia la clasificación en directo.",
@@ -160,5 +161,15 @@
         "a": "No. Foot Simu es gratis, tus pronósticos se guardan en el navegador y puedes compartirlos con un enlace."
       }
     ]
+  },
+  "Countries": {
+    "England": "Inglaterra",
+    "Spain": "España",
+    "Germany": "Alemania",
+    "Italy": "Italia",
+    "France": "Francia",
+    "Portugal": "Portugal",
+    "Netherlands": "Países Bajos",
+    "Brazil": "Brasil"
   }
 }

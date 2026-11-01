@@ -8,7 +8,8 @@
   },
   "Nav": {
     "home": "Home",
-    "language": "Language"
+    "language": "Language",
+    "leagues": "Leagues"
   },
   "Home": {
     "subheading": "Pick a league, enter your predictions or let the simulator play the remaining matches, and watch the table change live.",
@@ -160,5 +161,15 @@
         "a": "No. Foot Simu is free, your predictions are saved in your browser and you can share them with a link."
       }
     ]
+  },
+  "Countries": {
+    "England": "England",
+    "Spain": "Spain",
+    "Germany": "Germany",
+    "Italy": "Italy",
+    "France": "France",
+    "Portugal": "Portugal",
+    "Netherlands": "Netherlands",
+    "Brazil": "Brazil"
   }
 }

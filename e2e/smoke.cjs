@@ -240,6 +240,42 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("header menu: countries A–Z with league submenus, no scrollbar", async () => {
+      const desktop = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+      await desktop.goto(`${BASE_URL}/en`);
+      const menu = desktop.locator('[data-testid="league-menu"]');
+      const countries = (await menu.locator(":scope > li > button").allInnerTexts()).map((x) => x.trim());
+      assert.deepEqual(countries, ["Brazil", "England", "France", "Germany", "Italy", "Netherlands", "Portugal", "Spain"]);
+      const overflow = await menu.evaluate((el) => el.scrollWidth - el.clientWidth);
+      assert.equal(overflow, 0, "no horizontal scroll in the menu");
+
+      await menu.getByRole("button", { name: "England" }).hover();
+      const england = menu.locator("#menu-gb-eng");
+      await england.waitFor();
+      assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship"]);
+      await england.getByRole("link", { name: "Championship" }).click();
+      await desktop.waitForURL(/\/en\/championship$/);
+      await desktop.close();
+
+      const pt = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+      await pt.goto(`${BASE_URL}/pt`);
+      const ptCountries = (await pt.locator('[data-testid="league-menu"] > li > button').allInnerTexts()).map((x) => x.trim());
+      assert.equal(ptCountries[0], "Alemanha");
+      assert.equal(ptCountries.at(-1), "Portugal");
+      await pt.close();
+
+      const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })).newPage();
+      await phone.goto(`${BASE_URL}/en`);
+      await phone.locator('[data-testid="league-menu"]').getByRole("button", { name: "Brazil" }).tap();
+      const brazil = phone.locator("#menu-br");
+      await brazil.waitFor();
+      assert.deepEqual((await brazil.locator("a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B"]);
+      await phone.keyboard.press("Escape");
+      await brazil.waitFor({ state: "detached" });
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, "no horizontal page scroll");
+      await phone.context().close();
+    });
+
     await step("kick-off times follow the visitor's time zone", async () => {
       const shown = {};
       for (const timezoneId of ["America/Sao_Paulo", "Europe/Lisbon"]) {

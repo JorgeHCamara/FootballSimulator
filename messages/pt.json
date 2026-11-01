@@ -8,7 +8,8 @@
   },
   "Nav": {
     "home": "Início",
-    "language": "Idioma"
+    "language": "Idioma",
+    "leagues": "Campeonatos"
   },
   "Home": {
     "subheading": "Escolha um campeonato, digite seus palpites ou deixe o simulador jogar as partidas restantes, e veja a tabela mudar ao vivo.",
@@ -160,5 +161,15 @@
         "a": "Não. O Foot Simu é grátis, seus palpites ficam salvos no navegador e você pode compartilhá-los com um link."
       }
     ]
+  },
+  "Countries": {
+    "England": "Inglaterra",
+    "Spain": "Espanha",
+    "Germany": "Alemanha",
+    "Italy": "Itália",
+    "France": "França",
+    "Portugal": "Portugal",
+    "Netherlands": "Holanda",
+    "Brazil": "Brasil"
   }
 }
