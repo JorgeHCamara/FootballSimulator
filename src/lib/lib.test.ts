@@ -463,3 +463,38 @@ describe("continental competitions (UEFA, CONMEBOL)", async () => {
     assert.deepEqual(conmebol.leagues.map((l) => l.name), ["Copa Libertadores", "Copa Sudamericana"]);
   });
 });
+
+describe("Argentina's annual table", async () => {
+  const { runMonteCarlo, probabilityInRange } = await import("../engine/montecarlo.ts");
+  const { buildLeagueModel } = await import("../engine/ratings.ts");
+  const { realResults } = await import("../engine/results.ts");
+
+  it("passes a qualified club's place down in the zone chances", () => {
+    const teams = [1, 2, 3].map((id) => ({ id, name: `T${id}`, shortName: `T${id}`, tla: `T${id}` }));
+    // Every game played: club 1 first, 2 second, 3 third.
+    const fixtures = [
+      { id: 1, matchday: 1, utcDate: "2026-01-01", homeId: 1, awayId: 2, result: { home: 2, away: 0 } },
+      { id: 2, matchday: 2, utcDate: "2026-01-08", homeId: 2, awayId: 3, result: { home: 2, away: 0 } },
+      { id: 3, matchday: 3, utcDate: "2026-01-15", homeId: 1, awayId: 3, result: { home: 2, away: 0 } },
+    ];
+    const fixed = realResults(fixtures);
+    const result = runMonteCarlo({
+      teams,
+      fixtures,
+      fixed,
+      model: buildLeagueModel(teams, fixtures, fixed),
+      standings: { tiebreakers: ["points"] },
+      iterations: 10,
+      seed: 1,
+      passDown: [1],
+    });
+    // Club 1 already qualified: club 2 takes the first place in the zone.
+    assert.equal(probabilityInRange(result, 2, 1, 1, true), 1);
+    assert.equal(probabilityInRange(result, 2, 1, 1), 0, "its real position is still 2nd");
+  });
+
+  it("is configured with Libertadores 1–3, Sudamericana 4–9 and relegation for the last", () => {
+    const arg = getLeagueBySlug("argentina-primera-division")!;
+    assert.deepEqual(arg.annual!.zones.map((z) => [z.kind, z.from, z.to]), [["libertadores", 1, 3], ["sudamericana", 4, 9], ["relegation", 30, 30]]);
+  });
+});

@@ -24,6 +24,11 @@ export interface MonteCarloInput {
    * results stand, everything else is simulated. With `groups`, only for a
    * knockout seeded from the group places (`seedFromGroups`, Libertadores).
    */
+  /**
+   * Clubs whose places pass down (qualified by another route): zone chances
+   * then use positions among the other clubs (see `zonePositionCounts`).
+   */
+  passDown?: readonly TeamId[];
   playoff?: {
     config: PlayoffConfig;
     options: Omit<BracketOptions, "seasonComplete">;
@@ -37,6 +42,8 @@ export interface MonteCarloResult {
   /** positionCounts[teamId][p] = number of runs the team finished in position p+1 (within its group, if any). */
   positionCounts: Record<TeamId, number[]>;
   averagePoints: Record<TeamId, number>;
+  /** With `passDown`: zonePositionCounts[teamId][p] = runs at position p+1 among clubs not passing down. */
+  zonePositionCounts?: Record<TeamId, number[]>;
   /** With `playoff`: playoffReached[teamId][r] = runs the club played in knockout round r. */
   playoffReached?: Record<TeamId, number[]>;
   /** With `playoff`: runs the club won the knockout phase. */
@@ -66,6 +73,9 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
   const results: ResultMap = { ...fixed };
   const grouped = Boolean(input.groups?.length);
   const playoff = !grouped || input.playoff?.config.seedFromGroups ? input.playoff : undefined;
+  const passDown = new Set(input.passDown ?? []);
+  const zonePositionCounts: Record<TeamId, number[]> = {};
+  if (passDown.size) for (const t of teams) zonePositionCounts[t.id] = new Array<number>(teams.length).fill(0);
   const playoffReached: Record<TeamId, number[]> = {};
   const playoffWins: Record<TeamId, number> = {};
   for (let i = 0; i < iterations; i++) {
@@ -73,9 +83,11 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
     const groupRows: ReturnType<typeof computeStandings>[] = [];
     for (const group of tables) {
       const rows = computeStandings(group, fixtures, results, tableOptions);
+      let zonePosition = 0;
       for (const row of rows) {
         positionCounts[row.teamId]![row.position - 1]!++;
         pointsTotal[row.teamId]! += row.points;
+        if (passDown.size && !passDown.has(row.teamId)) zonePositionCounts[row.teamId]![zonePosition++]!++;
       }
       groupRows.push(rows);
     }
@@ -100,12 +112,21 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
 
   const averagePoints: Record<TeamId, number> = {};
   for (const t of teams) averagePoints[t.id] = iterations > 0 ? pointsTotal[t.id]! / iterations : 0;
-  return { iterations, positionCounts, averagePoints, ...(playoff ? { playoffReached, playoffWins } : {}) };
+  return {
+    iterations,
+    positionCounts,
+    averagePoints,
+    ...(passDown.size ? { zonePositionCounts } : {}),
+    ...(playoff ? { playoffReached, playoffWins } : {}),
+  };
 }
 
-/** Probability that a team finishes within positions [from, to] (1-based, inclusive). */
-export function probabilityInRange(result: MonteCarloResult, teamId: TeamId, from: number, to: number): number {
-  const counts = result.positionCounts[teamId];
+/**
+ * Probability that a team finishes within positions [from, to] (1-based,
+ * inclusive); with `zone`, positions among the clubs not passing down.
+ */
+export function probabilityInRange(result: MonteCarloResult, teamId: TeamId, from: number, to: number, zone = false): number {
+  const counts = (zone && result.zonePositionCounts ? result.zonePositionCounts : result.positionCounts)[teamId];
   if (!counts || result.iterations === 0) return 0;
   let n = 0;
   for (let p = from; p <= to; p++) n += counts[p - 1] ?? 0;

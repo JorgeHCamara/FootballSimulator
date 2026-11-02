@@ -116,6 +116,12 @@ export interface LeagueConfig {
    * rating starts from its domestic league (see src/lib/continental.ts).
    */
   continental?: ContinentalConfig;
+  /**
+   * A season of several tournaments (Argentina) also has an annual table of
+   * every club over all of them, which decides the continental places and
+   * relegation.
+   */
+  annual?: { name: Record<SiteLocale, string>; zones: readonly Zone[] };
 }
 
 export interface ContinentalConfig {
@@ -695,9 +701,21 @@ export const LEAGUES: readonly LeagueConfig[] = [
     },
     espnOnly: true,
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadGoalDifference"],
-    // Per zone: the top 8 go to the play-offs. (Continental places and
-    // relegation come from the year's combined and average tables, not modelled.)
+    // Per zone: the top 8 go to the play-offs.
     zones: [{ kind: "titlePlayoffs", from: 1, to: 8 }],
+    // Annual table (both tournaments' regular phases, 2026 rules for the 2027
+    // cups): the Apertura and Clausura champions and the Copa Argentina winner
+    // go to the Libertadores, with the top 3 not already in; the next 6 to the
+    // Sudamericana; the last is relegated (as is the last in the three-season
+    // averages, not modelled).
+    annual: {
+      name: { en: "Annual table", pt: "Tabela anual", es: "Tabla anual" },
+      zones: [
+        { kind: "libertadores", from: 1, to: 3 },
+        { kind: "sudamericana", from: 4, to: 9 },
+        { kind: "relegation", from: 30, to: 30 },
+      ],
+    },
     // Play-offs: single games at the better-placed club, level straight to
     // penalties; round of 16 across the zones (1A v 8B, 1B v 8A, 2A v 7B…),
     // then a fixed bracket (1A/8B v 4B/5A…); the final at a neutral ground.

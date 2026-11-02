@@ -6,6 +6,7 @@ import { Faq } from "../../../components/Faq.tsx";
 import { Flag } from "../../../components/Flag.tsx";
 import { JsonLd } from "../../../components/JsonLd.tsx";
 import { LeagueSimulator } from "../../../components/LeagueSimulator.tsx";
+import { TournamentSwitch } from "../../../components/TournamentSwitch.tsx";
 import { COMPETITIONS, getCompetitionBySlug, type CompetitionConfig } from "../../../config/competitions.ts";
 import type { CupConfig } from "../../../config/cups.ts";
 import type { LeagueConfig, SiteLocale } from "../../../config/leagues.ts";
@@ -28,6 +29,9 @@ function seoValues(competition: CompetitionConfig, locale: string, season: strin
   const lang = locale as SiteLocale;
   return { simulator: competition.simulatorName[lang], league: competition.name, aka: competition.aka[lang], season };
 }
+
+/** The season a page covers: a season of several tournaments ("Clausura 2026") is shown by its year. */
+const pageSeason = (data: { season: string; tournaments?: unknown[] }) => (data.tournaments ? (data.season.split(" ").at(-1) ?? data.season) : data.season);
 
 /** Leagues decided by playoffs rather than relegation and European places (MLS) get their own wording. */
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
@@ -90,7 +94,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const loaded = await load(slug);
   if (!loaded) return {};
   const t = await getTranslations({ locale, namespace: "Metadata" });
-  const values = seoValues(loaded.config, locale, loaded.data.season);
+  const values = seoValues(loaded.config, locale, pageSeason(loaded.data));
   const keys = META_KEYS[loaded.wording];
   const title = t(keys.title, values);
   const description = t(keys.description, values);
@@ -123,7 +127,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
     getTranslations("Metadata"),
   ]);
   const { config, data, wording } = loaded;
-  const values = seoValues(config, locale, data.season);
+  const values = seoValues(config, locale, pageSeason(data));
   const faqKey =
     wording === "cup" || wording === "cupBracket" || wording === "continental" || wording === "continentalGroups" || wording === "zones"
       ? wording
@@ -184,7 +188,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
         data={[
           {
             "@type": "WebApplication",
-            name: `${values.simulator} ${data.season}`,
+            name: `${values.simulator} ${values.season}`,
             url: pageUrl,
             description: meta(META_KEYS[wording].description, values),
             applicationCategory: "GameApplication",
@@ -218,7 +222,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
         <h1 className="flex items-center gap-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
           <Flag code={config.flag} width={36} />
           <span>
-            {values.simulator} <span className="font-semibold text-zinc-500 dark:text-zinc-400">{data.season}</span>
+            {values.simulator} <span className="font-semibold text-zinc-500 dark:text-zinc-400">{values.season}</span>
           </span>
         </h1>
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{seo(intro, values)}</p>
@@ -227,6 +231,16 @@ export default async function LeaguePage({ params }: { params: Params }) {
 
       {loaded.kind === "cup" ? (
         <CupSimulator cup={loaded.config} data={loaded.data} />
+      ) : loaded.data.tournaments && loaded.config.annual ? (
+        // Several tournaments a season (Argentina): a switch between them and the annual table.
+        <TournamentSwitch
+          league={{ ...loaded.config, annual: loaded.config.annual }}
+          teams={leagueTeams}
+          tournaments={loaded.data.tournaments}
+          current={loaded.data.tournaments.find((x) => x.seasonKey === loaded.data.seasonKey)?.id ?? loaded.data.tournaments[0]!.id}
+          {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
+          {...(priorStrengths ? { priorStrengths } : {})}
+        />
       ) : (
         <LeagueSimulator
           league={loaded.config}

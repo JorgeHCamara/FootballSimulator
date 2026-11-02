@@ -46,6 +46,14 @@ interface Props {
   priorStrengths?: Record<number, TeamStrength>;
   /** Clubs joining the knockout phase from another competition, with their records there (see `seedFromGroups.external`). */
   externalSeeds?: StandingRow[];
+  /**
+   * Clubs already in the competition of the first zone by another route
+   * (Argentina's annual table: the tournament champions, already in the
+   * Libertadores). They show in that zone and its places pass down.
+   */
+  qualifiedElsewhere?: number[];
+  /** Note under the table for `qualifiedElsewhere`, e.g. who the champions are. */
+  qualifiedNote?: string;
 }
 
 type Tab = "table" | "chances";
@@ -59,7 +67,19 @@ function nextSeasonLabel(season: string): string {
   return "";
 }
 
-export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason, groups, priorStrengths, externalSeeds }: Props) {
+export function LeagueSimulator({
+  league,
+  teams,
+  fixtures,
+  seasonKey,
+  season: seasonLabel,
+  postseason,
+  groups,
+  priorStrengths,
+  externalSeeds,
+  qualifiedElsewhere,
+  qualifiedNote,
+}: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const [hydrated, setHydrated] = useState(false);
@@ -105,14 +125,17 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
   // Reserve sides (Eerste Divisie's "Jong" teams) can't go up: promotion places
   // and play-off seeds count first teams only, renumbered 1, 2, 3…
   const reserveNames = league.reserveTeams;
-  const isReserve = (id: number) => reserveNames?.some((start) => teamMap.get(id)?.name.startsWith(start)) ?? false;
+  const qualified = useMemo(() => new Set(qualifiedElsewhere ?? []), [qualifiedElsewhere]);
+  // Clubs whose places pass down: reserve sides, and clubs qualified by another route.
+  const passesDown = Boolean(reserveNames) || qualified.size > 0;
+  const isReserve = (id: number) => (reserveNames?.some((start) => teamMap.get(id)?.name.startsWith(start)) ?? false) || qualified.has(id);
   const firstTeams = (table: StandingRow[]) =>
-    reserveNames ? table.filter((r) => !isReserve(r.teamId)).map((r, i) => ({ ...r, position: i + 1 })) : table;
-  const playoffRows = useMemo(() => firstTeams(rows), [rows]); // eslint-disable-line react-hooks/exhaustive-deps
-  /** Position that decides each club's zone (none for a reserve side). */
+    passesDown ? table.filter((r) => !isReserve(r.teamId)).map((r, i) => ({ ...r, position: i + 1 })) : table;
+  const playoffRows = useMemo(() => firstTeams(rows), [rows, qualified]); // eslint-disable-line react-hooks/exhaustive-deps
+  /** Position that decides each club's zone (none for a reserve side or a club qualified elsewhere). */
   const zonePositions = useMemo(
-    () => (reserveNames ? new Map(rows.map((r) => [r.teamId, playoffRows.find((p) => p.teamId === r.teamId)?.position ?? null])) : undefined),
-    [reserveNames, rows, playoffRows],
+    () => (passesDown ? new Map(rows.map((r) => [r.teamId, playoffRows.find((p) => p.teamId === r.teamId)?.position ?? null])) : undefined),
+    [passesDown, rows, playoffRows],
   );
 
   // Play-offs across separate tables (MLS Cup) are seeded from every group's
@@ -308,6 +331,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             iterations: league.continental || playoff?.seedFromGroups ? ITERATIONS / 2 : ITERATIONS,
             seed: 2026,
             ...(groupTabs.length ? { groups: groupTabs.map((g) => g.teamIds) } : {}),
+            ...(qualifiedElsewhere?.length ? { passDown: qualifiedElsewhere } : {}),
             // Continental competitions: the chance of winning it takes the knockout phase too.
             // Also a title play-off seeded from groups (Argentina): the chance of winning the tournament.
             ...((league.continental || playoff?.seedFromGroups) && playoff
@@ -315,7 +339,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
               : {}),
           }
         : null,
-    [tab, hydrated, teams, fixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds],
+    [tab, hydrated, teams, fixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere],
   );
 
   const actionButton =
@@ -379,7 +403,13 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
         <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2">
           {tab === "table" ? (
             <>
-              <StandingsTable league={league} rows={rows} teams={teamMap} {...(zonePositions ? { zonePositions } : {})} />
+              <StandingsTable
+                league={league}
+                rows={rows}
+                teams={teamMap}
+                {...(zonePositions ? { zonePositions } : {})}
+                {...(qualified.size ? { qualified, ...(qualifiedNote ? { qualifiedNote } : {}) } : {})}
+              />
               {playoff?.title && bracket.length > 0 && (
                 <PlayoffChampion
                   bracket={bracket}

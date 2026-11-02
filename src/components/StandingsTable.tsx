@@ -23,9 +23,13 @@ interface Props {
    * (its rank among first teams), or null for a reserve side, which has none.
    */
   zonePositions?: Map<TeamId, number | null>;
+  /** Clubs already in the first zone's competition by another route: shown in that zone, their places passed down. */
+  qualified?: ReadonlySet<TeamId>;
+  /** Note explaining `qualified` (replaces the reserve-side note). */
+  qualifiedNote?: string;
 }
 
-export function StandingsTable({ league, rows, teams, zonePositions }: Props) {
+export function StandingsTable({ league, rows, teams, zonePositions, qualified, qualifiedNote }: Props) {
   const t = useTranslations("Simulator");
   const tz = useTranslations("Zones");
   const cell = "px-1.5 py-2 text-center tabular-nums";
@@ -57,13 +61,16 @@ export function StandingsTable({ league, rows, teams, zonePositions }: Props) {
               // promotion places follow the rank among first teams.
               const real = zoneForPosition(league, row.position);
               const zonePosition = zonePositions ? zonePositions.get(row.teamId) : row.position;
-              const reserve = zonePositions !== undefined && zonePosition === null;
+              const isQualified = qualified?.has(row.teamId) ?? false;
+              const reserve = zonePositions !== undefined && zonePosition === null && !isQualified;
               const zone =
                 real && RELEGATION.has(real.kind)
                   ? real
-                  : zonePosition != null
-                    ? [zoneForPosition(league, zonePosition)].find((z) => z && !RELEGATION.has(z.kind))
-                    : undefined;
+                  : isQualified
+                    ? league.zones[0]
+                    : zonePosition != null
+                      ? [zoneForPosition(league, zonePosition)].find((z) => z && !RELEGATION.has(z.kind))
+                      : undefined;
               return (
                 <tr
                   key={row.teamId}
@@ -81,6 +88,11 @@ export function StandingsTable({ league, rows, teams, zonePositions }: Props) {
                       {reserve && (
                         <span className="shrink-0 rounded bg-zinc-200 px-1 text-[10px] font-semibold uppercase text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300" title={t("reserveTeam")} data-testid="reserve-tag">
                           {t("reserveTag")}
+                        </span>
+                      )}
+                      {isQualified && (
+                        <span className="shrink-0 text-xs" title={qualifiedNote} aria-label={qualifiedNote} data-testid="qualified-tag">
+                          🏆
                         </span>
                       )}
                     </span>
@@ -116,7 +128,13 @@ export function StandingsTable({ league, rows, teams, zonePositions }: Props) {
           </li>
         ))}
       </ul>
-      {zonePositions && <p className="mt-1 text-xs text-zinc-500">{t("reserveNote")}</p>}
+      {qualified?.size ? (
+        <p className="mt-1 text-xs text-zinc-500" data-testid="qualified-note">
+          {qualifiedNote}
+        </p>
+      ) : (
+        zonePositions && <p className="mt-1 text-xs text-zinc-500">{t("reserveNote")}</p>
+      )}
     </div>
   );
 }

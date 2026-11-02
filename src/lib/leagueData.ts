@@ -2,7 +2,7 @@ import { gamesPerTeam, type EspnStages, type LeagueConfig } from "../config/leag
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
-import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnGroups, fetchEspnSeason } from "./espn.ts";
+import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
 
@@ -18,6 +18,24 @@ export interface LeagueData {
   postseason?: Fixture[];
   /** Clubs of each separate table (MLS conferences), in the league config's group order. */
   groups?: { id: string; teamIds: number[] }[];
+  /**
+   * Every tournament of the season when it has several (Argentina: Apertura,
+   * Clausura), in the config's order (latest first). The fields above are the
+   * current one's.
+   */
+  tournaments?: Tournament[];
+}
+
+export interface Tournament {
+  /** ESPN's stage of its table, e.g. "torneo-apertura". */
+  id: string;
+  /** e.g. "Apertura". */
+  name: string;
+  /** e.g. "Apertura 2026". */
+  season: string;
+  fixtures: Fixture[];
+  postseason?: Fixture[];
+  seasonKey: string;
 }
 
 /** Server responses are cached for an hour, well inside the free tier's rate limit. */
@@ -92,42 +110,63 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
     const stages = stageSets.find((set) => stageSets.length === 1 || tableGames(set) >= (league.teams * perTeam) / 4) ?? stageSets.at(-1);
     if (groups) {
       // Only games between member clubs: drops exhibitions such as the MLS All-Star game.
-      // With stages, only the table's: knockout games can bring in clubs from
+      // With stages, only the tables': knockout games can bring in clubs from
       // another competition (Sudamericana: the Libertadores third-placed clubs).
       const members = new Set(groups.flatMap((g) => g.teamIds));
       const isMember = (id: string | undefined) => members.has(Number(id));
-      all = all.filter(
-        (e) => (stages && e.season?.slug !== stages.table) || (e.competitions[0]?.competitors ?? []).every((c) => isMember(c.team.id)),
-      );
+      const isTable = (slug: string | undefined) => stageSets.length === 0 || stageSets.some((set) => set.table === slug);
+      all = all.filter((e) => !isTable(e.season?.slug) || (e.competitions[0]?.competitors ?? []).every((c) => isMember(c.team.id)));
     }
+    const yearLabel = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
+    // ESPN and football-data.org use different match ids, so each source keeps
+    // its own saved predictions (Série B has only ever used ESPN).
+    const baseKey = league.espnOnly ? `${league.code}:${year}` : `${league.code}:espn:${year}`;
     // Games after a club's full league schedule are post-season (play-offs);
     // they feed the play-off bracket, or are left out when the site has none.
-    const { league: events, postseason } = stages
-      ? {
-          league: all.filter((e) => e.season?.slug === stages.table),
-          postseason: all.filter((e) => stages.knockout.includes(e.season?.slug ?? "")),
-        }
-      : espnSplitSeason(all, perTeam);
+    const split = (set: EspnStages | undefined) =>
+      set
+        ? {
+            league: all.filter((e) => e.season?.slug === set.table),
+            postseason: all.filter((e) => set.knockout.includes(e.season?.slug ?? "")),
+          }
+        : espnSplitSeason(all, perTeam);
+    // Cancelled play-off games (e.g. a series' unneeded game 3) are left out.
+    const realPostseason = (events: EspnEvent[]) => espnFixtures(events.filter((e) => e.status.type.name !== "STATUS_CANCELED"));
+    const { league: events, postseason } = split(stages);
     const fixtures = espnFixtures(events, weeklyRounds ? { weekly: true } : { roundCount: perTeam });
     // Skip a year until at least half of its games are published.
     if (fixtures.length < (league.teams * perTeam) / 4) continue;
-    const yearLabel = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
-    const label = stages?.name ? `${stages.name} ${yearLabel}` : yearLabel;
+    // A season of several tournaments: each one with games, with its own predictions.
+    const tournaments: Tournament[] = [];
+    const tournamentEvents: EspnEvent[] = [];
+    if (stageSets.length > 1) {
+      for (const set of stageSets) {
+        const parts = split(set);
+        if (parts.league.length === 0) continue;
+        tournamentEvents.push(...parts.league, ...parts.postseason);
+        tournaments.push({
+          id: set.table,
+          name: set.name ?? set.table,
+          season: set.name ? `${set.name} ${yearLabel}` : yearLabel,
+          fixtures: set === stages ? fixtures : espnFixtures(parts.league, { roundCount: perTeam }),
+          ...(league.playoff && parts.postseason.length ? { postseason: realPostseason(parts.postseason) } : {}),
+          seasonKey: `${baseKey}:${set.table}`,
+        });
+      }
+    }
     return {
       // Knockout games can bring in clubs from outside the table (see above), which need names too.
-      teams: withFallbackCrests(applyTeamOverrides(espnTeams(stages ? [...events, ...postseason] : events), { league: league.code })),
+      teams: withFallbackCrests(
+        applyTeamOverrides(espnTeams(stages ? [...events, ...postseason, ...tournamentEvents] : events), { league: league.code }),
+      ),
       fixtures,
-      season: label,
-      // ESPN and football-data.org use different match ids, so each source keeps
-      // its own saved predictions (Série B has only ever used ESPN).
+      season: stages?.name ? `${stages.name} ${yearLabel}` : yearLabel,
       // Each tournament of a season (Apertura, Clausura) keeps its own predictions.
-      seasonKey: `${league.espnOnly ? `${league.code}:${year}` : `${league.code}:espn:${year}`}${stageSets.length > 1 && stages ? `:${stages.table}` : ""}`,
+      seasonKey: `${baseKey}${stageSets.length > 1 && stages ? `:${stages.table}` : ""}`,
       source: "live",
-      // Cancelled play-off games (e.g. a series' unneeded game 3) are left out.
-      ...(league.playoff && postseason.length
-        ? { postseason: espnFixtures(postseason.filter((e) => e.status.type.name !== "STATUS_CANCELED")) }
-        : {}),
+      ...(league.playoff && postseason.length ? { postseason: realPostseason(postseason) } : {}),
       ...(groups ? { groups } : {}),
+      ...(tournaments.length > 1 ? { tournaments } : {}),
     };
   }
   throw new Error(`No ${league.code} fixtures on ESPN for ${current} or ${current - 1}`);
@@ -149,13 +188,37 @@ function loadSample(league: LeagueConfig): LeagueData {
   // Sample groups: the clubs split evenly, in order.
   const size = league.groups ? Math.ceil(teams.length / league.groups.length) : 0;
   const groups = league.groups?.map((g, i) => ({ id: g.id, teamIds: teams.slice(i * size, (i + 1) * size).map((t) => t.id) }));
+  // Several tournaments a season (Argentina): the current one as above, and an
+  // earlier one fully played, its fixture ids and dates moved clear of it.
+  const sets = league.espn.stages && !("table" in league.espn.stages) ? league.espn.stages : [];
+  let tournaments: Tournament[] | undefined;
+  if (sets.length > 1) {
+    const halfYear = 26 * 7 * 24 * 60 * 60 * 1000;
+    const earlier = sampleLeague(league, 1).fixtures.map((f) => ({
+      ...f,
+      id: f.id + 100_000,
+      utcDate: new Date(Date.parse(f.utcDate) - halfYear).toISOString(),
+    }));
+    // Its final, already played: club 1 beat club 2 (the annual table's champion pass-down).
+    const lastDate = earlier.reduce((max, f) => (f.utcDate > max ? f.utcDate : max), "");
+    const final: Fixture = { id: 200_001, matchday: 0, utcDate: lastDate, homeId: 1, awayId: 2, result: { home: 2, away: 1 } };
+    tournaments = sets.map((set, i) => ({
+      id: set.table,
+      name: set.name ?? set.table,
+      season: `${set.name ?? ""} ${year}`.trim(),
+      fixtures: i === 0 ? fixtures : earlier,
+      ...(i === 0 ? {} : { postseason: [final] }),
+      seasonKey: `${league.code}:sample:${set.table}`,
+    }));
+  }
   return {
     teams,
     fixtures,
-    season: `${year}`,
-    seasonKey: `${league.code}:sample`,
+    season: tournaments ? tournaments[0]!.season : `${year}`,
+    seasonKey: tournaments ? tournaments[0]!.seasonKey : `${league.code}:sample`,
     source: "sample",
     ...(groups ? { groups } : {}),
+    ...(tournaments ? { tournaments } : {}),
   };
 }
 

@@ -703,6 +703,38 @@ async function step(name, fn) {
       await p.getByRole("tab", { name: "Chances" }).click();
       await p.locator('[data-testid="win-chance"]').first().waitFor({ timeout: 90000 });
       assert.match(await p.locator('[data-testid="chances"] thead').innerText(), /Playoffs[\s\S]*Win/);
+      await p.getByRole("tab", { name: "Table" }).click();
+
+      // Apertura · Clausura · Annual table: the current tournament first.
+      const switcher = p.locator('[data-testid="tournament-switch"] button');
+      assert.deepEqual(await switcher.allInnerTexts(), ["Apertura", "Clausura", "Annual table"]);
+      assert.equal(await switcher.nth(1).getAttribute("aria-pressed"), "true");
+      // The earlier tournament: every game played.
+      await switcher.nth(0).click();
+      await p.locator('[data-testid="matchday-select"]').waitFor();
+      assert.equal(await p.locator('[data-testid="matchday-select"] option').count(), 17);
+      const played = async () => (await rows.evaluateAll((r) => r.map((x) => Number(x.children[2].textContent)))).reduce((a, b) => a + b, 0);
+      // The annual table: all 30 clubs; the Apertura champion (sample: club 1) is in the
+      // Libertadores already, so the places pass down; the last club goes down.
+      await switcher.nth(2).click();
+      await p.locator('[data-testid="qualified-note"]').waitFor();
+      assert.equal(await rows.count(), 30);
+      const annualZones = await rows.evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.equal(annualZones.filter((z) => z === "libertadores").length, 4, "champion + top 3");
+      assert.equal(annualZones.filter((z) => z === "sudamericana").length, 6);
+      assert.equal(annualZones[29], "relegation");
+      assert.equal(await p.locator('[data-testid="qualified-tag"]').count(), 1);
+      assert.match(await p.locator('[data-testid="qualified-note"]').innerText(), /Apertura champion/);
+      // The annual table shares the Clausura's predictions.
+      const before = await played();
+      await switcher.nth(1).click();
+      await p.getByRole("button", { name: "Simulate matchday" }).click();
+      await switcher.nth(2).click();
+      await p.locator('[data-testid="qualified-note"]').waitFor();
+      assert.ok((await played()) > before, "a Clausura prediction counts in the annual table");
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="libertadores-chance"]').first().waitFor({ timeout: 90000 });
+      assert.match(await p.locator('[data-testid="chances"] thead').innerText(), /Libertadores[\s\S]*Sudamericana[\s\S]*Relegation/);
       await p.close();
     });
 

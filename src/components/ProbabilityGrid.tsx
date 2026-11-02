@@ -19,9 +19,15 @@ interface Props {
 
 export function ProbabilityGrid({ league, input, rows, teams }: Props) {
   const t = useTranslations("Simulator");
+  const tz = useTranslations("Zones");
+  const passDown = input?.passDown ? new Set(input.passDown) : undefined;
   const format = useFormatter();
   const result = useMonteCarlo(input);
   const relegation = league.zones.find((z) => z.kind === "relegation");
+  // South American leagues: the Copa Libertadores and Sudamericana places
+  // (positions among clubs not already qualified, when some pass down).
+  const libertadores = league.zones.find((z) => z.kind === "libertadores");
+  const sudamericana = league.zones.find((z) => z.kind === "sudamericana");
   // MLS: the chance of any playoff place, wild card included.
   const playoffZones = league.zones.filter((z) => z.kind === "playoffs" || z.kind === "playoffWildCard" || z.kind === "titlePlayoffs");
   const playoffs = playoffZones.length
@@ -65,6 +71,8 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                 <th className="px-2 text-right">{league.groups ? t("firstPlaceChance") : t("titleChance")}</th>
               )}
               {playoffs && <th className="px-2 text-right">{t("playoffChance")}</th>}
+              {libertadores && <th className="px-2 text-right">{tz("libertadores")}</th>}
+              {sudamericana && <th className="px-2 text-right">{tz("sudamericana")}</th>}
               {relegation && <th className="px-2 text-right">{t("relegationChance")}</th>}
               {/* A title play-off simulated with the table (Argentina): the chance of winning it. */}
               {!continental && result.playoffWins && <th className="px-2 text-right">{t("winChance")}</th>}
@@ -109,6 +117,16 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                   {playoffs && (
                     <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="playoff-chance">
                       {pct(probabilityInRange(result, row.teamId, playoffs.from, playoffs.to))}
+                    </td>
+                  )}
+                  {libertadores && (
+                    <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="libertadores-chance">
+                      {passDown?.has(row.teamId) ? "✓" : pct(probabilityInRange(result, row.teamId, libertadores.from, libertadores.to, true))}
+                    </td>
+                  )}
+                  {sudamericana && (
+                    <td className="px-2 text-right tabular-nums text-emerald-700 dark:text-emerald-300">
+                      {passDown?.has(row.teamId) ? "–" : pct(probabilityInRange(result, row.teamId, sudamericana.from, sudamericana.to, true))}
                     </td>
                   )}
                   {relegation && (

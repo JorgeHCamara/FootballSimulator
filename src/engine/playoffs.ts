@@ -575,3 +575,13 @@ export function simulatePlayoff(
   }
   return added;
 }
+
+/** Winner of a tournament's real final (its last post-season game), once played. */
+export function realChampion(postseason: readonly Fixture[] | undefined): TeamId | null {
+  const final = [...(postseason ?? [])].sort((a, b) => a.utcDate.localeCompare(b.utcDate)).at(-1);
+  if (!final?.result) return null;
+  const { home, away } = final.result;
+  if (home !== away) return home > away ? final.homeId : final.awayId;
+  if (!final.penalties || final.penalties.home === final.penalties.away) return null;
+  return final.penalties.home > final.penalties.away ? final.homeId : final.awayId;
+}

@@ -136,7 +136,10 @@
     "knockoutProjectedGroupsExternal": "The knockout phase is seeded once the group stage is over: group winners (seeds 1–8) go straight to the round of 16; runners-up (9–16) play a play-off against the clubs finishing 3rd in the Copa Libertadores groups (17–24). Until the real draw, the pairings shown are one possible draw that follows the seeding.",
     "playoffRuleNeutral": "Single match at a neutral ground. If level: extra time and penalties.",
     "playoffRuleNeutralPenalties": "Single match at a neutral ground. If level: straight to penalties.",
-    "playoffZonePlace": "{position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} in {group}"
+    "playoffZonePlace": "{position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} in {group}",
+    "tournament": "Tournament",
+    "annualQualifiedNote": "Already in the Copa Libertadores as tournament champion: {champions}. The annual-table places pass down to the next clubs. The Copa Argentina winner also qualifies, and the last club in the three-season averages table is also relegated (not shown).",
+    "annualChampion": "{club} ({tournament} champion)"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -194,7 +197,7 @@
       "SUD": "Open the Chances tab to see every club's chance of winning its group, of finishing in its group's top two, of reaching the final and of winning the {league}."
     },
     "step3Americas": "Open the Chances tab to see every team's chances of the title, the Copa Libertadores and relegation.",
-    "introZones": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the remaining matches: both zone tables update instantly with the official tiebreakers. The top 8 of each zone go to the play-offs, played across the zones (1st in Zone A v 8th in Zone B…) in single matches down to the final.",
+    "introZones": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the remaining matches: both zone tables update instantly with the official tiebreakers. The top 8 of each zone go to the play-offs, played across the zones (1st in Zone A v 8th in Zone B…) in single matches down to the final. Switch between the Apertura, the Clausura and the annual table, which decides the continental places and relegation.",
     "step3Zones": "Open the Chances tab to see every club's chance of finishing first in its zone, of reaching the play-offs and of winning the title."
   },
   "Faq": {
@@ -383,7 +386,7 @@
       },
       {
         "q": "What about the Copa Libertadores places and relegation?",
-        "a": "They are decided over the whole year (the combined table of both tournaments, and the average table for relegation), so this simulator covers the current tournament: its zone tables, its play-offs and its champion."
+        "a": "They come from the annual table, which adds up both tournaments' regular phases for all 30 clubs: open it with the switch above the table. The Apertura and Clausura champions and the Copa Argentina winner go to the Copa Libertadores with the top 3 not already in, the next 6 to the Copa Sudamericana, and the last club is relegated. A second club goes down from the three-season averages table, which isn't modelled here."
       },
       {
         "q": "How are the chances calculated?",

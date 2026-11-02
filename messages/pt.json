@@ -136,7 +136,10 @@
     "knockoutProjectedGroupsExternal": "O mata-mata é definido quando a fase de grupos termina: os primeiros colocados (cabeças 1–8) vão direto às oitavas; os segundos (9–16) jogam um playoff contra os terceiros colocados dos grupos da Libertadores (17–24). Até o sorteio real, os confrontos mostrados são um sorteio possível que segue os cabeças de chave.",
     "playoffRuleNeutral": "Jogo único em campo neutro. Se empatar: prorrogação e pênaltis.",
     "playoffRuleNeutralPenalties": "Jogo único em campo neutro. Se empatar: direto para os pênaltis.",
-    "playoffZonePlace": "{position}º da {group}"
+    "playoffZonePlace": "{position}º da {group}",
+    "tournament": "Torneio",
+    "annualQualifiedNote": "Já classificado à Libertadores como campeão de torneio: {champions}. As vagas da tabela anual passam aos clubes seguintes. O campeão da Copa Argentina também se classifica, e o último da tabela de médias de três temporadas também é rebaixado (não mostrado).",
+    "annualChampion": "{club} (campeão do {tournament})"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -194,7 +197,7 @@
       "SUD": "Abra a aba Chances para ver as chances de cada clube de ganhar o grupo, de terminar entre os dois primeiros, de chegar à final e de ganhar a {league}."
     },
     "step3Americas": "Abra a aba Chances para ver as chances de cada time de título, Libertadores e rebaixamento.",
-    "introZones": "Use o {simulator} para prever o resto do {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: as tabelas das duas zonas são atualizadas na hora com os critérios oficiais. Os 8 primeiros de cada zona vão aos playoffs, cruzando as zonas (1º da Zona A x 8º da Zona B…) em jogos únicos até a final.",
+    "introZones": "Use o {simulator} para prever o resto do {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: as tabelas das duas zonas são atualizadas na hora com os critérios oficiais. Os 8 primeiros de cada zona vão aos playoffs, cruzando as zonas (1º da Zona A x 8º da Zona B…) em jogos únicos até a final. Alterne entre o Apertura, o Clausura e a tabela anual, que define as vagas continentais e o rebaixamento.",
     "step3Zones": "Abra a aba Chances para ver as chances de cada clube de terminar em primeiro na zona, de chegar aos playoffs e de ser campeão."
   },
   "Faq": {
@@ -383,7 +386,7 @@
       },
       {
         "q": "E as vagas na Libertadores e o rebaixamento?",
-        "a": "São definidos ao longo do ano (na tabela anual dos dois torneios e na tabela de médias para o rebaixamento), então este simulador cobre o torneio atual: as tabelas das zonas, os playoffs e o campeão."
+        "a": "Saem da tabela anual, que soma as fases regulares dos dois torneios para os 30 clubes: abra-a no seletor acima da tabela. Os campeões do Apertura e do Clausura e o campeão da Copa Argentina vão à Libertadores com os 3 primeiros ainda não classificados, os 6 seguintes à Sul-Americana, e o último é rebaixado. Um segundo clube cai pela tabela de médias de três temporadas, que não é modelada aqui."
       },
       {
         "q": "Como as chances são calculadas?",

@@ -9,6 +9,7 @@ import {
   playoffCancelled,
   playoffIds,
   playoffWinners,
+  realChampion,
   seedByGroupPlace,
   seriesGames,
   simulatePenalties,
@@ -464,5 +465,23 @@ describe("Argentina's play-offs (zones interleaved, cross-zone round of 16)", ()
     const higherWins = Object.fromEntries(r16.map((t) => [t.legs[0]!.id, { home: 1, away: 0 }]));
     const qf = buildBracket(seeds, arg.playoff!, higherWins, options)[1]!;
     assert.deepEqual(qf.map((t) => [t.higher.teamId, t.lower.teamId]), [[101, 204], [201, 104], [102, 203], [202, 103]]);
+  });
+});
+
+describe("realChampion", () => {
+  const game = (id: number, utcDate: string, result: Fixture["result"], penalties?: Fixture["penalties"]): Fixture => ({
+    id,
+    matchday: 0,
+    utcDate,
+    homeId: 16,
+    awayId: 4,
+    result,
+    ...(penalties ? { penalties } : {}),
+  });
+  it("takes the winner of the last real post-season game", () => {
+    assert.equal(realChampion([game(2, "2026-05-24", { home: 2, away: 3 }), game(1, "2026-05-16", { home: 1, away: 0 })]), 4);
+    assert.equal(realChampion([game(1, "2026-05-24", { home: 1, away: 1 }, { home: 4, away: 3 })]), 16);
+    assert.equal(realChampion([game(1, "2026-05-24", null)]), null);
+    assert.equal(realChampion(undefined), null);
   });
 });
