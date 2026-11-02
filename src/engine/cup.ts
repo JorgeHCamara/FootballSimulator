@@ -91,12 +91,23 @@ export function clubTiers(config: CupConfig, divisions: Readonly<Record<TeamId, 
   return tiers;
 }
 
-/** Draw order, unless the round is played at the lower-division club: then the lower club hosts. */
-export function hostFirst(config: CupRoundConfig, home: TeamId, away: TeamId, tiers: Readonly<Record<TeamId, number>> | undefined): [TeamId, TeamId] {
+/**
+ * Draw order, unless the round is played at the lower-division club: then the
+ * lower club hosts. With `hostTier` only clubs at or below that tier get the
+ * home game, and only against a club above it (DFB-Pokal: amateurs v pros).
+ */
+export function hostFirst(
+  config: CupRoundConfig,
+  home: TeamId,
+  away: TeamId,
+  tiers: Readonly<Record<TeamId, number>> | undefined,
+  hostTier?: number,
+): [TeamId, TeamId] {
   if (!config.lowerHosts || !tiers || config.legs === 2) return [home, away];
   const th = tiers[home] ?? Infinity;
   const ta = tiers[away] ?? Infinity;
-  return ta > th ? [away, home] : [home, away];
+  const swap = hostTier === undefined ? ta > th : ta >= hostTier && th < hostTier;
+  return swap ? [away, home] : [home, away];
 }
 
 /** 32-bit string/number hash (FNV-1a), for deterministic draws. */
@@ -326,7 +337,7 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     }
     for (const pair of pairs) {
       if (ties.length >= roundConfig.ties) break;
-      const [home, away] = hostFirst(roundConfig, pair[0], pair[1], options.tiers);
+      const [home, away] = hostFirst(roundConfig, pair[0], pair[1], options.tiers, config.hostTier);
       ties.push(makeTie(r, ties.length, home, away, roundConfig, undefined, date));
     }
     rounds.push({

@@ -469,3 +469,45 @@ describe("Coppa Italia (fixed bracket, no draws)", () => {
     assert.equal(top, 400);
   });
 });
+
+describe("DFB-Pokal (amateur clubs host professional ones)", () => {
+  const dfb = CUPS.find((c) => c.code === "DFB")!;
+  // 1–18 Bundesliga, 19–36 2. Bundesliga, 37+ 3. Liga and amateur clubs.
+  const divisions: Record<number, string> = {};
+  for (let id = 1; id <= 36; id++) divisions[id] = id <= 18 ? "BL1" : "BL2";
+
+  it("has the 2026/27 rounds: single games, final in Berlin", () => {
+    assert.deepEqual(dfb.rounds.map((r) => r.ties), [32, 16, 8, 4, 2, 1]);
+    assert.ok(dfb.rounds.every((r) => (r.legs ?? 1) === 1));
+    assert.equal(dfb.rounds.at(-1)!.venue, "Olympiastadion Berlin");
+    assert.equal(dfb.hostTier, 2);
+  });
+
+  it("puts an amateur club at home against a professional one, else keeps the draw order", () => {
+    const tiers = clubTiers(dfb, divisions, [1, 20, 40, 41]);
+    assert.deepEqual(tiers, { 1: 0, 20: 1, 40: 2.5, 41: 2.5 });
+    const round = dfb.rounds[2]!;
+    assert.deepEqual(hostFirst(round, 1, 40, tiers, dfb.hostTier), [40, 1], "amateur hosts Bundesliga club");
+    assert.deepEqual(hostFirst(round, 20, 40, tiers, dfb.hostTier), [40, 20], "amateur hosts 2. Bundesliga club");
+    assert.deepEqual(hostFirst(round, 1, 20, tiers, dfb.hostTier), [1, 20], "2. Bundesliga club drawn away stays away");
+    assert.deepEqual(hostFirst(round, 40, 41, tiers, dfb.hostTier), [40, 41], "two amateurs: draw order");
+    assert.deepEqual(hostFirst(dfb.rounds[5]!, 1, 40, tiers, dfb.hostTier), [1, 40], "final: no home rule");
+  });
+
+  it("never draws a professional club at home to an amateur one", () => {
+    // Second round played: 16 real ties, the home clubs win (8 amateurs, 8 pros).
+    const winners = [1, 2, 3, 4, 19, 20, 21, 22, 40, 41, 42, 43, 44, 45, 46, 47];
+    const second: RealCupTie[] = winners.map((id, t) => ({
+      round: "secondRound",
+      homeId: id,
+      awayId: 100 + t,
+      legs: [fixture(960_000 + t, id, 100 + t, { home: 2, away: 0 })],
+    }));
+    const tiers = clubTiers(dfb, divisions, [...winners, ...second.map((t) => t.awayId)]);
+    for (const salt of [0, 1, 2, 3, 4]) {
+      const r16 = buildCup(dfb, second, {}, { entrants: {}, drawSalt: salt, roundDates: {}, tiers })[2]!;
+      assert.equal(r16.ties.length, 8);
+      for (const tie of r16.ties) assert.ok(!(tiers[tie.homeId]! < 2 && tiers[tie.awayId]! >= 2), `pro hosts amateur: ${tie.homeId} v ${tie.awayId}`);
+    }
+  });
+});

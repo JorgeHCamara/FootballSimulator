@@ -297,7 +297,7 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="promoted-contender"]').innerText(), /plays Ligue 1's 16th over two legs/);
       // Header: the second divisions sit under their country, top division first.
       const menu = p.locator('[data-testid="league-menu"]');
-      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga"]], ["Italy", "it", ["Serie A", "Serie B", "Coppa Italia"]], ["France", "fr", ["Ligue 1", "Ligue 2"]]]) {
+      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]], ["Italy", "it", ["Serie A", "Serie B", "Coppa Italia"]], ["France", "fr", ["Ligue 1", "Ligue 2"]]]) {
         await menu.getByRole("button", { name: country }).click();
         await menu.locator(`#menu-${flag}`).waitFor();
         assert.deepEqual((await menu.locator(`#menu-${flag} a`).allInnerTexts()).map((x) => x.trim()), leagues, country);
@@ -552,6 +552,32 @@ async function step(name, fn) {
       const menu = p.locator('[data-testid="league-menu"]');
       await menu.getByRole("button", { name: "Italy" }).click();
       assert.deepEqual((await menu.locator("#menu-it a").allInnerTexts()).map((x) => x.trim()), ["Serie A", "Serie B", "Coppa Italia"]);
+      await p.close();
+    });
+
+    await step("DFB-Pokal: single games, amateurs at home to professional clubs, Berlin final", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/dfb-pokal`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["First Round", "Second Round", "Round of 16", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 32, "32 first-round ties");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /\b2BL\b/, "2. Bundesliga tags");
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      await bar.nth(2).click();
+      assert.equal(await ties.count(), 8, "round of 16 drawn");
+      await bar.nth(5).click();
+      const legs = await p.locator('[data-testid="cup-bracket"] [data-testid="cup-tie"]').evaluateAll((els) => els.map((e) => e.dataset.legs));
+      assert.deepEqual(legs, ["1", "1", "1", "1", "1", "1", "1"]);
+      assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Olympiastadion Berlin/);
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /DFB-Pokal \d{4}\/\d{2} winner/);
+      const menu = p.locator('[data-testid="league-menu"]');
+      await menu.getByRole("button", { name: "Germany" }).click();
+      assert.deepEqual((await menu.locator("#menu-de a").allInnerTexts()).map((x) => x.trim()), ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]);
       await p.close();
     });
 

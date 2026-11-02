@@ -22,17 +22,24 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   5535: "/crests/5535.png", // Badajoz
   6195: "/crests/6195.png", // Sociedade Imperatriz de Desportos
   6277: "/crests/6277.png", // SE Gama
+  6318: "/crests/6318.png", // Hallescher FC
+  6325: "/crests/6325.png", // SC Verl 1924
+  6610: "/crests/6610.png", // SV Waldhof Mannheim
+  6631: "/crests/6631.png", // SG Sonnenhof Großaspch
   6825: "/crests/6825.png", // Gimnastica Segoviana
   6827: "/crests/6827.png", // Alcoyano
   6856: "/crests/6856.png", // Sestao
   6858: "/crests/6858.png", // Guijuelo
   7041: "/crests/7041.png", // Peña Sport
+  7277: "/crests/7277.png", // Bahlinger SC 1929
+  7891: "/crests/7891.png", // Eintracht Trier
   8678: "/crests/8678.png", // Real Unión Irun
   8961: "/crests/8961.png", // Coruxo
   9141: "/crests/9141.png", // Don Benito
   9303: "/crests/9303.png", // Maranhao
   9414: "/crests/9414.png", // Poblense
   9449: "/crests/9449.png", // Antequera CF
+  9705: "/crests/9705.png", // Rot-Weiss Essen
   12585: "/crests/12585.png", // CD Tudelano
   14263: "/crests/14263.png", // Atlético Baleares
   15557: "/crests/15557.png", // Oratorio
@@ -41,6 +48,7 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   15562: "/crests/15562.png", // Aguia de Maraba
   17326: "/crests/17326.png", // Ferroviaria
   17332: "/crests/17332.png", // Lagarto
+  17492: "/crests/17492.png", // Viktoria Köln
   17565: "/crests/17565.png", // Zamora CF
   17569: "/crests/17569.png", // CD Varea
   17570: "/crests/17570.png", // Gimnástica Torrelavega
@@ -54,9 +62,12 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   18334: "/crests/18334.png", // AE Prat
   18342: "/crests/18342.png", // San Sebastián de los Reyes
   18433: "/crests/18433.png", // Altos
+  18747: "/crests/18747.png", // Lüneburger SK Hansa
+  19233: "/crests/19233.png", // SSV Jeddeloh II
   19294: "/crests/19294.png", // Unionistas de Salamanca
   19962: "/crests/19962.png", // Castanhal U20
   20699: "/crests/20699.png", // CEOV Operário
+  20735: "/crests/20735.png", // VSG Altglienicke
   20770: "/crests/20770.png", // Cray Wanderers
   20771: "/crests/20771.png", // Marine
   20776: "/crests/20776.png", // Anaitasuna
@@ -69,6 +80,7 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   21369: "/crests/21369.png", // Guarany de Bagé
   21384: "/crests/21384.png", // Azuriz
   21389: "/crests/21389.png", // Tuna Luso
+  21508: "/crests/21508.png", // Schott
   21550: "/crests/21550.png", // Atletico Alagoinhas
   21553: "/crests/21553.png", // Trem
   21711: "/crests/21711.png", // Alvechurch
@@ -76,12 +88,14 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   21717: "/crests/21717.png", // Atlético Paso
   21722: "/crests/21722.png", // Manresa
   21723: "/crests/21723.png", // Utebo
+  21957: "/crests/21957.png", // Westfalia Rhynern
   22043: "/crests/22043.png", // Mijas Las Lagunas
   22080: "/crests/22080.png", // Arosa
   22084: "/crests/22084.png", // Covadonga
   22190: "/crests/22190.png", // Capital
   22193: "/crests/22193.png", // Independente AP
   22194: "/crests/22194.png", // Manauara
+  22272: "/crests/22272.png", // 1. FC Phönix Lübeck
   22372: "/crests/22372.png", // CD Baztán
   22430: "/crests/22430.png", // CD Extremadura
   22432: "/crests/22432.png", // CD Cuarte
@@ -93,6 +107,7 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   22557: "/crests/22557.png", // Capital CF
   22559: "/crests/22559.png", // Independência
   22561: "/crests/22561.png", // Maracanã
+  131218: "/crests/131218.png", // Hemelingen
   131403: "/crests/131403.png", // Atlético Calatayud
   131412: "/crests/131412.png", // Maracena
   131419: "/crests/131419.png", // Atlético Melilla
@@ -113,6 +128,9 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   131686: "/crests/131686.png", // SC Penedense
   131687: "/crests/131687.png", // Porto Vitória FC
   131708: "/crests/131708.png", // Barra FC
+  131785: "/crests/131785.png", // HEBC Hamburg
+  131786: "/crests/131786.png", // VFB Krieschow
+  131787: "/crests/131787.png", // SC St. Tönis
   131836: "/crests/131836.png", // Union Brescia
   132144: "/crests/132144.png", // Salisbury FC
   132350: "/crests/132350.png", // Berkhamsted

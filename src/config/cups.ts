@@ -3,7 +3,7 @@ import type { CompetitionCode, FlagCode, SiteLocale } from "./leagues.ts";
 // Knockout cups. Unlike a league, a cup has no table: each round's pairings are
 // drawn, and clubs from several divisions (and outside the league system) meet.
 
-export type CupCode = "FAC" | "CDB" | "CDR" | "CIT";
+export type CupCode = "FAC" | "CDB" | "CDR" | "CIT" | "DFB";
 
 export type CupRoundKey =
   | "preliminaryRound"
@@ -69,6 +69,12 @@ export interface CupConfig {
   outsiderTier: number;
   /** Tag those clubs as "NL" (non-league); without it they get no tag. */
   tagOutsiders: boolean;
+  /**
+   * With `lowerHosts`: only clubs at or below this tier get the home game, and
+   * only against a club above it (DFB-Pokal: amateur clubs host professional
+   * ones; otherwise the draw order stands). Without it, the lower club hosts.
+   */
+  hostTier?: number;
   /** What the winner is champion of, for the champion box. */
   title: string;
   /**
@@ -201,6 +207,36 @@ export const CUPS: readonly CupConfig[] = [
     outsiderTier: 2.5,
     tagOutsiders: false,
     title: "Coppa Italia",
+  },
+  {
+    kind: "cup",
+    code: "DFB",
+    slug: "dfb-pokal",
+    name: "DFB-Pokal",
+    country: "Germany",
+    flag: "de",
+    simulatorName: { en: "DFB-Pokal Simulator", pt: "Simulador da DFB-Pokal", es: "Simulador de la DFB-Pokal" },
+    aka: { en: "German Cup", pt: "Copa da Alemanha", es: "Copa de Alemania" },
+    espn: { slug: "ger.dfb_pokal", seasons: "split" },
+    // 64 clubs from the first round: the 36 Bundesliga and 2. Bundesliga clubs,
+    // the top 3. Liga clubs and the regional cup winners. Single games (level:
+    // extra time and penalties), a fresh draw every round, and an amateur club
+    // (3. Liga and below) drawn against a professional one plays at home up to
+    // the semi-finals. Final at the Olympiastadion in Berlin.
+    rounds: [
+      { key: "firstRound", espnSlug: "first-round", ties: 32 },
+      { key: "secondRound", espnSlug: "second-round", ties: 16, lowerHosts: true },
+      { key: "roundOf16", espnSlug: "round-of-16", ties: 8, lowerHosts: true },
+      { key: "quarterFinals", espnSlug: "quarterfinals", ties: 4, lowerHosts: true },
+      { key: "semiFinals", espnSlug: "semifinals", ties: 2, lowerHosts: true },
+      { key: "final", espnSlug: "final", ties: 1, neutral: true, venue: "Olympiastadion Berlin" },
+    ],
+    feederLeagues: ["BL1", "BL2"],
+    // 3. Liga and the regional leagues.
+    outsiderTier: 2.5,
+    hostTier: 2,
+    tagOutsiders: false,
+    title: "DFB-Pokal",
   },
 ];
 

@@ -119,7 +119,7 @@ export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult
       }
       for (const pair of pairs) {
         if (specs.length >= round.ties) break;
-        const [home, away] = hostFirst(round, pair[0], pair[1], options.tiers);
+        const [home, away] = hostFirst(round, pair[0], pair[1], options.tiers, config.hostTier);
         specs.push({ first: home, second: away, legs: twoLegs ? [null, null] : [null], hosts: twoLegs ? [home, away] : [home], pens: null });
       }
       if (specs.length < round.ties) break;

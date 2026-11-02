@@ -124,7 +124,8 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
     const roundDates: Partial<Record<CupRoundKey, string>> = {};
     cup.rounds.forEach((round, r) => {
       // Scheduled games (even with clubs still "TBD") carry the real kick-off;
-      // otherwise a few days into the round's calendar window.
+      // otherwise near the end of the round's calendar window (a window opens
+      // as soon as the previous round ends, so its start is too early).
       const kickoffs = byRound[r]!.map((e) => e.date).filter((d) => !Number.isNaN(Date.parse(d))).sort();
       if (kickoffs[0]) {
         roundDates[round.key] = new Date(kickoffs[0]).toISOString();
@@ -132,7 +133,13 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
       }
       const slug = (label: string) => label.toLowerCase().replace(/^rd of/, "round of").replace(/\s+/g, "-");
       const entry = calendar.find((c) => slug(c.label) === round.espnSlug);
-      if (entry) roundDates[round.key] = new Date(Date.parse(entry.startDate) + 5 * 86_400_000).toISOString();
+      if (entry) {
+        const start = Date.parse(entry.startDate);
+        const end = Date.parse(entry.endDate);
+        const date = new Date(Number.isNaN(end) ? start + 5 * 86_400_000 : Math.max(start, end - 2 * 86_400_000));
+        date.setUTCHours(19, 0, 0, 0); // an evening kick-off, not the window's boundary time
+        roundDates[round.key] = date.toISOString();
+      }
     });
 
     const feeders = await loadFeeders(cup);

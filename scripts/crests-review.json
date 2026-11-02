@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-02T12:53:21.432Z",
+ "generated": "2026-11-02T13:30:53.661Z",
  "clubs": [
   {
    "espnId": 4489,
@@ -3264,6 +3264,393 @@
      "location": "Ravenna, Italy",
      "league": "Italian Serie C Girone B",
      "badge": "https://r2.thesportsdb.com/images/media/team/badge/l80c6j1724118398.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131787,
+   "name": "SC St. Tönis",
+   "shortName": "St. Tönis",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153099",
+   "candidates": [
+    {
+     "idTeam": "153099",
+     "team": "St. Tönis",
+     "location": "Tönisvorst, Germany",
+     "league": "German Oberliga Niederrhein",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/l1b59n1787294284.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6610,
+   "name": "SV Waldhof Mannheim",
+   "shortName": "SV Waldhof",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "137962",
+   "candidates": [
+    {
+     "idTeam": "137962",
+     "team": "Waldhof Mannheim",
+     "location": "Mannheim",
+     "league": "Germany Liga 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/7m7f591579106271.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 131218,
+   "name": "Hemelingen",
+   "shortName": "Hemelingen",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152267",
+   "candidates": [
+    {
+     "idTeam": "152267",
+     "team": "Hemelingen",
+     "location": "Bremen-Hemelingen",
+     "league": "German Oberliga Bremen",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/r7wxto1779857740.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18747,
+   "name": "Lüneburger SK Hansa",
+   "shortName": "Lüneburger",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138377",
+   "candidates": [
+    {
+     "idTeam": "138377",
+     "team": "Lüneburger SK Hansa",
+     "location": "Bardowick, Lüneburg, Lower Saxony,",
+     "league": "German Oberliga Niedersachsen",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/s13nob1580152636.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17492,
+   "name": "Viktoria Köln",
+   "shortName": "Viktoria Köln",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137961",
+   "candidates": [
+    {
+     "idTeam": "137961",
+     "team": "Viktoria Köln",
+     "location": "Cologne, North Rhine-Westphalia.",
+     "league": "Germany Liga 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ilegfp1579106280.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 7891,
+   "name": "Eintracht Trier",
+   "shortName": "Eintracht Trier",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140009",
+   "candidates": [
+    {
+     "idTeam": "140009",
+     "team": "Eintracht Trier",
+     "location": "Trier, Germany",
+     "league": "German Regionalliga SudWest",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/b1vbm11593871848.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6631,
+   "name": "SG Sonnenhof Großaspch",
+   "shortName": "SG Sonnenhof",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "137958",
+   "candidates": [
+    {
+     "idTeam": "137958",
+     "team": "Sonnenhof Großaspach",
+     "location": "Aspach",
+     "league": "Germany Liga 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/k31uuq1626207202.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 19233,
+   "name": "SSV Jeddeloh II",
+   "shortName": "Jeddeloh",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "138378",
+   "candidates": [
+    {
+     "idTeam": "138378",
+     "team": "Jeddeloh II",
+     "location": "Edewecht, Ammerland, Lower Saxony",
+     "league": "German Regionalliga Nord",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/9lfm5z1626207616.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 7277,
+   "name": "Bahlinger SC 1929",
+   "shortName": "Bahlinger SC",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138416",
+   "candidates": [
+    {
+     "idTeam": "138416",
+     "team": "Bahlinger SC",
+     "location": "Kaiserstuhl, Bahlingen, Baden-Württemberg, Germany",
+     "league": "German Oberliga Baden-Württemberg",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/e6ru2s1580147505.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21508,
+   "name": "Schott",
+   "shortName": "Schott",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "140051",
+   "candidates": [
+    {
+     "idTeam": "140051",
+     "team": "Schott Mainz",
+     "location": "Mainz, Rhineland-Palatinate, Germany",
+     "league": "German Oberliga Rheinland-Pfalz - Saar",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/0m8sei1594559227.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 131786,
+   "name": "VFB Krieschow",
+   "shortName": "Krieschow",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "155856",
+   "candidates": [
+    {
+     "idTeam": "155856",
+     "team": "Krieschow",
+     "location": "Krieschow, Kolkwitz, Brandenburg, Germany",
+     "league": "German Oberliga Nordost Süd",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/b64r1g1780941005.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21957,
+   "name": "Westfalia Rhynern",
+   "shortName": "W Rhynern",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "155857",
+   "candidates": [
+    {
+     "idTeam": "155857",
+     "team": "Westfalia Rhynern",
+     "location": "Rhynern, North Rhine-Westphalia, Germany",
+     "league": "German Regionalliga West",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/eckbwi1780941203.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22272,
+   "name": "1. FC Phönix Lübeck",
+   "shortName": "Phönix Lübeck",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140024",
+   "candidates": [
+    {
+     "idTeam": "140024",
+     "team": "Phönix Lübeck",
+     "location": "Lübeck, Schleswig-Holstein, Germany",
+     "league": "German Regionalliga Nord",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/t5k7mm1781070443.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 9705,
+   "name": "Rot-Weiss Essen",
+   "shortName": "Rot-Weiss Essen",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "138400",
+   "candidates": []
+  },
+  {
+   "espnId": 6325,
+   "name": "SC Verl 1924",
+   "shortName": "SC Verl 1924",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "138399",
+   "candidates": [
+    {
+     "idTeam": "155923",
+     "team": "Verl II",
+     "location": "Verl, North Rhine-Westphalia, Germany",
+     "league": "German Oberliga Westfalen",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/an4agr1781072707.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 20735,
+   "name": "VSG Altglienicke",
+   "shortName": "Altglienicke",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138383",
+   "candidates": [
+    {
+     "idTeam": "138383",
+     "team": "Altglienicke",
+     "location": "Treptow-Köpenick, Berlin",
+     "league": "German Regionalliga Nordost",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/at1vqj1580154269.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6318,
+   "name": "Hallescher FC",
+   "shortName": "Hallescher",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137959",
+   "candidates": [
+    {
+     "idTeam": "137959",
+     "team": "Hallescher",
+     "location": "Halle an der Saale",
+     "league": "German Regionalliga Nordost",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/xxdkdj1579106317.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131785,
+   "name": "HEBC Hamburg",
+   "shortName": "HEBC",
+   "country": "Germany",
+   "competitions": [
+    "DFB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "155746",
+   "candidates": [
+    {
+     "idTeam": "155746",
+     "team": "HEBC Hamburg",
+     "location": "Eimsbüttel, Hamburg, Germany",
+     "league": "German Oberliga Hamburg",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/53ai8h1780097084.png",
      "score": 1
     }
    ]
