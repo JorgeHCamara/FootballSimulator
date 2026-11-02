@@ -24,6 +24,12 @@ export interface StandingsOptions {
   deductions?: Readonly<Record<TeamId, number>>;
   /** Skip building the form column (hot path in Monte Carlo runs). Defaults to true. */
   includeForm?: boolean;
+  /**
+   * A split league (Scotland): once every game up to round `afterRound` has a
+   * score, the top `top` clubs at that point stay above the rest whatever
+   * their points later (rounds after the split are within each half).
+   */
+  split?: { afterRound: number; top: number };
 }
 
 const emptyTotals = (): Totals => ({
@@ -192,7 +198,17 @@ export function computeStandings(
   const criteria: Tiebreaker[] = options.tiebreakers[0] === "points"
     ? [...options.tiebreakers]
     : ["points", ...options.tiebreakers];
-  const order = rankGroup(ids, criteria, overall, matches, names);
+  let order = rankGroup(ids, criteria, overall, matches, names);
+  // The split: the table at the split decides the halves, which then stay apart.
+  if (options.split) {
+    const firstPhase = fixtures.filter((f) => f.matchday <= options.split!.afterRound);
+    const splitDone = firstPhase.length > 0 && firstPhase.every((f) => results[f.id]) && fixtures.some((f) => f.matchday > options.split!.afterRound);
+    if (splitDone) {
+      const atSplit = computeStandings(teams, firstPhase, results, { ...options, split: undefined, includeForm: false });
+      const top = new Set(atSplit.slice(0, options.split.top).map((r) => r.teamId));
+      order = [...order.filter((id) => top.has(id)), ...order.filter((id) => !top.has(id))];
+    }
+  }
   const includeForm = options.includeForm ?? true;
   const chronological = includeForm ? sortFixtures(fixtures) : [];
 

@@ -163,6 +163,20 @@ function shapes(code: FlagCode) {
           <rect x="9" y="7" width="12" height="2.2" rx="1" fill="#ffffff" opacity="0.85" />
         </>
       );
+    case "gb-sct":
+      return (
+        <>
+          <rect width="30" height="20" fill="#0065bd" />
+          <path d="M0 0L30 20M30 0L0 20" stroke="#ffffff" strokeWidth="3.2" />
+        </>
+      );
+    case "jp":
+      return (
+        <>
+          <rect width="30" height="20" fill="#ffffff" />
+          <circle cx="15" cy="10" r="6" fill="#bc002d" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

@@ -52,6 +52,7 @@ const CONTINENT_OF: Record<string, Continent> = {
   France: "Europe",
   Portugal: "Europe",
   Netherlands: "Europe",
+  Scotland: "Europe",
   CONMEBOL: "South America",
   Brazil: "South America",
   Argentina: "South America",
@@ -64,6 +65,7 @@ const CONTINENT_OF: Record<string, Continent> = {
   USA: "North America",
   Mexico: "North America",
   "Saudi Arabia": "Asia",
+  Japan: "Asia",
 };
 
 export function continentOf(country: string): Continent {

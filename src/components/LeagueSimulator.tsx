@@ -115,7 +115,10 @@ export function LeagueSimulator({
       buildLeagueModel(teams, fixtures, real, priorStrengths ? { priorStrengths: new Map(Object.entries(priorStrengths).map(([id, st]) => [Number(id), st])) } : {}),
     [teams, fixtures, real, priorStrengths],
   );
-  const standingsOptions = useMemo(() => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}) }), [league.tiebreakers, deductions]);
+  const standingsOptions = useMemo(
+    () => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}), ...(league.split ? { split: league.split } : {}) }),
+    [league.tiebreakers, deductions, league.split],
+  );
 
   const effective = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
   const tableTeams = useMemo(

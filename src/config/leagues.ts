@@ -36,7 +36,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -99,7 +99,7 @@ export interface LeagueGroup {
   zones?: readonly Zone[];
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -123,6 +123,8 @@ export interface LeagueConfig {
    * stage splits the table); until ESPN's standings show them, one table.
    */
   groupsOptional?: boolean;
+  /** A split league (Scotland): see StandingsOptions.split. */
+  split?: { afterRound: number; top: number };
   /**
    * Real data comes from ESPN and falls back to football-data.org (with `code`
    * as the competition code); leagues outside football-data.org's free tier set
@@ -608,6 +610,35 @@ export const LEAGUES: readonly LeagueConfig[] = [
     ],
   },
   {
+    code: "SPFL",
+    slug: "scottish-premiership",
+    name: "Scottish Premiership",
+    country: "Scotland",
+    flag: "gb-sct",
+    simulatorName: { en: "Scottish Premiership Simulator", pt: "Simulador da Scottish Premiership", es: "Simulador de la Scottish Premiership" },
+    aka: { en: "William Hill Premiership", pt: "Campeonato Escocês", es: "Liga escocesa" },
+    teams: 12,
+    // 33 games (three rounds of each other), then the split: the top six and
+    // bottom six play each other once more (38 games), keeping their halves.
+    gamesPerTeam: 38,
+    split: { afterRound: 33, top: 6 },
+    espn: { slug: "sco.1", seasons: "split" },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
+    // Base case (the European places shift with the cup winner and UEFA's
+    // coefficients): champion to the Champions League, 2nd to its qualifying
+    // rounds, 3rd to the Europa League and 4th to the Conference League
+    // qualifying; 11th plays the Championship play-off winner, 12th goes down.
+    zones: [
+      { kind: "championsLeague", from: 1, to: 1 },
+      { kind: "championsLeagueQualifying", from: 2, to: 2 },
+      { kind: "europaLeague", from: 3, to: 3 },
+      { kind: "conferenceLeague", from: 4, to: 4 },
+      { kind: "relegationPlayoff", from: 11, to: 11 },
+      { kind: "relegation", from: 12, to: 12 },
+    ],
+  },
+  {
     code: "BSA",
     slug: "brasileirao",
     name: "Brasileirão Série A",
@@ -1064,6 +1095,28 @@ export const LEAGUES: readonly LeagueConfig[] = [
         { kind: "relegation", from: 18, to: 18 },
       ],
     },
+  },
+  {
+    code: "J1",
+    slug: "j1-league",
+    name: "J1 League",
+    country: "Japan",
+    flag: "jp",
+    simulatorName: { en: "J1 League Simulator", pt: "Simulador da J1 League", es: "Simulador de la J1 League" },
+    aka: { en: "Meiji Yasuda J1 League", pt: "Campeonato Japonês", es: "Liga japonesa" },
+    teams: 20,
+    // From 2026/27 an August–May season, 38 games (the special half-season
+    // tournament of early 2026 is left out).
+    espn: { slug: "jpn.1", seasons: "split", stages: { table: "regular-season", knockout: [] } },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
+    // Champion and runner-up to the AFC Champions League Elite, 3rd to its
+    // preliminary stage; the bottom three go down.
+    zones: [
+      { kind: "aclElite", from: 1, to: 2 },
+      { kind: "aclEliteQualifying", from: 3, to: 3 },
+      { kind: "relegation", from: 18, to: 20 },
+    ],
   },
   {
     code: "SPL",

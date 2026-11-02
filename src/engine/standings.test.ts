@@ -130,3 +130,34 @@ describe("computeStandings", () => {
     assert.deepEqual(rows.find((r) => r.teamId === 1)!.form, ["D", "L", "W", "W", "D"]);
   });
 });
+
+describe("a split league (Scotland)", () => {
+  // Four clubs; after round 1 the top two and bottom two play within their halves.
+  const teams = [1, 2, 3, 4].map((id) => ({ id, name: `T${id}`, shortName: `T${id}`, tla: `T${id}` }));
+  const fixtures = [
+    { id: 1, matchday: 1, utcDate: "2026-01-01", homeId: 1, awayId: 3, result: null },
+    { id: 2, matchday: 1, utcDate: "2026-01-01", homeId: 2, awayId: 4, result: null },
+    { id: 3, matchday: 2, utcDate: "2026-02-01", homeId: 3, awayId: 4, result: null },
+    { id: 4, matchday: 2, utcDate: "2026-02-01", homeId: 1, awayId: 2, result: null },
+    { id: 5, matchday: 3, utcDate: "2026-03-01", homeId: 3, awayId: 4, result: null },
+  ];
+  // Round 1: 1 and 2 win (top half). Then 3 wins twice in the bottom half: 6 points, more than 2's 3.
+  const results = { 1: { home: 1, away: 0 }, 2: { home: 1, away: 0 }, 3: { home: 1, away: 0 }, 4: { home: 1, away: 0 }, 5: { home: 1, away: 0 } };
+  const split = { afterRound: 1, top: 2 };
+
+  it("keeps the top half above the bottom half after the split", () => {
+    const plain = computeStandings(teams, fixtures, results, { tiebreakers: ["points"] });
+    assert.deepEqual(plain.map((r) => r.teamId), [1, 3, 2, 4], "on points alone, 3 would be 2nd");
+    const withSplit = computeStandings(teams, fixtures, results, { tiebreakers: ["points"], split });
+    assert.deepEqual(withSplit.map((r) => r.teamId), [1, 2, 3, 4]);
+    assert.deepEqual(withSplit.map((r) => r.position), [1, 2, 3, 4]);
+  });
+
+  it("is a plain table until the first phase is complete", () => {
+    const open = { ...results, 2: undefined } as unknown as typeof results;
+    delete (open as Record<number, unknown>)[2];
+    const table = computeStandings(teams, fixtures, open, { tiebreakers: ["points"], split });
+    const plain = computeStandings(teams, fixtures, open, { tiebreakers: ["points"] });
+    assert.deepEqual(table.map((r) => r.teamId), plain.map((r) => r.teamId));
+  });
+});
