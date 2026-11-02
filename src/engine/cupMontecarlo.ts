@@ -1,5 +1,5 @@
 import type { CupConfig } from "../config/cups.ts";
-import { cupGameId, cupSecondLegId, cupShootoutId, drawRoundRandom, iterationRng, type CupBuildOptions, type RealCupTie } from "./cup.ts";
+import { cupGameId, cupSecondLegId, cupShootoutId, drawRoundRandom, hostFirst, iterationRng, type CupBuildOptions, type RealCupTie } from "./cup.ts";
 import { cupModelFor } from "./cupModel.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateScore } from "./match.ts";
 import { simulatePenalties } from "./playoffs.ts";
@@ -17,7 +17,7 @@ export interface CupMonteCarloInput {
    */
   fixed: ResultMap;
   strengths: Record<TeamId, TeamStrength>;
-  options: Pick<CupBuildOptions, "entrants">;
+  options: Pick<CupBuildOptions, "entrants" | "tiers">;
   iterations: number;
   seed: number;
 }
@@ -107,8 +107,9 @@ export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult
           pens: fixed[cupShootoutId(r, slot)] ?? t.legs[ids.length - 1]?.penalties ?? null,
         };
       });
-      for (const [home, away] of drawRoundRandom(participants.filter((id) => !placed.has(id)), rng)) {
+      for (const pair of drawRoundRandom(participants.filter((id) => !placed.has(id)), rng)) {
         if (specs.length >= round.ties) break;
+        const [home, away] = hostFirst(round, pair[0], pair[1], options.tiers);
         specs.push({ first: home, second: away, legs: twoLegs ? [null, null] : [null], hosts: twoLegs ? [home, away] : [home], pens: null });
       }
       if (specs.length < round.ties) break;

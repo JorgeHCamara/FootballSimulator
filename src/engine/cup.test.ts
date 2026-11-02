@@ -8,6 +8,8 @@ import {
   cupGameId,
   cupIds,
   cupSecondLegId,
+  clubTiers,
+  hostFirst,
   cupShootoutId,
   cupWinner,
   drawRound,
@@ -336,5 +338,45 @@ describe("Copa do Brasil (two legs, Série A entering in the fifth round, neutra
       assert.equal(Object.values(mc.reached).reduce((n, c) => n + c[r]!, 0), 40 * clubs, `round ${r}`);
     }
     assert.equal(Object.values(mc.won).reduce((a, b) => a + b, 0), 40);
+  });
+});
+
+describe("Copa del Rey (lower-division club hosts, Supercopa clubs enter in the round of 32)", () => {
+  const cdr = CUPS.find((c) => c.code === "CDR")!;
+
+  it("has the 2026/27 rounds: two-legged qualifier and semi-finals, neutral final", () => {
+    assert.deepEqual(cdr.rounds.map((r) => r.ties), [10, 56, 28, 16, 8, 4, 2, 1]);
+    assert.deepEqual(cdr.rounds.map((r) => r.legs ?? 1), [2, 1, 1, 1, 1, 1, 2, 1]);
+    assert.equal(cdr.rounds.at(-1)!.venue, "La Cartuja");
+    assert.equal(cdr.rounds[3]!.entrantsNotYetIn, true);
+  });
+
+  it("puts the lower-division club at home in single games", () => {
+    const tiers = clubTiers(cdr, { 1: "PD", 2: "SD" }, [1, 2, 3]);
+    assert.deepEqual(tiers, { 1: 0, 2: 1, 3: 3 });
+    const single = cdr.rounds[1]!;
+    assert.deepEqual(hostFirst(single, 1, 2, tiers), [2, 1], "Segunda club hosts La Liga club");
+    assert.deepEqual(hostFirst(single, 3, 2, tiers), [3, 2], "already at the lower club");
+    assert.deepEqual(hostFirst(single, 1, 1, tiers), [1, 1]);
+    assert.deepEqual(hostFirst(cdr.rounds[6]!, 1, 3, tiers), [1, 3], "two legs: draw order");
+    assert.deepEqual(hostFirst(faCup.rounds[0]!, 1, 3, tiers), [1, 3], "FA Cup: draw order");
+  });
+
+  it("draws the round of 32 from 28 winners and the 4 Supercopa clubs, lower clubs at home", () => {
+    // Second round already played: 28 real ties, home clubs (9001…) win.
+    const second: RealCupTie[] = Array.from({ length: 28 }, (_, t) => ({
+      round: "secondRound",
+      homeId: 9001 + t,
+      awayId: 9101 + t,
+      legs: [fixture(950_000 + t, 9001 + t, 9101 + t, { home: 1, away: 0 })],
+    }));
+    const supercopa = [1, 2, 3, 4];
+    const divisions: Record<number, string> = { 1: "PD", 2: "PD", 3: "PD", 4: "PD", 9001: "PD", 9002: "SD" };
+    const tiers = clubTiers(cdr, divisions, [...supercopa, ...second.map((t) => t.homeId)]);
+    const rounds = buildCup(cdr, second, {}, { entrants: { roundOf32: supercopa }, drawSalt: 0, roundDates: {}, tiers });
+    const r32 = rounds[3]!;
+    assert.equal(r32.ties.length, 16);
+    assert.equal(new Set(r32.ties.flatMap((t) => [t.homeId, t.awayId])).size, 32);
+    for (const tie of r32.ties) assert.ok(tiers[tie.homeId]! >= tiers[tie.awayId]!, `lower club hosts: ${tie.homeId} v ${tie.awayId}`);
   });
 });

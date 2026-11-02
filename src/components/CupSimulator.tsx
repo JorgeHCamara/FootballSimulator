@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { CupConfig } from "../config/cups.ts";
 import {
   buildCup,
+  clubTiers,
   clubsAlive,
   cupIds,
   cupWinner,
@@ -55,8 +56,13 @@ export function CupSimulator({ cup, data }: Props) {
   const { setScore, applyResults, replace, reset, undo, reconcile, redraw, syncPairings, drop } = useSimStore.getState();
 
   const teamMap = useMemo(() => new Map(data.teams.map((team) => [team.id, team])), [data.teams]);
+  // Rounds played at the lower-division club's ground need each club's tier.
+  const tiers = useMemo(
+    () => clubTiers(cup, data.divisions, [...data.teams.map((team) => team.id)]),
+    [cup, data.divisions, data.teams],
+  );
   const buildOptions = useMemo<CupBuildOptions>(
-    () => ({ entrants: data.entrants, drawSalt: season.drawSalt ?? 0, roundDates: data.roundDates }),
+    () => ({ entrants: data.entrants, drawSalt: season.drawSalt ?? 0, roundDates: data.roundDates, tiers }),
     [data.entrants, data.roundDates, season.drawSalt],
   );
   const rounds = useMemo(() => buildCup(cup, data.real, season.predictions, buildOptions), [cup, data.real, season.predictions, buildOptions]);
@@ -189,9 +195,9 @@ export function CupSimulator({ cup, data }: Props) {
   const monteCarloInput = useMemo<CupMonteCarloInput | null>(
     () =>
       tab === "chances" && hydrated
-        ? { config: cup, real: data.real, fixed: fixedReal, strengths: data.strengths, options: { entrants: data.entrants }, iterations: CUP_ITERATIONS, seed: 2026 }
+        ? { config: cup, real: data.real, fixed: fixedReal, strengths: data.strengths, options: { entrants: data.entrants, tiers }, iterations: CUP_ITERATIONS, seed: 2026 }
         : null,
-    [tab, hydrated, cup, data.real, data.strengths, data.entrants, fixedReal],
+    [tab, hydrated, cup, data.real, data.strengths, data.entrants, fixedReal, tiers],
   );
 
   const actionButton =

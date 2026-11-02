@@ -131,7 +131,11 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
     const feeders = await loadFeeders(cup);
     const entrants: Partial<Record<CupRoundKey, TeamId[]>> = {};
     for (const round of cup.rounds) {
-      if (round.entrantsFrom) entrants[round.key] = round.entrantsFrom.flatMap((code) => feeders.members[code] ?? []);
+      if (!round.entrantsFrom) continue;
+      const members = round.entrantsFrom.flatMap((code) => feeders.members[code] ?? []);
+      // Clubs already in the real draw (earlier rounds) don't enter again.
+      const inCup = new Set(real.flatMap((t) => [t.homeId, t.awayId]));
+      entrants[round.key] = round.entrantsNotYetIn ? members.filter((id) => !inCup.has(id)) : members;
     }
     const teams = new Map(feeders.teams);
     for (const team of withFallbackCrests(applyTeamOverrides(espnTeams(all)))) if (!teams.has(team.id)) teams.set(team.id, team);

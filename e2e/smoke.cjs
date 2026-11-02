@@ -490,6 +490,28 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Copa del Rey: two-legged qualifier, lower club at home, La Cartuja final", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/copa-del-rey`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["Qualifying round", "First Round", "Second Round", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      assert.equal(await p.locator('[data-testid="cup-tie"]').first().getAttribute("data-legs"), "2");
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      await bar.nth(7).click();
+      const legs = await p.locator('[data-testid="cup-bracket"] [data-testid="cup-tie"]').evaluateAll((els) => els.map((e) => e.dataset.legs));
+      assert.deepEqual(legs, ["1", "1", "1", "1", "2", "2", "1"]);
+      assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /La Cartuja/);
+      // Spain's menu: La Liga, Segunda División, Copa del Rey.
+      const menu = p.locator('[data-testid="league-menu"]');
+      await menu.getByRole("button", { name: "Spain" }).click();
+      assert.deepEqual((await menu.locator("#menu-es a").allInnerTexts()).map((x) => x.trim()), ["La Liga", "Segunda División", "Copa del Rey"]);
+      await p.close();
+    });
+
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/mls`);

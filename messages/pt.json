@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup e Copa do Brasil. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil e Copa del Rey. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
@@ -29,7 +29,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup e Copa do Brasil. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil e Copa del Rey. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -207,7 +207,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup e Copa do Brasil, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil e Copa del Rey, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -258,22 +258,26 @@
     "simulateAll": "Simular até a final",
     "newDraw": "Novo sorteio",
     "round": {
+      "qualifyingRound": "Eliminatória prévia",
       "firstRound": "Primeira fase",
       "secondRound": "Segunda fase",
       "thirdRound": "Terceira fase",
       "fourthRound": "Quarta fase",
       "fifthRound": "Quinta fase",
+      "roundOf32": "16 avos de final",
       "roundOf16": "Oitavas de final",
       "quarterFinals": "Quartas de final",
       "semiFinals": "Semifinais",
       "final": "Final"
     },
     "roundShort": {
+      "qualifyingRound": "EP",
       "firstRound": "F1",
       "secondRound": "F2",
       "thirdRound": "F3",
       "fourthRound": "F4",
       "fifthRound": "F5",
+      "roundOf32": "16A",
       "roundOf16": "OF",
       "quarterFinals": "QF",
       "semiFinals": "SF",
@@ -300,7 +304,9 @@
       "EL2": "L2",
       "nonLeague": "NL",
       "BSA": "A",
-      "BSB": "B"
+      "BSB": "B",
+      "PD": "1ª",
+      "SD": "2ª"
     },
     "basedOn": "Com base em {count} copas simuladas a partir dos resultados atuais, incluindo seus palpites nos confrontos reais.",
     "chancesNote": "As fases ainda não sorteadas são sorteadas de novo em cada simulação, então as chances incluem a sorte do sorteio.",
@@ -315,7 +321,8 @@
     "waitingRealDraw": "Aguardando o sorteio real: os clubes que entram nesta fase ainda não são conhecidos.",
     "ratingNote": {
       "FAC": "A força de cada clube vem do seu próprio campeonato nesta temporada (Premier League, Championship, League One ou League Two), ajustada pela divisão; clubes fora das ligas profissionais ficam abaixo da League Two.",
-      "CDB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Série A ou Série B), ajustada pela divisão; clubes da Série C, da Série D e dos estaduais ficam abaixo da Série B."
+      "CDB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Série A ou Série B), ajustada pela divisão; clubes da Série C, da Série D e dos estaduais ficam abaixo da Série B.",
+      "CDR": "A força de cada clube vem do seu próprio campeonato nesta temporada (La Liga ou Segunda División), ajustada pela divisão; clubes da Primera Federación para baixo ficam abaixo da Segunda."
     },
     "finalAfter": "Os vencedores das {round} se enfrentam aqui."
   }

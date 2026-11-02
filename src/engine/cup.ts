@@ -77,6 +77,26 @@ export interface CupBuildOptions {
   drawSalt: number;
   /** Placeholder kick-off per round (ISO date), for simulated draws. */
   roundDates: Partial<Record<CupRoundKey, string>>;
+  /** Each club's tier (0 = top division), for rounds where the lower-division club hosts. */
+  tiers?: Readonly<Record<TeamId, number>>;
+}
+
+/** Tier of every known club: its feeder league's position, else the cup's outsider tier. */
+export function clubTiers(config: CupConfig, divisions: Readonly<Record<TeamId, string>>, clubs: Iterable<TeamId>): Record<TeamId, number> {
+  const tiers: Record<TeamId, number> = {};
+  for (const id of clubs) {
+    const tier = config.feederLeagues.indexOf(divisions[id] as never);
+    tiers[id] = tier >= 0 ? tier : config.outsiderTier;
+  }
+  return tiers;
+}
+
+/** Draw order, unless the round is played at the lower-division club: then the lower club hosts. */
+export function hostFirst(config: CupRoundConfig, home: TeamId, away: TeamId, tiers: Readonly<Record<TeamId, number>> | undefined): [TeamId, TeamId] {
+  if (!config.lowerHosts || !tiers || config.legs === 2) return [home, away];
+  const th = tiers[home] ?? Infinity;
+  const ta = tiers[away] ?? Infinity;
+  return ta > th ? [away, home] : [home, away];
 }
 
 /** 32-bit string/number hash (FNV-1a), for deterministic draws. */
@@ -220,8 +240,9 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     }
     const remaining = participants.filter((id) => !placed.has(id));
     const pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt));
-    for (const [home, away] of pairs) {
+    for (const pair of pairs) {
       if (ties.length >= roundConfig.ties) break;
+      const [home, away] = hostFirst(roundConfig, pair[0], pair[1], options.tiers);
       ties.push(makeTie(r, ties.length, home, away, roundConfig, undefined, date));
     }
     rounds.push({

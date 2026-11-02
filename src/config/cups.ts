@@ -3,14 +3,16 @@ import type { CompetitionCode, FlagCode, SiteLocale } from "./leagues.ts";
 // Knockout cups. Unlike a league, a cup has no table: each round's pairings are
 // drawn, and clubs from several divisions (and outside the league system) meet.
 
-export type CupCode = "FAC" | "CDB";
+export type CupCode = "FAC" | "CDB" | "CDR";
 
 export type CupRoundKey =
+  | "qualifyingRound"
   | "firstRound"
   | "secondRound"
   | "thirdRound"
   | "fourthRound"
   | "fifthRound"
+  | "roundOf32"
   | "roundOf16"
   | "quarterFinals"
   | "semiFinals"
@@ -24,6 +26,13 @@ export interface CupRoundConfig {
   ties: number;
   /** Leagues whose clubs enter the competition in this round. */
   entrantsFrom?: readonly CompetitionCode[];
+  /**
+   * Only the clubs of `entrantsFrom` not already in the cup's real draw enter
+   * here (Copa del Rey: the four Supercopa clubs skip the early rounds).
+   */
+  entrantsNotYetIn?: boolean;
+  /** Single games are played at the lower-division club's ground (Copa del Rey). */
+  lowerHosts?: boolean;
   /** Two legs (home and away, aggregate, then penalties); one game by default. */
   legs?: 1 | 2;
   /** Played at a neutral ground (implied by `venue`). */
@@ -117,6 +126,37 @@ export const CUPS: readonly CupConfig[] = [
     outsiderTier: 2.5,
     tagOutsiders: false,
     title: "Copa do Brasil",
+  },
+  {
+    kind: "cup",
+    code: "CDR",
+    slug: "copa-del-rey",
+    name: "Copa del Rey",
+    country: "Spain",
+    flag: "es",
+    simulatorName: { en: "Copa del Rey Simulator", pt: "Simulador da Copa del Rey", es: "Simulador de la Copa del Rey" },
+    aka: { en: "Spanish Cup", pt: "Copa do Rei", es: "Copa del Rey" },
+    espn: { slug: "esp.copa_del_rey", seasons: "split" },
+    // 2026/27: a two-legged qualifying round, then single games at the
+    // lower-division club's ground (level: extra time and penalties); the four
+    // Supercopa clubs enter in the round of 32; two-legged semi-finals; final
+    // at La Cartuja, Seville. Clubs entering the qualifying and first rounds
+    // come from the real draw.
+    rounds: [
+      { key: "qualifyingRound", espnSlug: "qualifying-round", ties: 10, legs: 2 },
+      { key: "firstRound", espnSlug: "first-round", ties: 56, lowerHosts: true },
+      { key: "secondRound", espnSlug: "second-round", ties: 28, lowerHosts: true },
+      { key: "roundOf32", espnSlug: "round-of-32", ties: 16, lowerHosts: true, entrantsFrom: ["PD"], entrantsNotYetIn: true },
+      { key: "roundOf16", espnSlug: "round-of-16", ties: 8, lowerHosts: true },
+      { key: "quarterFinals", espnSlug: "quarterfinals", ties: 4, lowerHosts: true },
+      { key: "semiFinals", espnSlug: "semifinals", ties: 2, legs: 2 },
+      { key: "final", espnSlug: "final", ties: 1, neutral: true, venue: "La Cartuja" },
+    ],
+    feederLeagues: ["PD", "SD"],
+    // Primera Federación and below.
+    outsiderTier: 3,
+    tagOutsiders: false,
+    title: "Copa del Rey",
   },
 ];
 

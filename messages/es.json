@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Fútbol – Simula LaLiga, Premier League, Brasileirão y más",
-    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, la FA Cup y la Copa de Brasil. Clasificación en directo y probabilidades de título, Europa y descenso.",
+    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, la FA Cup, la Copa de Brasil y la Copa del Rey. Clasificación en directo y probabilidades de título, Europa y descenso.",
     "leagueTitle": "{simulator} {season} – Predice la Clasificación",
     "leagueDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Europa y descenso.",
     "leagueDescriptionPlayoffs": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira las clasificaciones de las conferencias en directo y las probabilidades de cada equipo de llegar a los playoffs.",
@@ -29,7 +29,7 @@
     "heading": "Simulador de Fútbol",
     "tagline": "Simula la temporada antes de que ocurra",
     "aboutTitle": "Un simulador de fútbol gratis para las mejores ligas",
-    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A y B, MLS, la FA Cup y la Copa de Brasil. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
+    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A y B, MLS, la FA Cup, la Copa de Brasil y la Copa del Rey. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
   },
   "Simulator": {
     "table": "Clasificación",
@@ -207,7 +207,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A y Série B, MLS, la FA Cup y la Copa de Brasil, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A y Série B, MLS, la FA Cup, la Copa de Brasil y la Copa del Rey, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",
@@ -258,22 +258,26 @@
     "simulateAll": "Simular hasta la final",
     "newDraw": "Nuevo sorteo",
     "round": {
+      "qualifyingRound": "Eliminatoria previa",
       "firstRound": "Primera ronda",
       "secondRound": "Segunda ronda",
       "thirdRound": "Tercera ronda",
       "fourthRound": "Cuarta ronda",
       "fifthRound": "Quinta ronda",
+      "roundOf32": "Dieciseisavos de final",
       "roundOf16": "Octavos de final",
       "quarterFinals": "Cuartos de final",
       "semiFinals": "Semifinales",
       "final": "Final"
     },
     "roundShort": {
+      "qualifyingRound": "EP",
       "firstRound": "R1",
       "secondRound": "R2",
       "thirdRound": "R3",
       "fourthRound": "R4",
       "fifthRound": "R5",
+      "roundOf32": "1/16",
       "roundOf16": "OF",
       "quarterFinals": "CF",
       "semiFinals": "SF",
@@ -300,7 +304,9 @@
       "EL2": "L2",
       "nonLeague": "NL",
       "BSA": "A",
-      "BSB": "B"
+      "BSB": "B",
+      "PD": "1ª",
+      "SD": "2ª"
     },
     "basedOn": "Basado en {count} copas simuladas a partir de los resultados actuales, incluidos tus pronósticos en los emparejamientos reales.",
     "chancesNote": "Las rondas aún no sorteadas se sortean de nuevo en cada simulación, así que las probabilidades incluyen la suerte del sorteo.",
@@ -315,7 +321,8 @@
     "waitingRealDraw": "Esperando el sorteo real: aún no se conocen los clubes que entran en esta ronda.",
     "ratingNote": {
       "FAC": "La fuerza de cada club sale de su propia liga esta temporada (Premier League, Championship, League One o League Two), ajustada por la división; los clubes de fuera de las ligas profesionales quedan por debajo de la League Two.",
-      "CDB": "La fuerza de cada club sale de su propia liga esta temporada (Série A o Série B), ajustada por la división; los clubes de la Série C, la Série D y los campeonatos estatales quedan por debajo de la Série B."
+      "CDB": "La fuerza de cada club sale de su propia liga esta temporada (Série A o Série B), ajustada por la división; los clubes de la Série C, la Série D y los campeonatos estatales quedan por debajo de la Série B.",
+      "CDR": "La fuerza de cada club sale de su propia liga esta temporada (LaLiga o Segunda División), ajustada por la división; los clubes de Primera Federación y categorías inferiores quedan por debajo de Segunda."
     },
     "finalAfter": "Aquí se enfrentan los ganadores de las {round}."
   }

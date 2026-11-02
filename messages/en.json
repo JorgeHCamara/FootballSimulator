@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Football Simulator – Simulate the Premier League, La Liga, Brasileirão and more",
-    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, the FA Cup and the Copa do Brasil. Live table plus title, Europe and relegation chances.",
+    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, the FA Cup, the Copa do Brasil and the Copa del Rey. Live table plus title, Europe and relegation chances.",
     "leagueTitle": "{simulator} {season} – Predict the Table",
     "leagueDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Europe and relegation chances.",
     "leagueDescriptionPlayoffs": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the conference tables update live and see every club's playoff chances.",
@@ -29,7 +29,7 @@
     "heading": "Football Simulator",
     "tagline": "Simulate the season before it happens",
     "aboutTitle": "A free football simulator for the top leagues",
-    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup and the Copa do Brasil. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
+    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil and the Copa del Rey. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
   },
   "Simulator": {
     "table": "Table",
@@ -207,7 +207,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup and the Copa do Brasil, with real fixtures and results for the current season."
+        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil and the Copa del Rey, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",
@@ -258,22 +258,26 @@
     "simulateAll": "Simulate to the final",
     "newDraw": "New draw",
     "round": {
+      "qualifyingRound": "Qualifying round",
       "firstRound": "First Round",
       "secondRound": "Second Round",
       "thirdRound": "Third Round",
       "fourthRound": "Fourth Round",
       "fifthRound": "Fifth Round",
+      "roundOf32": "Round of 32",
       "roundOf16": "Round of 16",
       "quarterFinals": "Quarter-finals",
       "semiFinals": "Semi-finals",
       "final": "Final"
     },
     "roundShort": {
+      "qualifyingRound": "QR",
       "firstRound": "R1",
       "secondRound": "R2",
       "thirdRound": "R3",
       "fourthRound": "R4",
       "fifthRound": "R5",
+      "roundOf32": "R32",
       "roundOf16": "R16",
       "quarterFinals": "QF",
       "semiFinals": "SF",
@@ -300,7 +304,9 @@
       "EL2": "L2",
       "nonLeague": "NL",
       "BSA": "A",
-      "BSB": "B"
+      "BSB": "B",
+      "PD": "1ª",
+      "SD": "2ª"
     },
     "basedOn": "Based on {count} simulated cups from the current results, including your predictions on real pairings.",
     "chancesNote": "Rounds not drawn yet are drawn afresh in every run, so the chances include the luck of the draw.",
@@ -315,7 +321,8 @@
     "waitingRealDraw": "Waiting for the real draw: the clubs entering this round aren't known yet.",
     "ratingNote": {
       "FAC": "Each club's strength comes from its own league this season (Premier League, Championship, League One or League Two), scaled by the division; non-league clubs are rated below League Two.",
-      "CDB": "Each club's strength comes from its own league this season (Série A or Série B), scaled by the division; clubs from Série C, Série D and the state leagues are rated below Série B."
+      "CDB": "Each club's strength comes from its own league this season (Série A or Série B), scaled by the division; clubs from Série C, Série D and the state leagues are rated below Série B.",
+      "CDR": "Each club's strength comes from its own league this season (La Liga or Segunda División), scaled by the division; clubs from Primera Federación and below are rated under Segunda."
     },
     "finalAfter": "The winners of the {round} meet here."
   }
