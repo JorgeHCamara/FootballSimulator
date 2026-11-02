@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Liga MX, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
@@ -16,7 +16,8 @@
     "continentalGroupsDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule a fase de grupos, veja as oito tabelas ao vivo e jogue o mata-mata até a final, com as chances de cada clube de chegar às oitavas e de ser campeão.",
     "leagueDescriptionAmericas": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela ao vivo e as chances de título, Libertadores e rebaixamento.",
     "zonesDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as duas zonas ao vivo e jogue os playoffs até a final, com as chances de cada clube de chegar aos playoffs e de ser campeão.",
-    "tournamentsDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule cada torneio do ano, jogue os playoffs quando houver e veja a tabela anual com as vagas na Libertadores e na Sul-Americana."
+    "tournamentsDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule cada torneio do ano, jogue os playoffs quando houver e veja a tabela anual com as vagas na Libertadores e na Sul-Americana.",
+    "liguillaDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela ao vivo e jogue a Liguilla até a final, com as chances de cada clube de chegar à Liguilla e de ser campeão."
   },
   "Nav": {
     "home": "Início",
@@ -38,7 +39,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Liga MX, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -209,7 +210,9 @@
     "introZones": "Use o {simulator} para prever o resto do {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: as tabelas das duas zonas são atualizadas na hora com os critérios oficiais. Os 8 primeiros de cada zona vão aos playoffs, cruzando as zonas (1º da Zona A x 8º da Zona B…) em jogos únicos até a final. Alterne entre o Apertura, o Clausura e a tabela anual, que define as vagas continentais e o rebaixamento.",
     "step3Zones": "Abra a aba Chances para ver as chances de cada clube de terminar em primeiro na zona, de chegar aos playoffs e de ser campeão.",
     "introTournaments": "Use o {simulator} para prever o resto do {league} {season} ({aka}). O ano tem vários torneios, cada um com sua tabela e seu campeão: alterne entre eles e a tabela anual, que soma todos e define as vagas na Libertadores e na Sul-Americana. Digite seus placares ou simule os jogos restantes, e as tabelas são atualizadas na hora.",
-    "step3Tournaments": "Abra a aba Chances para ver as chances de cada clube de ganhar o torneio e, na tabela anual, de ir à Libertadores e à Sul-Americana."
+    "step3Tournaments": "Abra a aba Chances para ver as chances de cada clube de ganhar o torneio e, na tabela anual, de ir à Libertadores e à Sul-Americana.",
+    "introLiguilla": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: a tabela é atualizada na hora com os critérios oficiais. Os 8 primeiros vão à Liguilla, disputada em ida e volta até a final.",
+    "step3Liguilla": "Abra a aba Chances para ver as chances de cada clube de terminar em primeiro, de chegar à Liguilla e de ser campeão."
   },
   "Faq": {
     "league": [
@@ -263,7 +266,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Liga MX, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -429,6 +432,28 @@
         "q": "O Foot Simu é grátis?",
         "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
       }
+    ],
+    "liguilla": [
+      {
+        "q": "Como funciona o {simulator}?",
+        "a": "Ele começa com a tabela e os jogos reais da {league} {season}. Digite o placar de qualquer jogo ou clique em Simular: cada resultado é sorteado a partir do ataque e da defesa de cada time nesta temporada, com mando de campo, e a tabela é atualizada na hora. Quando a fase regular termina, a Liguilla pode ser jogada até a final."
+      },
+      {
+        "q": "Como funciona a Liguilla?",
+        "a": "Os 8 primeiros se classificam. As quartas são 1º x 8º, 2º x 7º, 3º x 6º e 4º x 5º, e as semifinais são reordenadas: o mais bem colocado que restar enfrenta o pior. Todas as fases são em ida e volta, com o mais bem colocado decidindo em casa. Um empate no agregado classifica o mais bem colocado, exceto na final, que vai para a prorrogação e os pênaltis."
+      },
+      {
+        "q": "Como as chances são calculadas?",
+        "a": "A aba Chances joga o resto do torneio e a Liguilla 5.000 vezes a partir dos resultados atuais, incluindo seus palpites, e conta quantas vezes cada clube termina em cada posição e é campeão."
+      },
+      {
+        "q": "Meus palpites ficam salvos?",
+        "a": "Sim. Seus palpites ficam salvos no seu navegador, então continuam lá quando você voltar. Use Compartilhar para enviar um link que mostra exatamente a sua tabela."
+      },
+      {
+        "q": "O Foot Simu é grátis?",
+        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+      }
     ]
   },
   "Countries": {
@@ -447,7 +472,8 @@
     "Chile": "Chile",
     "Colombia": "Colômbia",
     "Uruguay": "Uruguai",
-    "Paraguay": "Paraguai"
+    "Paraguay": "Paraguai",
+    "Mexico": "México"
   },
   "Cup": {
     "fixtures": "Jogos",

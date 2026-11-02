@@ -29,7 +29,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -61,6 +61,11 @@ export interface EspnStages {
   knockout: readonly string[];
   /** Tournament name for the season label, e.g. "Clausura" ("Clausura 2026"). */
   name?: string;
+  /**
+   * Year shown with the name, from the season's starting year (a split season:
+   * Liga MX's "Apertura 2026" is +0, its "Clausura 2027" +1); the season label otherwise.
+   */
+  yearOffset?: number;
   /** This tournament's own format, when it differs from the league's (Uruguay's Intermedio). */
   gamesPerTeam?: number;
   zones?: readonly Zone[];
@@ -83,7 +88,7 @@ export interface LeagueGroup {
   name: Record<SiteLocale, string>;
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -911,6 +916,41 @@ export const LEAGUES: readonly LeagueConfig[] = [
         { kind: "libertadores", from: 1, to: 2 },
         { kind: "sudamericana", from: 3, to: 6 },
       ],
+    },
+  },
+  {
+    code: "MX",
+    slug: "liga-mx",
+    name: "Liga MX",
+    country: "Mexico",
+    flag: "mx",
+    simulatorName: { en: "Liga MX Simulator", pt: "Simulador da Liga MX", es: "Simulador de la Liga MX" },
+    aka: { en: "Mexican Liga MX", pt: "Campeonato Mexicano", es: "Liga BBVA MX" },
+    teams: 18,
+    // Two tournaments a season (Apertura from July, Clausura from January), one
+    // round robin of 17 games each; the top 8 go to the Liguilla. No relegation.
+    gamesPerTeam: 17,
+    espn: {
+      slug: "mex.1",
+      seasons: "split",
+      stages: [
+        { table: "torneo-clausura", knockout: ["clausura---quarterfinals", "clausura---semifinals", "clausura---finals"], name: "Clausura", yearOffset: 1 },
+        { table: "torneo-apertura", knockout: ["apertura---quarterfinals", "apertura---semifinals", "apertura---finals"], name: "Apertura", yearOffset: 0 },
+      ],
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "headToHeadPoints"],
+    zones: [{ kind: "titlePlayoffs", from: 1, to: 8 }],
+    // Liguilla: two legs, the better-placed club at home second. Quarter-finals
+    // 1v8, 2v7, 3v6, 4v5, then re-seeded semi-finals; level on aggregate, the
+    // better-placed club goes through, except in the final (extra time and penalties).
+    playoff: {
+      rounds: [
+        { key: "quarterFinals", legs: 2, levelTie: "betterPlaced", pairs: [[1, 8], [2, 7], [3, 6], [4, 5]] },
+        { key: "semiFinals", legs: 2, levelTie: "betterPlaced" },
+        { key: "final", legs: 2, levelTie: "penalties" },
+      ],
+      title: "Liga MX",
     },
   },
   {

@@ -768,6 +768,23 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Liga MX: 18 clubs, Liguilla with the better-placed club through on a level aggregate", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/liga-mx`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.equal(await rows.count(), 18);
+      const zones = await rows.evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.deepEqual([zones[0], zones[7], zones[8]], ["titlePlayoffs", "titlePlayoffs", ""]);
+      await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Play-off" });
+      const liguilla = p.locator('[data-testid="playoff"]');
+      assert.match(await liguilla.innerText(), /1st place × 8th place[\s\S]*goes through if the aggregate is level/);
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Liga MX/);
+      assert.equal(await p.locator('[data-testid="playoff-tie"]').count(), 4 + 2 + 1);
+      await p.close();
+    });
+
     await step("Chile: 16 clubs, Libertadores, Sudamericana and relegation zones", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/chile-primera-division`);
@@ -884,6 +901,7 @@ async function step(name, fn) {
       assert.deepEqual((await menu.locator("#menu-conmebol a").allInnerTexts()).map((x) => x.trim()), ["Copa Libertadores", "Copa Sudamericana"]);
       await menu.getByRole("button", { name: "North America" }).click();
       assert.deepEqual((await menu.locator("#menu-us a").allInnerTexts()).map((x) => x.trim()), ["MLS"]);
+      assert.deepEqual((await menu.locator("#menu-mx a").allInnerTexts()).map((x) => x.trim()), ["Liga MX"]);
       await desktop.close();
 
       const pt = await browser.newPage({ viewport: { width: 1280, height: 800 } });
@@ -904,7 +922,7 @@ async function step(name, fn) {
       await mobile.waitFor();
       assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America"]);
       const headings = (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "paraguay", "uruguay", "usa"]);
+      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "paraguay", "uruguay", "mexico", "usa"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();

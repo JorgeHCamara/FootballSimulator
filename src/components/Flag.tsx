@@ -127,6 +127,16 @@ function shapes(code: FlagCode) {
           <circle cx="15" cy="10" r="2.3" fill="none" stroke="#0038a8" strokeWidth="0.6" />
         </>
       );
+    case "mx":
+      // Simplified: the coat of arms as a brown disc.
+      return (
+        <>
+          <rect width="10" height="20" fill="#006847" />
+          <rect x="10" width="10" height="20" fill="#ffffff" />
+          <rect x="20" width="10" height="20" fill="#ce1126" />
+          <circle cx="15" cy="10" r="2.6" fill="#8c5a2b" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

@@ -59,7 +59,7 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
             <tr>
               <th className="py-2 pl-3 text-left">{t("team")}</th>
               <th className="px-2 text-right">{t("averagePoints")}</th>
-              {/* In a league of separate tables, 1st in a conference isn't the title. */}
+              {/* In a league of separate tables, or with a title play-off, 1st place isn't the title. */}
               {continental ? (
                 <>
                   <th className="px-2 text-right">{t("topChance", { count: top8!.to })}</th>
@@ -68,7 +68,7 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                   <th className="px-2 text-right">{t("winChance")}</th>
                 </>
               ) : (
-                <th className="px-2 text-right">{league.groups ? t("firstPlaceChance") : t("titleChance")}</th>
+                <th className="px-2 text-right">{league.groups || result.playoffWins ? t("firstPlaceChance") : t("titleChance")}</th>
               )}
               {playoffs && <th className="px-2 text-right">{t("playoffChance")}</th>}
               {libertadores && <th className="px-2 text-right">{tz("libertadores")}</th>}

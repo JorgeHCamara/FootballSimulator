@@ -175,7 +175,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
         tournaments.push({
           id: set.table,
           name: set.name ?? set.table,
-          season: set.name ? `${set.name} ${yearLabel}` : yearLabel,
+          season: set.name ? `${set.name} ${set.yearOffset !== undefined ? year + set.yearOffset : yearLabel}` : yearLabel,
           fixtures: set === stages && !set.gamesPerTeam ? fixtures : own,
           ...(playoff && parts.postseason.length ? { postseason: realPostseason(parts.postseason) } : {}),
           seasonKey: `${baseKey}:${set.table}`,
@@ -189,7 +189,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
         applyTeamOverrides(espnTeams(stages ? [...events, ...postseason, ...tournamentEvents] : events), { league: league.code }),
       ),
       fixtures,
-      season: stages?.name ? `${stages.name} ${yearLabel}` : yearLabel,
+      season: stages?.name ? `${stages.name} ${stages.yearOffset !== undefined ? year + stages.yearOffset : yearLabel}` : yearLabel,
       // Each tournament of a season (Apertura, Clausura) keeps its own predictions.
       seasonKey: `${baseKey}${stageSets.length > 1 && stages ? `:${stages.table}` : ""}`,
       source: "live",
