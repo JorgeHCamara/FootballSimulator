@@ -1,13 +1,15 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil e Copa del Rey. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil, Copa del Rey e Coppa Italia. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
     "ogTagline": "Palpites · Simulação da temporada · Chances de título e rebaixamento",
     "cupTitle": "{simulator} {season} – Preveja o sorteio e a final",
-    "cupDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule todas as fases, da primeira fase à final, com sorteio simulado para as fases ainda não sorteadas e as chances de cada clube de ganhar a copa."
+    "cupDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule todas as fases, da primeira fase à final, com sorteio simulado para as fases ainda não sorteadas e as chances de cada clube de ganhar a copa.",
+    "cupTitleBracket": "{simulator} {season} – Preveja a chave e a final",
+    "cupDescriptionBracket": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule todas as fases até a final pela chave fixa, e veja as chances de cada clube de ganhar a copa."
   },
   "Nav": {
     "home": "Início",
@@ -29,7 +31,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil e Copa del Rey. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey e Coppa Italia. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -153,7 +155,9 @@
     "introCup": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule cada fase: confronto empatado vai para os pênaltis, os vencedores entram no sorteio e as fases ainda não sorteadas ganham um sorteio simulado, substituído pelo real assim que for feito.",
     "step1Cup": "Escolha uma fase e digite o placar de cada jogo, ou use o dado para simulá-lo. Confronto empatado vai para os pênaltis.",
     "step2Cup": "Clique em Simular fase ou Simular até a final. A fase seguinte é sorteada entre os vencedores; Novo sorteio refaz um sorteio simulado.",
-    "step3Cup": "Abra a aba Chances para ver as chances de cada clube de chegar a cada fase e de ganhar a copa."
+    "step3Cup": "Abra a aba Chances para ver as chances de cada clube de chegar a cada fase e de ganhar a copa.",
+    "introCupBracket": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule cada fase: confronto empatado vai para os pênaltis, e os vencedores avançam pela chave fixa, sem sorteios.",
+    "step2CupBracket": "Clique em Simular fase ou Simular até a final. Os vencedores avançam pela chave fixa."
   },
   "Faq": {
     "league": [
@@ -207,7 +211,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil e Copa del Rey, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey e Coppa Italia, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -239,6 +243,28 @@
         "q": "O Foot Simu é grátis?",
         "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
       }
+    ],
+    "cupBracket": [
+      {
+        "q": "Como funciona o {simulator}?",
+        "a": "Ele começa com a chave e os resultados reais da {league} {season}. {ratingNote} Confronto empatado é decidido nos pênaltis."
+      },
+      {
+        "q": "Há sorteio?",
+        "a": "Não. A {league} é disputada numa chave fixa definida antes da temporada, então todos os confrontos das oitavas à final já são conhecidos: os vencedores de cada fase enfrentam os vencedores do confronto vizinho."
+      },
+      {
+        "q": "Como as chances são calculadas?",
+        "a": "A aba Chances joga o resto da copa 5.000 vezes a partir dos resultados atuais, seguindo a chave fixa, e conta quantas vezes cada clube chega a cada fase e ganha a copa."
+      },
+      {
+        "q": "Meus palpites ficam salvos?",
+        "a": "Sim. Seus palpites ficam salvos no navegador e continuam lá quando você voltar. Use Compartilhar para enviar um link que mostra exatamente o seu chaveamento."
+      },
+      {
+        "q": "O Foot Simu é grátis?",
+        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+      }
     ]
   },
   "Countries": {
@@ -258,6 +284,7 @@
     "simulateAll": "Simular até a final",
     "newDraw": "Novo sorteio",
     "round": {
+      "preliminaryRound": "Fase preliminar",
       "qualifyingRound": "Eliminatória prévia",
       "firstRound": "Primeira fase",
       "secondRound": "Segunda fase",
@@ -271,6 +298,7 @@
       "final": "Final"
     },
     "roundShort": {
+      "preliminaryRound": "FP",
       "qualifyingRound": "EP",
       "firstRound": "F1",
       "secondRound": "F2",
@@ -306,7 +334,9 @@
       "BSA": "A",
       "BSB": "B",
       "PD": "1ª",
-      "SD": "2ª"
+      "SD": "2ª",
+      "SA": "A",
+      "SB": "B"
     },
     "basedOn": "Com base em {count} copas simuladas a partir dos resultados atuais, incluindo seus palpites nos confrontos reais.",
     "chancesNote": "As fases ainda não sorteadas são sorteadas de novo em cada simulação, então as chances incluem a sorte do sorteio.",
@@ -322,8 +352,14 @@
     "ratingNote": {
       "FAC": "A força de cada clube vem do seu próprio campeonato nesta temporada (Premier League, Championship, League One ou League Two), ajustada pela divisão; clubes fora das ligas profissionais ficam abaixo da League Two.",
       "CDB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Série A ou Série B), ajustada pela divisão; clubes da Série C, da Série D e dos estaduais ficam abaixo da Série B.",
-      "CDR": "A força de cada clube vem do seu próprio campeonato nesta temporada (La Liga ou Segunda División), ajustada pela divisão; clubes da Primera Federación para baixo ficam abaixo da Segunda."
+      "CDR": "A força de cada clube vem do seu próprio campeonato nesta temporada (La Liga ou Segunda División), ajustada pela divisão; clubes da Primera Federación para baixo ficam abaixo da Segunda.",
+      "CIT": "A força de cada clube vem do seu próprio campeonato nesta temporada (Serie A ou Serie B), ajustada pela divisão; clubes da Serie C ficam abaixo da Serie B. Não há sorteio: a Coppa Italia segue uma chave fixa."
     },
-    "finalAfter": "Os vencedores das {round} se enfrentam aqui."
+    "finalAfter": "Os vencedores das {round} se enfrentam aqui.",
+    "bracketAfter": "Chave fixa, sem sorteio: os vencedores se enfrentam assim.",
+    "versus": "x",
+    "bracketWinnerOf": "Vencedor da {round} {n}",
+    "chancesNoteBracket": "Não há sorteio: cada simulação segue a chave fixa.",
+    "bracketStatus": "Chave fixa"
   }
 }

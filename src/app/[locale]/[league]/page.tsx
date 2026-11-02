@@ -32,22 +32,27 @@ function seoValues(competition: CompetitionConfig, locale: string, season: strin
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
 /** Which set of texts a page uses: league, play-off league, or cup. */
-type Wording = "league" | "playoffs" | "cup";
+type Wording = "league" | "playoffs" | "cup" | "cupBracket";
 
-type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" };
+type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
 async function load(slug: string): Promise<Loaded | undefined> {
   const competition = getCompetitionBySlug(slug);
   if (!competition) return undefined;
-  if (competition.kind === "cup") return { kind: "cup", config: competition.cup, data: await getCupData(competition.cup), wording: "cup" };
+  if (competition.kind === "cup") {
+    // A fixed bracket (Coppa Italia) has no draws to talk about.
+    const wording = competition.cup.rounds.some((r) => r.bracket) ? "cupBracket" : "cup";
+    return { kind: "cup", config: competition.cup, data: await getCupData(competition.cup), wording };
+  }
   const { league } = competition;
   return { kind: "league", config: league, data: await getLeagueData(league), wording: playoffWording(league) ? "playoffs" : "league" };
 }
 
-const META_KEYS: Record<Wording, { title: "leagueTitle" | "cupTitle"; description: "leagueDescription" | "leagueDescriptionPlayoffs" | "cupDescription" }> = {
+const META_KEYS: Record<Wording, { title: "leagueTitle" | "cupTitle" | "cupTitleBracket"; description: "leagueDescription" | "leagueDescriptionPlayoffs" | "cupDescription" | "cupDescriptionBracket" }> = {
   league: { title: "leagueTitle", description: "leagueDescription" },
   playoffs: { title: "leagueTitle", description: "leagueDescriptionPlayoffs" },
   cup: { title: "cupTitle", description: "cupDescription" },
+  cupBracket: { title: "cupTitleBracket", description: "cupDescriptionBracket" },
 };
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
@@ -89,16 +94,22 @@ export default async function LeaguePage({ params }: { params: Params }) {
   ]);
   const { config, data, wording } = loaded;
   const values = seoValues(config, locale, data.season);
-  const faqKey = wording === "cup" ? "cup" : wording === "playoffs" ? "leaguePlayoffs" : "league";
+  const faqKey = wording === "cup" || wording === "cupBracket" ? wording : wording === "playoffs" ? "leaguePlayoffs" : "league";
   // Cups: the FAQ explains where this cup's ratings come from.
   const cupT = await getTranslations("Cup");
   const faqValues = loaded.kind === "cup" ? { ...values, ratingNote: cupT(`ratingNote.${loaded.config.code}`) } : values;
   const faq = (faqT.raw(faqKey) as FaqItem[]).map((item) => ({ q: fill(item.q, faqValues), a: fill(item.a, faqValues) }));
   const pageUrl = `${SITE_URL}/${locale}/${config.slug}`;
   const lang = locale as SiteLocale;
-  const intro = wording === "cup" ? "introCup" : wording === "playoffs" ? "introPlayoffs" : "intro";
+  const intro = wording === "cupBracket" ? "introCupBracket" : wording === "cup" ? "introCup" : wording === "playoffs" ? "introPlayoffs" : "intro";
   const stepKey = (step: "step1" | "step2" | "step3") =>
-    wording === "cup" ? (`${step}Cup` as const) : step === "step3" && wording === "playoffs" ? "step3Playoffs" : step;
+    wording === "cupBracket" && step === "step2"
+      ? "step2CupBracket"
+      : wording === "cup" || wording === "cupBracket"
+        ? (`${step}Cup` as const)
+        : step === "step3" && wording === "playoffs"
+          ? "step3Playoffs"
+          : step;
 
   return (
     <div className="space-y-4" data-source={data.source}>

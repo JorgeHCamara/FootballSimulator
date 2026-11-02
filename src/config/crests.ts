@@ -11,6 +11,8 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   2589: "/crests/2589.png", // Stafford Rangers
   3748: "/crests/3748.png", // Pontevedra
   3835: "/crests/3835.png", // Xerez
+  4002: "/crests/4002.png", // Potenza
+  4347: "/crests/4347.png", // Ravenna
   4475: "/crests/4475.png", // Conquense
   4489: "/crests/4489.png", // Oxford City
   5401: "/crests/5401.png", // Real Jaen CF
@@ -111,6 +113,7 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   131686: "/crests/131686.png", // SC Penedense
   131687: "/crests/131687.png", // Porto Vitória FC
   131708: "/crests/131708.png", // Barra FC
+  131836: "/crests/131836.png", // Union Brescia
   132144: "/crests/132144.png", // Salisbury FC
   132350: "/crests/132350.png", // Berkhamsted
   132415: "/crests/132415.png", // AFC Rushden & Diamonds

@@ -297,7 +297,7 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="promoted-contender"]').innerText(), /plays Ligue 1's 16th over two legs/);
       // Header: the second divisions sit under their country, top division first.
       const menu = p.locator('[data-testid="league-menu"]');
-      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga"]], ["Italy", "it", ["Serie A", "Serie B"]], ["France", "fr", ["Ligue 1", "Ligue 2"]]]) {
+      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga"]], ["Italy", "it", ["Serie A", "Serie B", "Coppa Italia"]], ["France", "fr", ["Ligue 1", "Ligue 2"]]]) {
         await menu.getByRole("button", { name: country }).click();
         await menu.locator(`#menu-${flag}`).waitFor();
         assert.deepEqual((await menu.locator(`#menu-${flag} a`).allInnerTexts()).map((x) => x.trim()), leagues, country);
@@ -509,6 +509,49 @@ async function step(name, fn) {
       const menu = p.locator('[data-testid="league-menu"]');
       await menu.getByRole("button", { name: "Spain" }).click();
       assert.deepEqual((await menu.locator("#menu-es a").allInnerTexts()).map((x) => x.trim()), ["La Liga", "Segunda División", "Copa del Rey"]);
+      await p.close();
+    });
+
+    await step("Coppa Italia: fixed bracket from the round of 16, two-legged semis, Olimpico final", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/coppa-italia`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["Preliminary round", "First Round", "Second Round", "Round of 16", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 4, "4 preliminary-round ties");
+      // Up to the round of 16, then the quarter-finals list the fixed pairings before anyone's through.
+      for (let i = 0; i < 3; i++) await p.getByRole("button", { name: "Simulate round" }).click();
+      await bar.nth(3).click();
+      assert.equal(await ties.count(), 8);
+      await bar.nth(4).click();
+      const pairings = (i) => p.locator('[data-testid="bracket-round"]').nth(i).locator('[data-testid="bracket-pairings"] li').allInnerTexts();
+      assert.equal((await pairings(0)).length, 4, "fixed quarter-final pairings listed");
+      assert.equal((await pairings(1)).length, 2, "semi-finals: each side's four clubs");
+      assert.equal((await pairings(1))[0].split(" / ").length, 7, "4 + 4 clubs, joined by 'v'");
+      assert.deepEqual(await pairings(2), ["Winner of SF 1 v Winner of SF 2"]);
+      assert.match((await bar.nth(4).innerText()), /Fixed bracket/);
+      // The bracket: quarter-final i is between the winners of round-of-16 ties 2i and 2i+1, no draw.
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      await bar.nth(3).click();
+      const r16Winners = await ties.evaluateAll((els) => els.map((e) => e.dataset.winner));
+      await bar.nth(6).click();
+      const column = (i) => p.locator('[data-testid="bracket-round"]').nth(i).locator('[data-testid="cup-tie"]').evaluateAll((els) => els.map((e) => ({ home: e.dataset.home, away: e.dataset.away, winner: e.dataset.winner, legs: e.dataset.legs })));
+      const [qf, sf, fin] = [await column(0), await column(1), await column(2)];
+      assert.deepEqual(qf.flatMap((t) => [t.home, t.away]), r16Winners, "quarter-finals follow the bracket");
+      assert.deepEqual(sf.flatMap((t) => [t.home, t.away]), qf.map((t) => t.winner), "semi-finals follow the bracket");
+      assert.deepEqual([fin[0].home, fin[0].away], sf.map((t) => t.winner));
+      assert.deepEqual([...qf, ...sf, ...fin].map((t) => t.legs), ["1", "1", "1", "1", "2", "2", "1"]);
+      assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Stadio Olimpico/);
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Coppa Italia \d{4}\/\d{2} winner/);
+      assert.ok(!(await p.locator('[data-testid="simulated-draw-note"]').isVisible()), "no draw in a fixed bracket");
+      // Italy's menu: Serie A, Serie B, Coppa Italia.
+      const menu = p.locator('[data-testid="league-menu"]');
+      await menu.getByRole("button", { name: "Italy" }).click();
+      assert.deepEqual((await menu.locator("#menu-it a").allInnerTexts()).map((x) => x.trim()), ["Serie A", "Serie B", "Coppa Italia"]);
       await p.close();
     });
 

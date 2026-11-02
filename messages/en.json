@@ -1,13 +1,15 @@
 {
   "Metadata": {
     "homeTitle": "Football Simulator – Simulate the Premier League, La Liga, Brasileirão and more",
-    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, the FA Cup, the Copa do Brasil and the Copa del Rey. Live table plus title, Europe and relegation chances.",
+    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey and the Coppa Italia. Live table plus title, Europe and relegation chances.",
     "leagueTitle": "{simulator} {season} – Predict the Table",
     "leagueDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Europe and relegation chances.",
     "leagueDescriptionPlayoffs": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the conference tables update live and see every club's playoff chances.",
     "ogTagline": "Predict the table · Simulate the season · Title and relegation chances",
     "cupTitle": "{simulator} {season} – Predict the Draw and the Final",
-    "cupDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate every round, from the first round to the final, with a simulated draw for the rounds not yet drawn and each club's chance of winning the cup."
+    "cupDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate every round, from the first round to the final, with a simulated draw for the rounds not yet drawn and each club's chance of winning the cup.",
+    "cupTitleBracket": "{simulator} {season} – Predict the Bracket and the Final",
+    "cupDescriptionBracket": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate every round to the final along the fixed bracket, and see each club's chance of winning the cup."
   },
   "Nav": {
     "home": "Home",
@@ -29,7 +31,7 @@
     "heading": "Football Simulator",
     "tagline": "Simulate the season before it happens",
     "aboutTitle": "A free football simulator for the top leagues",
-    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil and the Copa del Rey. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
+    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey and the Coppa Italia. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
   },
   "Simulator": {
     "table": "Table",
@@ -153,7 +155,9 @@
     "introCup": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate each round: a tie that ends level goes to penalties, the winners go into the hat, and the rounds not yet drawn get a simulated draw that the real one replaces when it is made.",
     "step1Cup": "Choose a round and type a score for each game, or use the dice to simulate it. A tie that ends level goes to penalties.",
     "step2Cup": "Press Simulate round or Simulate to the final. The next round is drawn from the winners; New draw reshuffles a simulated draw.",
-    "step3Cup": "Open the Chances tab to see every club's chance of reaching each round and of winning the cup."
+    "step3Cup": "Open the Chances tab to see every club's chance of reaching each round and of winning the cup.",
+    "introCupBracket": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate each round: a tie that ends level goes to penalties, and the winners move on along the fixed bracket, with no draws.",
+    "step2CupBracket": "Press Simulate round or Simulate to the final. The winners move on along the fixed bracket."
   },
   "Faq": {
     "league": [
@@ -207,7 +211,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil and the Copa del Rey, with real fixtures and results for the current season."
+        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey and the Coppa Italia, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",
@@ -239,6 +243,28 @@
         "q": "Is Foot Simu free?",
         "a": "Yes. Foot Simu is completely free and you don't need an account."
       }
+    ],
+    "cupBracket": [
+      {
+        "q": "How does the {simulator} work?",
+        "a": "It starts from the real {league} {season} bracket and results. {ratingNote} A tie that ends level is decided on penalties."
+      },
+      {
+        "q": "Is there a draw?",
+        "a": "No. The {league} is played on a fixed bracket set before the season, so every pairing from the round of 16 to the final is known in advance: each round's winners meet the winners of the neighbouring tie."
+      },
+      {
+        "q": "How are the chances calculated?",
+        "a": "The Chances tab plays the rest of the cup 5,000 times from the current results along the fixed bracket, and counts how often each club reaches each round and wins the cup."
+      },
+      {
+        "q": "Are my predictions saved?",
+        "a": "Yes. Your predictions are saved in your browser, so they are still there when you come back. Use Share to send a link that shows exactly your bracket."
+      },
+      {
+        "q": "Is Foot Simu free?",
+        "a": "Yes. Foot Simu is completely free and you don't need an account."
+      }
     ]
   },
   "Countries": {
@@ -258,6 +284,7 @@
     "simulateAll": "Simulate to the final",
     "newDraw": "New draw",
     "round": {
+      "preliminaryRound": "Preliminary round",
       "qualifyingRound": "Qualifying round",
       "firstRound": "First Round",
       "secondRound": "Second Round",
@@ -271,6 +298,7 @@
       "final": "Final"
     },
     "roundShort": {
+      "preliminaryRound": "PR",
       "qualifyingRound": "QR",
       "firstRound": "R1",
       "secondRound": "R2",
@@ -306,7 +334,9 @@
       "BSA": "A",
       "BSB": "B",
       "PD": "1ª",
-      "SD": "2ª"
+      "SD": "2ª",
+      "SA": "A",
+      "SB": "B"
     },
     "basedOn": "Based on {count} simulated cups from the current results, including your predictions on real pairings.",
     "chancesNote": "Rounds not drawn yet are drawn afresh in every run, so the chances include the luck of the draw.",
@@ -322,8 +352,14 @@
     "ratingNote": {
       "FAC": "Each club's strength comes from its own league this season (Premier League, Championship, League One or League Two), scaled by the division; non-league clubs are rated below League Two.",
       "CDB": "Each club's strength comes from its own league this season (Série A or Série B), scaled by the division; clubs from Série C, Série D and the state leagues are rated below Série B.",
-      "CDR": "Each club's strength comes from its own league this season (La Liga or Segunda División), scaled by the division; clubs from Primera Federación and below are rated under Segunda."
+      "CDR": "Each club's strength comes from its own league this season (La Liga or Segunda División), scaled by the division; clubs from Primera Federación and below are rated under Segunda.",
+      "CIT": "Each club's strength comes from its own league this season (Serie A or Serie B), scaled by the division; Serie C clubs are rated below Serie B. There is no draw: the Coppa Italia follows a fixed bracket."
     },
-    "finalAfter": "The winners of the {round} meet here."
+    "finalAfter": "The winners of the {round} meet here.",
+    "bracketAfter": "Fixed bracket, no draw: the winners meet like this.",
+    "versus": "v",
+    "bracketWinnerOf": "Winner of {round} {n}",
+    "chancesNoteBracket": "There is no draw: every run follows the fixed bracket.",
+    "bracketStatus": "Fixed bracket"
   }
 }

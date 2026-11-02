@@ -4,7 +4,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import type { CupConfig } from "../config/cups.ts";
 import type { CompetitionCode } from "../config/leagues.ts";
 import { LEAGUES } from "../config/leagues.ts";
-import { needsShootout, tieAggregate, tieWinner, type CupRound, type CupTie } from "../engine/cup.ts";
+import { bracketSides, needsShootout, tieAggregate, tieWinner, type CupRound, type CupTie } from "../engine/cup.ts";
 import { useEffect, useState } from "react";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { CupBracket } from "./CupBracket.tsx";
@@ -156,11 +156,12 @@ export function CupRounds(props: RoundsProps) {
   const t = useTranslations("Cup");
   const format = useFormatter();
   const round = rounds[roundIndex]!;
-  const bracketFrom = rounds.findIndex((r) => r.config.ties <= 4);
+  // The closing rounds (quarter-finals on), not an early round that happens to be small (Coppa Italia's preliminary round).
+  const bracketFrom = rounds.findIndex((_, i) => rounds.slice(i).every((r) => r.config.ties <= 4));
   const decided = (r: CupRound) => r.ties.filter((tie) => tieWinner(tie, predictions) !== null).length;
 
   const status = (r: CupRound) => {
-    if (r.drawn === "pending") return t("drawPending");
+    if (r.drawn === "pending") return t(r.config.bracket ? "bracketStatus" : "drawPending");
     const done = decided(r);
     if (done === r.config.ties) return t("roundComplete");
     return r.drawn === "simulated" ? t("simulatedDraw") : `${done}/${r.config.ties}`;
@@ -207,7 +208,7 @@ export function CupRounds(props: RoundsProps) {
       {bracketFrom >= 0 && roundIndex >= bracketFrom ? (
         <CupBracket {...props} rounds={rounds.slice(bracketFrom)} fullRounds={rounds} highlight={roundIndex - bracketFrom} />
       ) : round.drawn === "pending" && round.ties.length === 0 ? (
-        <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} />
+        <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} teams={props.teams} />
       ) : (
         <div className="space-y-3">
           {/* Equal rows: every card in the round is as tall as the tallest (e.g. one with penalties). */}
@@ -216,7 +217,7 @@ export function CupRounds(props: RoundsProps) {
               <TieCard key={tie.game.id} tie={tie} {...props} />
             ))}
           </div>
-          {round.drawn === "pending" && <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} />}
+          {round.drawn === "pending" && <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} teams={props.teams} />}
         </div>
       )}
     </div>
@@ -224,9 +225,28 @@ export function CupRounds(props: RoundsProps) {
 }
 
 /** A round whose draw hasn't been made: who it waits for and how many clubs go in the hat. */
-export function PendingRound({ cup, round, rounds, predictions }: { cup: CupConfig; round: CupRound; rounds: CupRound[]; predictions: ResultMap }) {
+export function PendingRound({ cup, round, rounds, predictions, teams }: { cup: CupConfig; round: CupRound; rounds: CupRound[]; predictions: ResultMap; teams: Map<TeamId, Team> }) {
   const t = useTranslations("Cup");
   const previous = rounds[round.index - 1];
+  // Fixed bracket (Coppa Italia): the pairings are already known, only the clubs aren't.
+  const sides = previous ? bracketSides(cup, rounds, round.index, predictions) : null;
+  if (sides && previous) {
+    const name = (id: TeamId) => teams.get(id)?.shortName ?? teams.get(id)?.name ?? "?";
+    // Up to four clubs per side by name; more (a final far ahead) reads as "winner of semi-final 1".
+    const side = (ids: TeamId[], i: number) => (ids.length <= 4 ? ids.map(name).join(" / ") : t("bracketWinnerOf", { round: t(`roundShort.${previous.config.key}`), n: i + 1 }));
+    return (
+      <div className="rounded-xl border border-dashed border-zinc-300 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700" data-testid="pending-round">
+        <p className="text-center font-semibold text-zinc-700 dark:text-zinc-300">{t("bracketAfter")}</p>
+        <ul className="mt-3 space-y-2" data-testid="bracket-pairings">
+          {sides.map(([a, b], i) => (
+            <li key={i} className="rounded-lg bg-zinc-100 px-3 py-2 text-center text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+              {side(a, 2 * i)} <span className="text-zinc-400">{t("versus")}</span> {side(b, 2 * i + 1)}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
   const entrants = cup.rounds[round.index]!.entrantsFrom;
   const count = round.config.ties * 2;
   // The previous round is decided but its draw can't be made here: clubs

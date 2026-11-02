@@ -1,5 +1,5 @@
 import type { CupConfig } from "../config/cups.ts";
-import { cupGameId, cupSecondLegId, cupShootoutId, drawRoundRandom, hostFirst, iterationRng, type CupBuildOptions, type RealCupTie } from "./cup.ts";
+import { bracketBase, bracketLines, bracketPairs, cupGameId, cupSecondLegId, cupShootoutId, drawRoundRandom, hostFirst, iterationRng, type CupBuildOptions, type RealCupTie } from "./cup.ts";
 import { cupModelFor } from "./cupModel.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateScore } from "./match.ts";
 import { simulatePenalties } from "./playoffs.ts";
@@ -83,8 +83,10 @@ export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult
     (reached[id] ??= new Array<number>(roundCount).fill(0))[r]!++;
   };
 
+  const base = bracketBase(config);
   for (let i = 0; i < iterations; i++) {
     const rng = iterationRng(input.seed, i);
+    let lines: Map<TeamId, number> | null = null;
     let previous: TeamId[] = [];
     for (let r = 0; r < roundCount; r++) {
       const round = config.rounds[r]!;
@@ -107,12 +109,21 @@ export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult
           pens: fixed[cupShootoutId(r, slot)] ?? t.legs[ids.length - 1]?.penalties ?? null,
         };
       });
-      for (const pair of drawRoundRandom(participants.filter((id) => !placed.has(id)), rng)) {
+      const remaining = participants.filter((id) => !placed.has(id));
+      let pairs: [TeamId, TeamId][];
+      if (round.bracket && lines) {
+        const fixed = bracketPairs(remaining, lines, r - base);
+        pairs = [...fixed.pairs, ...drawRoundRandom(fixed.rest, rng)];
+      } else {
+        pairs = drawRoundRandom(remaining, rng);
+      }
+      for (const pair of pairs) {
         if (specs.length >= round.ties) break;
         const [home, away] = hostFirst(round, pair[0], pair[1], options.tiers);
         specs.push({ first: home, second: away, legs: twoLegs ? [null, null] : [null], hosts: twoLegs ? [home, away] : [home], pens: null });
       }
       if (specs.length < round.ties) break;
+      if (r === base) lines = bracketLines(config, specs.map((spec) => ({ homeId: spec.first, awayId: spec.second })));
       previous = specs.map((spec) => playTie(spec, model, neutral, rng));
       if (r === roundCount - 1) won[previous[0]!] = (won[previous[0]!] ?? 0) + 1;
     }

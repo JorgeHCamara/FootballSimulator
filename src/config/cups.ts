@@ -3,9 +3,10 @@ import type { CompetitionCode, FlagCode, SiteLocale } from "./leagues.ts";
 // Knockout cups. Unlike a league, a cup has no table: each round's pairings are
 // drawn, and clubs from several divisions (and outside the league system) meet.
 
-export type CupCode = "FAC" | "CDB" | "CDR";
+export type CupCode = "FAC" | "CDB" | "CDR" | "CIT";
 
 export type CupRoundKey =
+  | "preliminaryRound"
   | "qualifyingRound"
   | "firstRound"
   | "secondRound"
@@ -39,6 +40,11 @@ export interface CupRoundConfig {
   neutral?: boolean;
   /** The neutral ground's name, e.g. "Wembley". */
   venue?: string;
+  /**
+   * Fixed bracket instead of a draw (Coppa Italia): the round's ties pair the
+   * clubs from neighbouring slots of the bracket (see `CupConfig.bracketOrder`).
+   */
+  bracket?: boolean;
 }
 
 export interface CupConfig {
@@ -65,6 +71,12 @@ export interface CupConfig {
   tagOutsiders: boolean;
   /** What the winner is champion of, for the champion box. */
   title: string;
+  /**
+   * Fixed bracket order of the round before the first `bracket` round: the
+   * home club (feed team id) of each of its ties, top to bottom. Without it,
+   * or when the clubs don't match (another season), the slot order is used.
+   */
+  bracketOrder?: readonly number[];
 }
 
 export const CUPS: readonly CupConfig[] = [
@@ -157,6 +169,38 @@ export const CUPS: readonly CupConfig[] = [
     outsiderTier: 3,
     tagOutsiders: false,
     title: "Copa del Rey",
+  },
+  {
+    kind: "cup",
+    code: "CIT",
+    slug: "coppa-italia",
+    name: "Coppa Italia",
+    country: "Italy",
+    flag: "it",
+    simulatorName: { en: "Coppa Italia Simulator", pt: "Simulador da Coppa Italia", es: "Simulador de la Coppa Italia" },
+    aka: { en: "Italian Cup", pt: "Copa da Itália", es: "Copa de Italia" },
+    espn: { slug: "ita.coppa_italia", seasons: "split" },
+    // 2026/27: 44 clubs (Serie A, Serie B and four Serie C clubs) in a fixed,
+    // seeded bracket with no draws. Single games (the seeded club at home;
+    // level: extra time and penalties), the top eight Serie A clubs enter in
+    // the round of 16, two-legged semi-finals, final at the Stadio Olimpico.
+    rounds: [
+      { key: "preliminaryRound", espnSlug: "preliminary-round", ties: 4 },
+      { key: "firstRound", espnSlug: "first-round", ties: 16 },
+      { key: "secondRound", espnSlug: "second-round", ties: 8 },
+      { key: "roundOf16", espnSlug: "round-of-16", ties: 8, entrantsFrom: ["SA"], entrantsNotYetIn: true },
+      { key: "quarterFinals", espnSlug: "quarterfinals", ties: 4, bracket: true },
+      { key: "semiFinals", espnSlug: "semifinals", ties: 2, legs: 2, bracket: true },
+      { key: "final", espnSlug: "final", ties: 1, neutral: true, venue: "Stadio Olimpico", bracket: true },
+    ],
+    // 2026/27 bracket, round of 16 top to bottom: Inter, Bologna | Milan, Como
+    // (semi-final 1); Roma, Juventus | Napoli, Atalanta (semi-final 2).
+    bracketOrder: [110, 107, 103, 2572, 104, 111, 114, 105],
+    feederLeagues: ["SA", "SB"],
+    // Serie C clubs.
+    outsiderTier: 2.5,
+    tagOutsiders: false,
+    title: "Coppa Italia",
   },
 ];
 

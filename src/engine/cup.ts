@@ -137,6 +137,82 @@ export function drawRoundRandom(clubs: readonly TeamId[], rng: Rng): [TeamId, Te
   return pairs;
 }
 
+/** Index of the round before the first fixed-bracket round, or -1 without a bracket. */
+export function bracketBase(config: CupConfig): number {
+  const first = config.rounds.findIndex((r) => r.bracket);
+  return first > 0 ? first - 1 : -1;
+}
+
+/**
+ * Each club's line in a fixed bracket: the slot of its tie in the base round,
+ * in `config.bracketOrder` when that names every tie, else in slot order.
+ */
+export function bracketLines(config: CupConfig, base: readonly { homeId: TeamId; awayId: TeamId }[]): Map<TeamId, number> {
+  const order = config.bracketOrder ?? [];
+  const positions = base.map((tie) => {
+    const i = order.indexOf(tie.homeId);
+    return i >= 0 ? i : order.indexOf(tie.awayId);
+  });
+  const useOrder = positions.every((p) => p >= 0) && new Set(positions).size === positions.length;
+  const lines = new Map<TeamId, number>();
+  base.forEach((tie, i) => {
+    const line = useOrder ? positions[i]! : i;
+    lines.set(tie.homeId, line);
+    lines.set(tie.awayId, line);
+  });
+  return lines;
+}
+
+/**
+ * Pairs the clubs of a bracket round `depth` rounds after the base: two clubs
+ * meet when their lines fall in the same block of 2^depth. Pairs come in
+ * bracket order, the club from the upper line first (at home); clubs without
+ * a partner (or a line) are returned in `rest`.
+ */
+export function bracketPairs(clubs: readonly TeamId[], lines: ReadonlyMap<TeamId, number>, depth: number): { pairs: [TeamId, TeamId][]; rest: TeamId[] } {
+  const blocks = new Map<number, TeamId[]>();
+  const rest: TeamId[] = [];
+  for (const id of clubs) {
+    const line = lines.get(id);
+    if (line === undefined) rest.push(id);
+    else blocks.set(line >> depth, [...(blocks.get(line >> depth) ?? []), id]);
+  }
+  const pairs: [TeamId, TeamId][] = [];
+  for (const block of [...blocks.keys()].sort((a, b) => a - b)) {
+    const ids = blocks.get(block)!.sort((a, b) => lines.get(a)! - lines.get(b)!);
+    if (ids.length === 2) pairs.push([ids[0]!, ids[1]!]);
+    else rest.push(...ids);
+  }
+  return { pairs, rest };
+}
+
+/**
+ * For a fixed-bracket round that can't be built yet: the clubs who can reach
+ * each side of each of its ties, in bracket order. They come from the latest
+ * round with all its ties known (the winner only, where a tie is decided).
+ * Null when the round isn't a bracket round.
+ */
+export function bracketSides(config: CupConfig, rounds: readonly CupRound[], r: number, results: ResultMap): [TeamId[], TeamId[]][] | null {
+  const base = bracketBase(config);
+  if (base < 0 || r <= base || !config.rounds[r]?.bracket || !rounds[base]) return null;
+  let k = r - 1;
+  while (k > base && rounds[k]!.ties.length < config.rounds[k]!.ties) k--;
+  if (rounds[k]!.ties.length < config.rounds[k]!.ties) return null;
+  const lines = bracketLines(config, rounds[base]!.ties);
+  const depth = r - base;
+  const sides = Array.from({ length: config.rounds[r]!.ties }, (): [TeamId[], TeamId[]] => [[], []]);
+  for (const tie of rounds[k]!.ties) {
+    const winner = tieWinner(tie, results);
+    for (const id of winner === null ? [tie.homeId, tie.awayId] : [winner]) {
+      const line = lines.get(id);
+      if (line === undefined) continue;
+      sides[line >> depth]?.[(line >> (depth - 1)) & 1]?.push(id);
+    }
+  }
+  for (const side of sides.flat()) side.sort((a, b) => lines.get(a)! - lines.get(b)!);
+  return sides;
+}
+
 const scoreOf = (fixture: Fixture, results: ResultMap): Score | null => results[fixture.id] ?? fixture.result;
 
 /** Goals per club over every leg, or null while a leg has no score. */
@@ -239,7 +315,15 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
       return;
     }
     const remaining = participants.filter((id) => !placed.has(id));
-    const pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt));
+    let pairs: [TeamId, TeamId][];
+    if (roundConfig.bracket && bracketBase(config) >= 0) {
+      // Fixed bracket: neighbouring slots meet, no draw.
+      const base = bracketBase(config);
+      const fixed = bracketPairs(remaining, bracketLines(config, rounds[base]!.ties), r - base);
+      pairs = [...fixed.pairs, ...drawRound(fixed.rest, hashSeed(config.code, r, options.drawSalt))];
+    } else {
+      pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt));
+    }
     for (const pair of pairs) {
       if (ties.length >= roundConfig.ties) break;
       const [home, away] = hostFirst(roundConfig, pair[0], pair[1], options.tiers);
@@ -248,7 +332,7 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     rounds.push({
       index: r,
       config: roundConfig,
-      drawn: complete ? "real" : roundConfig.ties === 1 ? "determined" : "simulated",
+      drawn: complete ? "real" : roundConfig.ties === 1 || roundConfig.bracket ? "determined" : "simulated",
       ties,
       participants,
     });

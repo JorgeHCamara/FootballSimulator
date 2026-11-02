@@ -50,7 +50,7 @@ export function CupChances({ cup, input, teams, divisions, alive, fromRound }: P
   return (
     <section className="rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" data-testid="cup-chances">
       <p className="border-b border-zinc-100 px-3 py-2 text-xs text-zinc-500 dark:border-zinc-800">
-        {t("basedOn", { count: format.number(result.iterations) })} {t("chancesNote")}
+        {t("basedOn", { count: format.number(result.iterations) })} {t(cup.rounds.slice(fromRound + 1).every((r) => r.bracket) ? "chancesNoteBracket" : "chancesNote")}
       </p>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">

@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-02T02:18:38.034Z",
+ "generated": "2026-11-02T12:53:21.432Z",
  "clubs": [
   {
    "espnId": 4489,
@@ -3198,6 +3198,72 @@
      "location": "Salamanca, Spain",
      "league": "Spanish Segunda Federación Group 5",
      "badge": "https://r2.thesportsdb.com/images/media/team/badge/ea70171579897018.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 4002,
+   "name": "Potenza",
+   "shortName": "Potenza",
+   "country": "Italy",
+   "competitions": [
+    "CIT"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137257",
+   "candidates": [
+    {
+     "idTeam": "137257",
+     "team": "Potenza",
+     "location": "Potenza, Italy",
+     "league": "Italian Serie C Girone C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3137o21657633124.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131836,
+   "name": "Union Brescia",
+   "shortName": "Union Brescia",
+   "country": "Italy",
+   "competitions": [
+    "CIT"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152839",
+   "candidates": [
+    {
+     "idTeam": "152839",
+     "team": "Union Brescia",
+     "location": "Brescia, Lombardy, Italy",
+     "league": "Italian Serie C Girone A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fsmg861754609859.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 4347,
+   "name": "Ravenna",
+   "shortName": "Ravenna",
+   "country": "Italy",
+   "competitions": [
+    "CIT"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "133880",
+   "candidates": [
+    {
+     "idTeam": "133880",
+     "team": "Ravenna",
+     "location": "Ravenna, Italy",
+     "league": "Italian Serie C Girone B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/l80c6j1724118398.png",
      "score": 1
     }
    ]

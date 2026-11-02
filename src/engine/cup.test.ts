@@ -3,6 +3,9 @@ import { describe, it } from "node:test";
 import { CUPS } from "../config/cups.ts";
 import { groupLegs } from "../lib/cupData.ts";
 import {
+  bracketSides,
+  bracketLines,
+  bracketPairs,
   buildCup,
   clubsAlive,
   cupGameId,
@@ -378,5 +381,91 @@ describe("Copa del Rey (lower-division club hosts, Supercopa clubs enter in the 
     assert.equal(r32.ties.length, 16);
     assert.equal(new Set(r32.ties.flatMap((t) => [t.homeId, t.awayId])).size, 32);
     for (const tie of r32.ties) assert.ok(tiers[tie.homeId]! >= tiers[tie.awayId]!, `lower club hosts: ${tie.homeId} v ${tie.awayId}`);
+  });
+});
+
+describe("Coppa Italia (fixed bracket, no draws)", () => {
+  const cit = CUPS.find((c) => c.code === "CIT")!;
+  // The 2026/27 round of 16, in ESPN's (fixture id) order, home clubs winning.
+  const r16Pairs: [TeamId, TeamId][] = [
+    [110, 3263], // Inter–Genoa
+    [2572, 4050], // Como–Cremonese
+    [111, 3997], // Juventus–Sassuolo
+    [107, 2923], // Bologna–Palermo
+    [114, 109], // Napoli–Fiorentina
+    [104, 119], // Roma–Verona
+    [103, 4007], // Milan–Monza
+    [105, 118], // Atalanta–Udinese
+  ];
+  const r16: RealCupTie[] = r16Pairs.map(([h, a], t) => ({ round: "roundOf16", homeId: h, awayId: a, legs: [fixture(700_000 + t, h, a)] }));
+  // Results go by slot: the round of 16 is round 0 of `late`.
+  const won: ResultMap = Object.fromEntries(r16.map((_, t) => [cupGameId(0, t), { home: 1, away: 0 }]));
+  const build = (results: ResultMap) => buildCup(cit, r16, results, { entrants: {}, drawSalt: 0, roundDates: {} });
+  // Only the round of 16 onwards, so it starts the cup.
+  const late = { ...cit, rounds: cit.rounds.slice(3) };
+  const buildLate = (results: ResultMap, salt = 0) => buildCup(late, r16, results, { entrants: {}, drawSalt: salt, roundDates: {} });
+
+  it("has the 2026/27 rounds: two-legged semi-finals, final at the Olimpico", () => {
+    assert.deepEqual(cit.rounds.map((r) => r.ties), [4, 16, 8, 8, 4, 2, 1]);
+    assert.deepEqual(cit.rounds.map((r) => r.legs ?? 1), [1, 1, 1, 1, 1, 2, 1]);
+    assert.deepEqual(cit.rounds.map((r) => Boolean(r.bracket)), [false, false, false, false, true, true, true]);
+    assert.equal(cit.rounds.at(-1)!.venue, "Stadio Olimpico");
+    assert.ok(build({})[0]!.drawn === "pending");
+  });
+
+  it("pairs neighbouring lines, upper line at home", () => {
+    const lines = new Map([[1, 0], [2, 1], [3, 2], [4, 3]]);
+    assert.deepEqual(bracketPairs([4, 2, 3, 1], lines, 1), { pairs: [[1, 2], [3, 4]], rest: [] });
+    assert.deepEqual(bracketPairs([4, 1], lines, 2), { pairs: [[1, 4]], rest: [] });
+    assert.deepEqual(bracketPairs([4, 3, 9], lines, 1), { pairs: [[3, 4]], rest: [9] });
+  });
+
+  it("uses the official bracket order when it names every tie, else slot order", () => {
+    const lines = bracketLines(cit, r16);
+    assert.equal(lines.get(110), 0);
+    assert.equal(lines.get(3263), 0);
+    assert.equal(lines.get(107), 1, "Bologna next to Inter");
+    assert.equal(lines.get(105), 7);
+    const other = bracketLines(cit, [{ homeId: 1, awayId: 2 }, { homeId: 3, awayId: 4 }]);
+    assert.deepEqual([...other.values()], [0, 0, 1, 1]);
+  });
+
+  it("sets the quarter-finals and semi-finals by the bracket, the same with any draw salt", () => {
+    const rounds = buildLate(won);
+    const qf = rounds[1]!;
+    assert.equal(qf.drawn, "determined");
+    assert.deepEqual(qf.ties.map((t) => [t.homeId, t.awayId]), [[110, 107], [103, 2572], [104, 111], [114, 105]]);
+    assert.deepEqual(buildLate(won, 5)[1]!.ties.map((t) => t.homeId), qf.ties.map((t) => t.homeId));
+    const semis = buildLate({ ...won, ...homeWins(qf.ties) })[2]!;
+    assert.deepEqual(semis.ties.map((t) => [t.homeId, t.awayId]), [[110, 103], [104, 114]]);
+    assert.equal(semis.ties[0]!.legs.length, 2);
+    // Upsets keep the bracket: Bologna beats Inter, Monza beats Milan.
+    const qfUpsets = { ...won, [qf.ties[0]!.game.id]: { home: 0, away: 1 } };
+    const r16Upset = { ...qfUpsets, [cupGameId(0, 6)]: { home: 0, away: 2 } };
+    const qf2 = buildLate(r16Upset)[1]!;
+    assert.deepEqual(qf2.ties[1]!.homeId, 4007, "Monza takes Milan's line");
+  });
+
+  it("names who can reach each side of a pending bracket round", () => {
+    const open = buildLate({});
+    assert.equal(open[1]!.drawn, "pending");
+    assert.deepEqual(bracketSides(late, open, 1, {}), [[[110, 3263], [107, 2923]], [[103, 4007], [2572, 4050]], [[104, 119], [111, 3997]], [[114, 109], [105, 118]]]);
+    // Semi-final 1 before the quarter-finals: Inter's quarter v Milan's; a decided tie leaves only its winner.
+    const interOut = { [cupGameId(0, 0)]: { home: 0, away: 1 } };
+    assert.deepEqual(bracketSides(late, buildLate(interOut), 2, interOut)![0], [[3263, 107, 2923], [103, 4007, 2572, 4050]]);
+    assert.equal(bracketSides(late, open, 3, {})![0]![0]!.length, 8);
+    assert.equal(bracketSides(faCup, buildCup(faCup, realFirstRound, {}, options), 5, {}), null);
+  });
+
+  it("only ever meets Inter and Milan in the semi-final, never earlier", () => {
+    const strengths = Object.fromEntries(r16Pairs.flat().map((id) => [id, { attack: 1, defence: 1 }]));
+    const mc = runCupMonteCarlo({ config: late, real: r16, fixed: {}, strengths, options: { entrants: {} }, iterations: 400, seed: 3 });
+    assert.equal(Object.values(mc.won).reduce((a, b) => a + b, 0), 400);
+    for (const id of r16Pairs.flat()) assert.equal(mc.reached[id]![0], 400);
+    const qfClubs = r16Pairs.flat().reduce((sum, id) => sum + mc.reached[id]![1]!, 0);
+    assert.equal(qfClubs, 400 * 8);
+    // Inter's side (lines 0-3) supplies exactly one finalist per run.
+    const top = [110, 3263, 107, 2923, 103, 4007, 2572, 4050].reduce((sum, id) => sum + mc.reached[id]![3]!, 0);
+    assert.equal(top, 400);
   });
 });

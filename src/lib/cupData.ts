@@ -122,11 +122,18 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
     // The season's own board carries the round calendar.
     const calendar = boards.find((b) => b.leagues?.[0]?.season?.year === year)?.leagues?.[0]?.calendar?.[0]?.entries ?? [];
     const roundDates: Partial<Record<CupRoundKey, string>> = {};
-    for (const round of cup.rounds) {
+    cup.rounds.forEach((round, r) => {
+      // Scheduled games (even with clubs still "TBD") carry the real kick-off;
+      // otherwise a few days into the round's calendar window.
+      const kickoffs = byRound[r]!.map((e) => e.date).filter((d) => !Number.isNaN(Date.parse(d))).sort();
+      if (kickoffs[0]) {
+        roundDates[round.key] = new Date(kickoffs[0]).toISOString();
+        return;
+      }
       const slug = (label: string) => label.toLowerCase().replace(/^rd of/, "round of").replace(/\s+/g, "-");
       const entry = calendar.find((c) => slug(c.label) === round.espnSlug);
       if (entry) roundDates[round.key] = new Date(Date.parse(entry.startDate) + 5 * 86_400_000).toISOString();
-    }
+    });
 
     const feeders = await loadFeeders(cup);
     const entrants: Partial<Record<CupRoundKey, TeamId[]>> = {};
