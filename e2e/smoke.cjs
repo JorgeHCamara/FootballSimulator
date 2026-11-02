@@ -238,7 +238,7 @@ async function step(name, fn) {
       }
       await p.goto(`${BASE_URL}/pt`);
       const menu = p.locator('[data-testid="league-menu"]');
-      await menu.getByRole("button", { name: "Brasil" }).click();
+      await menu.getByRole("button", { name: "América do Sul" }).click();
       assert.deepEqual((await menu.locator("#menu-br a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B", "Copa do Brasil"]);
       await p.close();
     });
@@ -298,7 +298,8 @@ async function step(name, fn) {
       // Header: the second divisions sit under their country, top division first.
       const menu = p.locator('[data-testid="league-menu"]');
       for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]], ["Italy", "it", ["Serie A", "Serie B", "Coppa Italia"]], ["France", "fr", ["Ligue 1", "Ligue 2"]]]) {
-        await menu.getByRole("button", { name: country }).click();
+        // Countries sit in the Europe panel.
+        await menu.getByRole("button", { name: "Europe" }).click();
         await menu.locator(`#menu-${flag}`).waitFor();
         assert.deepEqual((await menu.locator(`#menu-${flag} a`).allInnerTexts()).map((x) => x.trim()), leagues, country);
         await p.keyboard.press("Escape");
@@ -507,7 +508,7 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /La Cartuja/);
       // Spain's menu: La Liga, Segunda División, Copa del Rey.
       const menu = p.locator('[data-testid="league-menu"]');
-      await menu.getByRole("button", { name: "Spain" }).click();
+      await menu.getByRole("button", { name: "Europe" }).click();
       assert.deepEqual((await menu.locator("#menu-es a").allInnerTexts()).map((x) => x.trim()), ["La Liga", "Segunda División", "Copa del Rey"]);
       await p.close();
     });
@@ -550,7 +551,7 @@ async function step(name, fn) {
       assert.ok(!(await p.locator('[data-testid="simulated-draw-note"]').isVisible()), "no draw in a fixed bracket");
       // Italy's menu: Serie A, Serie B, Coppa Italia.
       const menu = p.locator('[data-testid="league-menu"]');
-      await menu.getByRole("button", { name: "Italy" }).click();
+      await menu.getByRole("button", { name: "Europe" }).click();
       assert.deepEqual((await menu.locator("#menu-it a").allInnerTexts()).map((x) => x.trim()), ["Serie A", "Serie B", "Coppa Italia"]);
       await p.close();
     });
@@ -576,8 +577,52 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Olympiastadion Berlin/);
       assert.match(await p.locator('[data-testid="champion"]').innerText(), /DFB-Pokal \d{4}\/\d{2} winner/);
       const menu = p.locator('[data-testid="league-menu"]');
-      await menu.getByRole("button", { name: "Germany" }).click();
+      await menu.getByRole("button", { name: "Europe" }).click();
       assert.deepEqual((await menu.locator("#menu-de a").allInnerTexts()).map((x) => x.trim()), ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]);
+      await p.close();
+    });
+
+    await step("Champions League: 36-club league phase, knockout phase to the final, win chances", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/champions-league`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.equal(await rows.count(), 36);
+      const zones = await rows.evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.deepEqual([zones[0], zones[7], zones[8], zones[23], zones[24], zones[35]], ["knockoutRoundOf16", "knockoutRoundOf16", "knockoutPlayoff", "knockoutPlayoff", "eliminated", "eliminated"]);
+      const select = p.locator('[data-testid="matchday-select"]');
+      const options = await select.locator("option").allInnerTexts();
+      assert.equal(options.length, 9, "8 matchdays and the knockout phase");
+      assert.equal(options.at(-1), "Knockout phase");
+      assert.equal(await p.locator('[data-testid="fixtures"] [data-testid="match-row"]').count(), 18, "18 games a matchday");
+      // Before the league phase ends: projected pairings by position.
+      await select.selectOption({ label: "Knockout phase" });
+      const rounds = p.locator('[data-testid="playoff-round"]');
+      assert.equal(await rounds.count(), 1, "one knockout round at a time");
+      assert.match(await rounds.first().innerText(), /9th place[\s\S]*24th place/);
+      // Simulate the league phase and the whole knockout phase.
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Champions League/);
+      await p.locator('[data-testid="knockout-draw-note"]').waitFor();
+      assert.match(await p.locator('[data-testid="playoff"]').innerText(), /Metropolitano/);
+      // One round at a time: the final is shown once everything is decided; each tab has its ties.
+      const tabs = p.locator('[data-testid="knockout-rounds"] button');
+      assert.deepEqual(await tabs.allInnerTexts(), ["Play-off", "Round of 16", "QF", "SF", "Final"]);
+      const perRound = [];
+      for (let i = 0; i < 5; i++) {
+        await tabs.nth(i).click();
+        perRound.push(await p.locator('[data-testid="playoff-tie"]').count());
+      }
+      assert.deepEqual(perRound, [8, 8, 4, 2, 1]);
+      // Chances: top 8, top 24, final and win columns; win chances add up to about 100%.
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="win-chance"]').first().waitFor({ timeout: 90000 });
+      const wins = await p.locator('[data-testid="win-chance"]').allInnerTexts();
+      assert.equal(wins.length, 36);
+      const total = wins.reduce((n, x) => n + (x === "–" ? 0 : x.startsWith("<") ? 0.05 : parseFloat(x)), 0);
+      assert.ok(total > 90 && total < 110, `win chances sum to ${total}%`);
       await p.close();
     });
 
@@ -656,45 +701,57 @@ async function step(name, fn) {
       await p.close();
     });
 
-    await step("header menu: countries A–Z with league submenus, no scrollbar", async () => {
+    await step("header menu: continents with country columns, UEFA first, no scrollbar", async () => {
       const desktop = await browser.newPage({ viewport: { width: 1280, height: 800 } });
       await desktop.goto(`${BASE_URL}/en`);
       const menu = desktop.locator('[data-testid="league-menu"]');
-      const countries = (await menu.locator(":scope > li > button").allInnerTexts()).map((x) => x.trim());
-      assert.deepEqual(countries, ["Brazil", "England", "France", "Germany", "Italy", "Netherlands", "Portugal", "Spain", "USA"]);
+      const continents = (await menu.locator(":scope > li > button").allInnerTexts()).map((x) => x.trim());
+      assert.deepEqual(continents, ["Europe", "South America", "North America"]);
       const overflow = await menu.evaluate((el) => el.scrollWidth - el.clientWidth);
       assert.equal(overflow, 0, "no horizontal scroll in the menu");
 
-      await menu.getByRole("button", { name: "England" }).hover();
+      await menu.getByRole("button", { name: "Europe" }).hover();
+      const panel = menu.locator('[data-testid="menu-panel"]');
+      await panel.waitFor();
+      const columns = (await panel.locator("p").allInnerTexts()).map((x) => x.trim().toLowerCase());
+      assert.deepEqual(columns, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain"]);
+      assert.deepEqual((await menu.locator("#menu-eu a").allInnerTexts()).map((x) => x.trim()), ["Champions League", "Europa League", "Conference League"]);
       const england = menu.locator("#menu-gb-eng");
-      await england.waitFor();
       assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship", "League One", "League Two", "FA Cup"]);
+      // The wide panel stays inside the window.
+      const box = await panel.boundingBox();
+      assert.ok(box.x >= 0 && box.x + box.width <= 1280, `panel within the viewport: ${box.x}–${box.x + box.width}`);
       await england.getByRole("link", { name: "Championship" }).click();
       await desktop.waitForURL(/\/en\/championship$/);
+      await menu.getByRole("button", { name: "North America" }).click();
+      assert.deepEqual((await menu.locator("#menu-us a").allInnerTexts()).map((x) => x.trim()), ["MLS"]);
       await desktop.close();
 
       const pt = await browser.newPage({ viewport: { width: 1280, height: 800 } });
       await pt.goto(`${BASE_URL}/pt`);
-      const ptCountries = (await pt.locator('[data-testid="league-menu"] > li > button').allInnerTexts()).map((x) => x.trim());
-      assert.equal(ptCountries[0], "Alemanha");
-      assert.equal(ptCountries.at(-1), "Portugal");
+      const ptMenu = pt.locator('[data-testid="league-menu"]');
+      assert.deepEqual((await ptMenu.locator(":scope > li > button").allInnerTexts()).map((x) => x.trim()), ["Europa", "América do Sul", "América do Norte"]);
+      await ptMenu.getByRole("button", { name: "Europa" }).click();
+      const ptColumns = (await ptMenu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase());
+      assert.deepEqual(ptColumns.slice(0, 2), ["uefa", "alemanha"]);
       await pt.close();
 
       const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })).newPage();
       await phone.goto(`${BASE_URL}/en`);
-      assert.equal(await phone.locator('[data-testid="league-menu"]').isVisible(), false, "country bar hidden on phones");
+      assert.equal(await phone.locator('[data-testid="league-menu"]').isVisible(), false, "continent bar hidden on phones");
       const burger = phone.locator('[data-testid="mobile-menu-button"]');
       await burger.tap();
-      const panel = phone.locator('[data-testid="mobile-menu"]');
-      await panel.waitFor();
-      const headings = (await panel.locator(":scope > ul > li > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["brazil", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "usa"]);
+      const mobile = phone.locator('[data-testid="mobile-menu"]');
+      await mobile.waitFor();
+      assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America"]);
+      const headings = (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
+      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "brazil", "usa"]);
       await phone.keyboard.press("Escape");
-      await panel.waitFor({ state: "detached" });
+      await mobile.waitFor({ state: "detached" });
       await burger.tap();
-      await panel.getByRole("link", { name: "Brasileirão Série B" }).tap();
+      await mobile.getByRole("link", { name: "Brasileirão Série B" }).tap();
       await phone.waitForURL(/\/en\/brasileirao-serie-b$/);
-      await panel.waitFor({ state: "detached" });
+      await mobile.waitFor({ state: "detached" });
       assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, "no horizontal page scroll");
       await phone.context().close();
     });

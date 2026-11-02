@@ -3,19 +3,18 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Link, usePathname } from "../i18n/navigation.ts";
-import { Flag } from "./Flag.tsx";
-import { useCountryGroups } from "./LeagueMenu.tsx";
+import { CountryColumn, useContinentGroups } from "./LeagueMenu.tsx";
 
 /**
  * Phones and small tablets: a ☰ button beside the logo opens a panel with every
- * country and its leagues, so any league is one tap away. Closes on the button,
+ * continent, its countries and their leagues, so any competition is one tap away. Closes on the button,
  * Esc, a tap outside or choosing a league.
  */
 export function MobileMenu() {
-  const t = useTranslations("Countries");
+  const tc = useTranslations("Continents");
   const nav = useTranslations("Nav");
   const pathname = usePathname();
-  const groups = useCountryGroups();
+  const groups = useContinentGroups();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -57,33 +56,20 @@ export function MobileMenu() {
           className="absolute inset-x-0 top-full z-40 max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-white/10 bg-white text-zinc-900 shadow-xl dark:bg-zinc-900 dark:text-zinc-100"
           data-testid="mobile-menu"
         >
-          <ul className="mx-auto grid max-w-6xl gap-x-4 px-4 py-2 sm:grid-cols-2">
+          <div className="mx-auto max-w-6xl px-4 py-2">
             {groups.map((group) => (
-              <li key={group.country} className="border-b border-zinc-100 py-2 last:border-b-0 dark:border-zinc-800 sm:border-b-0">
-                <p className="flex items-center gap-2 px-2 pb-1 text-xs font-bold uppercase tracking-wide text-zinc-500">
-                  <Flag code={group.flag} width={18} />
-                  {t(group.country)}
-                </p>
-                <ul>
-                  {group.leagues.map((league) => {
-                    const current = pathname === `/${league.slug}`;
-                    return (
-                      <li key={league.code}>
-                        <Link
-                          href={`/${league.slug}`}
-                          aria-current={current ? "page" : undefined}
-                          onClick={() => setOpen(false)}
-                          className={`block rounded-lg px-2 py-2 text-base hover:bg-pitch-50 dark:hover:bg-pitch-900/40 ${current ? "bg-pitch-50 font-semibold text-pitch-700 dark:bg-pitch-900/40 dark:text-pitch-100" : ""}`}
-                        >
-                          {league.name}
-                        </Link>
-                      </li>
-                    );
-                  })}
+              <section key={group.continent} className="border-b border-zinc-100 py-2 last:border-b-0 dark:border-zinc-800" data-testid="mobile-continent">
+                <h2 className="px-2 pb-1 text-sm font-extrabold text-zinc-800 dark:text-zinc-100">{tc(group.continent)}</h2>
+                <ul className="grid gap-x-4 gap-y-2 sm:grid-cols-2">
+                  {group.countries.map((country) => (
+                    <li key={country.country}>
+                      <CountryColumn group={country} onPick={() => setOpen(false)} large />
+                    </li>
+                  ))}
                 </ul>
-              </li>
+              </section>
             ))}
-          </ul>
+          </div>
         </nav>
       )}
     </div>

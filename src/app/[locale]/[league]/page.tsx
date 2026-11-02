@@ -12,6 +12,7 @@ import type { LeagueConfig, SiteLocale } from "../../../config/leagues.ts";
 import { Link } from "../../../i18n/navigation.ts";
 import { routing } from "../../../i18n/routing.ts";
 import { getCupData, type CupData } from "../../../lib/cupData.ts";
+import { getContinentalPriors } from "../../../lib/continental.ts";
 import { getLeagueData, type LeagueData } from "../../../lib/leagueData.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd, fill, type FaqItem } from "../../../lib/site.ts";
 
@@ -31,8 +32,8 @@ function seoValues(competition: CompetitionConfig, locale: string, season: strin
 /** Leagues decided by playoffs rather than relegation and European places (MLS) get their own wording. */
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
-/** Which set of texts a page uses: league, play-off league, or cup. */
-type Wording = "league" | "playoffs" | "cup" | "cupBracket";
+/** Which set of texts a page uses: league, play-off league, continental competition, or cup. */
+type Wording = "league" | "playoffs" | "continental" | "cup" | "cupBracket";
 
 type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
@@ -45,11 +46,19 @@ async function load(slug: string): Promise<Loaded | undefined> {
     return { kind: "cup", config: competition.cup, data: await getCupData(competition.cup), wording };
   }
   const { league } = competition;
-  return { kind: "league", config: league, data: await getLeagueData(league), wording: playoffWording(league) ? "playoffs" : "league" };
+  const wording = league.continental ? "continental" : playoffWording(league) ? "playoffs" : "league";
+  return { kind: "league", config: league, data: await getLeagueData(league), wording };
 }
 
-const META_KEYS: Record<Wording, { title: "leagueTitle" | "cupTitle" | "cupTitleBracket"; description: "leagueDescription" | "leagueDescriptionPlayoffs" | "cupDescription" | "cupDescriptionBracket" }> = {
+const META_KEYS: Record<
+  Wording,
+  {
+    title: "leagueTitle" | "continentalTitle" | "cupTitle" | "cupTitleBracket";
+    description: "leagueDescription" | "leagueDescriptionPlayoffs" | "continentalDescription" | "cupDescription" | "cupDescriptionBracket";
+  }
+> = {
   league: { title: "leagueTitle", description: "leagueDescription" },
+  continental: { title: "continentalTitle", description: "continentalDescription" },
   playoffs: { title: "leagueTitle", description: "leagueDescriptionPlayoffs" },
   cup: { title: "cupTitle", description: "cupDescription" },
   cupBracket: { title: "cupTitleBracket", description: "cupDescriptionBracket" },
@@ -94,14 +103,25 @@ export default async function LeaguePage({ params }: { params: Params }) {
   ]);
   const { config, data, wording } = loaded;
   const values = seoValues(config, locale, data.season);
-  const faqKey = wording === "cup" || wording === "cupBracket" ? wording : wording === "playoffs" ? "leaguePlayoffs" : "league";
+  const faqKey = wording === "cup" || wording === "cupBracket" || wording === "continental" ? wording : wording === "playoffs" ? "leaguePlayoffs" : "league";
   // Cups: the FAQ explains where this cup's ratings come from.
   const cupT = await getTranslations("Cup");
   const faqValues = loaded.kind === "cup" ? { ...values, ratingNote: cupT(`ratingNote.${loaded.config.code}`) } : values;
   const faq = (faqT.raw(faqKey) as FaqItem[]).map((item) => ({ q: fill(item.q, faqValues), a: fill(item.a, faqValues) }));
   const pageUrl = `${SITE_URL}/${locale}/${config.slug}`;
   const lang = locale as SiteLocale;
-  const intro = wording === "cupBracket" ? "introCupBracket" : wording === "cup" ? "introCup" : wording === "playoffs" ? "introPlayoffs" : "intro";
+  const intro =
+    wording === "cupBracket"
+      ? "introCupBracket"
+      : wording === "cup"
+        ? "introCup"
+        : wording === "continental"
+          ? "introContinental"
+          : wording === "playoffs"
+            ? "introPlayoffs"
+            : "intro";
+  // Continental competitions: ratings start from each club's domestic league.
+  const priorStrengths = loaded.kind === "league" && loaded.config.continental ? await getContinentalPriors(loaded.config, loaded.data.teams.map((t) => t.id)) : undefined;
   const stepKey = (step: "step1" | "step2" | "step3") =>
     wording === "cupBracket" && step === "step2"
       ? "step2CupBracket"
@@ -109,7 +129,9 @@ export default async function LeaguePage({ params }: { params: Params }) {
         ? (`${step}Cup` as const)
         : step === "step3" && wording === "playoffs"
           ? "step3Playoffs"
-          : step;
+          : step === "step3" && wording === "continental"
+            ? "step3Continental"
+            : step;
 
   return (
     <div className="space-y-4" data-source={data.source}>
@@ -169,6 +191,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           season={loaded.data.season}
           {...(loaded.data.postseason ? { postseason: loaded.data.postseason } : {})}
           {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
+          {...(priorStrengths ? { priorStrengths } : {})}
         />
       )}
 
@@ -179,7 +202,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
             {(["step1", "step2", "step3"] as const).map((step, i) => (
               <li key={step} className="flex gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pitch-600 text-xs font-bold text-white">{i + 1}</span>
-                <span className="pt-0.5">{seo(stepKey(step))}</span>
+                <span className="pt-0.5">{seo(stepKey(step), values)}</span>
               </li>
             ))}
           </ol>

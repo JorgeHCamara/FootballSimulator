@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
-import { buildLeagueModel } from "../engine/ratings.ts";
+import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
 import { buildBracket, isShootoutId, needsShootout, playoffCancelled, playoffIds, seriesGames, simulatePenalties, simulatePlayoff, tieIds } from "../engine/playoffs.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
@@ -31,6 +31,8 @@ interface Props {
   postseason?: Fixture[];
   /** Clubs of each separate table (MLS conferences), matching `league.groups`. */
   groups?: { id: string; teamIds: number[] }[];
+  /** Starting ratings (continental competitions: from each club's domestic league). */
+  priorStrengths?: Record<number, TeamStrength>;
 }
 
 type Tab = "table" | "chances";
@@ -44,7 +46,7 @@ function nextSeasonLabel(season: string): string {
   return "";
 }
 
-export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason, groups }: Props) {
+export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason, groups, priorStrengths }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const [hydrated, setHydrated] = useState(false);
@@ -70,7 +72,11 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
   const teamMap = useMemo(() => new Map(teams.map((tm) => [tm.id, tm])), [teams]);
   const real = useMemo(() => realResults(fixtures), [fixtures]);
   // Ratings come from real results only: predictions shouldn't change how good a team is.
-  const model = useMemo(() => buildLeagueModel(teams, fixtures, real), [teams, fixtures, real]);
+  const model = useMemo(
+    () =>
+      buildLeagueModel(teams, fixtures, real, priorStrengths ? { priorStrengths: new Map(Object.entries(priorStrengths).map(([id, st]) => [Number(id), st])) } : {}),
+    [teams, fixtures, real, priorStrengths],
+  );
   const standingsOptions = useMemo(() => ({ tiebreakers: league.tiebreakers }), [league.tiebreakers]);
 
   const effective = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
@@ -282,12 +288,15 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             fixed: effective,
             model,
             standings: standingsOptions,
-            iterations: ITERATIONS,
+            // The knockout phase makes each continental run several times slower, so half as many (as for cups).
+            iterations: league.continental ? ITERATIONS / 2 : ITERATIONS,
             seed: 2026,
             ...(groupTabs.length ? { groups: groupTabs.map((g) => g.teamIds) } : {}),
+            // Continental competitions: the chance of winning it takes the knockout phase too.
+            ...(league.continental && playoff ? { playoff: { config: playoff, options: bracketOptions } } : {}),
           }
         : null,
-    [tab, hydrated, teams, fixtures, effective, model, standingsOptions, groupTabs],
+    [tab, hydrated, teams, fixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions],
   );
 
   const actionButton =
@@ -414,6 +423,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
                     ...(playoff.winnerPlays ? { winnerPlays: playoff.winnerPlays } : {}),
                     ...(cancelled && playoff.directIfClear ? { cancelled: playoff.directIfClear } : {}),
                     groupNames: (league.groups ?? []).map((g) => g.shortName[lang]),
+                    ...(league.continental ? { knockout: true } : {}),
                   },
                 }
               : {})}

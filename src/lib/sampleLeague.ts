@@ -1,5 +1,5 @@
 import type { CupConfig, CupRoundKey } from "../config/cups.ts";
-import { LEAGUES, type CompetitionCode, type LeagueConfig } from "../config/leagues.ts";
+import { LEAGUES, gamesPerTeam, type CompetitionCode, type LeagueConfig } from "../config/leagues.ts";
 import type { RealCupTie } from "../engine/cup.ts";
 import { cupModelFor, tierStrength } from "../engine/cupModel.ts";
 import { expectedGoals, simulateFixtures, simulateScore } from "../engine/match.ts";
@@ -59,13 +59,15 @@ export function sampleLeague(league: LeagueConfig, playedShare = 0.4): SampleLea
   };
 
   // Season starts so that the played share of matchdays lies in the past.
-  const rounds = (league.teams - 1) * 2;
+  // A continental league phase (UEFA) plays only the first rounds of a round robin:
+  // each club meets 8 (or 6) different opponents.
+  const rounds = league.continental ? gamesPerTeam(league) : (league.teams - 1) * 2;
   const playedRounds = Math.round(rounds * playedShare);
   const weekMs = 7 * 24 * 60 * 60 * 1000;
   const start = new Date(Date.now() - playedRounds * weekMs + weekMs / 2);
   start.setUTCHours(15, 0, 0, 0);
 
-  const schedule = doubleRoundRobin(teams.map((t) => t.id), start.toISOString());
+  const schedule = doubleRoundRobin(teams.map((t) => t.id), start.toISOString()).filter((f) => f.matchday <= rounds);
   const played = schedule.filter((f) => f.matchday <= playedRounds);
   const results = simulateFixtures(played, {}, truth, rng);
   const fixtures = schedule.map((f) => ({ ...f, result: results[f.id] ?? null }));

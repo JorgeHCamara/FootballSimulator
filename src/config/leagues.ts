@@ -14,7 +14,10 @@ export type ZoneKind =
   | "relegationPlayoff"
   | "relegation"
   | "playoffs"
-  | "playoffWildCard";
+  | "playoffWildCard"
+  | "knockoutRoundOf16"
+  | "knockoutPlayoff"
+  | "eliminated";
 
 export interface Zone {
   kind: ZoneKind;
@@ -24,7 +27,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -49,7 +52,7 @@ export interface LeagueGroup {
   name: Record<SiteLocale, string>;
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -89,7 +92,50 @@ export interface LeagueConfig {
    * cup winners and UEFA/CONMEBOL coefficients, so treat these as the base case.
    */
   zones: readonly Zone[];
+  /**
+   * A continental competition (UEFA): clubs from many leagues, so each club's
+   * rating starts from its domestic league (see src/lib/continental.ts).
+   */
+  continental?: ContinentalConfig;
 }
+
+export interface ContinentalConfig {
+  /**
+   * Rating tier (as in a cup: 0 = Premier League level, see cupModel.ts) of
+   * clubs from leagues the site doesn't cover; they are mostly their league's
+   * best, so the stronger the competition, the higher they start.
+   */
+  outsiderTier: number;
+}
+
+/**
+ * UEFA knockout phase (2024– format), seeded from the league-phase table:
+ * 1st–8th go to the round of 16; 9th–24th play a two-legged knockout play-off,
+ * seeded 9th–16th v unseeded 17th–24th (drawn: 9/10 v 23/24, 11/12 v 21/22,
+ * 13/14 v 19/20, 15/16 v 17/18). The draw then fixes the bracket: 1/2 meet the
+ * 15–18 winners, 3/4 the 13/14–19/20 winners and so on, and the paths cross as
+ * 1/2 v 7/8 and 3/4 v 5/6 in the quarter-finals. The better-placed club hosts
+ * the second leg; level on aggregate: extra time and penalties. The projected
+ * pairings below are one possible draw, replaced by the real one when known.
+ */
+const UEFA_KNOCKOUT = (venue: string, title: string): PlayoffConfig => ({
+  rounds: [
+    {
+      key: "knockoutPlayoff",
+      legs: 2,
+      levelTie: "penalties",
+      drawn: true,
+      gapWeeks: 3,
+      pairs: [[9, 24], [10, 23], [11, 22], [12, 21], [13, 20], [14, 19], [15, 18], [16, 17]],
+    },
+    { key: "roundOf16", legs: 2, levelTie: "penalties", drawn: true, fixedBracket: true, gapWeeks: 3, entrants: [1, 2, 3, 4, 5, 6, 7, 8] },
+    { key: "quarterFinals", legs: 2, levelTie: "penalties", drawn: true, fixedBracket: true, gapWeeks: 4 },
+    { key: "semiFinals", legs: 2, levelTie: "penalties", drawn: true, fixedBracket: true, gapWeeks: 3 },
+    // Placeholder dates: about three weeks between rounds, the final at the end of May.
+    { key: "final", legs: 1, levelTie: "penalties", venue, gapWeeks: 4 },
+  ],
+  title,
+});
 
 export const LEAGUES: readonly LeagueConfig[] = [
   {
@@ -591,6 +637,72 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "playoffs", from: 1, to: 7 },
       { kind: "playoffWildCard", from: 8, to: 9 },
     ],
+  },
+  {
+    code: "UCL",
+    slug: "champions-league",
+    name: "Champions League",
+    country: "UEFA",
+    flag: "eu",
+    simulatorName: { en: "Champions League Simulator", pt: "Simulador da Champions League", es: "Simulador de la Champions League" },
+    aka: { en: "UEFA Champions League", pt: "Liga dos Campeões", es: "Liga de Campeones" },
+    teams: 36,
+    gamesPerTeam: 8,
+    espn: { slug: "uefa.champions", seasons: "split" },
+    espnOnly: true,
+    // League phase: 36 clubs, 8 games each against 8 different opponents, one table.
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "wins"],
+    zones: [
+      { kind: "knockoutRoundOf16", from: 1, to: 8 },
+      { kind: "knockoutPlayoff", from: 9, to: 24 },
+      { kind: "eliminated", from: 25, to: 36 },
+    ],
+    playoff: UEFA_KNOCKOUT("Metropolitano", "Champions League"),
+    continental: { outsiderTier: 0.8 },
+  },
+  {
+    code: "UEL",
+    slug: "europa-league",
+    name: "Europa League",
+    country: "UEFA",
+    flag: "eu",
+    simulatorName: { en: "Europa League Simulator", pt: "Simulador da Europa League", es: "Simulador de la Europa League" },
+    aka: { en: "UEFA Europa League", pt: "Liga Europa", es: "Liga Europa" },
+    teams: 36,
+    gamesPerTeam: 8,
+    espn: { slug: "uefa.europa", seasons: "split" },
+    espnOnly: true,
+    // League phase: 36 clubs, 8 games each against 8 different opponents, one table.
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "wins"],
+    zones: [
+      { kind: "knockoutRoundOf16", from: 1, to: 8 },
+      { kind: "knockoutPlayoff", from: 9, to: 24 },
+      { kind: "eliminated", from: 25, to: 36 },
+    ],
+    playoff: UEFA_KNOCKOUT("Deutsche Bank Park", "Europa League"),
+    continental: { outsiderTier: 1.2 },
+  },
+  {
+    code: "UECL",
+    slug: "conference-league",
+    name: "Conference League",
+    country: "UEFA",
+    flag: "eu",
+    simulatorName: { en: "Conference League Simulator", pt: "Simulador da Conference League", es: "Simulador de la Conference League" },
+    aka: { en: "UEFA Conference League", pt: "Liga Conferência", es: "Liga Conferencia" },
+    teams: 36,
+    gamesPerTeam: 6,
+    espn: { slug: "uefa.europa.conf", seasons: "split" },
+    espnOnly: true,
+    // League phase: 36 clubs, 6 games each against 6 different opponents, one table.
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "wins"],
+    zones: [
+      { kind: "knockoutRoundOf16", from: 1, to: 8 },
+      { kind: "knockoutPlayoff", from: 9, to: 24 },
+      { kind: "eliminated", from: 25, to: 36 },
+    ],
+    playoff: UEFA_KNOCKOUT("Beşiktaş Park", "Conference League"),
+    continental: { outsiderTier: 1.7 },
   },
 ];
 

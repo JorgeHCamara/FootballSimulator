@@ -1,0 +1,78 @@
+import { LEAGUES, type CompetitionCode, type LeagueConfig } from "../config/leagues.ts";
+import { tierStrength } from "../engine/cupModel.ts";
+import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
+import { realResults } from "../engine/results.ts";
+import type { TeamId } from "../engine/types.ts";
+import { getLeagueData } from "./leagueData.ts";
+
+// Starting ratings for a continental competition, whose clubs come from many
+// leagues: each club's attack/defence relative to its own league (this
+// season's real results), scaled by how strong that league is, on the same
+// scale as the domestic cups (one tier = ×0.85 attack, ÷0.85 defence). The
+// league-phase results then pull the ratings toward the club's European form
+// (see buildLeagueModel's priorStrengths).
+
+/**
+ * League strength in tiers below the Premier League, roughly following UEFA's
+ * country coefficients (a judgement call, not an official figure).
+ */
+export const LEAGUE_TIERS: Partial<Record<CompetitionCode, number>> = {
+  PL: 0,
+  PD: 0.25,
+  BL1: 0.35,
+  SA: 0.35,
+  FL1: 0.6,
+  PPL: 0.9,
+  DED: 1,
+  ELC: 1.4,
+  SD: 1.5,
+  BL2: 1.5,
+  SB: 1.6,
+  FL2: 1.8,
+  DJL: 2.4,
+};
+
+/** Combines domestic ratings into priors for the competition's clubs, averaging 1 across them. */
+export function continentalPriors(
+  clubs: readonly TeamId[],
+  domestic: readonly { tier: number; strengths: ReadonlyMap<TeamId, TeamStrength> }[],
+  outsiderTier: number,
+): Record<TeamId, TeamStrength> {
+  const raw = clubs.map((id) => {
+    const home = domestic.find((d) => d.strengths.has(id));
+    const scale = tierStrength(home ? home.tier : outsiderTier);
+    const s = home?.strengths.get(id) ?? { attack: 1, defence: 1 };
+    return { id, attack: s.attack * scale.attack, defence: s.defence * scale.defence };
+  });
+  // Relative to the competition's average club (geometric means of 1), like
+  // ratings built from its own results.
+  const mean = (values: number[]) => Math.exp(values.reduce((sum, v) => sum + Math.log(v), 0) / Math.max(values.length, 1));
+  const attack = mean(raw.map((r) => r.attack));
+  const defence = mean(raw.map((r) => r.defence));
+  return Object.fromEntries(raw.map((r) => [r.id, { attack: r.attack / attack, defence: r.defence / defence }]));
+}
+
+/** Priors for a continental competition's clubs from the domestic leagues on the site. */
+export async function getContinentalPriors(league: LeagueConfig, clubs: readonly TeamId[]): Promise<Record<TeamId, TeamStrength>> {
+  if (!league.continental || process.env.FOOTSIMU_SAMPLE_DATA === "1") return {};
+  const feeders = LEAGUES.filter((l) => LEAGUE_TIERS[l.code] !== undefined);
+  const domestic = (
+    await Promise.all(
+      feeders.map(async (feeder) => {
+        try {
+          const data = await getLeagueData(feeder);
+          if (data.source !== "live") return null;
+          const model = buildLeagueModel(data.teams, data.fixtures, realResults(data.fixtures));
+          return { tier: LEAGUE_TIERS[feeder.code]!, strengths: model.strengths };
+        } catch (error) {
+          // Its clubs then start like clubs from leagues the site doesn't cover.
+          console.warn(`${league.code}: ${feeder.code} unavailable for ratings:`, error);
+          return null;
+        }
+      }),
+    )
+  ).filter((d) => d !== null);
+  // Top divisions first, so a club is rated from the strongest league it's in.
+  domestic.sort((a, b) => a.tier - b.tier);
+  return continentalPriors(clubs, domestic, league.continental.outsiderTier);
+}

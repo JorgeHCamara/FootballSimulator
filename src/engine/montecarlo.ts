@@ -1,4 +1,5 @@
 import { expectedGoals, simulateScore } from "./match.ts";
+import { simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
 import { computeStandings, type StandingsOptions } from "./standings.ts";
@@ -18,6 +19,11 @@ export interface MonteCarloInput {
    * group on its own, and positions are within the team's group.
    */
   groups?: readonly (readonly TeamId[])[];
+  /**
+   * Also play the knockout phase after each run's table (UEFA): real knockout
+   * results stand, everything else is simulated. Not with `groups`.
+   */
+  playoff?: { config: PlayoffConfig; options: Omit<BracketOptions, "seasonComplete"> };
 }
 
 export interface MonteCarloResult {
@@ -25,6 +31,10 @@ export interface MonteCarloResult {
   /** positionCounts[teamId][p] = number of runs the team finished in position p+1 (within its group, if any). */
   positionCounts: Record<TeamId, number[]>;
   averagePoints: Record<TeamId, number>;
+  /** With `playoff`: playoffReached[teamId][r] = runs the club played in knockout round r. */
+  playoffReached?: Record<TeamId, number[]>;
+  /** With `playoff`: runs the club won the knockout phase. */
+  playoffWins?: Record<TeamId, number>;
 }
 
 export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
@@ -48,19 +58,37 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
 
   const tableOptions: StandingsOptions = { ...standings, includeForm: false };
   const results: ResultMap = { ...fixed };
+  const playoff = input.groups?.length ? undefined : input.playoff;
+  const playoffReached: Record<TeamId, number[]> = {};
+  const playoffWins: Record<TeamId, number> = {};
   for (let i = 0; i < iterations; i++) {
     for (const r of remaining) results[r.id] = simulateScore(r.xg, rng);
     for (const group of tables) {
-      for (const row of computeStandings(group, fixtures, results, tableOptions)) {
+      const rows = computeStandings(group, fixtures, results, tableOptions);
+      for (const row of rows) {
         positionCounts[row.teamId]![row.position - 1]!++;
         pointsTotal[row.teamId]! += row.points;
       }
+      if (!playoff) continue;
+      // The bracket only needs the table and knockout results (real ones come with the options).
+      const roundCount = playoff.config.rounds.length;
+      let final: PlayoffTie | undefined;
+      const played = simulatePlayoff(rows, playoff.config, {}, input.model, rng, playoff.options, (r, ties) => {
+        for (const tie of ties) {
+          for (const id of [tie.higher.teamId, tie.lower.teamId]) {
+            if (id !== null) (playoffReached[id] ??= new Array<number>(roundCount).fill(0))[r]!++;
+          }
+        }
+        if (r === roundCount - 1) final = ties[0];
+      });
+      const winner = final ? tieOutcome(final, played)?.winner : undefined;
+      if (winner !== undefined) playoffWins[winner] = (playoffWins[winner] ?? 0) + 1;
     }
   }
 
   const averagePoints: Record<TeamId, number> = {};
   for (const t of teams) averagePoints[t.id] = iterations > 0 ? pointsTotal[t.id]! / iterations : 0;
-  return { iterations, positionCounts, averagePoints };
+  return { iterations, positionCounts, averagePoints, ...(playoff ? { playoffReached, playoffWins } : {}) };
 }
 
 /** Probability that a team finishes within positions [from, to] (1-based, inclusive). */

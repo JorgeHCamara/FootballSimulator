@@ -347,7 +347,8 @@ describe("ESPN feed mapping", () => {
   });
 
   it("every league has an ESPN feed as fallback", () => {
-    for (const league of LEAGUES) assert.match(league.espn.slug, /^[a-z]{3}\.\d$/, league.code);
+    // Domestic leagues ("eng.1"), or UEFA competitions ("uefa.champions").
+    for (const league of LEAGUES) assert.match(league.espn.slug, league.continental ? /^uefa\.[a-z.]+$/ : /^[a-z]{3}\.\d$/, league.code);
   });
 
   it("gives ESPN club names the same display names as football-data.org", () => {
@@ -381,5 +382,56 @@ describe("fallback crests", () => {
     for (const [id, path] of Object.entries(CREST_FALLBACKS)) {
       assert.ok(existsSync(new URL(`../../public${path}`, import.meta.url)), `crest ${id} missing: ${path}`);
     }
+  });
+});
+
+describe("continental competitions (UEFA)", async () => {
+  const { continentalPriors } = await import("./continental.ts");
+  const { runMonteCarlo } = await import("../engine/montecarlo.ts");
+  const { buildLeagueModel } = await import("../engine/ratings.ts");
+  const { realResults } = await import("../engine/results.ts");
+  const { sampleLeague } = await import("./sampleLeague.ts");
+  const { continents } = await import("../config/competitions.ts");
+
+  it("rates clubs from their domestic league, scaled by its strength, averaging 1", () => {
+    const pl = new Map([[1, { attack: 1.5, defence: 0.7 }]]);
+    const ned = new Map([[2, { attack: 1.5, defence: 0.7 }]]);
+    const priors = continentalPriors([1, 2, 3], [{ tier: 0, strengths: pl }, { tier: 1, strengths: ned }], 2);
+    assert.ok(priors[1]!.attack > priors[2]!.attack && priors[2]!.attack > priors[3]!.attack, "PL > Eredivisie > outsider");
+    assert.ok(priors[1]!.defence < priors[2]!.defence);
+    const geo = Math.cbrt(priors[1]!.attack * priors[2]!.attack * priors[3]!.attack);
+    assert.ok(Math.abs(geo - 1) < 1e-9);
+  });
+
+  it("plays a sample league phase of 8 rounds and the knockout phase to one winner per run", () => {
+    const ucl = getLeagueBySlug("champions-league")!;
+    const { teams, fixtures } = sampleLeague(ucl);
+    assert.equal(teams.length, 36);
+    for (const team of teams) assert.equal(fixtures.filter((f) => f.homeId === team.id || f.awayId === team.id).length, 8);
+    const fixed = realResults(fixtures);
+    const result = runMonteCarlo({
+      teams,
+      fixtures,
+      fixed,
+      model: buildLeagueModel(teams, fixtures, fixed),
+      standings: { tiebreakers: ucl.tiebreakers },
+      iterations: 200,
+      seed: 1,
+      playoff: { config: ucl.playoff!, options: { afterMatchday: 8, afterDate: "2027-01-28T20:00:00Z" } },
+    });
+    assert.equal(Object.values(result.playoffWins!).reduce((a, b) => a + b, 0), 200);
+    // 24 clubs in the knockout phase every run, 2 in every final.
+    const reached = Object.values(result.playoffReached!);
+    assert.equal(reached.reduce((sum, r) => sum + r[0]!, 0), 200 * 16);
+    assert.equal(reached.reduce((sum, r) => sum + r[1]!, 0), 200 * 16);
+    assert.equal(reached.reduce((sum, r) => sum + r[4]!, 0), 200 * 2);
+  });
+
+  it("groups the menu by continent, UEFA under Europe", () => {
+    const groups = continents();
+    assert.deepEqual(groups.map((g) => g.continent), ["Europe", "South America", "North America"]);
+    const uefa = groups[0]!.countries.find((c) => c.country === "UEFA")!;
+    assert.deepEqual(uefa.leagues.map((l) => l.name), ["Champions League", "Europa League", "Conference League"]);
+    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil"]);
   });
 });

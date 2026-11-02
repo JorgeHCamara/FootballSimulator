@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia e DFB-Pokal. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League e Conference League. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
@@ -9,7 +9,9 @@
     "cupTitle": "{simulator} {season} – Preveja o sorteio e a final",
     "cupDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule todas as fases, da primeira fase à final, com sorteio simulado para as fases ainda não sorteadas e as chances de cada clube de ganhar a copa.",
     "cupTitleBracket": "{simulator} {season} – Preveja a chave e a final",
-    "cupDescriptionBracket": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule todas as fases até a final pela chave fixa, e veja as chances de cada clube de ganhar a copa."
+    "cupDescriptionBracket": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule todas as fases até a final pela chave fixa, e veja as chances de cada clube de ganhar a copa.",
+    "continentalTitle": "{simulator} {season} – Tabela da Fase de Liga e Mata-mata",
+    "continentalDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule a fase de liga, veja a tabela ao vivo e jogue o mata-mata até a final, com as chances de cada clube de ficar no top 8, no top 24 e de ser campeão."
   },
   "Nav": {
     "home": "Início",
@@ -31,7 +33,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia e DFB-Pokal. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League e Conference League. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -89,8 +91,8 @@
     "promotedBarrage": "{winner} venceu o playoff e agora enfrenta o {position}º da {league} em ida e volta por uma vaga na {league}.",
     "playoffs": "Playoff",
     "playoffPlace": "{position}º colocado",
-    "playoffRound": "{round, select, eliminators {Eliminatórias} semiFinals {Semifinais} final {Final} wildCard {Repescagem (wild card)} roundOne {Primeira fase} conferenceSemiFinals {Semifinais de conferência} conferenceFinal {Final de conferência} mlsCup {MLS Cup} preliminary {Fase preliminar} playOff1 {Playoff 1} playOff2 {Playoff 2} other {Playoff}}",
-    "playoffWinnerOf": "{round, select, eliminators {Vencedor da eliminatória} semiFinals {Vencedor da semifinal} wildCard {Vencedor da repescagem} roundOne {Vencedor da primeira fase} conferenceSemiFinals {Vencedor da semifinal} conferenceFinal {Campeão da conferência} preliminary {Vencedor da preliminar} playOff1 {Vencedor do playoff 1} playOff2 {Vencedor do playoff 2} other {Vencedor}}",
+    "playoffRound": "{round, select, eliminators {Eliminatórias} semiFinals {Semifinais} final {Final} wildCard {Repescagem (wild card)} roundOne {Primeira fase} conferenceSemiFinals {Semifinais de conferência} conferenceFinal {Final de conferência} mlsCup {MLS Cup} preliminary {Fase preliminar} playOff1 {Playoff 1} playOff2 {Playoff 2} knockoutPlayoff {Playoff da fase eliminatória} roundOf16 {Oitavas de final} quarterFinals {Quartas de final} other {Playoff}}",
+    "playoffWinnerOf": "{round, select, eliminators {Vencedor da eliminatória} semiFinals {Vencedor da semifinal} wildCard {Vencedor da repescagem} roundOne {Vencedor da primeira fase} conferenceSemiFinals {Vencedor da semifinal} conferenceFinal {Campeão da conferência} preliminary {Vencedor da preliminar} playOff1 {Vencedor do playoff 1} playOff2 {Vencedor do playoff 2} knockoutPlayoff {Vencedor do playoff} roundOf16 {Vencedor das oitavas} quarterFinals {Vencedor das quartas} other {Vencedor}}",
     "playoffRuleTwoLegs": "{higher} faz o jogo de volta em casa. Empate no agregado: prorrogação e pênaltis.",
     "playoffRuleOneLeg": "Jogo único no estádio do {higher}. Empate: prorrogação e pênaltis.",
     "playoffRuleOneLegBetterPlaced": "Jogo único no estádio do {higher}. Empate após a prorrogação: o {higher} avança.",
@@ -115,7 +117,15 @@
     "conference": "Conferência",
     "reserveTag": "Reserva",
     "reserveTeam": "Time reserva: não pode subir",
-    "reserveNote": "Times reserva não podem subir nem disputar os playoffs; a vaga passa para o próximo time principal."
+    "reserveNote": "Times reserva não podem subir nem disputar os playoffs; a vaga passa para o próximo time principal.",
+    "knockoutPhase": "Fase eliminatória",
+    "knockoutProjected": "A fase eliminatória é definida pela tabela da fase de liga quando ela terminar. Até o sorteio real, os confrontos mostrados são um sorteio possível que segue os cabeças de chave.",
+    "knockoutDrawNote": "Os confrontos seguem os cabeças de chave até o sorteio real, que os substitui assim que for publicado.",
+    "top8Chance": "Top 8",
+    "top24Chance": "Top 24",
+    "finalChance": "Final",
+    "winChance": "Título",
+    "knockoutRoundShort": "{round, select, knockoutPlayoff {Playoff} roundOf16 {Oitavas} quarterFinals {Quartas} semiFinals {Semis} final {Final} other {Fase}}"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -130,7 +140,10 @@
     "relegationPlayoff": "Playoff de rebaixamento",
     "relegation": "Rebaixamento",
     "playoffs": "Playoffs da MLS Cup",
-    "playoffWildCard": "Repescagem (wild card)"
+    "playoffWildCard": "Repescagem (wild card)",
+    "knockoutRoundOf16": "Oitavas de final",
+    "knockoutPlayoff": "Playoff",
+    "eliminated": "Eliminado"
   },
   "Footer": {
     "attribution": "Dados: football-data.org",
@@ -157,7 +170,9 @@
     "step2Cup": "Clique em Simular fase ou Simular até a final. A fase seguinte é sorteada entre os vencedores; Novo sorteio refaz um sorteio simulado.",
     "step3Cup": "Abra a aba Chances para ver as chances de cada clube de chegar a cada fase e de ganhar a copa.",
     "introCupBracket": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule cada fase: confronto empatado vai para os pênaltis, e os vencedores avançam pela chave fixa, sem sorteios.",
-    "step2CupBracket": "Clique em Simular fase ou Simular até a final. Os vencedores avançam pela chave fixa."
+    "step2CupBracket": "Clique em Simular fase ou Simular até a final. Os vencedores avançam pela chave fixa.",
+    "introContinental": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule a fase de liga: a tabela dos 36 clubes é atualizada na hora com os critérios de desempate da UEFA. Os 8 primeiros vão direto às oitavas, do 9º ao 24º jogam o playoff, e o mata-mata pode ser jogado até a final.",
+    "step3Continental": "Abra a aba Chances para ver as chances de cada clube de terminar no top 8, de chegar ao mata-mata, de chegar à final e de ganhar a {league}."
   },
   "Faq": {
     "league": [
@@ -211,7 +226,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia e DFB-Pokal, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League e Conference League, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -265,6 +280,28 @@
         "q": "O Foot Simu é grátis?",
         "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
       }
+    ],
+    "continental": [
+      {
+        "q": "Como funciona o {simulator}?",
+        "a": "Ele começa com a tabela e os jogos reais da fase de liga da {league} {season}. Digite o placar de qualquer jogo ou clique em Simular: a tabela é atualizada na hora com os critérios de desempate da UEFA. Quando a fase de liga termina, o mata-mata é definido pela tabela e pode ser jogado até a final."
+      },
+      {
+        "q": "Como os clubes são avaliados?",
+        "a": "Os clubes vêm de várias ligas, então cada clube começa com o seu desempenho no próprio campeonato nesta temporada, ajustado pela força dessa liga (clubes de ligas que não estão no Foot Simu começam com um valor padrão da competição). Os resultados na {league} atualizam a avaliação ao longo da temporada."
+      },
+      {
+        "q": "Como funciona o mata-mata?",
+        "a": "Os 8 primeiros vão direto às oitavas de final. Do 9º ao 24º jogam um playoff de ida e volta, 9º–16º contra 17º–24º, e os vencedores enfrentam os 8 primeiros nas oitavas. O clube mais bem colocado na fase de liga decide em casa, e um empate no placar agregado vai para a prorrogação e os pênaltis. A final é em jogo único. Até o sorteio real, os confrontos seguem os cabeças de chave."
+      },
+      {
+        "q": "Como as chances são calculadas?",
+        "a": "A aba Chances joga o resto da fase de liga e todo o mata-mata 5.000 vezes a partir dos resultados atuais, incluindo seus palpites na fase de liga, e conta quantas vezes cada clube termina no top 8 e no top 24, chega à final e ganha a {league}."
+      },
+      {
+        "q": "O Foot Simu é grátis?",
+        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+      }
     ]
   },
   "Countries": {
@@ -276,7 +313,8 @@
     "Portugal": "Portugal",
     "Netherlands": "Holanda",
     "Brazil": "Brasil",
-    "USA": "EUA"
+    "USA": "EUA",
+    "UEFA": "UEFA"
   },
   "Cup": {
     "fixtures": "Jogos",
@@ -364,5 +402,10 @@
     "bracketWinnerOf": "Vencedor da {round} {n}",
     "chancesNoteBracket": "Não há sorteio: cada simulação segue a chave fixa.",
     "bracketStatus": "Chave fixa"
+  },
+  "Continents": {
+    "Europe": "Europa",
+    "South America": "América do Sul",
+    "North America": "América do Norte"
   }
 }

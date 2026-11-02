@@ -27,6 +27,10 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
   const playoffs = playoffZones.length
     ? { from: Math.min(...playoffZones.map((z) => z.from)), to: Math.max(...playoffZones.map((z) => z.to)) }
     : undefined;
+  // Continental competitions (UEFA): straight to the round of 16, into the knockout phase at all, and the knockout rounds.
+  const top8 = league.zones.find((z) => z.kind === "knockoutRoundOf16");
+  const knockout = league.zones.find((z) => z.kind === "knockoutPlayoff");
+  const continental = Boolean(league.continental && top8 && knockout);
   const positions = Array.from({ length: rows.length }, (_, i) => i + 1);
   const pct = (p: number) => (p === 0 ? "–" : p < 0.001 ? "<0.1%" : format.number(p, { style: "percent", maximumFractionDigits: p < 0.1 ? 1 : 0 }));
 
@@ -50,7 +54,16 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
               <th className="py-2 pl-3 text-left">{t("team")}</th>
               <th className="px-2 text-right">{t("averagePoints")}</th>
               {/* In a league of separate tables, 1st in a conference isn't the title. */}
-              <th className="px-2 text-right">{league.groups ? t("firstPlaceChance") : t("titleChance")}</th>
+              {continental ? (
+                <>
+                  <th className="px-2 text-right">{t("top8Chance")}</th>
+                  <th className="px-2 text-right">{t("top24Chance")}</th>
+                  <th className="px-2 text-right">{t("finalChance")}</th>
+                  <th className="px-2 text-right">{t("winChance")}</th>
+                </>
+              ) : (
+                <th className="px-2 text-right">{league.groups ? t("firstPlaceChance") : t("titleChance")}</th>
+              )}
               {playoffs && <th className="px-2 text-right">{t("playoffChance")}</th>}
               {relegation && <th className="px-2 text-right">{t("relegationChance")}</th>}
               <th className="hidden pr-3 pl-4 text-left md:table-cell">{t("positionHeatmap")}</th>
@@ -69,9 +82,26 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                     </span>
                   </td>
                   <td className="px-2 text-right tabular-nums">{result.averagePoints[row.teamId]!.toFixed(1)}</td>
-                  <td className="px-2 text-right font-semibold tabular-nums" data-testid="title-chance">
-                    {pct(probabilityInRange(result, row.teamId, 1, 1))}
-                  </td>
+                  {continental ? (
+                    <>
+                      <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="top8-chance">
+                        {pct(probabilityInRange(result, row.teamId, top8!.from, top8!.to))}
+                      </td>
+                      <td className="px-2 text-right tabular-nums" data-testid="top24-chance">
+                        {pct(probabilityInRange(result, row.teamId, top8!.from, knockout!.to))}
+                      </td>
+                      <td className="px-2 text-right tabular-nums" data-testid="final-chance">
+                        {pct((result.playoffReached?.[row.teamId]?.at(-1) ?? 0) / result.iterations)}
+                      </td>
+                      <td className="px-2 text-right font-semibold tabular-nums" data-testid="win-chance">
+                        {pct((result.playoffWins?.[row.teamId] ?? 0) / result.iterations)}
+                      </td>
+                    </>
+                  ) : (
+                    <td className="px-2 text-right font-semibold tabular-nums" data-testid="title-chance">
+                      {pct(probabilityInRange(result, row.teamId, 1, 1))}
+                    </td>
+                  )}
                   {playoffs && (
                     <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="playoff-chance">
                       {pct(probabilityInRange(result, row.teamId, playoffs.from, playoffs.to))}
@@ -91,7 +121,7 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                           <span
                             key={p}
                             title={`${p}: ${pct(share)}`}
-                            className={`h-5 w-4 rounded-[2px] ${zone ? ZONE_STYLES[zone.kind].dot : "bg-zinc-500"}`}
+                            className={`h-5 ${rows.length > 24 ? "w-2.5" : "w-4"} rounded-[2px] ${zone ? ZONE_STYLES[zone.kind].dot : "bg-zinc-500"}`}
                             style={{ opacity: share === 0 ? 0.06 : 0.15 + 0.85 * Math.sqrt(share) }}
                           />
                         );

@@ -355,3 +355,62 @@ describe("Segunda División play-off (3rd–6th, two-legged rounds, draw advanta
     assert.deepEqual(getLeagueByCode("SD")!.reserveTeams, ["Real Sociedad II", "RC Celta Fortuna"]);
   });
 });
+
+describe("UEFA knockout phase (league-phase seeding, drawn pairings)", () => {
+  const ucl = getLeagueByCode("UCL")!;
+  const config = ucl.playoff!;
+  // Team id = 100 + position.
+  const table = Array.from({ length: 36 }, (_, i) => row(i + 1, 101 + i));
+  const leg = (id: number, homeId: number, awayId: number, utcDate: string, result: Fixture["result"] = null): Fixture => ({
+    id,
+    matchday: 0,
+    utcDate,
+    homeId,
+    awayId,
+    result,
+  });
+  const pairsOf = (ties: PlayoffTie[]) => ties.map((t) => [t.higher.teamId, t.lower.teamId]);
+
+  it("projects 9th–24th into the play-off and the top 8 into the round of 16 along the seeding", () => {
+    const bracket = buildBracket(table, config, {}, options);
+    assert.deepEqual(bracket.map((r) => r.length), [8, 8, 4, 2, 1]);
+    assert.deepEqual(pairsOf(bracket[0]!), [[109, 124], [110, 123], [111, 122], [112, 121], [113, 120], [114, 119], [115, 118], [116, 117]]);
+    // Round of 16: 1st meets the 16th/17th winner, 8th the 9th/24th winner.
+    assert.deepEqual(bracket[1]![0]!.lower.from, { round: 0, tie: 7 });
+    assert.deepEqual(bracket[1]![7]!.lower.from, { round: 0, tie: 0 });
+    // The better-placed club hosts the second leg.
+    assert.equal(bracket[0]![0]!.legs[1]!.homeId, 109);
+    // Placeholder dates spread like UEFA's calendar: play-off three weeks after
+    // the league phase (15 Nov in these options), final 17 weeks after it.
+    assert.equal(bracket[0]![0]!.legs[0]!.utcDate.slice(0, 10), "2026-12-06");
+    assert.equal(buildBracket(table, config, {}, { ...options, seasonComplete: false })[4]![0]!.higher.teamId, null);
+  });
+
+  it("replaces projected pairings with the real draw once the feed lists it", () => {
+    // Real draw: 9th v 23rd and 10th v 24th (the other ties as projected).
+    const real = [leg(1, 123, 109, "2027-02-16T20:00:00Z"), leg(2, 124, 110, "2027-02-17T20:00:00Z")];
+    const ties = buildBracket(table, config, {}, { ...options, real })[0]!;
+    assert.deepEqual(pairsOf(ties).slice(0, 3), [[109, 123], [110, 124], [111, 122]]);
+    assert.equal(ties[0]!.legs[0]!.utcDate, "2027-02-16T20:00:00Z", "the real leg is used");
+    assert.equal(new Set(ties.flatMap((t) => [t.higher.teamId, t.lower.teamId])).size, 16);
+  });
+
+  it("keeps every club once when the real draw breaks several projected pairs", () => {
+    // 9 v 17, 16 v 24: their projected partners (24, 17) are taken, so 23 … end up re-paired.
+    const real = [leg(1, 117, 109, "2027-02-16T20:00:00Z"), leg(2, 124, 116, "2027-02-16T20:00:00Z")];
+    const ties = buildBracket(table, config, {}, { ...options, real })[0]!;
+    const pairs = pairsOf(ties);
+    assert.deepEqual(pairs[0], [109, 117]);
+    assert.ok(pairs.some(([a, b]) => a === 116 && b === 124));
+    assert.equal(new Set(pairs.flat()).size, 16);
+  });
+
+  it("plays down to one winner, with the final at a neutral venue", () => {
+    const model: LeagueModel = { avgHomeGoals: 1.5, avgAwayGoals: 1.2, strengths: new Map() };
+    const results = simulatePlayoff(table, config, {}, model, createRng(4), options);
+    const bracket = buildBracket(table, config, results, options);
+    assert.equal(bracket[4]![0]!.legs[0]!.neutral, true);
+    const [winner] = playoffWinners(bracket, results);
+    assert.ok(winner !== null && winner! >= 101 && winner! <= 124);
+  });
+});

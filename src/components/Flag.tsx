@@ -53,6 +53,25 @@ function shapes(code: FlagCode) {
           <circle cx="12" cy="10" r="2.2" fill="#da291c" />
         </>
       );
+    case "eu":
+      // Europe (UEFA competitions): a ring of twelve gold stars, drawn as dots.
+      return (
+        <>
+          <rect width="30" height="20" fill="#003399" />
+          <circle cx="15.00" cy="4.00" r="0.9" fill="#ffcc00" />
+          <circle cx="18.00" cy="4.80" r="0.9" fill="#ffcc00" />
+          <circle cx="20.20" cy="7.00" r="0.9" fill="#ffcc00" />
+          <circle cx="21.00" cy="10.00" r="0.9" fill="#ffcc00" />
+          <circle cx="20.20" cy="13.00" r="0.9" fill="#ffcc00" />
+          <circle cx="18.00" cy="15.20" r="0.9" fill="#ffcc00" />
+          <circle cx="15.00" cy="16.00" r="0.9" fill="#ffcc00" />
+          <circle cx="12.00" cy="15.20" r="0.9" fill="#ffcc00" />
+          <circle cx="9.80" cy="13.00" r="0.9" fill="#ffcc00" />
+          <circle cx="9.00" cy="10.00" r="0.9" fill="#ffcc00" />
+          <circle cx="9.80" cy="7.00" r="0.9" fill="#ffcc00" />
+          <circle cx="12.00" cy="4.80" r="0.9" fill="#ffcc00" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

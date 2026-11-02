@@ -36,3 +36,43 @@ export function countries(): CountryGroup[] {
   }
   return [...groups.values()];
 }
+
+export type Continent = "Europe" | "South America" | "North America";
+
+/** Continent order in the menus. */
+export const CONTINENTS: readonly Continent[] = ["Europe", "South America", "North America"];
+
+/** Continent of each country (by English name, as in the configs); "UEFA" holds the continental competitions. */
+const CONTINENT_OF: Record<string, Continent> = {
+  UEFA: "Europe",
+  England: "Europe",
+  Spain: "Europe",
+  Germany: "Europe",
+  Italy: "Europe",
+  France: "Europe",
+  Portugal: "Europe",
+  Netherlands: "Europe",
+  Brazil: "South America",
+  USA: "North America",
+};
+
+export function continentOf(country: string): Continent {
+  const continent = CONTINENT_OF[country];
+  if (!continent) throw new Error(`No continent for ${country}`);
+  return continent;
+}
+
+export interface ContinentGroup {
+  /** English continent name, also the translation key (Continents.<continent>). */
+  continent: Continent;
+  /** The continent's countries; a continental federation ("UEFA") is one of them. */
+  countries: CountryGroup[];
+}
+
+/** Countries grouped by continent, in menu order (countries in config order). */
+export function continents(): ContinentGroup[] {
+  const groups = countries();
+  return CONTINENTS.map((continent) => ({ continent, countries: groups.filter((g) => continentOf(g.country) === continent) })).filter(
+    (g) => g.countries.length > 0,
+  );
+}

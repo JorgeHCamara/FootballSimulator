@@ -23,6 +23,8 @@ export interface PlayoffView {
   winnerPlays?: { league: string; position: number };
   /** Not held this season (Serie B: 3rd finished far enough clear of 4th). */
   cancelled?: { position: number; over: number; points: number };
+  /** A continental knockout phase (UEFA): its own wording, and drawn pairings. */
+  knockout?: boolean;
 }
 
 interface Props {
@@ -65,7 +67,7 @@ export function FixtureList(props: Props) {
         >
           {matchdays.map((md) => (
             <option key={md} value={md} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
-              {md === PLAYOFF_MATCHDAY ? t("playoffs") : t("matchday", { number: md })}
+              {md === PLAYOFF_MATCHDAY ? t(playoff?.knockout ? "knockoutPhase" : "playoffs") : t("matchday", { number: md })}
             </option>
           ))}
         </select>
@@ -105,6 +107,12 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
   const t = useTranslations("Simulator");
   const { bracket, seasonComplete } = playoff;
   const lastRound = bracket.length - 1;
+  // A continental knockout phase (31 ties, most over two legs) shows one round
+  // at a time: the first one still open, unless another is picked.
+  const [picked, setPicked] = useState<number | null>(null);
+  const openRound = bracket.findIndex((round) => round.some((tie) => tieOutcome(tie, predictions) === null));
+  const shownRound = picked ?? (openRound >= 0 ? openRound : lastRound);
+  const rounds = playoff.knockout ? bracket.map((round, r) => ({ round, r })).filter(({ r }) => r === shownRound) : bracket.map((round, r) => ({ round, r }));
 
   // A side is a club once known; before that its table position (league not
   // finished) or "Semi-final winner" style text (earlier round not decided).
@@ -161,13 +169,34 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
 
   return (
     <div data-testid="playoff">
-      {!seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t("playoffProjected")}</p>}
+      {!seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t(playoff.knockout ? "knockoutProjected" : "playoffProjected")}</p>}
+      {seasonComplete && playoff.knockout && (
+        <p className="px-3 pt-2 text-xs text-zinc-500" data-testid="knockout-draw-note">
+          {t("knockoutDrawNote")}
+        </p>
+      )}
       {playoff.cancelled && (
         <p className="px-3 py-3 text-sm text-zinc-600 dark:text-zinc-300" data-testid="playoff-cancelled">
           {t("playoffCancelled", { ...playoff.cancelled })}
         </p>
       )}
-      {bracket.map((round, r) => (
+      {playoff.knockout && (
+        <div className="flex gap-1 overflow-x-auto px-3 pt-2" role="tablist" data-testid="knockout-rounds">
+          {bracket.map((round, r) => (
+            <button
+              key={r}
+              type="button"
+              role="tab"
+              aria-selected={r === shownRound}
+              onClick={() => setPicked(r)}
+              className={`whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold ${r === shownRound ? "bg-pitch-600 text-white" : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"}`}
+            >
+              {t("knockoutRoundShort", { round: round[0]?.config.key ?? "" })}
+            </button>
+          ))}
+        </div>
+      )}
+      {rounds.map(({ round, r }) => (
         <div key={r} data-testid="playoff-round">
           {bracket.length > 1 && (
             <h3 className="border-b border-zinc-100 bg-zinc-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-zinc-600 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300">

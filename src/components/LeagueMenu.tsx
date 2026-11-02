@@ -2,36 +2,80 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { countries } from "../config/competitions.ts";
+import { continents, type ContinentGroup, type CountryGroup } from "../config/competitions.ts";
 import { Link, usePathname } from "../i18n/navigation.ts";
 import { Flag } from "./Flag.tsx";
 
 const CLOSE_DELAY_MS = 150;
 
-/** Countries with their leagues, alphabetical in the current language. */
-export function useCountryGroups() {
+/**
+ * Continents with their countries: a continental federation (UEFA) first, then
+ * the countries alphabetically in the current language.
+ */
+export function useContinentGroups(): ContinentGroup[] {
   const t = useTranslations("Countries");
   const locale = useLocale();
-  return useMemo(() => countries().sort((a, b) => t(a.country).localeCompare(t(b.country), locale)), [t, locale]);
+  return useMemo(
+    () =>
+      continents().map((group) => ({
+        ...group,
+        countries: [...group.countries].sort((a, b) => Number(isFederation(b)) - Number(isFederation(a)) || t(a.country).localeCompare(t(b.country), locale)),
+      })),
+    [t, locale],
+  );
+}
+
+/** A continental federation's group (UEFA), listed before the countries. */
+const isFederation = (group: CountryGroup) => group.flag === "eu";
+
+/** One country (or UEFA) and its competitions, as a column of a mega-menu panel. */
+export function CountryColumn({ group, onPick, large = false }: { group: CountryGroup; onPick: () => void; large?: boolean }) {
+  const t = useTranslations("Countries");
+  const pathname = usePathname();
+  return (
+    <div>
+      <p className="flex items-center gap-2 px-2 pb-1 text-xs font-bold uppercase tracking-wide text-zinc-500">
+        <Flag code={group.flag} width={18} />
+        {t(group.country)}
+      </p>
+      <ul id={`menu-${group.flag}`}>
+        {group.leagues.map((league) => {
+          const current = pathname === `/${league.slug}`;
+          return (
+            <li key={league.code}>
+              <Link
+                href={`/${league.slug}`}
+                aria-current={current ? "page" : undefined}
+                onClick={onPick}
+                className={`block whitespace-nowrap rounded-lg px-2 ${large ? "py-2 text-base" : "py-1.5 text-sm"} hover:bg-pitch-50 dark:hover:bg-pitch-900/40 ${current ? "bg-pitch-50 font-semibold text-pitch-700 dark:bg-pitch-900/40 dark:text-pitch-100" : ""}`}
+              >
+                {league.name}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }
 
 /**
- * Header menu: one entry per country (alphabetical in the current language),
- * each opening a submenu with that country's leagues. Opens on mouse hover, or
- * on click/tap/Enter; closes on leaving, Esc, an outside click or choosing a league.
- * Shown on wide screens; phones and small tablets use MobileMenu instead.
+ * Header menu: one entry per continent, each opening a panel with a column
+ * per country (and UEFA) listing its leagues and cups. Opens on mouse hover,
+ * or on click/tap/Enter; closes on leaving, Esc, an outside click or choosing
+ * a competition. Shown on wide screens; phones and small tablets use MobileMenu.
  */
 export function LeagueMenu() {
-  const t = useTranslations("Countries");
+  const t = useTranslations("Continents");
   const nav = useTranslations("Nav");
   const pathname = usePathname();
   const [open, setOpen] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  /** The open submenu came from hovering, so a click on its button shouldn't close it. */
+  /** The open panel came from hovering, so a click on its button shouldn't close it. */
   const openedByHover = useRef(false);
   const menuRef = useRef<HTMLUListElement>(null);
 
-  const groups = useCountryGroups();
+  const groups = useContinentGroups();
 
   const cancelClose = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -57,29 +101,31 @@ export function LeagueMenu() {
     };
   }, [open]);
 
-  // Close after navigating to a league.
+  // Close after navigating to a competition.
   useEffect(() => setOpen(null), [pathname]);
 
   return (
     <nav aria-label={nav("leagues")} className="hidden border-t border-white/10 bg-pitch-900/40 lg:block">
-      <ul ref={menuRef} className="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-1 gap-y-0.5 px-2 py-1.5 text-sm" data-testid="league-menu">
-        {groups.map((group, i) => {
-          const isOpen = open === group.country;
-          const active = group.leagues.some((l) => pathname === `/${l.slug}`);
-          const id = `menu-${group.flag}`;
-          // Keep dropdowns of the last entries inside the viewport.
-          const alignRight = i >= groups.length - 2;
+      <ul ref={menuRef} className="relative mx-auto flex max-w-6xl justify-center gap-x-1 px-2 py-1.5 text-sm" data-testid="league-menu">
+        {groups.map((group) => {
+          const isOpen = open === group.continent;
+          const active = group.countries.some((c) => c.leagues.some((l) => pathname === `/${l.slug}`));
+          const id = `menu-${group.continent.toLowerCase().replace(/\s+/g, "-")}`;
+          // A continent with several countries gets a wide panel centred under the
+          // bar; one with a single country a small one under its own button.
+          const wide = group.countries.length > 2;
+          const columns = Math.min(group.countries.length, 4);
           return (
             <li
-              key={group.country}
-              className="relative"
+              key={group.continent}
+              className={wide ? "" : "relative"}
               // Hover only for real mice: a tap also fires pointer-enter, and would
               // otherwise open the menu and then toggle it shut on the click.
               onPointerEnter={(e) => {
                 if (e.pointerType !== "mouse") return;
                 cancelClose();
-                openedByHover.current = open !== group.country;
-                setOpen(group.country);
+                openedByHover.current = open !== group.continent;
+                setOpen(group.continent);
               }}
               onPointerLeave={(e) => e.pointerType === "mouse" && scheduleClose()}
             >
@@ -88,40 +134,29 @@ export function LeagueMenu() {
                 aria-expanded={isOpen}
                 aria-controls={id}
                 onClick={() => {
-                  setOpen(isOpen && !openedByHover.current ? null : group.country);
+                  setOpen(isOpen && !openedByHover.current ? null : group.continent);
                   openedByHover.current = false;
                 }}
-                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-pitch-50 hover:bg-white/10 ${isOpen || active ? "bg-white/10" : ""}`}
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium text-pitch-50 hover:bg-white/10 ${isOpen || active ? "bg-white/10" : ""}`}
               >
-                <Flag code={group.flag} width={18} />
-                {t(group.country)}
+                {t(group.continent)}
                 <svg aria-hidden viewBox="0 0 12 12" width="10" height="10" className={`transition ${isOpen ? "rotate-180" : ""}`}>
                   <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
               {isOpen && (
-                <ul
+                <div
                   id={id}
-                  className={`absolute top-full z-30 mt-1 min-w-52 rounded-xl border border-zinc-200 bg-white p-1 text-zinc-900 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 ${alignRight ? "right-0" : "left-0"}`}
+                  data-testid="menu-panel"
+                  className={`absolute top-full z-30 mt-1 rounded-xl border border-zinc-200 bg-white p-3 text-zinc-900 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 ${wide ? "left-1/2 w-[min(56rem,calc(100vw-2rem))] -translate-x-1/2" : "left-0 min-w-52"}`}
                   onPointerEnter={cancelClose}
                 >
-                  {group.leagues.map((league) => {
-                    const current = pathname === `/${league.slug}`;
-                    return (
-                      <li key={league.code}>
-                        <Link
-                          href={`/${league.slug}`}
-                          aria-current={current ? "page" : undefined}
-                          onClick={() => setOpen(null)}
-                          className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 hover:bg-pitch-50 dark:hover:bg-pitch-900/40 ${current ? "bg-pitch-50 font-semibold text-pitch-700 dark:bg-pitch-900/40 dark:text-pitch-100" : ""}`}
-                        >
-                          <Flag code={league.flag} width={18} />
-                          {league.name}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
+                  <div className={`grid gap-x-4 gap-y-4 ${columns === 4 ? "grid-cols-4" : columns === 3 ? "grid-cols-3" : columns === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
+                    {group.countries.map((country) => (
+                      <CountryColumn key={country.country} group={country} onPick={() => setOpen(null)} />
+                    ))}
+                  </div>
+                </div>
               )}
             </li>
           );
