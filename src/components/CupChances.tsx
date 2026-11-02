@@ -28,7 +28,7 @@ export function CupChances({ cup, input, teams, divisions, alive, fromRound }: P
   const t = useTranslations("Cup");
   const ts = useTranslations("Simulator");
   const format = useFormatter();
-  const tag = useDivisionTag(divisions);
+  const tag = useDivisionTag(divisions, cup);
   const result: CupMonteCarloResult | null = useMonteCarlo(input, "cup");
   const [showAll, setShowAll] = useState(false);
   const pct = (p: number) => (p === 0 ? "–" : p < 0.001 ? "<0.1%" : format.number(p, { style: "percent", maximumFractionDigits: p < 0.1 ? 1 : 0 }));
@@ -75,7 +75,7 @@ export function CupChances({ cup, input, teams, divisions, alive, fromRound }: P
                     <span className="flex items-center gap-2">
                       <TeamBadge team={team} />
                       <span className="truncate font-medium">{team.shortName}</span>
-                      <span className="shrink-0 rounded bg-zinc-200 px-1 text-[10px] font-semibold text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">{tag(id)}</span>
+                      {tag(id) && <span className="shrink-0 rounded bg-zinc-200 px-1 text-[10px] font-semibold text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">{tag(id)}</span>}
                     </span>
                   </td>
                   {columns.map(({ r, round }) => {

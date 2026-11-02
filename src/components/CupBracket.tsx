@@ -34,7 +34,7 @@ export function CupBracket(props: Props) {
             </h3>
             <div className="flex grow flex-col justify-around gap-3">
               {round.ties.length === 0 ? (
-                <PendingRound cup={cup} round={round} rounds={fullRounds} />
+                <PendingRound cup={cup} round={round} rounds={fullRounds} predictions={predictions} />
               ) : (
                 columns[column]!.map((tie) => (
                   <div key={tie.game.id} data-testid="bracket-tie">

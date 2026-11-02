@@ -39,10 +39,10 @@ export function buildCupModel(feeders: readonly FeederModel[]): LeagueModel {
   return { avgHomeGoals: CUP_AVG_HOME_GOALS, avgAwayGoals: CUP_AVG_AWAY_GOALS, strengths: buildCupStrengths(feeders) };
 }
 
-/** A model whose missing clubs are non-league sides rather than average ones. */
-export function cupModelFor(strengths: ReadonlyMap<TeamId, TeamStrength>, clubs: Iterable<TeamId>): LeagueModel {
+/** A model whose missing clubs rate at `outsiderTier` (non-league sides by default) rather than average. */
+export function cupModelFor(strengths: ReadonlyMap<TeamId, TeamStrength>, clubs: Iterable<TeamId>, outsiderTier = NON_LEAGUE_TIER): LeagueModel {
   const all = new Map(strengths);
-  const nonLeague = tierStrength(NON_LEAGUE_TIER);
+  const nonLeague = tierStrength(outsiderTier);
   for (const id of clubs) if (!all.has(id)) all.set(id, nonLeague);
   return { avgHomeGoals: CUP_AVG_HOME_GOALS, avgAwayGoals: CUP_AVG_AWAY_GOALS, strengths: all };
 }

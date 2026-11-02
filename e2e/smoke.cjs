@@ -239,7 +239,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/pt`);
       const menu = p.locator('[data-testid="league-menu"]');
       await menu.getByRole("button", { name: "Brasil" }).click();
-      assert.deepEqual((await menu.locator("#menu-br a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B"]);
+      assert.deepEqual((await menu.locator("#menu-br a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B", "Copa do Brasil"]);
       await p.close();
     });
 
@@ -449,6 +449,36 @@ async function step(name, fn) {
       await phone.goto(`${BASE_URL}/en/fa-cup`);
       assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390);
       await phone.close();
+    });
+
+    await step("Copa do Brasil: two-legged ties with aggregate, waiting rounds, neutral final", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/copa-do-brasil`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.equal(await bar.count(), 9);
+      assert.match((await bar.nth(5).innerText()).split("\n")[0], /Round of 16/);
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 14, "14 first-round ties");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /\bB\b/, "Série B tags");
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      // Fifth round: two legs, the second at the other club, and the aggregate.
+      await bar.nth(4).click();
+      assert.equal(await ties.count(), 16);
+      const first = ties.first();
+      assert.equal(await first.getAttribute("data-legs"), "2");
+      const legs = await first.locator('[data-testid="match-row"]').allInnerTexts();
+      assert.match(legs[0], /1st leg/);
+      assert.match(legs[1], /2nd leg/);
+      assert.match(await first.locator('[data-testid="cup-aggregate"]').innerText(), /Aggregate: .+ \d+–\d+ /);
+      // Bracket: two-legged quarter- and semi-finals, a single neutral final.
+      await bar.nth(8).click();
+      const bracketTies = p.locator('[data-testid="cup-bracket"] [data-testid="cup-tie"]');
+      assert.deepEqual(await bracketTies.evaluateAll((els) => els.map((e) => e.dataset.legs)), ["2", "2", "2", "2", "2", "2", "1"]);
+      assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Mané Garrincha/);
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Copa do Brasil \d{4} winner/);
+      assert.ok(!(await p.locator('[data-testid="simulated-draw-note"]').isVisible()), "the final isn't a draw");
+      await p.close();
     });
 
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {

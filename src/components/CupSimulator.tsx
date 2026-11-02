@@ -12,6 +12,7 @@ import {
   needsShootout,
   simulateCup,
   simulateCupRound,
+  tieAggregate,
   tieWinner,
   type CupBuildOptions,
 } from "../engine/cup.ts";
@@ -64,12 +65,12 @@ export function CupSimulator({ cup, data }: Props) {
     [data.real, data.entrants],
   );
   const model = useMemo(
-    () => cupModelFor(new Map(Object.entries(data.strengths).map(([id, s]) => [Number(id), s])), allClubs),
-    [data.strengths, allClubs],
+    () => cupModelFor(new Map(Object.entries(data.strengths).map(([id, s]) => [Number(id), s])), allClubs, cup.outsiderTier),
+    [data.strengths, allClubs, cup.outsiderTier],
   );
   // Share links cover every slot; overrides and reconciliation only the real ties.
   const slotFixtures = useMemo<Fixture[]>(() => cupIds(cup).map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null })), [cup]);
-  const realFixtures = useMemo(() => rounds.flatMap((r) => r.ties.filter((tie) => tie.real).flatMap((tie) => [tie.game, tie.shootout])), [rounds]);
+  const realFixtures = useMemo(() => rounds.flatMap((r) => r.ties.filter((tie) => tie.real).flatMap((tie) => [...tie.legs, tie.shootout])), [rounds]);
 
   // A prediction belongs to a pairing: drop it when its slot is drawn differently.
   useEffect(() => {
@@ -77,8 +78,7 @@ export function CupSimulator({ cup, data }: Props) {
     const pairings: Record<number, string> = {};
     for (const round of rounds) {
       for (const tie of round.ties) {
-        pairings[tie.game.id] = `${tie.homeId}-${tie.awayId}`;
-        pairings[tie.shootout.id] = pairings[tie.game.id]!;
+        for (const fixture of [...tie.legs, tie.shootout]) pairings[fixture.id] = `${tie.homeId}-${tie.awayId}`;
       }
     }
     const removed = syncPairings(seasonKey, pairings);
@@ -279,11 +279,11 @@ function CupChampion({ cup, rounds, winner, predictions, teams, season }: { cup:
     ? rounds.flatMap((round) => {
         const tie = round.ties.find((x) => x.homeId === winner || x.awayId === winner);
         if (!tie) return [];
-        const score = predictions[tie.game.id] ?? tie.game.result;
+        const score = tieAggregate(tie, predictions);
         const pens = predictions[tie.shootout.id] ?? tie.shootout.result;
         const home = tie.homeId === winner;
         const opponent = teams.get(home ? tie.awayId : tie.homeId)?.shortName ?? "";
-        const line = score ? `${home ? score.home : score.away}–${home ? score.away : score.home}` : "";
+        const line = score ? `${home ? score.home : score.away}–${home ? score.away : score.home}${tie.legs.length === 2 ? ` ${t("onAggregate")}` : ""}` : "";
         const pensLine = pens && needsShootout(tie, predictions) ? ` (${Math.max(pens.home, pens.away)}–${Math.min(pens.home, pens.away)} ${t("onPenalties")})` : "";
         return [{ key: round.config.key, text: `${t(`round.${round.config.key}`)}: ${line} v ${opponent}${pensLine}` }];
       })

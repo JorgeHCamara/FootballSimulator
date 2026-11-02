@@ -333,6 +333,17 @@ describe("ESPN feed mapping", () => {
     }
   });
 
+  it("keeps a shoot-out after a second leg that wasn't itself a draw (level on aggregate)", () => {
+    // Copa do Brasil 2026: Atlético-MG 2–1 Ceará, then Ceará 2–1 Atlético-MG, 2–4 on penalties.
+    const leg2: EspnEvent = {
+      id: "77",
+      date: "2026-05-14T22:00Z",
+      status: { type: { name: "STATUS_FINAL_PEN", state: "post", completed: true } },
+      competitions: [{ competitors: [{ ...side("home", "9", "Ceará", "2"), shootoutScore: 2 }, { ...side("away", "8", "Atlético-MG", "1"), shootoutScore: 4 }] }],
+    };
+    assert.deepEqual(espnFixtures([leg2])[0]!.penalties, { home: 2, away: 4 });
+  });
+
   it("every league has an ESPN feed as fallback", () => {
     for (const league of LEAGUES) assert.match(league.espn.slug, /^[a-z]{3}\.\d$/, league.code);
   });

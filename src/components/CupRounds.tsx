@@ -3,7 +3,8 @@
 import { useFormatter, useTranslations } from "next-intl";
 import type { CupConfig } from "../config/cups.ts";
 import type { CompetitionCode } from "../config/leagues.ts";
-import { needsShootout, tieWinner, type CupRound, type CupTie } from "../engine/cup.ts";
+import { LEAGUES } from "../config/leagues.ts";
+import { needsShootout, tieAggregate, tieWinner, type CupRound, type CupTie } from "../engine/cup.ts";
 import { useEffect, useState } from "react";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { CupBracket } from "./CupBracket.tsx";
@@ -19,24 +20,37 @@ export interface CupViewProps {
   onSimulate: (fixture: Fixture) => void;
 }
 
-/** Short division label for a cup club: PL, CH, L1, L2 or NL (non-league). */
-export function useDivisionTag(divisions: Record<TeamId, CompetitionCode>) {
+/**
+ * Short division label for a cup club: PL, CH, L1, L2 or NL (non-league) in
+ * the FA Cup, A or B in the Copa do Brasil (clubs outside them get no tag).
+ */
+export function useDivisionTag(divisions: Record<TeamId, CompetitionCode>, cup: CupConfig) {
   const t = useTranslations("Cup");
-  return (id: TeamId) => {
+  return (id: TeamId): string | undefined => {
     const code = divisions[id];
-    return code ? t(`division.${code}`) : t("division.nonLeague");
+    if (code) return t(`division.${code}`);
+    return cup.tagOutsiders ? t("division.nonLeague") : undefined;
   };
 }
 
-/** One tie as a card: the game, its shoot-out when level, the winner in bold. */
-export function TieCard({ tie, teams, predictions, divisions, onScore, onSimulate, compact = false }: Omit<CupViewProps, "cup" | "rounds"> & { tie: CupTie; compact?: boolean }) {
-  const tag = useDivisionTag(divisions);
+/** One tie as a card: its game (or both legs), the aggregate, the shoot-out when level, the winner in bold. */
+export function TieCard({ cup, tie, teams, predictions, divisions, onScore, onSimulate, compact = false }: Omit<CupViewProps, "rounds"> & { tie: CupTie; compact?: boolean }) {
+  const t = useTranslations("Cup");
+  const tag = useDivisionTag(divisions, cup);
   const winner = tieWinner(tie, predictions);
-  // Only a level game has a shoot-out (a score left from an earlier draw is cleared by CupSimulator).
+  // Only a level tie has a shoot-out (a score left from an earlier draw is cleared by CupSimulator).
   const pens = needsShootout(tie, predictions);
+  const twoLegs = tie.legs.length === 2;
+  const total = twoLegs ? tieAggregate(tie, predictions) : null;
   const home = teams.get(tie.homeId);
   const away = teams.get(tie.awayId);
   if (!home || !away) return null;
+  const tagsFor = (leg: Fixture) => {
+    if (compact) return {};
+    const homeTag = tag(leg.homeId);
+    const awayTag = tag(leg.awayId);
+    return homeTag || awayTag ? { tags: { ...(homeTag ? { home: homeTag } : {}), ...(awayTag ? { away: awayTag } : {}) } } : {};
+  };
   return (
     <ul
       className={`flex h-full flex-col rounded-xl border bg-white dark:bg-zinc-900 ${winner !== null ? "border-pitch-300 dark:border-pitch-900" : "border-zinc-200 dark:border-zinc-800"} ${compact ? "text-sm" : ""}`}
@@ -45,19 +59,29 @@ export function TieCard({ tie, teams, predictions, divisions, onScore, onSimulat
       data-home={tie.homeId}
       data-away={tie.awayId}
       data-winner={winner ?? ""}
+      data-legs={tie.legs.length}
     >
-      <MatchRow
-        fixture={tie.game}
-        home={home}
-        away={away}
-        prediction={predictions[tie.game.id]}
-        {...(compact ? {} : { tags: { home: tag(tie.homeId), away: tag(tie.awayId) } })}
-        winner={winner}
-        joinsNext={pens}
-        inlineDice
-        onScore={(score) => onScore(tie.game, score)}
-        onSimulate={() => onSimulate(tie.game)}
-      />
+      {tie.legs.map((leg, n) => (
+        <MatchRow
+          key={leg.id}
+          fixture={leg}
+          home={teams.get(leg.homeId) ?? home}
+          away={teams.get(leg.awayId) ?? away}
+          prediction={predictions[leg.id]}
+          {...tagsFor(leg)}
+          {...(twoLegs ? { label: t(n === 0 ? "firstLeg" : "secondLeg") } : {})}
+          winner={winner}
+          joinsNext={n === tie.legs.length - 1 ? pens || total !== null : true}
+          inlineDice
+          onScore={(score) => onScore(leg, score)}
+          onSimulate={() => onSimulate(leg)}
+        />
+      ))}
+      {total && (
+        <li className="px-3 pb-1 text-center text-xs text-zinc-600 dark:text-zinc-300" data-testid="cup-aggregate">
+          {t("aggregate", { home: home.shortName, away: away.shortName, hg: total.home, ag: total.away })}
+        </li>
+      )}
       {pens && (
         <ShootoutLine
           fixture={tie.shootout}
@@ -183,13 +207,13 @@ export function CupRounds(props: RoundsProps) {
       {bracketFrom >= 0 && roundIndex >= bracketFrom ? (
         <CupBracket {...props} rounds={rounds.slice(bracketFrom)} fullRounds={rounds} highlight={roundIndex - bracketFrom} />
       ) : round.drawn === "pending" && round.ties.length === 0 ? (
-        <PendingRound cup={cup} round={round} rounds={rounds} />
+        <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" data-testid="round-grid">
           {round.ties.map((tie) => (
             <TieCard key={tie.game.id} tie={tie} {...props} />
           ))}
-          {round.drawn === "pending" && <PendingRound cup={cup} round={round} rounds={rounds} />}
+          {round.drawn === "pending" && <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} />}
         </div>
       )}
     </div>
@@ -197,17 +221,31 @@ export function CupRounds(props: RoundsProps) {
 }
 
 /** A round whose draw hasn't been made: who it waits for and how many clubs go in the hat. */
-export function PendingRound({ cup, round, rounds }: { cup: CupConfig; round: CupRound; rounds: CupRound[] }) {
+export function PendingRound({ cup, round, rounds, predictions }: { cup: CupConfig; round: CupRound; rounds: CupRound[]; predictions: ResultMap }) {
   const t = useTranslations("Cup");
   const previous = rounds[round.index - 1];
   const entrants = cup.rounds[round.index]!.entrantsFrom;
   const count = round.config.ties * 2;
+  // The previous round is decided but its draw can't be made here: clubs
+  // entering this round are only named by the real draw.
+  const waiting = previous && previous.drawn !== "pending" && previous.ties.length > 0 && previous.ties.every((tie) => tieWinner(tie, predictions) !== null);
+  const leagues = (entrants ?? []).map((code) => LEAGUES.find((l) => l.code === code)?.name ?? code).join(" + ");
   return (
     <div className="rounded-xl border border-dashed border-zinc-300 px-4 py-8 text-center text-sm text-zinc-500 dark:border-zinc-700" data-testid="pending-round">
-      <p className="font-semibold text-zinc-700 dark:text-zinc-300">{previous ? t("drawAfter", { round: t(`round.${previous.config.key}`) }) : t("drawPending")}</p>
-      <p className="mt-1">
-        {entrants ? t("drawClubsEntering", { count, entering: entrants.length ? t("entrantsFrom", { leagues: entrants.join(" + ") }) : "" }) : t("drawClubs", { count })}
+      <p className="font-semibold text-zinc-700 dark:text-zinc-300">
+        {round.config.ties === 1 && previous
+          ? t("finalAfter", { round: t(`round.${previous.config.key}`) })
+          : waiting
+            ? t("waitingRealDraw")
+            : previous
+              ? t("drawAfter", { round: t(`round.${previous.config.key}`) })
+              : t("drawPending")}
       </p>
+      {round.config.ties > 1 && (
+        <p className="mt-1">
+          {entrants ? t("drawClubsEntering", { count, entering: leagues ? t("entrantsFrom", { leagues }) : "" }) : t("drawClubs", { count })}
+        </p>
+      )}
     </div>
   );
 }

@@ -1,17 +1,21 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { CUPS } from "../config/cups.ts";
+import { groupLegs } from "../lib/cupData.ts";
 import {
   buildCup,
   clubsAlive,
   cupGameId,
   cupIds,
+  cupSecondLegId,
   cupShootoutId,
   cupWinner,
   drawRound,
   isCupShootoutId,
   needsShootout,
   simulateCup,
+  simulateCupRound,
+  tieAggregate,
   tieWinner,
   type RealCupTie,
 } from "./cup.ts";
@@ -40,7 +44,7 @@ const realFirstRound: RealCupTie[] = Array.from({ length: 40 }, (_, t) => ({
   round: "firstRound",
   homeId: 1001 + 2 * t,
   awayId: 1002 + 2 * t,
-  fixture: fixture(500_000 + t, 1001 + 2 * t, 1002 + 2 * t),
+  legs: [fixture(500_000 + t, 1001 + 2 * t, 1002 + 2 * t)],
 }));
 const options = { entrants, drawSalt: 0, roundDates: { secondRound: "2026-12-05T15:00:00Z" } };
 const model: LeagueModel = { avgHomeGoals: 1.5, avgAwayGoals: 1.2, strengths: new Map() };
@@ -119,7 +123,7 @@ describe("buildCup", () => {
     const rounds0 = buildCup(faCup, realFirstRound, {}, options);
     const results = homeWins(rounds0[0]!.ties);
     // ESPN already lists one second-round tie: 1001 v 1003.
-    const real = [...realFirstRound, { round: "secondRound" as const, homeId: 1001, awayId: 1003, fixture: fixture(600_000, 1001, 1003) }];
+    const real = [...realFirstRound, { round: "secondRound" as const, homeId: 1001, awayId: 1003, legs: [fixture(600_000, 1001, 1003)] }];
     const second = buildCup(faCup, real, results, options)[1]!;
     assert.equal(second.drawn, "simulated");
     assert.deepEqual([second.ties[0]!.homeId, second.ties[0]!.awayId, second.ties[0]!.real], [1001, 1003, true]);
@@ -149,7 +153,7 @@ describe("tie outcome", () => {
   });
 
   it("takes a real shoot-out from the feed", () => {
-    const real = [{ ...realFirstRound[0]!, fixture: fixture(500_000, 1001, 1002, { home: 1, away: 1 }, { home: 5, away: 4 }) }];
+    const real = [{ ...realFirstRound[0]!, legs: [fixture(500_000, 1001, 1002, { home: 1, away: 1 }, { home: 5, away: 4 })] }];
     const withPens = buildCup(faCup, real, {}, options)[0]!.ties[0]!;
     assert.deepEqual(withPens.shootout.result, { home: 5, away: 4 });
     assert.equal(tieWinner(withPens, {}), 1001);
@@ -225,5 +229,112 @@ describe("runCupMonteCarlo", () => {
     const mc = runCupMonteCarlo({ config: faCup, real: realFirstRound, fixed, strengths, options: { entrants }, iterations: 30, seed: 9 });
     assert.equal(mc.reached[1002]![1], 30, "the away club always goes through");
     assert.equal(mc.reached[1001]![1], 0);
+  });
+});
+
+describe("Copa do Brasil (two legs, Série A entering in the fifth round, neutral final)", () => {
+  const copa = CUPS.find((c) => c.code === "CDB")!;
+  // Rounds 1–4 from the real draw: 28 clubs (2001–2028) in round one, then the
+  // feed's later entrants. Here only the fifth round onwards is built: the 12
+  // fourth-round winners (3001–3012) meet the 20 Série A clubs (1–20).
+  const serieA = Array.from({ length: 20 }, (_, i) => i + 1);
+  const fourthWinners = Array.from({ length: 12 }, (_, i) => 3001 + i);
+  const fourthRound: RealCupTie[] = fourthWinners.map((id, t) => ({
+    round: "fourthRound",
+    homeId: id,
+    awayId: 4001 + t,
+    legs: [fixture(700_000 + t, id, 4001 + t, { home: 1, away: 0 })],
+  }));
+  // Rounds 1–3 already played as real ties (winners feed nothing we test here).
+  const earlier: RealCupTie[] = [
+    ...Array.from({ length: 14 }, (_, t) => ({ round: "firstRound" as const, homeId: 5001 + 2 * t, awayId: 5002 + 2 * t, legs: [fixture(710_000 + t, 5001 + 2 * t, 5002 + 2 * t, { home: 1, away: 0 })] })),
+    ...Array.from({ length: 44 }, (_, t) => ({ round: "secondRound" as const, homeId: 6001 + 2 * t, awayId: 6002 + 2 * t, legs: [fixture(720_000 + t, 6001 + 2 * t, 6002 + 2 * t, { home: 1, away: 0 })] })),
+    ...Array.from({ length: 24 }, (_, t) => ({ round: "thirdRound" as const, homeId: 7001 + 2 * t, awayId: 7002 + 2 * t, legs: [fixture(730_000 + t, 7001 + 2 * t, 7002 + 2 * t, { home: 1, away: 0 })] })),
+  ];
+  const real = [...earlier, ...fourthRound];
+  const copaOptions = { entrants: { fifthRound: serieA }, drawSalt: 0, roundDates: { fifthRound: "2026-04-22T22:00:00Z" } };
+
+  it("keeps the FA Cup's ids and gives two-legged ties a second-leg slot", () => {
+    const ids = cupIds(copa);
+    assert.equal(new Set(ids).size, ids.length);
+    assert.equal(ids.length, 2 * (14 + 44 + 24 + 12 + 16 + 8 + 4 + 2 + 1) + (16 + 8 + 4 + 2));
+    assert.equal(cupIds(faCup).length, 246, "FA Cup unchanged");
+    assert.ok(!isCupShootoutId(cupSecondLegId(4, 3)));
+    assert.ok(isCupShootoutId(cupShootoutId(4, 3)));
+  });
+
+  it("draws the fifth round from 12 winners and 20 Série A clubs, over two legs", () => {
+    const rounds = buildCup(copa, real, {}, copaOptions);
+    const fifth = rounds[4]!;
+    assert.equal(fifth.drawn, "simulated");
+    assert.equal(fifth.ties.length, 16);
+    assert.equal(new Set(fifth.ties.flatMap((t) => [t.homeId, t.awayId])).size, 32);
+    const tie = fifth.ties[0]!;
+    assert.equal(tie.legs.length, 2);
+    assert.deepEqual([tie.legs[1]!.homeId, tie.legs[1]!.awayId], [tie.awayId, tie.homeId], "second leg at the other club");
+    assert.equal(tie.legs[1]!.id, cupSecondLegId(4, 0));
+    assert.equal(rounds[5]!.drawn, "pending");
+  });
+
+  it("decides a two-legged tie on aggregate, then penalties after the second leg", () => {
+    const tie = buildCup(copa, real, {}, copaOptions)[4]!.ties[0]!;
+    const [first, second] = tie.legs as [Fixture, Fixture];
+    // 2–1 at the first club's ground, 0–1 at the other: 2–2 on aggregate.
+    const level: ResultMap = { [first.id]: { home: 2, away: 1 }, [second.id]: { home: 1, away: 0 } };
+    assert.deepEqual(tieAggregate(tie, level), { home: 2, away: 2 });
+    assert.ok(needsShootout(tie, level));
+    assert.equal(tieWinner(tie, level), null);
+    // The shoot-out is at the second leg's ground: its home club is tie.awayId.
+    assert.equal(tie.shootout.homeId, tie.awayId);
+    assert.equal(tieWinner(tie, { ...level, [tie.shootout.id]: { home: 4, away: 2 } }), tie.awayId);
+    // 2–1 then 1–1: the first club goes through without penalties.
+    assert.equal(tieWinner(tie, { [first.id]: { home: 2, away: 1 }, [second.id]: { home: 1, away: 1 } }), tie.homeId);
+    // Only the first leg played: undecided, and simulating plays only the second leg.
+    const partial = { [first.id]: { home: 3, away: 0 } };
+    assert.equal(tieWinner(tie, partial), null);
+    const added = simulateCupRound({ ...buildCup(copa, real, {}, copaOptions)[4]!, ties: [tie] }, partial, model, createRng(3));
+    assert.equal(added[first.id], undefined);
+    assert.ok(added[second.id]);
+  });
+
+  it("takes real legs (paired by club) and a real shoot-out on the second leg", () => {
+    const legs = groupLegs([
+      fixture(800_002, 2, 1, { home: 1, away: 0 }, { home: 2, away: 4 }),
+      fixture(800_001, 1, 2, { home: 1, away: 0 }),
+      fixture(800_003, 3, 4, null),
+    ].map((f, i) => ({ ...f, utcDate: i === 0 ? "2026-05-14T22:00Z" : "2026-04-23T22:00Z" })));
+    assert.deepEqual(legs.map((l) => l.map((f) => f.id)), [[800_001, 800_002], [800_003]]);
+    const realFifth: RealCupTie = { round: "fifthRound", homeId: 1, awayId: 2, legs: legs[0]! };
+    const tie = buildCup(copa, [...real, realFifth], {}, copaOptions)[4]!.ties[0]!;
+    assert.deepEqual([tie.homeId, tie.awayId, tie.real], [1, 2, true]);
+    assert.deepEqual(tie.shootout.result, { home: 2, away: 4 });
+    assert.equal(tieWinner(tie, {}), 1, "1 won the shoot-out away at 2");
+  });
+
+  it("waits for the real draw when a round's entrants aren't known", () => {
+    // Only the first round is known: the second round's 74 entrants come from the real draw.
+    const onlyFirst = earlier.filter((t) => t.round === "firstRound");
+    const rounds = buildCup(copa, onlyFirst, {}, copaOptions);
+    assert.equal(rounds[1]!.drawn, "pending");
+    assert.equal(rounds[1]!.ties.length, 0);
+  });
+
+  it("plays down to a neutral final between the two semi-final winners", () => {
+    const results = simulateCup(copa, real, {}, model, createRng(8), copaOptions);
+    const rounds = buildCup(copa, real, results, copaOptions);
+    assert.deepEqual(rounds.slice(4).map((r) => r.ties.length), [16, 8, 4, 2, 1]);
+    const final = rounds[8]!;
+    assert.equal(final.drawn, "determined");
+    assert.equal(final.ties[0]!.legs.length, 1);
+    assert.equal(final.ties[0]!.game.neutral, true);
+    assert.ok(cupWinner(rounds, results) !== null);
+  });
+
+  it("runs the Monte Carlo through two-legged rounds", () => {
+    const mc = runCupMonteCarlo({ config: copa, real, fixed: {}, strengths: {}, options: { entrants: { fifthRound: serieA } }, iterations: 40, seed: 5 });
+    for (const [r, clubs] of [[4, 32], [5, 16], [6, 8], [7, 4], [8, 2]] as const) {
+      assert.equal(Object.values(mc.reached).reduce((n, c) => n + c[r]!, 0), 40 * clubs, `round ${r}`);
+    }
+    assert.equal(Object.values(mc.won).reduce((a, b) => a + b, 0), 40);
   });
 });

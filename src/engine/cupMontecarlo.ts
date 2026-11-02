@@ -1,9 +1,10 @@
 import type { CupConfig } from "../config/cups.ts";
-import { cupGameId, cupShootoutId, drawRoundRandom, iterationRng, type CupBuildOptions, type RealCupTie } from "./cup.ts";
+import { cupGameId, cupSecondLegId, cupShootoutId, drawRoundRandom, iterationRng, type CupBuildOptions, type RealCupTie } from "./cup.ts";
 import { cupModelFor } from "./cupModel.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateScore } from "./match.ts";
 import { simulatePenalties } from "./playoffs.ts";
-import type { TeamStrength } from "./ratings.ts";
+import type { LeagueModel, TeamStrength } from "./ratings.ts";
+import type { Rng } from "./rng.ts";
 import type { ResultMap, Score, TeamId } from "./types.ts";
 
 export interface CupMonteCarloInput {
@@ -29,9 +30,41 @@ export interface CupMonteCarloResult {
   won: Record<TeamId, number>;
 }
 
+interface TieSpec {
+  /** Home club of the first (or only) game. */
+  first: TeamId;
+  second: TeamId;
+  /** Known scores per leg (home of that leg first), null to simulate. */
+  legs: (Score | null)[];
+  /** Home club per leg. */
+  hosts: TeamId[];
+  /** Known shoot-out score, home = the last leg's home club. */
+  pens: Score | null;
+}
+
+/** Plays a tie: known legs kept, the rest simulated; level aggregate goes to penalties. */
+function playTie(spec: TieSpec, model: LeagueModel, neutral: boolean, rng: Rng): TeamId {
+  let first = 0;
+  let second = 0;
+  spec.legs.forEach((known, i) => {
+    const host = spec.hosts[i]!;
+    const guest = host === spec.first ? spec.second : spec.first;
+    const score = known ?? simulateScore(neutral ? expectedGoalsNeutral(model, host, guest) : expectedGoals(model, host, guest), rng);
+    const firstAtHome = host === spec.first;
+    first += firstAtHome ? score.home : score.away;
+    second += firstAtHome ? score.away : score.home;
+  });
+  if (first !== second) return first > second ? spec.first : spec.second;
+  const pens = spec.pens && spec.pens.home !== spec.pens.away ? spec.pens : simulatePenalties(rng);
+  const lastHost = spec.hosts.at(-1)!;
+  const hostWins = pens.home > pens.away;
+  return hostWins ? lastHost : lastHost === spec.first ? spec.second : spec.first;
+}
+
 /**
  * Plays the rest of the cup many times. Undrawn rounds get a fresh random draw
- * every run, so the chances include the luck of the draw.
+ * every run, so the chances include the luck of the draw. A round whose
+ * entrants aren't known (only the real draw names them) ends the run.
  */
 export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult {
   const { config, fixed, options, iterations } = input;
@@ -39,10 +72,10 @@ export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult
   const strengths = new Map(Object.entries(input.strengths).map(([id, s]) => [Number(id), s]));
   const entrants = config.rounds.map((round) => options.entrants[round.key] ?? []);
   const realByRound = config.rounds.map((round) =>
-    input.real.filter((t) => t.round === round.key).sort((a, b) => a.fixture.id - b.fixture.id).slice(0, round.ties),
+    input.real.filter((t) => t.round === round.key).sort((a, b) => a.legs[0]!.id - b.legs[0]!.id).slice(0, round.ties),
   );
   const allClubs = [...realByRound.flat().flatMap((t) => [t.homeId, t.awayId]), ...entrants.flat()];
-  const model = cupModelFor(strengths, allClubs);
+  const model = cupModelFor(strengths, allClubs, config.outsiderTier);
 
   const reached: Record<TeamId, number[]> = {};
   const won: Record<TeamId, number> = {};
@@ -55,33 +88,32 @@ export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult
     let previous: TeamId[] = [];
     for (let r = 0; r < roundCount; r++) {
       const round = config.rounds[r]!;
+      const twoLegs = round.legs === 2;
+      const neutral = Boolean(round.neutral ?? round.venue);
       const reals = realByRound[r]!;
       const placed = new Set(reals.flatMap((t) => [t.homeId, t.awayId]));
       const participants = [...new Set([...previous, ...entrants[r]!, ...placed])];
+      if (reals.length < round.ties && participants.length < round.ties * 2) break;
       for (const id of participants) count(id, r);
-      const pairs: { home: TeamId; away: TeamId; real?: RealCupTie; slot: number }[] = reals.map((t, slot) => ({ home: t.homeId, away: t.awayId, real: t, slot }));
+
+      const specs: TieSpec[] = reals.map((t, slot) => {
+        const ids = twoLegs ? [cupGameId(r, slot), cupSecondLegId(r, slot)] : [cupGameId(r, slot)];
+        const hosts = ids.map((_, n) => t.legs[n]?.homeId ?? (n === 0 ? t.homeId : t.awayId));
+        return {
+          first: t.homeId,
+          second: t.awayId,
+          legs: ids.map((id, n) => fixed[id] ?? t.legs[n]?.result ?? null),
+          hosts,
+          pens: fixed[cupShootoutId(r, slot)] ?? t.legs[ids.length - 1]?.penalties ?? null,
+        };
+      });
       for (const [home, away] of drawRoundRandom(participants.filter((id) => !placed.has(id)), rng)) {
-        if (pairs.length >= round.ties) break;
-        pairs.push({ home, away, slot: pairs.length });
+        if (specs.length >= round.ties) break;
+        specs.push({ first: home, second: away, legs: twoLegs ? [null, null] : [null], hosts: twoLegs ? [home, away] : [home], pens: null });
       }
-      const neutral = Boolean(round.venue);
-      const winners: TeamId[] = [];
-      for (const { home, away, real, slot } of pairs) {
-        let score: Score | null = real ? (fixed[cupGameId(r, slot)] ?? real.fixture.result) : null;
-        if (!score) score = simulateScore(neutral ? expectedGoalsNeutral(model, home, away) : expectedGoals(model, home, away), rng);
-        let winner: TeamId;
-        if (score.home !== score.away) {
-          winner = score.home > score.away ? home : away;
-        } else {
-          let pens: Score | null = real ? (fixed[cupShootoutId(r, slot)] ?? real.fixture.penalties ?? null) : null;
-          if (!pens || pens.home === pens.away) pens = simulatePenalties(rng);
-          winner = pens.home > pens.away ? home : away;
-        }
-        winners.push(winner);
-      }
-      if (winners.length < round.ties) break;
-      previous = winners;
-      if (r === roundCount - 1) won[winners[0]!] = (won[winners[0]!] ?? 0) + 1;
+      if (specs.length < round.ties) break;
+      previous = specs.map((spec) => playTie(spec, model, neutral, rng));
+      if (r === roundCount - 1) won[previous[0]!] = (won[previous[0]!] ?? 0) + 1;
     }
   }
   return { iterations, reached, won };

@@ -90,7 +90,10 @@ export default async function LeaguePage({ params }: { params: Params }) {
   const { config, data, wording } = loaded;
   const values = seoValues(config, locale, data.season);
   const faqKey = wording === "cup" ? "cup" : wording === "playoffs" ? "leaguePlayoffs" : "league";
-  const faq = (faqT.raw(faqKey) as FaqItem[]).map((item) => ({ q: fill(item.q, values), a: fill(item.a, values) }));
+  // Cups: the FAQ explains where this cup's ratings come from.
+  const cupT = await getTranslations("Cup");
+  const faqValues = loaded.kind === "cup" ? { ...values, ratingNote: cupT(`ratingNote.${loaded.config.code}`) } : values;
+  const faq = (faqT.raw(faqKey) as FaqItem[]).map((item) => ({ q: fill(item.q, faqValues), a: fill(item.a, faqValues) }));
   const pageUrl = `${SITE_URL}/${locale}/${config.slug}`;
   const lang = locale as SiteLocale;
   const intro = wording === "cup" ? "introCup" : wording === "playoffs" ? "introPlayoffs" : "intro";

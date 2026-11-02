@@ -5,7 +5,7 @@ import type { RealCupTie } from "../engine/cup.ts";
 import { buildCupStrengths, type FeederModel } from "../engine/cupModel.ts";
 import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
-import type { Team, TeamId } from "../engine/types.ts";
+import type { Fixture, Team, TeamId } from "../engine/types.ts";
 import { EspnError, espnFixtures, espnTeams, fetchEspnYear, type EspnEvent } from "./espn.ts";
 import { getLeagueData } from "./leagueData.ts";
 import { sampleCup } from "./sampleLeague.ts";
@@ -32,8 +32,19 @@ const REVALIDATE_SECONDS = 3600;
 const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 const inflight = new Map<string, Promise<CupData>>();
 
-/** The season being played, by its starting year: cup seasons run August–May. */
-const currentSeasonYear = (now = new Date()) => (now.getUTCMonth() < 5 ? now.getUTCFullYear() - 1 : now.getUTCFullYear());
+/** The season being played, by its starting year (split seasons run August–May). */
+const currentSeasonYear = (cup: CupConfig, now = new Date()) =>
+  cup.espn.seasons === "split" && now.getUTCMonth() < 5 ? now.getUTCFullYear() - 1 : now.getUTCFullYear();
+
+/** Groups a round's games into ties: one game, or the two legs between the same clubs (in date order). */
+export function groupLegs(fixtures: readonly Fixture[]): Fixture[][] {
+  const ties = new Map<string, Fixture[]>();
+  for (const f of [...fixtures].sort((a, b) => a.utcDate.localeCompare(b.utcDate) || a.id - b.id)) {
+    const key = [f.homeId, f.awayId].sort((a, b) => a - b).join("-");
+    ties.set(key, [...(ties.get(key) ?? []), f]);
+  }
+  return [...ties.values()];
+}
 
 /** Same request sharing as getLeagueData. */
 export function getCupData(cup: CupConfig): Promise<CupData> {
@@ -93,9 +104,10 @@ async function loadFeeders(cup: CupConfig) {
 
 async function loadEspnCup(cup: CupConfig): Promise<CupData> {
   const init = { next: { revalidate: REVALIDATE_SECONDS, tags: [`cup:${cup.code}`] } };
-  const current = currentSeasonYear();
+  const current = currentSeasonYear(cup);
   for (const year of [current, current - 1]) {
-    const boards = await Promise.all([year, year + 1].map((y) => fetchEspnYear(cup.espn.slug, y, init)));
+    const years = cup.espn.seasons === "split" ? [year, year + 1] : [year];
+    const boards = await Promise.all(years.map((y) => fetchEspnYear(cup.espn.slug, y, init)));
     const events = new Map<string, EspnEvent>();
     for (const e of boards.flatMap((b) => b.events ?? [])) if (e.season?.year === year) events.set(e.id, e);
     const all = [...events.values()];
@@ -104,13 +116,14 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
     if (byRound[0]!.length < cup.rounds[0]!.ties / 2) continue;
 
     const real: RealCupTie[] = cup.rounds.flatMap((round, r) =>
-      espnFixtures(byRound[r]!).map((fixture) => ({ round: round.key, homeId: fixture.homeId, awayId: fixture.awayId, fixture })),
+      groupLegs(espnFixtures(byRound[r]!)).map((legs) => ({ round: round.key, homeId: legs[0]!.homeId, awayId: legs[0]!.awayId, legs })),
     );
     // The season's own board carries the round calendar.
     const calendar = boards.find((b) => b.leagues?.[0]?.season?.year === year)?.leagues?.[0]?.calendar?.[0]?.entries ?? [];
     const roundDates: Partial<Record<CupRoundKey, string>> = {};
     for (const round of cup.rounds) {
-      const entry = calendar.find((c) => c.label.toLowerCase().replace(/\s+/g, "-") === round.espnSlug);
+      const slug = (label: string) => label.toLowerCase().replace(/^rd of/, "round of").replace(/\s+/g, "-");
+      const entry = calendar.find((c) => slug(c.label) === round.espnSlug);
       if (entry) roundDates[round.key] = new Date(Date.parse(entry.startDate) + 5 * 86_400_000).toISOString();
     }
 
@@ -129,7 +142,7 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
       roundDates,
       divisions: feeders.divisions,
       strengths: feeders.strengths,
-      season: `${year}/${String(year + 1).slice(2)}`,
+      season: cup.espn.seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year),
       seasonKey: `${cup.code}:${year}`,
       source: "live",
     };

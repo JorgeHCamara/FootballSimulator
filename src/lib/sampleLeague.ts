@@ -1,5 +1,5 @@
 import type { CupConfig, CupRoundKey } from "../config/cups.ts";
-import type { CompetitionCode, LeagueConfig } from "../config/leagues.ts";
+import { LEAGUES, type CompetitionCode, type LeagueConfig } from "../config/leagues.ts";
 import type { RealCupTie } from "../engine/cup.ts";
 import { cupModelFor, tierStrength } from "../engine/cupModel.ts";
 import { expectedGoals, simulateFixtures, simulateScore } from "../engine/match.ts";
@@ -73,53 +73,60 @@ export function sampleLeague(league: LeagueConfig, playedShare = 0.4): SampleLea
 }
 
 /**
- * A fictional cup for local development and tests: 80 first-round clubs (half
- * of the ties played, one on penalties) and 44 top-two-division clubs waiting
- * for the third round.
+ * A fictional cup for local development and tests, for any round structure:
+ * the first round's clubs come from the lower feeder leagues and outsiders,
+ * every later round gets the entrants it needs (feeder-league clubs for rounds
+ * with `entrantsFrom`, outsiders otherwise), and half of the first round is
+ * played (one tie on penalties).
  */
 export function sampleCup(cup: CupConfig): CupData {
   const rng = createRng(hash(cup.code));
   const teams: Team[] = [];
   const divisions: Record<TeamId, CompetitionCode> = {};
   const strengths: Record<TeamId, TeamStrength> = {};
-  const club = (id: TeamId, name: string, shortName: string, division: CompetitionCode | undefined, tier: number | undefined) => {
-    teams.push({ id, name, shortName, tla: shortName.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase() });
+  let nextId = 1;
+  const club = (division: CompetitionCode | undefined, tier: number): TeamId => {
+    const id = nextId++;
+    const town = TOWNS[(id * 7) % TOWNS.length]!;
+    const name = division === cup.feederLeagues[0] ? `FC ${town}` : division === cup.feederLeagues[1] ? `${town} County` : `${town} ${SUFFIXES[id % SUFFIXES.length]!}`;
+    teams.push({ id, name, shortName: town, tla: town.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase() });
     if (division) divisions[id] = division;
-    if (tier !== undefined) {
-      const quality = rng() * 2 - 1;
-      const scale = tierStrength(tier);
-      strengths[id] = { attack: Math.exp(0.3 * quality) * scale.attack, defence: Math.exp(-0.3 * quality) * scale.defence };
-    }
+    const quality = rng() * 2 - 1;
+    const scale = tierStrength(tier);
+    strengths[id] = { attack: Math.exp(0.3 * quality) * scale.attack, defence: Math.exp(-0.3 * quality) * scale.defence };
+    return id;
   };
-  // Clubs entering later: 20 "FC Town" (top division) and 24 "Town County" (second).
-  const entrantLeagues = cup.rounds.find((r) => r.entrantsFrom)?.entrantsFrom ?? [];
+  const leagueSize = (code: CompetitionCode) => LEAGUES.find((l) => l.code === code)?.teams ?? 20;
+  const entering = new Set(cup.rounds.flatMap((r) => r.entrantsFrom ?? []));
+
   const entrants: Partial<Record<CupRoundKey, TeamId[]>> = {};
-  const later: TeamId[] = [];
-  for (let i = 0; i < 20; i++) {
-    club(i + 1, `FC ${TOWNS[i]!}`, TOWNS[i]!, entrantLeagues[0], 0);
-    later.push(i + 1);
-  }
-  for (let i = 0; i < 24; i++) {
-    club(101 + i, `${TOWNS[(i + 5) % TOWNS.length]!} County`, TOWNS[(i + 5) % TOWNS.length]!, entrantLeagues[1], 1);
-    later.push(101 + i);
-  }
-  const entrantRound = cup.rounds.find((r) => r.entrantsFrom);
-  if (entrantRound) entrants[entrantRound.key] = later;
-  // First round: 24 third-tier clubs, 24 fourth-tier clubs and 32 non-league sides.
   const first: TeamId[] = [];
-  for (let i = 0; i < 80; i++) {
-    const town = TOWNS[(i * 7) % TOWNS.length]!;
-    const id = 1001 + i;
-    const division = i < 24 ? cup.feederLeagues[2] : i < 48 ? cup.feederLeagues[3] : undefined;
-    club(id, `${town} ${SUFFIXES[i % SUFFIXES.length]!}`, town, division, i < 24 ? 2 : i < 48 ? 3 : undefined);
-    first.push(id);
-  }
+  cup.rounds.forEach((round, r) => {
+    const needed = round.ties * 2 - (r === 0 ? 0 : cup.rounds[r - 1]!.ties);
+    if (needed <= 0) return;
+    const ids: TeamId[] = [];
+    if (round.entrantsFrom) {
+      for (const code of round.entrantsFrom) {
+        const tier = cup.feederLeagues.indexOf(code);
+        for (let i = 0; i < leagueSize(code) && ids.length < needed; i++) ids.push(club(code, tier));
+      }
+    } else if (r === 0) {
+      // Feeder leagues that don't enter later start here, then outsiders.
+      cup.feederLeagues.forEach((code, tier) => {
+        if (entering.has(code)) return;
+        for (let i = 0; i < leagueSize(code) && ids.length < needed; i++) ids.push(club(code, tier));
+      });
+    }
+    while (ids.length < needed) ids.push(club(undefined, cup.outsiderTier));
+    if (r === 0) first.push(...ids);
+    else entrants[round.key] = ids;
+  });
 
   const day = 86_400_000;
   const played = new Date(Date.now() - 3 * day);
   played.setUTCHours(15, 0, 0, 0);
   const upcoming = new Date(played.getTime() + 7 * day);
-  const model = cupModelFor(new Map(Object.entries(strengths).map(([id, s]) => [Number(id), s])), first);
+  const model = cupModelFor(new Map(Object.entries(strengths).map(([id, st]) => [Number(id), st])), first, cup.outsiderTier);
   const firstRound = cup.rounds[0]!;
   const real: RealCupTie[] = [];
   for (let t = 0; t < firstRound.ties; t++) {
@@ -133,7 +140,7 @@ export function sampleCup(cup: CupConfig): CupData {
       fixture.result = score;
       if (score.home === score.away) fixture.penalties = simulatePenalties(rng);
     }
-    real.push({ round: firstRound.key, homeId, awayId, fixture });
+    real.push({ round: firstRound.key, homeId, awayId, legs: [fixture] });
   }
   const roundDates: Partial<Record<CupRoundKey, string>> = {};
   cup.rounds.forEach((round, r) => {
@@ -147,7 +154,7 @@ export function sampleCup(cup: CupConfig): CupData {
     roundDates,
     divisions,
     strengths,
-    season: `${year}/${String(year + 1).slice(2)}`,
+    season: cup.espn.seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year),
     seasonKey: `${cup.code}:sample`,
     source: "sample",
   };

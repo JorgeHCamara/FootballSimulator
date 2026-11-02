@@ -5,10 +5,10 @@ import type { LeagueModel } from "./ratings.ts";
 import { createRng, type Rng } from "./rng.ts";
 import type { Fixture, ResultMap, Score, TeamId } from "./types.ts";
 
-// Knockout cup: each round's pairings are drawn (randomly), a drawn game goes to
-// extra time and penalties, and the winners meet in the next round. Rounds the
-// real draw hasn't reached yet are drawn here, deterministically, so a page
-// reload or a share link shows the same pairings.
+// Knockout cup: each round's pairings are drawn (randomly), a tie is one game
+// or two legs, a level tie goes to penalties, and the winners meet in the next
+// round. Rounds the real draw hasn't reached yet are drawn here,
+// deterministically, so a page reload or a share link shows the same pairings.
 
 /** Cup ties get synthetic fixture ids above the play-off range. */
 export const CUP_ID_BASE = 3_000_000_000;
@@ -16,20 +16,32 @@ export const CUP_ID_BASE = 3_000_000_000;
 /** A tie's slot: round r, tie t. Every slot exists whether or not it's drawn yet. */
 export const cupGameId = (round: number, tie: number) => CUP_ID_BASE + round * 1000 + tie * 2;
 export const cupShootoutId = (round: number, tie: number) => cupGameId(round, tie) + 1;
-export const isCupShootoutId = (id: number) => id >= CUP_ID_BASE && (id - CUP_ID_BASE) % 2 === 1;
+/** Second leg of a two-legged tie (offsets 500+ within the round). */
+export const cupSecondLegId = (round: number, tie: number) => CUP_ID_BASE + round * 1000 + 500 + tie;
+export const isCupShootoutId = (id: number) => {
+  if (id < CUP_ID_BASE) return false;
+  const offset = (id - CUP_ID_BASE) % 1000;
+  return offset < 500 && offset % 2 === 1;
+};
 
-/** Every slot id of the competition (games and shoot-outs), for share links. */
+/** Every slot id of the competition (games, second legs and shoot-outs), for share links. */
 export function cupIds(config: CupConfig): number[] {
-  return config.rounds.flatMap((round, r) => Array.from({ length: round.ties }, (_, t) => [cupGameId(r, t), cupShootoutId(r, t)]).flat());
+  return config.rounds.flatMap((round, r) =>
+    Array.from({ length: round.ties }, (_, t) => [cupGameId(r, t), cupShootoutId(r, t), ...(round.legs === 2 ? [cupSecondLegId(r, t)] : [])]).flat(),
+  );
 }
 
 export interface CupTie {
   round: number;
   index: number;
+  /** The club at home in the (first) game. */
   homeId: TeamId;
   awayId: TeamId;
+  /** The first (or only) game; the same fixture as legs[0]. */
   game: Fixture;
-  /** Penalty shoot-out pseudo-fixture (same home side as the game). */
+  /** One game, or both legs (the second at the other club). */
+  legs: Fixture[];
+  /** Penalty shoot-out pseudo-fixture: same home side as the last game. */
   shootout: Fixture;
   /** The pairing comes from the real draw. */
   real: boolean;
@@ -38,19 +50,24 @@ export interface CupTie {
 export interface CupRound {
   index: number;
   config: CupRoundConfig;
-  /** "real": every tie from the feed; "simulated": drawn here (partly or fully); "pending": the previous round isn't decided. */
-  drawn: "real" | "simulated" | "pending";
+  /**
+   * "real": every tie from the feed; "simulated": drawn here (partly or fully);
+   * "determined": a single tie between the only two clubs left (the final);
+   * "pending": waiting for the previous round, or for a draw whose entrants
+   * aren't known from any feed.
+   */
+  drawn: "real" | "simulated" | "determined" | "pending";
   ties: CupTie[];
   /** Clubs in the round, once known. */
   participants: TeamId[];
 }
 
-/** A real tie from the data feed. */
+/** A real tie from the data feed: one game, or both legs in date order. */
 export interface RealCupTie {
   round: CupRoundKey;
   homeId: TeamId;
   awayId: TeamId;
-  fixture: Fixture;
+  legs: Fixture[];
 }
 
 export interface CupBuildOptions {
@@ -102,42 +119,73 @@ export function drawRoundRandom(clubs: readonly TeamId[], rng: Rng): [TeamId, Te
 
 const scoreOf = (fixture: Fixture, results: ResultMap): Score | null => results[fixture.id] ?? fixture.result;
 
-/** The club going through, or null while the game (or a needed shoot-out) isn't decided. */
+/** Goals per club over every leg, or null while a leg has no score. */
+export function tieAggregate(tie: CupTie, results: ResultMap): { home: number; away: number } | null {
+  let home = 0;
+  let away = 0;
+  for (const leg of tie.legs) {
+    const score = scoreOf(leg, results);
+    if (!score) return null;
+    const homeAtHome = leg.homeId === tie.homeId;
+    home += homeAtHome ? score.home : score.away;
+    away += homeAtHome ? score.away : score.home;
+  }
+  return { home, away };
+}
+
+/** The club going through, or null while a game (or a needed shoot-out) isn't decided. */
 export function tieWinner(tie: CupTie, results: ResultMap): TeamId | null {
-  const score = scoreOf(tie.game, results);
-  if (!score) return null;
-  if (score.home !== score.away) return score.home > score.away ? tie.homeId : tie.awayId;
+  const total = tieAggregate(tie, results);
+  if (!total) return null;
+  if (total.home !== total.away) return total.home > total.away ? tie.homeId : tie.awayId;
   const pens = scoreOf(tie.shootout, results);
   if (!pens || pens.home === pens.away) return null;
-  return pens.home > pens.away ? tie.homeId : tie.awayId;
+  const shootoutHomeWins = pens.home > pens.away;
+  return shootoutHomeWins === (tie.shootout.homeId === tie.homeId) ? tie.homeId : tie.awayId;
 }
 
-/** True when the game is level, so the shoot-out decides it. */
+/** True when every game is played and the tie is level, so the shoot-out decides it. */
 export function needsShootout(tie: CupTie, results: ResultMap): boolean {
-  const score = scoreOf(tie.game, results);
-  return score !== null && score.home === score.away;
+  const total = tieAggregate(tie, results);
+  return total !== null && total.home === total.away;
 }
 
-function makeTie(round: number, index: number, homeId: TeamId, awayId: TeamId, config: CupRoundConfig, real: Fixture | undefined, date: string): CupTie {
-  const neutral = Boolean(config.venue);
-  const { penalties, ...realRest } = real ?? ({} as Partial<Fixture>);
-  const game: Fixture = {
-    id: cupGameId(round, index),
-    matchday: round + 1,
-    utcDate: realRest.utcDate ?? date,
-    homeId,
-    awayId,
-    result: realRest.result ?? null,
-    ...(neutral ? { neutral: true } : {}),
+function makeTie(
+  round: number,
+  index: number,
+  homeId: TeamId,
+  awayId: TeamId,
+  config: CupRoundConfig,
+  real: readonly Fixture[] | undefined,
+  date: string,
+): CupTie {
+  const neutral = Boolean(config.neutral ?? config.venue);
+  const twoLegs = config.legs === 2;
+  const legFor = (n: 0 | 1): Fixture => {
+    const source = real?.[n];
+    const [h, a] = source ? [source.homeId, source.awayId] : n === 0 ? [homeId, awayId] : [awayId, homeId];
+    const { penalties: _p, ...rest } = source ?? ({} as Partial<Fixture>);
+    return {
+      id: n === 0 ? cupGameId(round, index) : cupSecondLegId(round, index),
+      matchday: round + 1,
+      utcDate: rest.utcDate ?? (n === 0 ? date : new Date(Date.parse(date) + 7 * 86_400_000).toISOString()),
+      homeId: h,
+      awayId: a,
+      result: rest.result ?? null,
+      ...(neutral ? { neutral: true } : {}),
+    };
   };
-  const shootout: Fixture = { ...game, id: cupShootoutId(round, index), result: penalties ?? null };
-  return { round, index, homeId, awayId, game, shootout, real: real !== undefined };
+  const legs = twoLegs ? [legFor(0), legFor(1)] : [legFor(0)];
+  const last = legs.at(-1)!;
+  const penalties = real?.[legs.length - 1]?.penalties;
+  const shootout: Fixture = { ...last, id: cupShootoutId(round, index), result: penalties ?? null };
+  return { round, index, homeId: legs[0]!.homeId, awayId: legs[0]!.awayId, game: legs[0]!, legs, shootout, real: real !== undefined };
 }
 
 /**
  * Builds every round: real ties from the feed fill their slots (in feed order),
  * the remaining clubs are drawn among themselves, and a round whose previous
- * round isn't decided is pending.
+ * round isn't decided (or whose entrants aren't known) is pending.
  */
 export function buildCup(config: CupConfig, real: readonly RealCupTie[], results: ResultMap, options: CupBuildOptions): CupRound[] {
   const rounds: CupRound[] = [];
@@ -145,9 +193,9 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     const previous = rounds[r - 1];
     const entrants = options.entrants[roundConfig.key] ?? [];
     const date = options.roundDates[roundConfig.key] ?? new Date(Date.now() + (r + 1) * 28 * 86_400_000).toISOString();
-    const realTies = real.filter((t) => t.round === roundConfig.key).sort((a, b) => a.fixture.id - b.fixture.id);
+    const realTies = real.filter((t) => t.round === roundConfig.key).sort((a, b) => a.legs[0]!.id - b.legs[0]!.id);
 
-    // Winners of the previous round, or the first round's clubs from the feed.
+    // Winners of the previous round (none before the first round).
     let fromPrevious: TeamId[] | null;
     if (r === 0) {
       fromPrevious = [];
@@ -159,15 +207,17 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     }
 
     const ties: CupTie[] = [];
-    realTies.slice(0, roundConfig.ties).forEach((t, i) => ties.push(makeTie(r, i, t.homeId, t.awayId, roundConfig, t.fixture, date)));
+    realTies.slice(0, roundConfig.ties).forEach((t, i) => ties.push(makeTie(r, i, t.homeId, t.awayId, roundConfig, t.legs, date)));
     const placed = new Set(ties.flatMap((t) => [t.homeId, t.awayId]));
+    const complete = ties.length >= roundConfig.ties;
 
-    if (fromPrevious === null && ties.length < roundConfig.ties) {
-      // Keep the real ties already drawn; the rest waits for the previous round.
-      rounds.push({ index: r, config: roundConfig, drawn: "pending", ties, participants: [...placed] });
+    const participants = fromPrevious === null ? [...placed] : [...new Set([...fromPrevious, ...entrants, ...placed])];
+    // Not drawable yet: the previous round is open, or clubs entering this round
+    // aren't known from any feed (keep the real ties already published).
+    if (!complete && (fromPrevious === null || participants.length < roundConfig.ties * 2)) {
+      rounds.push({ index: r, config: roundConfig, drawn: "pending", ties, participants });
       return;
     }
-    const participants = [...new Set([...(fromPrevious ?? []), ...entrants, ...placed])];
     const remaining = participants.filter((id) => !placed.has(id));
     const pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt));
     for (const [home, away] of pairs) {
@@ -177,7 +227,7 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     rounds.push({
       index: r,
       config: roundConfig,
-      drawn: realTies.length >= roundConfig.ties ? "real" : "simulated",
+      drawn: complete ? "real" : roundConfig.ties === 1 ? "determined" : "simulated",
       ties,
       participants,
     });
@@ -203,11 +253,11 @@ export function clubsAlive(rounds: readonly CupRound[], results: ResultMap, allE
   return alive;
 }
 
-/** Simulates a round's undecided games and shoot-outs; returns the new results only. */
+/** Simulates a round's unplayed games and needed shoot-outs; returns the new results only. */
 export function simulateCupRound(round: CupRound, known: ResultMap, model: LeagueModel, rng: Rng): ResultMap {
   const added: ResultMap = {};
   const now = () => ({ ...known, ...added });
-  Object.assign(added, simulateFixtures(round.ties.map((t) => t.game).filter((g) => !scoreOf(g, known)), now(), model, rng));
+  Object.assign(added, simulateFixtures(round.ties.flatMap((t) => t.legs).filter((g) => !scoreOf(g, known)), now(), model, rng));
   for (const tie of round.ties) {
     if (needsShootout(tie, now()) && !scoreOf(tie.shootout, now())) added[tie.shootout.id] = simulatePenalties(rng);
   }

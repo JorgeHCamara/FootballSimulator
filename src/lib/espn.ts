@@ -317,7 +317,9 @@ export function espnFixtures(events: readonly EspnEvent[], { roundCount, weekly 
       homeId: games[i]!.home,
       awayId: games[i]!.away,
       result: finished && hasScore ? { home: homeGoals, away: awayGoals } : null,
-      ...(finished && hasScore && homeGoals === awayGoals && home.shootoutScore != null && away.shootoutScore != null
+      // A shoot-out can follow a game that wasn't itself level (a two-legged tie
+      // level on aggregate), so keep it whenever the feed reports one.
+      ...(finished && hasScore && home.shootoutScore != null && away.shootoutScore != null
         ? { penalties: { home: Number(home.shootoutScore), away: Number(away.shootoutScore) } }
         : {}),
     };
