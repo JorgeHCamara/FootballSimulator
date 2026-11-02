@@ -28,6 +28,10 @@ export function SiteFooter() {
           © {new Date().getFullYear()} Foot Simu ·{" "}
           <a href="https://www.football-data.org/" className="hover:text-zinc-600 hover:underline dark:hover:text-zinc-300" rel="noopener">
             {t("attribution")}
+          </a>{" "}
+          ·{" "}
+          <a href="https://www.thesportsdb.com/" className="hover:text-zinc-600 hover:underline dark:hover:text-zinc-300" rel="noopener">
+            {t("crestCredit")}
           </a>
         </p>
       </div>

@@ -6,6 +6,8 @@ import { doubleRoundRobin } from "../engine/schedule.ts";
 import type { ResultMap } from "../engine/types.ts";
 import { mapMatches, mapTeam, request, seasonOf, teamsFromMatches, type ApiMatch } from "./footballData.ts";
 import { decodeResults, encodeResults } from "./shareCodec.ts";
+import { existsSync } from "node:fs";
+import { CREST_FALLBACKS, withFallbackCrests } from "../config/crests.ts";
 import { assignRounds, espnFixtures, espnSplitSeason, espnTeams, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 
 describe("shareCodec", () => {
@@ -359,5 +361,25 @@ describe("ESPN feed mapping", () => {
     const athletic = { id: 20851, name: "Athletic", shortName: "Athletic", tla: "ACMG" };
     assert.equal(applyTeamOverrides([athletic], { league: "BSB" })[0]!.name, "Athletic-MG");
     assert.equal(applyTeamOverrides([athletic], { league: "PD" })[0]!.name, "Athletic");
+  });
+});
+
+describe("fallback crests", () => {
+  it("fills a missing crest from the saved map and keeps ESPN's own", () => {
+    const [id, path] = Object.entries(CREST_FALLBACKS)[0] ?? ["0", "/crests/0.png"];
+    const map = { [Number(id)]: path };
+    const teams = [
+      { id: Number(id), name: "A", shortName: "A", tla: "A" },
+      { id: Number(id), name: "B", shortName: "B", tla: "B", crest: "https://espn/1.png" },
+    ];
+    const filled = withFallbackCrests(teams);
+    if (Object.keys(CREST_FALLBACKS).length) assert.equal(filled[0]!.crest, map[Number(id)]);
+    assert.equal(filled[1]!.crest, "https://espn/1.png");
+  });
+
+  it("has a saved image for every entry", () => {
+    for (const [id, path] of Object.entries(CREST_FALLBACKS)) {
+      assert.ok(existsSync(new URL(`../../public${path}`, import.meta.url)), `crest ${id} missing: ${path}`);
+    }
   });
 });

@@ -1,4 +1,5 @@
 import { gamesPerTeam, type LeagueConfig } from "../config/leagues.ts";
+import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
 import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnGroups, fetchEspnSeason } from "./espn.ts";
@@ -98,7 +99,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
     if (fixtures.length < (league.teams * perTeam) / 4) continue;
     const label = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
     return {
-      teams: applyTeamOverrides(espnTeams(events), { league: league.code }),
+      teams: withFallbackCrests(applyTeamOverrides(espnTeams(events), { league: league.code })),
       fixtures,
       season: label,
       // ESPN and football-data.org use different match ids, so each source keeps

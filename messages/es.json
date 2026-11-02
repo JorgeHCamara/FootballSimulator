@@ -132,7 +132,8 @@
   },
   "Footer": {
     "attribution": "Datos: football-data.org",
-    "disclaimer": "Foot Simu no está afiliado a ninguna liga ni club. Las simulaciones son solo para entretenimiento."
+    "disclaimer": "Foot Simu no está afiliado a ninguna liga ni club. Las simulaciones son solo para entretenimiento.",
+    "crestCredit": "Algunos escudos: TheSportsDB"
   },
   "NotFound": {
     "title": "Página no encontrada",

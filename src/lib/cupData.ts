@@ -1,5 +1,6 @@
 import type { CupConfig, CupRoundKey } from "../config/cups.ts";
 import { LEAGUES, type CompetitionCode } from "../config/leagues.ts";
+import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { RealCupTie } from "../engine/cup.ts";
 import { buildCupStrengths, type FeederModel } from "../engine/cupModel.ts";
@@ -133,7 +134,7 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
       if (round.entrantsFrom) entrants[round.key] = round.entrantsFrom.flatMap((code) => feeders.members[code] ?? []);
     }
     const teams = new Map(feeders.teams);
-    for (const team of applyTeamOverrides(espnTeams(all))) if (!teams.has(team.id)) teams.set(team.id, team);
+    for (const team of withFallbackCrests(applyTeamOverrides(espnTeams(all)))) if (!teams.has(team.id)) teams.set(team.id, team);
 
     return {
       teams: [...teams.values()],
