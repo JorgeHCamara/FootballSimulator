@@ -80,7 +80,8 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
       groupRows.push(rows);
     }
     if (playoff) {
-      const rows = grouped ? seedByGroupPlace(groupRows, playoff.external, playoff.config.seedFromGroups?.places) : groupRows[0]!;
+      const seeding = playoff.config.seedFromGroups;
+      const rows = grouped ? seedByGroupPlace(groupRows, playoff.external, seeding?.places, seeding?.interleave) : groupRows[0]!;
       // The bracket only needs the table and knockout results (real ones come with the options).
       const roundCount = playoff.config.rounds.length;
       let final: PlayoffTie | undefined;

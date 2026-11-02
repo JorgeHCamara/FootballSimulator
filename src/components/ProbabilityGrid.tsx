@@ -23,7 +23,7 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
   const result = useMonteCarlo(input);
   const relegation = league.zones.find((z) => z.kind === "relegation");
   // MLS: the chance of any playoff place, wild card included.
-  const playoffZones = league.zones.filter((z) => z.kind === "playoffs" || z.kind === "playoffWildCard");
+  const playoffZones = league.zones.filter((z) => z.kind === "playoffs" || z.kind === "playoffWildCard" || z.kind === "titlePlayoffs");
   const playoffs = playoffZones.length
     ? { from: Math.min(...playoffZones.map((z) => z.from)), to: Math.max(...playoffZones.map((z) => z.to)) }
     : undefined;
@@ -66,6 +66,8 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
               )}
               {playoffs && <th className="px-2 text-right">{t("playoffChance")}</th>}
               {relegation && <th className="px-2 text-right">{t("relegationChance")}</th>}
+              {/* A title play-off simulated with the table (Argentina): the chance of winning it. */}
+              {!continental && result.playoffWins && <th className="px-2 text-right">{t("winChance")}</th>}
               <th className="hidden pr-3 pl-4 text-left md:table-cell">{t("positionHeatmap")}</th>
             </tr>
           </thead>
@@ -112,6 +114,11 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                   {relegation && (
                     <td className="px-2 text-right tabular-nums text-red-600 dark:text-red-400">
                       {pct(probabilityInRange(result, row.teamId, relegation.from, relegation.to))}
+                    </td>
+                  )}
+                  {!continental && result.playoffWins && (
+                    <td className="px-2 text-right font-semibold tabular-nums" data-testid="win-chance">
+                      {pct((result.playoffWins[row.teamId] ?? 0) / result.iterations)}
                     </td>
                   )}
                   <td className="hidden py-1.5 pr-3 pl-4 md:table-cell">

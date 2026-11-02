@@ -33,7 +33,7 @@ function seoValues(competition: CompetitionConfig, locale: string, season: strin
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
 /** Which set of texts a page uses: league, play-off league, continental competition, or cup. */
-type Wording = "league" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
+type Wording = "league" | "leagueAmericas" | "zones" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
 
 type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
@@ -46,7 +46,17 @@ async function load(slug: string): Promise<Loaded | undefined> {
     return { kind: "cup", config: competition.cup, data: await getCupData(competition.cup), wording };
   }
   const { league } = competition;
-  const wording = league.continental ? (league.groups ? "continentalGroups" : "continental") : playoffWording(league) ? "playoffs" : "league";
+  const wording: Wording = league.continental
+    ? league.groups
+      ? "continentalGroups"
+      : "continental"
+    : league.playoff?.seedFromGroups
+      ? "zones" // Argentina: zone tables and a title play-off
+      : playoffWording(league)
+        ? "playoffs"
+        : league.zones.some((z) => z.kind === "libertadores")
+          ? "leagueAmericas" // continental places are the Libertadores, not Europe
+          : "league";
   return { kind: "league", config: league, data: await getLeagueData(league), wording };
 }
 
@@ -57,6 +67,8 @@ const META_KEYS: Record<
     description:
       | "leagueDescription"
       | "leagueDescriptionPlayoffs"
+      | "leagueDescriptionAmericas"
+      | "zonesDescription"
       | "continentalDescription"
       | "continentalGroupsDescription"
       | "cupDescription"
@@ -64,6 +76,8 @@ const META_KEYS: Record<
   }
 > = {
   league: { title: "leagueTitle", description: "leagueDescription" },
+  leagueAmericas: { title: "leagueTitle", description: "leagueDescriptionAmericas" },
+  zones: { title: "leagueTitle", description: "zonesDescription" },
   continental: { title: "continentalTitle", description: "continentalDescription" },
   continentalGroups: { title: "continentalGroupsTitle", description: "continentalGroupsDescription" },
   playoffs: { title: "leagueTitle", description: "leagueDescriptionPlayoffs" },
@@ -111,7 +125,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
   const { config, data, wording } = loaded;
   const values = seoValues(config, locale, data.season);
   const faqKey =
-    wording === "cup" || wording === "cupBracket" || wording === "continental" || wording === "continentalGroups"
+    wording === "cup" || wording === "cupBracket" || wording === "continental" || wording === "continentalGroups" || wording === "zones"
       ? wording
       : wording === "playoffs"
         ? "leaguePlayoffs"
@@ -135,7 +149,9 @@ export default async function LeaguePage({ params }: { params: Params }) {
             ? (`introContinentalGroups.${config.code}` as "intro")
           : wording === "playoffs"
             ? "introPlayoffs"
-            : "intro";
+            : wording === "zones"
+              ? "introZones"
+              : "intro";
   // Continental competitions: clubs joining the knockout phase from another
   // competition (Sudamericana: Libertadores third places), and ratings that
   // start from each club's domestic league.
@@ -156,7 +172,11 @@ export default async function LeaguePage({ params }: { params: Params }) {
             ? "step3Continental"
             : step === "step3" && wording === "continentalGroups"
               ? (`step3ContinentalGroups.${config.code}` as "step3")
-              : step;
+              : step === "step3" && wording === "zones"
+                ? "step3Zones"
+                : step === "step3" && wording === "leagueAmericas"
+                  ? "step3Americas"
+                  : step;
 
   return (
     <div className="space-y-4" data-source={data.source}>

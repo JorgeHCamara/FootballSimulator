@@ -44,6 +44,8 @@ export interface PlayoffRoundConfig {
   noExtraTime?: boolean;
   /** Single match at a neutral ground, e.g. "Wembley". */
   venue?: string;
+  /** At a neutral ground not yet named (Argentina's final). */
+  neutral?: boolean;
   /** Fixed pairings by table position (first round). */
   pairs?: readonly (readonly [number, number])[];
   /** Positions that join in this round, alongside the previous round's winners. */
@@ -105,6 +107,12 @@ export interface PlayoffConfig {
      * third-placed clubs, seeds 17–24).
      */
     external?: { league: string; place: number };
+    /**
+     * Rank by place, then by group order rather than record (A1, B1, A2, B2…),
+     * so seeding pairs like 1 v 16 always cross the groups (Argentina: 1A v 8B,
+     * 1B v 8A…). Positions then also name the slot: zone = (p − 1) mod groups.
+     */
+    interleave?: boolean;
   };
 }
 
@@ -121,12 +129,14 @@ export function seedByGroupPlace(
   groups: readonly (readonly StandingRow[])[],
   external: readonly StandingRow[] = [],
   places = Infinity,
+  interleave = false,
 ): StandingRow[] {
   const deepest = Math.max(0, ...groups.map((g) => g.length));
   const ranked: StandingRow[] = [];
   for (let place = 1; place <= deepest; place++) {
     if (place === places + 1) ranked.push(...[...external].sort(byRecord));
-    ranked.push(...groups.flatMap((g) => g.filter((row) => row.position === place)).sort(byRecord));
+    const atPlace = groups.flatMap((g) => g.filter((row) => row.position === place));
+    ranked.push(...(interleave ? atPlace : atPlace.sort(byRecord)));
   }
   if (places >= deepest) ranked.push(...[...external].sort(byRecord));
   return ranked.map((row, i) => ({ ...row, position: i + 1 }));
@@ -401,7 +411,7 @@ export function buildBracket(
         const tie: PlayoffTie = { round: r, index: t, config: round, ...(group !== undefined ? { group } : {}), higher, lower, legs: [], shootout: null, gameShootouts: [] };
         ties.push(tie);
         if (higher.teamId === null || lower.teamId === null) continue;
-        const neutral = Boolean(round.venue);
+        const neutral = Boolean(round.venue || round.neutral);
         const reals = realBetween(higher.teamId, lower.teamId);
         // A leg: the real game between the two clubs when the feed has it (in date
         // order for a series; same home side otherwise, either way at a neutral venue).

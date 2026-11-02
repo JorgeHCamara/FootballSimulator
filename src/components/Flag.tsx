@@ -80,6 +80,23 @@ function shapes(code: FlagCode) {
           <polygon points="15.00,5.00 16.23,8.30 19.76,8.45 17.00,10.65 17.94,14.05 15.00,12.10 12.06,14.05 13.00,10.65 10.24,8.45 13.77,8.30" fill="#f2b705" />
         </>
       );
+    case "ar":
+      return (
+        <>
+          <rect width="30" height="20" fill="#74acdf" />
+          <rect y="6.67" width="30" height="6.67" fill="#ffffff" />
+          <circle cx="15" cy="10" r="2" fill="#f6b40e" />
+        </>
+      );
+    case "cl":
+      return (
+        <>
+          <rect width="30" height="20" fill="#ffffff" />
+          <rect y="10" width="30" height="10" fill="#d52b1e" />
+          <rect width="10" height="10" fill="#0039a6" />
+          <polygon points="5.00,2.00 5.71,4.03 7.85,4.07 6.14,5.37 6.76,7.43 5.00,6.20 3.24,7.43 3.86,5.37 2.15,4.07 4.29,4.03" fill="#ffffff" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

@@ -125,7 +125,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
     );
     // A knockout seeded from the group places (Libertadores): one ranking, winners first.
     const seeding = league.playoff?.seedFromGroups;
-    if (seeding) return { overall: seedByGroupPlace(groupTables, externalSeeds, seeding.places), groups: undefined };
+    if (seeding) return { overall: seedByGroupPlace(groupTables, externalSeeds, seeding.places, seeding.interleave), groups: undefined };
     return { overall, groups: groupTables };
   };
 
@@ -305,11 +305,12 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             model,
             standings: standingsOptions,
             // The knockout phase makes each continental run several times slower, so half as many (as for cups).
-            iterations: league.continental ? ITERATIONS / 2 : ITERATIONS,
+            iterations: league.continental || playoff?.seedFromGroups ? ITERATIONS / 2 : ITERATIONS,
             seed: 2026,
             ...(groupTabs.length ? { groups: groupTabs.map((g) => g.teamIds) } : {}),
             // Continental competitions: the chance of winning it takes the knockout phase too.
-            ...(league.continental && playoff
+            // Also a title play-off seeded from groups (Argentina): the chance of winning the tournament.
+            ...((league.continental || playoff?.seedFromGroups) && playoff
               ? { playoff: { config: playoff, options: bracketOptions, ...(externalSeeds ? { external: externalSeeds } : {}) } }
               : {}),
           }
@@ -454,6 +455,9 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
                     ...(playoff.winnerPlays ? { winnerPlays: playoff.winnerPlays } : {}),
                     ...(cancelled && playoff.directIfClear ? { cancelled: playoff.directIfClear } : {}),
                     groupNames: (league.groups ?? []).map((g) => g.shortName[lang]),
+                    ...(playoff.seedFromGroups?.interleave
+                      ? { zoneSlots: { ids: (league.groups ?? []).map((g) => g.id), names: (league.groups ?? []).map((g) => g.name[lang]) } }
+                      : {}),
                     ...(league.continental
                       ? { knockout: playoff.seedFromGroups ? (playoff.seedFromGroups.external ? "groupStageExternal" : "groupStage") : "leaguePhase" }
                       : {}),

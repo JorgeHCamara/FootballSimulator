@@ -1,4 +1,4 @@
-import { gamesPerTeam, type LeagueConfig } from "../config/leagues.ts";
+import { gamesPerTeam, type EspnStages, type LeagueConfig } from "../config/leagues.ts";
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
@@ -85,7 +85,11 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
   for (const year of [current, current - 1]) {
     let all = await fetchEspnSeason(slug, year, seasons, init);
     const groups = league.groups ? await loadEspnGroups(league, year, init) : undefined;
-    const stages = league.espn.stages;
+    // The tournament to show: the first listed (latest) with at least half its
+    // table published; a single tournament is always used.
+    const stageSets = league.espn.stages === undefined ? [] : "table" in league.espn.stages ? [league.espn.stages] : [...league.espn.stages];
+    const tableGames = (set: EspnStages) => all.filter((e) => e.season?.slug === set.table).length;
+    const stages = stageSets.find((set) => stageSets.length === 1 || tableGames(set) >= (league.teams * perTeam) / 4) ?? stageSets.at(-1);
     if (groups) {
       // Only games between member clubs: drops exhibitions such as the MLS All-Star game.
       // With stages, only the table's: knockout games can bring in clubs from
@@ -107,7 +111,8 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
     const fixtures = espnFixtures(events, weeklyRounds ? { weekly: true } : { roundCount: perTeam });
     // Skip a year until at least half of its games are published.
     if (fixtures.length < (league.teams * perTeam) / 4) continue;
-    const label = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
+    const yearLabel = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
+    const label = stages?.name ? `${stages.name} ${yearLabel}` : yearLabel;
     return {
       // Knockout games can bring in clubs from outside the table (see above), which need names too.
       teams: withFallbackCrests(applyTeamOverrides(espnTeams(stages ? [...events, ...postseason] : events), { league: league.code })),
@@ -115,7 +120,8 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       season: label,
       // ESPN and football-data.org use different match ids, so each source keeps
       // its own saved predictions (Série B has only ever used ESPN).
-      seasonKey: league.espnOnly ? `${league.code}:${year}` : `${league.code}:espn:${year}`,
+      // Each tournament of a season (Apertura, Clausura) keeps its own predictions.
+      seasonKey: `${league.espnOnly ? `${league.code}:${year}` : `${league.code}:espn:${year}`}${stageSets.length > 1 && stages ? `:${stages.table}` : ""}`,
       source: "live",
       // Cancelled play-off games (e.g. a series' unneeded game 3) are left out.
       ...(league.playoff && postseason.length

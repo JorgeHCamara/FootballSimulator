@@ -681,6 +681,41 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Argentina: two zones, cross-zone play-offs to a neutral final, title chances", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/argentina-primera-division`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.equal(await rows.count(), 15, "one zone at a time");
+      const zones = await rows.evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.deepEqual(zones.slice(7, 9), ["titlePlayoffs", ""]);
+      assert.deepEqual(await p.locator('[data-testid="group-switch"] button').allInnerTexts(), ["Zone A", "Zone B"]);
+      const options = await p.locator('[data-testid="matchday-select"] option').allInnerTexts();
+      assert.equal(options.length, 17, "16 rounds and the play-offs");
+      await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Play-off" });
+      const first = p.locator('[data-testid="playoff-round"]').first();
+      assert.match(await first.innerText(), /1st in Zone A[\s\S]*8th in Zone B/);
+      assert.match(await p.locator('[data-testid="playoff"]').innerText(), /Winner 1A\/8B\/4B\/5A|Winner 1A\/4B\/5A\/8B/);
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      assert.match(await p.locator('[data-testid="playoff"]').innerText(), /neutral ground/);
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="win-chance"]').first().waitFor({ timeout: 90000 });
+      assert.match(await p.locator('[data-testid="chances"] thead').innerText(), /Playoffs[\s\S]*Win/);
+      await p.close();
+    });
+
+    await step("Chile: 16 clubs, Libertadores, Sudamericana and relegation zones", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/chile-primera-division`);
+      const zones = await p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.equal(zones.length, 16);
+      assert.deepEqual([zones[0], zones[2], zones[3], zones[5], zones[6], zones[14], zones[15]], ["libertadores", "libertadoresQualifying", "sudamericana", "sudamericana", "", "relegation", "relegation"]);
+      assert.match(await p.locator("main").innerText(), /Copa Libertadores and relegation/);
+      await p.close();
+    });
+
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/mls`);
@@ -779,9 +814,9 @@ async function step(name, fn) {
       await england.getByRole("link", { name: "Championship" }).click();
       await desktop.waitForURL(/\/en\/championship$/);
       await menu.getByRole("button", { name: "South America" }).click();
-      assert.deepEqual((await menu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase()), ["conmebol", "brazil"]);
-      // Small panels size to their columns: no column (or link) overlaps the next.
-      const [conmebol, brazil] = await Promise.all(["#menu-conmebol", "#menu-br"].map((id) => menu.locator(id).boundingBox()));
+      assert.deepEqual((await menu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase()), ["conmebol", "argentina", "brazil", "chile"]);
+      // No column (or link) overlaps the next.
+      const [conmebol, brazil] = await Promise.all(["#menu-conmebol", "#menu-ar"].map((id) => menu.locator(id).boundingBox()));
       const widest = await menu.locator("#menu-conmebol a").evaluateAll((els) => Math.max(...els.map((e) => e.getBoundingClientRect().right)));
       assert.ok(widest <= brazil.x && conmebol.x + conmebol.width <= brazil.x, `columns overlap: ${widest} > ${brazil.x}`);
       assert.deepEqual((await menu.locator("#menu-conmebol a").allInnerTexts()).map((x) => x.trim()), ["Copa Libertadores", "Copa Sudamericana"]);
@@ -807,7 +842,7 @@ async function step(name, fn) {
       await mobile.waitFor();
       assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America"]);
       const headings = (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "brazil", "usa"]);
+      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "usa"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();

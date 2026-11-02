@@ -15,6 +15,7 @@ export type ZoneKind =
   | "relegation"
   | "playoffs"
   | "playoffWildCard"
+  | "titlePlayoffs"
   | "knockoutRoundOf16"
   | "knockoutPlayoff"
   | "eliminated";
@@ -27,7 +28,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -45,7 +46,19 @@ export interface EspnFeed {
    * counts: the table's stage, and the knockout stages after it. Other stages
    * (qualifying rounds before a group stage) are left out.
    */
-  stages?: { table: string; knockout: readonly string[] };
+  stages?: EspnStages | readonly EspnStages[];
+}
+
+/**
+ * One tournament within an ESPN season: its table stage and the knockout
+ * stages after it. A season with several (Argentina: Apertura, then
+ * Clausura) lists them latest first; the latest one under way is shown.
+ */
+export interface EspnStages {
+  table: string;
+  knockout: readonly string[];
+  /** Tournament name for the season label, e.g. "Clausura" ("Clausura 2026"). */
+  name?: string;
 }
 
 /** A separate table within a league, e.g. an MLS conference. */
@@ -58,7 +71,7 @@ export interface LeagueGroup {
   name: Record<SiteLocale, string>;
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -642,6 +655,89 @@ export const LEAGUES: readonly LeagueConfig[] = [
     zones: [
       { kind: "playoffs", from: 1, to: 7 },
       { kind: "playoffWildCard", from: 8, to: 9 },
+    ],
+  },
+  {
+    code: "ARG",
+    slug: "argentina-primera-division",
+    name: "Liga Profesional",
+    country: "Argentina",
+    flag: "ar",
+    simulatorName: {
+      en: "Argentine Primera División Simulator",
+      pt: "Simulador do Campeonato Argentino",
+      es: "Simulador de la Liga Profesional Argentina",
+    },
+    aka: { en: "Liga Profesional de Fútbol", pt: "Liga Profesional de Fútbol", es: "Liga Profesional de Fútbol" },
+    teams: 30,
+    // Two tournaments a year (Apertura, Clausura), each its own table: two
+    // zones of 15, 16 games (the zone plus the derby round), then play-offs.
+    gamesPerTeam: 16,
+    groups: [
+      { id: "A", espnName: "Group A", name: { en: "Zone A", pt: "Zona A", es: "Zona A" }, shortName: { en: "Zone A", pt: "Zona A", es: "Zona A" } },
+      { id: "B", espnName: "Group B", name: { en: "Zone B", pt: "Zona B", es: "Zona B" }, shortName: { en: "Zone B", pt: "Zona B", es: "Zona B" } },
+    ],
+    espn: {
+      slug: "arg.1",
+      seasons: "calendar",
+      stages: [
+        {
+          table: "torneo-clausura",
+          knockout: ["clausura---round-of-16", "clausura---quarterfinals", "clausura---semifinals", "clausura---final"],
+          name: "Clausura",
+        },
+        {
+          table: "torneo-apertura",
+          knockout: ["apertura---round-of-16", "apertura---quarterfinals", "apertura---semifinals", "apertura---final"],
+          name: "Apertura",
+        },
+      ],
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadGoalDifference"],
+    // Per zone: the top 8 go to the play-offs. (Continental places and
+    // relegation come from the year's combined and average tables, not modelled.)
+    zones: [{ kind: "titlePlayoffs", from: 1, to: 8 }],
+    // Play-offs: single games at the better-placed club, level straight to
+    // penalties; round of 16 across the zones (1A v 8B, 1B v 8A, 2A v 7B…),
+    // then a fixed bracket (1A/8B v 4B/5A…); the final at a neutral ground.
+    playoff: {
+      seedFromGroups: { places: 8, interleave: true },
+      rounds: [
+        {
+          key: "roundOf16",
+          legs: 1,
+          levelTie: "penalties",
+          noExtraTime: true,
+          pairs: [[1, 16], [2, 15], [3, 14], [4, 13], [5, 12], [6, 11], [7, 10], [8, 9]],
+        },
+        { key: "quarterFinals", legs: 1, levelTie: "penalties", noExtraTime: true, fixedBracket: true },
+        { key: "semiFinals", legs: 1, levelTie: "penalties", noExtraTime: true, fixedBracket: true },
+        { key: "final", legs: 1, levelTie: "penalties", neutral: true },
+      ],
+      title: "Liga Profesional",
+    },
+  },
+  {
+    code: "CHI",
+    slug: "chile-primera-division",
+    name: "Liga de Primera",
+    country: "Chile",
+    flag: "cl",
+    simulatorName: { en: "Chilean Primera División Simulator", pt: "Simulador do Campeonato Chileno", es: "Simulador de la Liga de Primera de Chile" },
+    aka: { en: "Chilean Primera División", pt: "Campeonato Chileno", es: "Campeonato Nacional" },
+    teams: 16,
+    espn: { slug: "chi.1", seasons: "calendar" },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "headToHeadPoints"],
+    // 2026: champion and runner-up to the Libertadores group stage; 3rd plays
+    // the Copa Chile winner for a Libertadores qualifying place; 4th–6th to the
+    // Sudamericana; the bottom two go down.
+    zones: [
+      { kind: "libertadores", from: 1, to: 2 },
+      { kind: "libertadoresQualifying", from: 3, to: 3 },
+      { kind: "sudamericana", from: 4, to: 6 },
+      { kind: "relegation", from: 15, to: 16 },
     ],
   },
   {

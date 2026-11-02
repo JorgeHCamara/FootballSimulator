@@ -438,3 +438,31 @@ describe("seedByGroupPlace (Libertadores knockout seeding)", () => {
     assert.deepEqual(seeds.map((r) => r.position), [1, 2, 3, 4, 5, 6, 7, 8]);
   });
 });
+
+describe("Argentina's play-offs (zones interleaved, cross-zone round of 16)", () => {
+  const arg = getLeagueByCode("ARG")!;
+  const zoneRow = (zone: "A" | "B", place: number) => row(place, (zone === "A" ? 100 : 200) + place);
+  const zoneA = Array.from({ length: 15 }, (_, i) => zoneRow("A", i + 1));
+  const zoneB = Array.from({ length: 15 }, (_, i) => zoneRow("B", i + 1));
+
+  it("seeds A1, B1, A2, B2… and pairs 1st of one zone with 8th of the other", () => {
+    const seeds = seedByGroupPlace([zoneA, zoneB], [], arg.playoff!.seedFromGroups!.places, true);
+    assert.deepEqual(seeds.slice(0, 4).map((r) => r.teamId), [101, 201, 102, 202]);
+    const bracket = buildBracket(seeds, arg.playoff!, {}, options);
+    assert.deepEqual(bracket.map((r) => r.length), [8, 4, 2, 1]);
+    const pairs = bracket[0]!.map((t) => [t.higher.teamId, t.lower.teamId]);
+    assert.deepEqual(pairs, [[101, 208], [201, 108], [102, 207], [202, 107], [103, 206], [203, 106], [104, 205], [204, 105]]);
+    // One leg at the better-placed club; the final at a neutral ground.
+    assert.equal(bracket[0]![1]!.legs.length, 1);
+    assert.equal(bracket[0]![1]!.legs[0]!.homeId, 201);
+    assert.equal(bracket[3]![0]!.config.neutral, true);
+  });
+
+  it("follows the fixed bracket: 1A/8B meets 4B/5A in the quarter-finals", () => {
+    const seeds = seedByGroupPlace([zoneA, zoneB], [], 8, true);
+    const r16 = buildBracket(seeds, arg.playoff!, {}, options)[0]!;
+    const higherWins = Object.fromEntries(r16.map((t) => [t.legs[0]!.id, { home: 1, away: 0 }]));
+    const qf = buildBracket(seeds, arg.playoff!, higherWins, options)[1]!;
+    assert.deepEqual(qf.map((t) => [t.higher.teamId, t.lower.teamId]), [[101, 204], [201, 104], [102, 203], [202, 103]]);
+  });
+});

@@ -61,7 +61,8 @@ export function sampleLeague(league: LeagueConfig, playedShare = 0.4): SampleLea
   // Season starts so that the played share of matchdays lies in the past.
   // A continental league phase (UEFA) plays only the first rounds of a round robin:
   // each club meets 8 (or 6) different opponents.
-  const rounds = league.continental ? gamesPerTeam(league) : (league.teams - 1) * 2;
+  // So does a tournament of zones (Argentina: 16 games).
+  const rounds = league.continental || league.playoff?.seedFromGroups ? gamesPerTeam(league) : (league.teams - 1) * 2;
   const playedRounds = Math.round(rounds * playedShare);
   const weekMs = 7 * 24 * 60 * 60 * 1000;
   const start = new Date(Date.now() - playedRounds * weekMs + weekMs / 2);

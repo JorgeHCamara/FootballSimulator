@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Fútbol – Simula LaLiga, Premier League, Brasileirão y más",
-    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana. Clasificación en directo y probabilidades de título, Europa y descenso.",
+    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, Liga Profesional Argentina, Liga de Primera de Chile, MLS, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana. Clasificación en directo y probabilidades de título, Europa y descenso.",
     "leagueTitle": "{simulator} {season} – Predice la Clasificación",
     "leagueDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Europa y descenso.",
     "leagueDescriptionPlayoffs": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira las clasificaciones de las conferencias en directo y las probabilidades de cada equipo de llegar a los playoffs.",
@@ -13,7 +13,9 @@
     "continentalTitle": "{simulator} {season} – Clasificación de la Fase Liga y Eliminatorias",
     "continentalDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula la fase liga, mira la clasificación en directo y juega las eliminatorias hasta la final, con las probabilidades de cada club de quedar entre los 8 primeros, entre los 24 primeros y de ganar el título.",
     "continentalGroupsTitle": "{simulator} {season} – Grupos y Eliminatorias",
-    "continentalGroupsDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula la fase de grupos, mira las ocho clasificaciones en directo y juega las eliminatorias hasta la final, con las probabilidades de cada club de llegar a octavos y de ganar el título."
+    "continentalGroupsDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula la fase de grupos, mira las ocho clasificaciones en directo y juega las eliminatorias hasta la final, con las probabilidades de cada club de llegar a octavos y de ganar el título.",
+    "leagueDescriptionAmericas": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Copa Libertadores y descenso.",
+    "zonesDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira las dos zonas en directo y juega los playoffs hasta la final, con las probabilidades de cada club de llegar a los playoffs y de ser campeón."
   },
   "Nav": {
     "home": "Inicio",
@@ -35,7 +37,7 @@
     "heading": "Simulador de Fútbol",
     "tagline": "Simula la temporada antes de que ocurra",
     "aboutTitle": "Un simulador de fútbol gratis para las mejores ligas",
-    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A y B, MLS, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
+    "aboutBody": "Foot Simu es un simulador de fútbol gratis para LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A y B, la Liga Profesional Argentina, la Liga de Primera de Chile, MLS, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana. Cada liga empieza con la clasificación y los partidos reales. Escribe tus pronósticos o simula las jornadas restantes y mira cómo podrían terminar la lucha por el título, las plazas europeas y la pelea por la permanencia."
   },
   "Simulator": {
     "table": "Clasificación",
@@ -131,7 +133,10 @@
     "knockoutProjectedGroups": "Las eliminatorias se definen con las clasificaciones de los grupos cuando termine la fase de grupos: los primeros (ordenados por su campaña en el grupo) contra los segundos. Hasta el sorteo real, los cruces mostrados son un sorteo posible que sigue a los cabezas de serie.",
     "championPendingGroups": "Completa la fase de grupos y las eliminatorias para ver al campeón.",
     "championPendingLeaguePhase": "Completa la fase liga y las eliminatorias para ver al campeón.",
-    "knockoutProjectedGroupsExternal": "Las eliminatorias se definen cuando termina la fase de grupos: los primeros (cabezas de serie 1–8) van directos a octavos; los segundos (9–16) juegan un playoff contra los terceros de los grupos de la Copa Libertadores (17–24). Hasta el sorteo real, los cruces mostrados son un sorteo posible que sigue a los cabezas de serie."
+    "knockoutProjectedGroupsExternal": "Las eliminatorias se definen cuando termina la fase de grupos: los primeros (cabezas de serie 1–8) van directos a octavos; los segundos (9–16) juegan un playoff contra los terceros de los grupos de la Copa Libertadores (17–24). Hasta el sorteo real, los cruces mostrados son un sorteo posible que sigue a los cabezas de serie.",
+    "playoffRuleNeutral": "Partido único en campo neutral. Si hay empate: prórroga y penaltis.",
+    "playoffRuleNeutralPenalties": "Partido único en campo neutral. Si hay empate: directo a los penaltis.",
+    "playoffZonePlace": "{position}.º de la {group}"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -149,7 +154,8 @@
     "playoffWildCard": "Comodín (wild card)",
     "knockoutRoundOf16": "Octavos de final",
     "knockoutPlayoff": "Playoff",
-    "eliminated": "Eliminado"
+    "eliminated": "Eliminado",
+    "titlePlayoffs": "Playoffs"
   },
   "Footer": {
     "attribution": "Datos: football-data.org",
@@ -186,7 +192,10 @@
     "step3ContinentalGroups": {
       "LIB": "Abre la pestaña Probabilidades para ver las opciones de cada club de terminar entre los dos primeros de su grupo, de llegar a la final y de ganar la {league}.",
       "SUD": "Abre la pestaña Probabilidades para ver las opciones de cada club de ganar su grupo, de terminar entre los dos primeros, de llegar a la final y de ganar la {league}."
-    }
+    },
+    "step3Americas": "Abre la pestaña Probabilidades para ver las opciones de cada equipo de título, Copa Libertadores y descenso.",
+    "introZones": "Usa el {simulator} para predecir el resto de la {league} {season} ({aka}). Escribe tus marcadores o simula los partidos restantes: las clasificaciones de las dos zonas se actualizan al instante con los criterios oficiales. Los 8 primeros de cada zona van a los playoffs, cruzando las zonas (1.º de la Zona A vs. 8.º de la Zona B…) a partido único hasta la final.",
+    "step3Zones": "Abre la pestaña Probabilidades para ver las opciones de cada club de terminar primero en su zona, de llegar a los playoffs y de ser campeón."
   },
   "Faq": {
     "league": [
@@ -240,7 +249,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A y Série B, MLS, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A y Série B, la Liga Profesional Argentina, la Liga de Primera de Chile, MLS, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",
@@ -362,7 +371,29 @@
           "a": "Sí. Foot Simu es completamente gratis y no necesitas cuenta."
         }
       ]
-    }
+    },
+    "zones": [
+      {
+        "q": "¿Cómo funciona el {simulator}?",
+        "a": "Parte de las clasificaciones y los partidos reales de las zonas de la {league} {season}. Escribe el marcador de cualquier partido o pulsa Simular: cada resultado sale del ataque y la defensa de cada equipo esta temporada, con la localía, y las clasificaciones se actualizan al instante. Cuando terminan las zonas, los playoffs se pueden jugar hasta la final."
+      },
+      {
+        "q": "¿Cómo son los playoffs?",
+        "a": "Se clasifican los 8 primeros de cada zona. Los octavos cruzan las zonas: 1.º de la Zona A vs. 8.º de la Zona B, 1.º de la Zona B vs. 8.º de la Zona A, 2.º vs. 7.º y así sucesivamente, en la cancha del mejor ubicado. El cuadro es fijo desde ahí. Un empate va directo a los penales, y la final se juega en cancha neutral."
+      },
+      {
+        "q": "¿Y los cupos a la Libertadores y el descenso?",
+        "a": "Se definen a lo largo del año (en la tabla anual de los dos torneos y en la tabla de promedios para el descenso), así que este simulador cubre el torneo actual: las zonas, los playoffs y el campeón."
+      },
+      {
+        "q": "¿Cómo se calculan las probabilidades?",
+        "a": "La pestaña Probabilidades juega el resto del torneo y los playoffs 5.000 veces a partir de los resultados actuales, incluidas tus predicciones, y cuenta cuántas veces cada club termina primero en su zona, llega a los playoffs y sale campeón."
+      },
+      {
+        "q": "¿Foot Simu es gratis?",
+        "a": "Sí. Foot Simu es completamente gratis y no necesitas cuenta."
+      }
+    ]
   },
   "Countries": {
     "England": "Inglaterra",
@@ -375,7 +406,9 @@
     "Brazil": "Brasil",
     "USA": "EE. UU.",
     "UEFA": "UEFA",
-    "CONMEBOL": "CONMEBOL"
+    "CONMEBOL": "CONMEBOL",
+    "Argentina": "Argentina",
+    "Chile": "Chile"
   },
   "Cup": {
     "fixtures": "Partidos",

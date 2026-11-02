@@ -25,6 +25,11 @@ export interface PlayoffView {
   cancelled?: { position: number; over: number; points: number };
   /** A continental knockout phase, seeded from a league phase (UEFA) or a group stage (Libertadores): its own wording, and drawn pairings. */
   knockout?: "leaguePhase" | "groupStage" | "groupStageExternal";
+  /**
+   * Seeds interleaved by zone (Argentina: 1A, 1B, 2A…): the zones' letters and
+   * names, so a seed reads "1st in Zone A" and a winner "Winner 1A/8B".
+   */
+  zoneSlots?: { ids: string[]; names: string[] };
 }
 
 interface Props {
@@ -125,9 +130,20 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
     return side.position !== null ? [side.position] : [];
   };
   const groupName = (group: number | undefined) => (group !== undefined ? playoff.groupNames?.[group] : undefined);
+  const zones = playoff.zoneSlots;
+  /** An interleaved seed as its zone and place within it. */
+  const zoneSlot = (position: number) => (zones ? { zone: (position - 1) % zones.ids.length, place: Math.ceil(position / zones.ids.length) } : null);
   const label = (side: PlayoffSide) => {
     if (side.teamId !== null) return teams.get(side.teamId)?.shortName ?? "";
     const group = groupName(side.group);
+    if (zones) {
+      if (side.from) {
+        const possible = seeds(side).map((p) => `${zoneSlot(p)!.place}${zones.ids[zoneSlot(p)!.zone]}`);
+        return possible.length <= 4 ? t("playoffSeedsWinner", { seeds: possible.join("/") }) : t("playoffWinnerOf", { round: bracket[side.from.round]![0]!.config.key });
+      }
+      const slot = zoneSlot(side.position ?? 1)!;
+      return t("playoffZonePlace", { position: slot.place, group: zones.names[slot.zone]! });
+    }
     if (side.from) {
       // Conference brackets: name the seeds that can still come through, e.g. "Winner 1/8/9 (East)".
       const possible = seeds(side);
@@ -149,6 +165,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
       return config.legs === 2 ? t("playoffRule", { higher }) : t("playoffRuleOneLegBetterPlaced", { higher });
     }
     if (config.venue) return t("playoffRuleFinal", { venue: config.venue });
+    if (config.neutral) return t(config.noExtraTime ? "playoffRuleNeutralPenalties" : "playoffRuleNeutral");
     if (config.legs === 2) return t("playoffRuleTwoLegs", { higher });
     return config.noExtraTime ? t("playoffRuleOneLegPenalties", { higher }) : t("playoffRuleOneLeg", { higher });
   };

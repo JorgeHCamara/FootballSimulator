@@ -54,6 +54,8 @@ const CONTINENT_OF: Record<string, Continent> = {
   Netherlands: "Europe",
   CONMEBOL: "South America",
   Brazil: "South America",
+  Argentina: "South America",
+  Chile: "South America",
   USA: "North America",
 };
 
