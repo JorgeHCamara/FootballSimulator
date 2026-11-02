@@ -2,13 +2,16 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { Link, usePathname } from "../i18n/navigation.ts";
+import { usePathname } from "../i18n/navigation.ts";
+import { Flag } from "./Flag.tsx";
 import { CountryColumn, useContinentGroups } from "./LeagueMenu.tsx";
 
 /**
- * Phones and small tablets: a ☰ button beside the logo opens a panel with every
- * continent, its countries and their leagues, so any competition is one tap away. Closes on the button,
- * Esc, a tap outside or choosing a league.
+ * Phones and small tablets: a ☰ button beside the logo opens a panel with one
+ * row per continent; tapping a continent shows its countries and their
+ * competitions (one continent at a time, so Asia is as close as Europe). On a
+ * competition's page its continent starts open. Closes on the button, Esc, a
+ * tap outside or choosing a competition.
  */
 export function MobileMenu() {
   const tc = useTranslations("Continents");
@@ -16,9 +19,18 @@ export function MobileMenu() {
   const pathname = usePathname();
   const groups = useContinentGroups();
   const [open, setOpen] = useState(false);
+  /** The continent shown open, or null for all closed. */
+  const [expanded, setExpanded] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
+  // The current page's continent (none on the home page).
+  const current = groups.find((g) => g.countries.some((c) => c.leagues.some((l) => pathname === `/${l.slug}`)))?.continent ?? null;
+
   useEffect(() => setOpen(false), [pathname]);
+  // Each time the menu opens, start from the current page's continent.
+  useEffect(() => {
+    if (open) setExpanded(current);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!open) return;
@@ -57,18 +69,45 @@ export function MobileMenu() {
           data-testid="mobile-menu"
         >
           <div className="mx-auto max-w-6xl px-4 py-2">
-            {groups.map((group) => (
-              <section key={group.continent} className="border-b border-zinc-100 py-2 last:border-b-0 dark:border-zinc-800" data-testid="mobile-continent">
-                <h2 className="px-2 pb-1 text-sm font-extrabold text-zinc-800 dark:text-zinc-100">{tc(group.continent)}</h2>
-                <ul className="grid gap-x-4 gap-y-2 sm:grid-cols-2">
-                  {group.countries.map((country) => (
-                    <li key={country.country}>
-                      <CountryColumn group={country} onPick={() => setOpen(false)} large />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
+            {groups.map((group) => {
+              const isOpen = expanded === group.continent;
+              const id = `mobile-${group.continent.toLowerCase().replace(/\s+/g, "-")}`;
+              return (
+                <section key={group.continent} className="border-b border-zinc-100 last:border-b-0 dark:border-zinc-800" data-testid="mobile-continent">
+                  <h2>
+                    <button
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={id}
+                      onClick={() => setExpanded(isOpen ? null : group.continent)}
+                      className="flex w-full items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-pitch-50 dark:hover:bg-pitch-900/40"
+                      data-testid="mobile-continent-button"
+                    >
+                      <span className="grow text-base font-extrabold text-zinc-800 dark:text-zinc-100">{tc(group.continent)}</span>
+                      {/* What's inside, at a glance. */}
+                      <span className="flex shrink-0 items-center gap-1" aria-hidden>
+                        {group.countries.slice(0, 6).map((country) => (
+                          <Flag key={country.country} code={country.flag} width={16} />
+                        ))}
+                        {group.countries.length > 6 && <span className="text-xs text-zinc-500">+{group.countries.length - 6}</span>}
+                      </span>
+                      <svg aria-hidden viewBox="0 0 12 12" width="12" height="12" className={`shrink-0 text-zinc-500 transition ${isOpen ? "rotate-180" : ""}`}>
+                        <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                  </h2>
+                  {isOpen && (
+                    <ul id={id} className="grid gap-x-4 gap-y-2 pb-3 sm:grid-cols-2" data-testid="mobile-continent-panel">
+                      {group.countries.map((country) => (
+                        <li key={country.country}>
+                          <CountryColumn group={country} onPick={() => setOpen(false)} large />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              );
+            })}
           </div>
         </nav>
       )}

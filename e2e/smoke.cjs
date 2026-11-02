@@ -980,16 +980,34 @@ async function step(name, fn) {
       await burger.tap();
       const mobile = phone.locator('[data-testid="mobile-menu"]');
       await mobile.waitFor();
-      assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America", "Asia"]);
-      const headings = (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "scotland", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "peru", "uruguay", "mexico", "usa", "japan", "saudi arabia"]);
+      // One row per continent, all closed on the home page: no competition links yet.
+      const rows = mobile.locator('[data-testid="mobile-continent-button"]');
+      assert.deepEqual(await rows.evaluateAll((els) => els.map((e) => e.firstElementChild.textContent.trim())), ["Europe", "South America", "North America", "Asia"]);
+      assert.equal(await mobile.locator("a").count(), 0, "continents start closed");
+      const countriesShown = async () => (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
+      // Asia: only its countries.
+      await rows.nth(3).tap();
+      assert.deepEqual(await countriesShown(), ["japan", "saudi arabia"]);
+      assert.equal(await rows.nth(3).getAttribute("aria-expanded"), "true");
+      // South America closes Asia.
+      await rows.nth(1).tap();
+      assert.deepEqual(await countriesShown(), ["conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "peru", "uruguay"]);
+      assert.equal(await rows.nth(3).getAttribute("aria-expanded"), "false");
+      await rows.nth(0).tap();
+      assert.deepEqual(await countriesShown(), ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "scotland", "spain"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();
+      await rows.nth(1).tap();
       await mobile.getByRole("link", { name: "Brasileirão Série B" }).tap();
       await phone.waitForURL(/\/en\/brasileirao-serie-b$/);
       await mobile.waitFor({ state: "detached" });
       assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, "no horizontal page scroll");
+      // On a competition's page, its continent starts open.
+      await phone.goto(`${BASE_URL}/en/saudi-pro-league`);
+      await burger.tap();
+      await mobile.waitFor();
+      assert.deepEqual(await countriesShown(), ["japan", "saudi arabia"]);
       await phone.context().close();
     });
 
