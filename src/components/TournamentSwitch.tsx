@@ -2,11 +2,13 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
+import type { EspnStages, LeagueConfig, SiteLocale } from "../config/leagues.ts";
+import { realChampion } from "../engine/playoffs.ts";
 import type { TeamStrength } from "../engine/ratings.ts";
+import { realResults } from "../engine/results.ts";
+import { computeStandings } from "../engine/standings.ts";
 import type { Fixture, Team, TeamId } from "../engine/types.ts";
 import type { Tournament } from "../lib/leagueData.ts";
-import { realChampion } from "../engine/playoffs.ts";
 import { LeagueSimulator } from "./LeagueSimulator.tsx";
 
 interface Props {
@@ -16,55 +18,107 @@ interface Props {
   tournaments: Tournament[];
   /** The tournament shown first (the current one). */
   current: string;
+  /** The current tournament's groups (from ESPN's standings). */
   groups?: { id: string; teamIds: number[] }[];
   priorStrengths?: Record<number, TeamStrength>;
 }
 
+/** A tournament's own format: the league's, with what its stage config changes. */
+export function tournamentConfig(league: LeagueConfig, stage: EspnStages | undefined): LeagueConfig {
+  if (!stage) return league;
+  const playoff = stage.playoff === null ? undefined : (stage.playoff ?? league.playoff);
+  return {
+    ...league,
+    ...(stage.gamesPerTeam ? { gamesPerTeam: stage.gamesPerTeam } : {}),
+    ...(stage.zones ? { zones: stage.zones } : {}),
+    ...(stage.groups ? { groups: stage.groups } : {}),
+    playoff,
+  };
+}
+
 /**
- * A season of several tournaments (Argentina: Apertura and Clausura), each with
- * its own tables, play-offs and saved predictions, plus the annual table of
- * every club over all of them, which decides the continental places and
- * relegation. The annual table shares the current tournament's predictions.
+ * A tournament's champion from real results: its play-off final when it has a
+ * play-off, else the leader once every game is played.
+ */
+export function tournamentChampion(config: LeagueConfig, teams: readonly Team[], tournament: Tournament): TeamId | null {
+  if (config.playoff) return realChampion(tournament.postseason);
+  if (tournament.fixtures.some((f) => !f.result)) return null;
+  const clubs = new Set(tournament.fixtures.flatMap((f) => [f.homeId, f.awayId]));
+  const table = computeStandings(
+    teams.filter((t) => clubs.has(t.id)),
+    tournament.fixtures,
+    realResults(tournament.fixtures),
+    { tiebreakers: config.tiebreakers, includeForm: false },
+  );
+  return table[0]?.teamId ?? null;
+}
+
+/**
+ * A season of several tournaments (Argentina, Colombia, Uruguay, Paraguay),
+ * each with its own tables, play-offs and saved predictions, plus the annual
+ * table of every club over all of them, which decides the continental places
+ * (and in some leagues relegation). The annual table shares the current
+ * tournament's predictions.
  */
 export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const [view, setView] = useState<string>(current);
+  const stages = useMemo(
+    () => (league.espn.stages && !("table" in league.espn.stages) ? league.espn.stages : []),
+    [league.espn.stages],
+  );
+  const configOf = (tournament: Tournament) => tournamentConfig(league, stages.find((s) => s.table === tournament.id));
   // Oldest first in the switch, then the annual table.
   const ordered = useMemo(() => [...tournaments].reverse(), [tournaments]);
   const shown = tournaments.find((x) => x.id === view);
   const live = tournaments.find((x) => x.id === current) ?? tournaments[0]!;
 
-  // The annual table: every tournament's regular phase in one table of all
-  // clubs, later tournaments' rounds numbered after the earlier ones'.
+  // The annual table: every tournament's regular phase (and, where it counts,
+  // its real play-off games) in one table of all clubs, later tournaments'
+  // rounds numbered after the earlier ones'.
   const annual = useMemo(() => {
     let offset = 0;
     const fixtures: Fixture[] = [];
     for (const tournament of ordered) {
+      const rounds = Math.max(0, ...tournament.fixtures.map((f) => f.matchday));
       fixtures.push(...tournament.fixtures.map((f) => ({ ...f, matchday: f.matchday + offset })));
-      offset += Math.max(0, ...tournament.fixtures.map((f) => f.matchday));
+      if (league.annual.includePostseason) {
+        fixtures.push(...(tournament.postseason ?? []).filter((f) => f.result).map((f) => ({ ...f, matchday: rounds + 1 + offset })));
+      }
+      offset += rounds + (league.annual.includePostseason && tournament.postseason?.length ? 1 : 0);
     }
     const config: LeagueConfig = {
       ...league,
       zones: league.annual.zones,
-      gamesPerTeam: offset,
+      gamesPerTeam: Math.round(fixtures.length * 2 / Math.max(1, new Set(fixtures.flatMap((f) => [f.homeId, f.awayId])).size)),
       groups: undefined,
       playoff: undefined,
     };
-    const champions = ordered.flatMap((x) => {
-      const id = realChampion(x.postseason);
-      return id === null ? [] : [{ id, tournament: x.name }];
-    });
+    const champions = league.annual.championsQualify
+      ? ordered.flatMap((x) => {
+          const id = tournamentChampion(tournamentConfig(league, stages.find((s) => s.table === x.id)), teams, x);
+          return id === null ? [] : [{ id, tournament: x.name }];
+        })
+      : [];
     return { config, fixtures, champions };
-  }, [ordered, league]);
+  }, [ordered, league, stages, teams]);
 
   const teamName = (id: TeamId) => teams.find((x) => x.id === id)?.shortName ?? "";
-  const qualifiedNote = t("annualQualifiedNote", {
-    champions: annual.champions.map((c) => t("annualChampion", { club: teamName(c.id), tournament: c.tournament })).join(", "),
-  });
+  const notes = [
+    annual.champions.length
+      ? t("annualQualifiedNote", {
+          champions: annual.champions.map((c) => t("annualChampion", { club: teamName(c.id), tournament: c.tournament })).join(", "),
+        })
+      : "",
+    // What else decides the places and relegation in this league (Copa winners, averages tables…).
+    t(`annualNotes.${league.code}` as "annualNotes.ARG"),
+  ].filter(Boolean);
 
   const button = (active: boolean) =>
     `whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-700" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"}`;
+
+  const shownGroups = shown ? (shown.groups ?? (shown.id === current ? groups : undefined)) : undefined;
 
   return (
     <div className="space-y-3">
@@ -81,13 +135,13 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
       {shown ? (
         <LeagueSimulator
           key={shown.id}
-          league={league}
+          league={configOf(shown)}
           teams={teams}
           fixtures={shown.fixtures}
           seasonKey={shown.seasonKey}
           season={shown.season}
           {...(shown.postseason ? { postseason: shown.postseason } : {})}
-          {...(groups ? { groups } : {})}
+          {...(shownGroups ? { groups: shownGroups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
         />
       ) : (
@@ -99,7 +153,8 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           // Shares the current tournament's predictions, both ways.
           seasonKey={live.seasonKey}
           season={live.season}
-          {...(annual.champions.length ? { qualifiedElsewhere: annual.champions.map((c) => c.id), qualifiedNote } : {})}
+          {...(annual.champions.length ? { qualifiedElsewhere: annual.champions.map((c) => c.id) } : {})}
+          {...(notes.length ? { qualifiedNote: notes.join(" ") } : {})}
         />
       )}
     </div>

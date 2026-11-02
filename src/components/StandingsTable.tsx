@@ -128,7 +128,7 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
           </li>
         ))}
       </ul>
-      {qualified?.size ? (
+      {qualifiedNote ? (
         <p className="mt-1 text-xs text-zinc-500" data-testid="qualified-note">
           {qualifiedNote}
         </p>

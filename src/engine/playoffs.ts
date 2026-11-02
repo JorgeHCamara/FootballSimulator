@@ -578,10 +578,20 @@ export function simulatePlayoff(
 
 /** Winner of a tournament's real final (its last post-season game), once played. */
 export function realChampion(postseason: readonly Fixture[] | undefined): TeamId | null {
-  const final = [...(postseason ?? [])].sort((a, b) => a.utcDate.localeCompare(b.utcDate)).at(-1);
-  if (!final?.result) return null;
-  const { home, away } = final.result;
-  if (home !== away) return home > away ? final.homeId : final.awayId;
-  if (!final.penalties || final.penalties.home === final.penalties.away) return null;
-  return final.penalties.home > final.penalties.away ? final.homeId : final.awayId;
+  const games = [...(postseason ?? [])].sort((a, b) => a.utcDate.localeCompare(b.utcDate));
+  const last = games.at(-1);
+  if (!last?.result) return null;
+  // A two-legged final (Colombia): both games between the finalists, on aggregate.
+  const pair = (f: Fixture) => [f.homeId, f.awayId].sort((a, b) => a - b).join("-");
+  const final = games.filter((f) => pair(f) === pair(last)).slice(-2);
+  if (final.some((f) => !f.result)) return null;
+  const goals = new Map<TeamId, number>([[last.homeId, 0], [last.awayId, 0]]);
+  for (const f of final) {
+    goals.set(f.homeId, goals.get(f.homeId)! + f.result!.home);
+    goals.set(f.awayId, goals.get(f.awayId)! + f.result!.away);
+  }
+  const [a, b] = [goals.get(last.homeId)!, goals.get(last.awayId)!];
+  if (a !== b) return a > b ? last.homeId : last.awayId;
+  if (!last.penalties || last.penalties.home === last.penalties.away) return null;
+  return last.penalties.home > last.penalties.away ? last.homeId : last.awayId;
 }

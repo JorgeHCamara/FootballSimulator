@@ -15,6 +15,7 @@ export type ZoneKind =
   | "relegation"
   | "playoffs"
   | "playoffWildCard"
+  | "title"
   | "titlePlayoffs"
   | "knockoutRoundOf16"
   | "knockoutPlayoff"
@@ -28,7 +29,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -55,11 +56,22 @@ export interface EspnFeed {
  * Clausura) lists them latest first; the latest one under way is shown.
  */
 export interface EspnStages {
+  /** ESPN's stage tag of the table; also matches it with a year ("torneo-apertura-2026"). */
   table: string;
   knockout: readonly string[];
   /** Tournament name for the season label, e.g. "Clausura" ("Clausura 2026"). */
   name?: string;
+  /** This tournament's own format, when it differs from the league's (Uruguay's Intermedio). */
+  gamesPerTeam?: number;
+  zones?: readonly Zone[];
+  /** Its own play-off, or null for none. */
+  playoff?: PlayoffConfig | null;
+  /** Separate tables, recognised from who plays whom (not in ESPN's standings for past tournaments). */
+  groups?: readonly LeagueGroup[];
 }
+
+/** True when an ESPN stage tag is this table's, with or without a year. */
+export const isStage = (slug: string | undefined, table: string) => slug === table || (slug !== undefined && new RegExp(`^${table}-\\d{4}$`).test(slug));
 
 /** A separate table within a league, e.g. an MLS conference. */
 export interface LeagueGroup {
@@ -71,7 +83,7 @@ export interface LeagueGroup {
   name: Record<SiteLocale, string>;
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -121,7 +133,14 @@ export interface LeagueConfig {
    * every club over all of them, which decides the continental places and
    * relegation.
    */
-  annual?: { name: Record<SiteLocale, string>; zones: readonly Zone[] };
+  annual?: {
+    name: Record<SiteLocale, string>;
+    zones: readonly Zone[];
+    /** Tournament champions qualify for the first zone's competition anyway: their places pass down (Argentina, Colombia, Paraguay). */
+    championsQualify?: boolean;
+    /** The real play-off games count in the annual table too (Colombia's reclasificación). */
+    includePostseason?: boolean;
+  };
 }
 
 export interface ContinentalConfig {
@@ -710,6 +729,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     // averages, not modelled).
     annual: {
       name: { en: "Annual table", pt: "Tabela anual", es: "Tabla anual" },
+      championsQualify: true,
       zones: [
         { kind: "libertadores", from: 1, to: 3 },
         { kind: "sudamericana", from: 4, to: 9 },
@@ -757,6 +777,141 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "sudamericana", from: 4, to: 6 },
       { kind: "relegation", from: 15, to: 16 },
     ],
+  },
+  {
+    code: "COL",
+    slug: "colombia-primera-a",
+    name: "Liga BetPlay",
+    country: "Colombia",
+    flag: "co",
+    simulatorName: { en: "Colombian Primera A Simulator", pt: "Simulador do Campeonato Colombiano", es: "Simulador de la Liga BetPlay" },
+    aka: { en: "Categoría Primera A", pt: "Liga BetPlay Dimayor", es: "Liga BetPlay Dimayor" },
+    teams: 20,
+    // Two tournaments a year (Apertura, Finalización): 19 games each (one round
+    // robin), the top 8 to the play-offs.
+    gamesPerTeam: 19,
+    espn: {
+      slug: "col.1",
+      seasons: "calendar",
+      stages: [
+        { table: "clausura", knockout: ["clausura---quarterfinals", "clausura---semifinals", "clausura---finals"], name: "Finalización" },
+        { table: "apertura", knockout: ["apertura---quarterfinals", "apertura---semifinals", "apertura---finals"], name: "Apertura" },
+      ],
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "headToHeadPoints"],
+    zones: [{ kind: "titlePlayoffs", from: 1, to: 8 }],
+    // 2026 play-offs: two legs throughout, the better-placed club at home second,
+    // level on aggregate straight to penalties; a fixed bracket: 1v8 and 3v6 meet
+    // in one semi-final, 2v5 and 4v7 in the other; a two-legged final.
+    playoff: {
+      rounds: [
+        { key: "quarterFinals", legs: 2, levelTie: "penalties", noExtraTime: true, pairs: [[1, 8], [2, 5], [4, 7], [3, 6]] },
+        { key: "semiFinals", legs: 2, levelTie: "penalties", noExtraTime: true, fixedBracket: true },
+        { key: "final", legs: 2, levelTie: "penalties", noExtraTime: true, fixedBracket: true },
+      ],
+      title: "Liga BetPlay",
+    },
+    // Annual reclassification (all games of both tournaments, play-offs
+    // included): the two tournament champions go to the Libertadores with the
+    // best 2 others; the next 3 to the Sudamericana (with the Copa BetPlay
+    // winner). Relegation is by the three-season averages (not modelled).
+    annual: {
+      name: { en: "Reclassification", pt: "Reclassificação", es: "Reclasificación" },
+      championsQualify: true,
+      includePostseason: true,
+      zones: [
+        { kind: "libertadores", from: 1, to: 2 },
+        { kind: "sudamericana", from: 3, to: 5 },
+      ],
+    },
+  },
+  {
+    code: "URU",
+    slug: "uruguay-primera-division",
+    name: "Liga AUF",
+    country: "Uruguay",
+    flag: "uy",
+    simulatorName: { en: "Uruguayan Primera División Simulator", pt: "Simulador do Campeonato Uruguaio", es: "Simulador del Campeonato Uruguayo" },
+    aka: { en: "Liga AUF Uruguaya", pt: "Campeonato Uruguaio", es: "Liga AUF Uruguaya" },
+    teams: 16,
+    // Three tournaments a year: Apertura and Clausura (one round robin, 15
+    // games, the leader wins), and the Intermedio in between (two groups of 8,
+    // the group winners play a final).
+    gamesPerTeam: 15,
+    espn: {
+      slug: "uru.1",
+      seasons: "calendar",
+      stages: [
+        { table: "torneo-clausura", knockout: [], name: "Clausura" },
+        {
+          table: "torneo-intermedio",
+          knockout: ["intermedio-final"],
+          name: "Intermedio",
+          gamesPerTeam: 7,
+          groups: [
+            { id: "A", espnName: "Serie A", name: { en: "Group A", pt: "Grupo A", es: "Serie A" }, shortName: { en: "Group A", pt: "Grupo A", es: "Serie A" } },
+            { id: "B", espnName: "Serie B", name: { en: "Group B", pt: "Grupo B", es: "Serie B" }, shortName: { en: "Group B", pt: "Grupo B", es: "Serie B" } },
+          ],
+          zones: [{ kind: "titlePlayoffs", from: 1, to: 1 }],
+          playoff: {
+            seedFromGroups: { places: 1, interleave: true },
+            rounds: [{ key: "final", legs: 1, levelTie: "penalties", neutral: true, pairs: [[1, 2]] }],
+            // "Torneo Intermedio 2026": the season label already names the tournament.
+            title: "Torneo",
+          },
+        },
+        { table: "torneo-apertura", knockout: [], name: "Apertura" },
+      ],
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
+    zones: [{ kind: "title", from: 1, to: 1 }],
+    // Annual table (all three tournaments): the continental places, roughly
+    // (the Uruguayan champion and runner-up, decided by the tournament winners'
+    // play-off, also go to the Libertadores). Relegation is by averages (not
+    // modelled).
+    annual: {
+      name: { en: "Annual table", pt: "Tabela anual", es: "Tabla anual" },
+      zones: [
+        { kind: "libertadores", from: 1, to: 4 },
+        { kind: "sudamericana", from: 5, to: 8 },
+      ],
+    },
+  },
+  {
+    code: "PAR",
+    slug: "paraguay-primera-division",
+    name: "Primera División",
+    country: "Paraguay",
+    flag: "py",
+    simulatorName: { en: "Paraguayan Primera División Simulator", pt: "Simulador do Campeonato Paraguaio", es: "Simulador de la Primera División de Paraguay" },
+    aka: { en: "División de Honor", pt: "Campeonato Paraguaio", es: "División de Honor" },
+    teams: 12,
+    // Two tournaments a year (Apertura, Clausura), home and away (22 games); the leader wins.
+    gamesPerTeam: 22,
+    espn: {
+      slug: "par.1",
+      seasons: "calendar",
+      stages: [
+        { table: "torneo-clausura", knockout: [], name: "Clausura" },
+        { table: "torneo-apertura", knockout: [], name: "Apertura" },
+      ],
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
+    zones: [{ kind: "title", from: 1, to: 1 }],
+    // Cumulative table: the two tournament champions go to the Libertadores with
+    // the best 2 others; the next 4 to the Sudamericana (usual allocation, not
+    // confirmed for 2026). Relegation is by the three-season averages (not modelled).
+    annual: {
+      name: { en: "Cumulative table", pt: "Tabela acumulada", es: "Tabla acumulada" },
+      championsQualify: true,
+      zones: [
+        { kind: "libertadores", from: 1, to: 2 },
+        { kind: "sudamericana", from: 3, to: 6 },
+      ],
+    },
   },
   {
     code: "UCL",

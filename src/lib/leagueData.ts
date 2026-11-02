@@ -1,4 +1,4 @@
-import { gamesPerTeam, type EspnStages, type LeagueConfig } from "../config/leagues.ts";
+import { gamesPerTeam, isStage, type EspnStages, type LeagueConfig } from "../config/leagues.ts";
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
@@ -36,6 +36,32 @@ export interface Tournament {
   fixtures: Fixture[];
   postseason?: Fixture[];
   seasonKey: string;
+  /** Its separate tables, when the tournament has them (`EspnStages.groups`), in the config's order. */
+  groups?: { id: string; teamIds: number[] }[];
+}
+
+/**
+ * Groups of a tournament from its games: clubs that play each other are in the
+ * same group (connected clubs), ordered by their lowest club id.
+ */
+export function inferGroups(fixtures: readonly Fixture[], ids: readonly string[]): { id: string; teamIds: number[] }[] {
+  const parent = new Map<number, number>();
+  const find = (x: number): number => {
+    const p = parent.get(x) ?? x;
+    if (p === x) return x;
+    const root = find(p);
+    parent.set(x, root);
+    return root;
+  };
+  for (const f of fixtures) {
+    parent.set(f.homeId, find(f.homeId));
+    parent.set(f.awayId, find(f.awayId));
+    parent.set(find(f.homeId), find(f.awayId));
+  }
+  const components = new Map<number, number[]>();
+  for (const id of parent.keys()) components.set(find(id), [...(components.get(find(id)) ?? []), id]);
+  const sorted = [...components.values()].map((g) => g.sort((a, b) => a - b)).sort((a, b) => a[0]! - b[0]!);
+  return sorted.slice(0, ids.length).map((teamIds, i) => ({ id: ids[i]!, teamIds }));
 }
 
 /** Server responses are cached for an hour, well inside the free tier's rate limit. */
@@ -106,7 +132,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
     // The tournament to show: the first listed (latest) with at least half its
     // table published; a single tournament is always used.
     const stageSets = league.espn.stages === undefined ? [] : "table" in league.espn.stages ? [league.espn.stages] : [...league.espn.stages];
-    const tableGames = (set: EspnStages) => all.filter((e) => e.season?.slug === set.table).length;
+    const tableGames = (set: EspnStages) => all.filter((e) => isStage(e.season?.slug, set.table)).length;
     const stages = stageSets.find((set) => stageSets.length === 1 || tableGames(set) >= (league.teams * perTeam) / 4) ?? stageSets.at(-1);
     if (groups) {
       // Only games between member clubs: drops exhibitions such as the MLS All-Star game.
@@ -114,7 +140,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       // another competition (Sudamericana: the Libertadores third-placed clubs).
       const members = new Set(groups.flatMap((g) => g.teamIds));
       const isMember = (id: string | undefined) => members.has(Number(id));
-      const isTable = (slug: string | undefined) => stageSets.length === 0 || stageSets.some((set) => set.table === slug);
+      const isTable = (slug: string | undefined) => stageSets.length === 0 || stageSets.some((set) => isStage(slug, set.table));
       all = all.filter((e) => !isTable(e.season?.slug) || (e.competitions[0]?.competitors ?? []).every((c) => isMember(c.team.id)));
     }
     const yearLabel = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
@@ -126,7 +152,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
     const split = (set: EspnStages | undefined) =>
       set
         ? {
-            league: all.filter((e) => e.season?.slug === set.table),
+            league: all.filter((e) => isStage(e.season?.slug, set.table)),
             postseason: all.filter((e) => set.knockout.includes(e.season?.slug ?? "")),
           }
         : espnSplitSeason(all, perTeam);
@@ -144,13 +170,16 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
         const parts = split(set);
         if (parts.league.length === 0) continue;
         tournamentEvents.push(...parts.league, ...parts.postseason);
+        const own = espnFixtures(parts.league, { roundCount: set.gamesPerTeam ?? perTeam });
+        const playoff = set.playoff === null ? undefined : (set.playoff ?? league.playoff);
         tournaments.push({
           id: set.table,
           name: set.name ?? set.table,
           season: set.name ? `${set.name} ${yearLabel}` : yearLabel,
-          fixtures: set === stages ? fixtures : espnFixtures(parts.league, { roundCount: perTeam }),
-          ...(league.playoff && parts.postseason.length ? { postseason: realPostseason(parts.postseason) } : {}),
+          fixtures: set === stages && !set.gamesPerTeam ? fixtures : own,
+          ...(playoff && parts.postseason.length ? { postseason: realPostseason(parts.postseason) } : {}),
           seasonKey: `${baseKey}:${set.table}`,
+          ...(set.groups ? { groups: inferGroups(own, set.groups.map((g) => g.id)) } : {}),
         });
       }
     }
@@ -193,23 +222,27 @@ function loadSample(league: LeagueConfig): LeagueData {
   const sets = league.espn.stages && !("table" in league.espn.stages) ? league.espn.stages : [];
   let tournaments: Tournament[] | undefined;
   if (sets.length > 1) {
-    const halfYear = 26 * 7 * 24 * 60 * 60 * 1000;
-    const earlier = sampleLeague(league, 1).fixtures.map((f) => ({
-      ...f,
-      id: f.id + 100_000,
-      utcDate: new Date(Date.parse(f.utcDate) - halfYear).toISOString(),
-    }));
-    // Its final, already played: club 1 beat club 2 (the annual table's champion pass-down).
-    const lastDate = earlier.reduce((max, f) => (f.utcDate > max ? f.utcDate : max), "");
-    const final: Fixture = { id: 200_001, matchday: 0, utcDate: lastDate, homeId: 1, awayId: 2, result: { home: 2, away: 1 } };
-    tournaments = sets.map((set, i) => ({
-      id: set.table,
-      name: set.name ?? set.table,
-      season: `${set.name ?? ""} ${year}`.trim(),
-      fixtures: i === 0 ? fixtures : earlier,
-      ...(i === 0 ? {} : { postseason: [final] }),
-      seasonKey: `${league.code}:sample:${set.table}`,
-    }));
+    // Earlier tournaments: fully played, each with its own fixture ids and
+    // dates, and a final already played (club 1 beat club 2) for the annual
+    // table's champion pass-down.
+    const month = 30 * 24 * 60 * 60 * 1000;
+    const played = sampleLeague(league, 1).fixtures;
+    tournaments = sets.map((set, i) => {
+      const own =
+        i === 0
+          ? fixtures
+          : played.map((f) => ({ ...f, id: f.id + i * 100_000, utcDate: new Date(Date.parse(f.utcDate) - i * 6 * month).toISOString() }));
+      const lastDate = own.reduce((max, f) => (f.utcDate > max ? f.utcDate : max), "");
+      const final: Fixture = { id: 200_000 + i, matchday: 0, utcDate: lastDate, homeId: 1, awayId: 2, result: { home: 2, away: 1 } };
+      return {
+        id: set.table,
+        name: set.name ?? set.table,
+        season: `${set.name ?? ""} ${year}`.trim(),
+        fixtures: own,
+        ...(i === 0 ? {} : { postseason: [final] }),
+        seasonKey: `${league.code}:sample:${set.table}`,
+      };
+    });
   }
   return {
     teams,

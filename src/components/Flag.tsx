@@ -97,6 +97,36 @@ function shapes(code: FlagCode) {
           <polygon points="5.00,2.00 5.71,4.03 7.85,4.07 6.14,5.37 6.76,7.43 5.00,6.20 3.24,7.43 3.86,5.37 2.15,4.07 4.29,4.03" fill="#ffffff" />
         </>
       );
+    case "co":
+      return (
+        <>
+          <rect width="30" height="20" fill="#ce1126" />
+          <rect width="30" height="15" fill="#003893" />
+          <rect width="30" height="10" fill="#fcd116" />
+        </>
+      );
+    case "uy":
+      // Simplified: nine stripes and the Sun of May as a gold disc.
+      return (
+        <>
+          <rect width="30" height="20" fill="#ffffff" />
+          <rect y="2.22" width="30" height="2.22" fill="#0038a8" />
+          <rect y="6.66" width="30" height="2.22" fill="#0038a8" />
+          <rect y="11.10" width="30" height="2.22" fill="#0038a8" />
+          <rect y="15.54" width="30" height="2.22" fill="#0038a8" />
+          <rect width="11" height="11.1" fill="#ffffff" />
+          <circle cx="5.5" cy="5.55" r="3" fill="#fcd116" />
+        </>
+      );
+    case "py":
+      return (
+        <>
+          <rect width="30" height="20" fill="#ffffff" />
+          <rect width="30" height="6.67" fill="#d52b1e" />
+          <rect y="13.33" width="30" height="6.67" fill="#0038a8" />
+          <circle cx="15" cy="10" r="2.3" fill="none" stroke="#0038a8" strokeWidth="0.6" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

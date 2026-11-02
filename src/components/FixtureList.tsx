@@ -166,7 +166,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
     }
     if (config.venue) return t("playoffRuleFinal", { venue: config.venue });
     if (config.neutral) return t(config.noExtraTime ? "playoffRuleNeutralPenalties" : "playoffRuleNeutral");
-    if (config.legs === 2) return t("playoffRuleTwoLegs", { higher });
+    if (config.legs === 2) return t(config.noExtraTime ? "playoffRuleTwoLegsPenalties" : "playoffRuleTwoLegs", { higher });
     return config.noExtraTime ? t("playoffRuleOneLegPenalties", { higher }) : t("playoffRuleOneLeg", { higher });
   };
 

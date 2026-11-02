@@ -479,9 +479,14 @@ describe("realChampion", () => {
     ...(penalties ? { penalties } : {}),
   });
   it("takes the winner of the last real post-season game", () => {
-    assert.equal(realChampion([game(2, "2026-05-24", { home: 2, away: 3 }), game(1, "2026-05-16", { home: 1, away: 0 })]), 4);
+    // An earlier round between other clubs doesn't count.
+    const semi: Fixture = { id: 1, matchday: 0, utcDate: "2026-05-16", homeId: 16, awayId: 17, result: { home: 1, away: 0 } };
+    assert.equal(realChampion([game(2, "2026-05-24", { home: 2, away: 3 }), semi]), 4);
     assert.equal(realChampion([game(1, "2026-05-24", { home: 1, away: 1 }, { home: 4, away: 3 })]), 16);
     assert.equal(realChampion([game(1, "2026-05-24", null)]), null);
     assert.equal(realChampion(undefined), null);
+    // Two legs (Colombia 2026): Junior won 3–0 at home and lost 1–0 away: champions on aggregate.
+    const leg = (id: number, date: string, homeId: number, awayId: number, home: number, away: number): Fixture => ({ id, matchday: 0, utcDate: date, homeId, awayId, result: { home, away } });
+    assert.equal(realChampion([leg(1, "2026-06-03", 7, 9, 3, 0), leg(2, "2026-06-08", 9, 7, 1, 0)]), 7);
   });
 });

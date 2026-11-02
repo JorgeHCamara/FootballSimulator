@@ -37,7 +37,7 @@ const pageSeason = (data: { season: string; tournaments?: unknown[] }) => (data.
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
 /** Which set of texts a page uses: league, play-off league, continental competition, or cup. */
-type Wording = "league" | "leagueAmericas" | "zones" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
+type Wording = "league" | "leagueAmericas" | "zones" | "tournaments" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
 
 type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
@@ -56,6 +56,8 @@ async function load(slug: string): Promise<Loaded | undefined> {
       : "continental"
     : league.playoff?.seedFromGroups
       ? "zones" // Argentina: zone tables and a title play-off
+      : league.annual
+        ? "tournaments" // several tournaments a year and an annual table (Colombia, Uruguay, Paraguay)
       : playoffWording(league)
         ? "playoffs"
         : league.zones.some((z) => z.kind === "libertadores")
@@ -73,6 +75,7 @@ const META_KEYS: Record<
       | "leagueDescriptionPlayoffs"
       | "leagueDescriptionAmericas"
       | "zonesDescription"
+      | "tournamentsDescription"
       | "continentalDescription"
       | "continentalGroupsDescription"
       | "cupDescription"
@@ -82,6 +85,7 @@ const META_KEYS: Record<
   league: { title: "leagueTitle", description: "leagueDescription" },
   leagueAmericas: { title: "leagueTitle", description: "leagueDescriptionAmericas" },
   zones: { title: "leagueTitle", description: "zonesDescription" },
+  tournaments: { title: "leagueTitle", description: "tournamentsDescription" },
   continental: { title: "continentalTitle", description: "continentalDescription" },
   continentalGroups: { title: "continentalGroupsTitle", description: "continentalGroupsDescription" },
   playoffs: { title: "leagueTitle", description: "leagueDescriptionPlayoffs" },
@@ -129,7 +133,12 @@ export default async function LeaguePage({ params }: { params: Params }) {
   const { config, data, wording } = loaded;
   const values = seoValues(config, locale, pageSeason(data));
   const faqKey =
-    wording === "cup" || wording === "cupBracket" || wording === "continental" || wording === "continentalGroups" || wording === "zones"
+    wording === "cup" ||
+    wording === "cupBracket" ||
+    wording === "continental" ||
+    wording === "continentalGroups" ||
+    wording === "zones" ||
+    wording === "tournaments"
       ? wording
       : wording === "playoffs"
         ? "leaguePlayoffs"
@@ -155,6 +164,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
             ? "introPlayoffs"
             : wording === "zones"
               ? "introZones"
+              : wording === "tournaments"
+                ? "introTournaments"
               : "intro";
   // Continental competitions: clubs joining the knockout phase from another
   // competition (Sudamericana: Libertadores third places), and ratings that
@@ -178,7 +189,9 @@ export default async function LeaguePage({ params }: { params: Params }) {
               ? (`step3ContinentalGroups.${config.code}` as "step3")
               : step === "step3" && wording === "zones"
                 ? "step3Zones"
-                : step === "step3" && wording === "leagueAmericas"
+                : step === "step3" && wording === "tournaments"
+                  ? "step3Tournaments"
+                  : step === "step3" && wording === "leagueAmericas"
                   ? "step3Americas"
                   : step;
 

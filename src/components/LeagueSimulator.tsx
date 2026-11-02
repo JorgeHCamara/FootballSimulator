@@ -328,13 +328,14 @@ export function LeagueSimulator({
             model,
             standings: standingsOptions,
             // The knockout phase makes each continental run several times slower, so half as many (as for cups).
-            iterations: league.continental || playoff?.seedFromGroups ? ITERATIONS / 2 : ITERATIONS,
+            iterations: league.continental || playoff?.seedFromGroups || (playoff?.title && !league.groups) ? ITERATIONS / 2 : ITERATIONS,
             seed: 2026,
             ...(groupTabs.length ? { groups: groupTabs.map((g) => g.teamIds) } : {}),
             ...(qualifiedElsewhere?.length ? { passDown: qualifiedElsewhere } : {}),
             // Continental competitions: the chance of winning it takes the knockout phase too.
             // Also a title play-off seeded from groups (Argentina): the chance of winning the tournament.
-            ...((league.continental || playoff?.seedFromGroups) && playoff
+            // and a title play-off of a single table (Colombia).
+            ...((league.continental || playoff?.seedFromGroups || (playoff?.title && !league.groups)) && playoff
               ? { playoff: { config: playoff, options: bracketOptions, ...(externalSeeds ? { external: externalSeeds } : {}) } }
               : {}),
           }
@@ -408,7 +409,8 @@ export function LeagueSimulator({
                 rows={rows}
                 teams={teamMap}
                 {...(zonePositions ? { zonePositions } : {})}
-                {...(qualified.size ? { qualified, ...(qualifiedNote ? { qualifiedNote } : {}) } : {})}
+                {...(qualified.size ? { qualified } : {})}
+                {...(qualifiedNote ? { qualifiedNote } : {})}
               />
               {playoff?.title && bracket.length > 0 && (
                 <PlayoffChampion

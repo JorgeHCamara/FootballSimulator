@@ -458,7 +458,7 @@ describe("continental competitions (UEFA, CONMEBOL)", async () => {
     assert.deepEqual(groups.map((g) => g.continent), ["Europe", "South America", "North America"]);
     const uefa = groups[0]!.countries.find((c) => c.country === "UEFA")!;
     assert.deepEqual(uefa.leagues.map((l) => l.name), ["Champions League", "Europa League", "Conference League"]);
-    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "Argentina", "Chile", "CONMEBOL"]);
+    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "Argentina", "Chile", "Colombia", "Uruguay", "Paraguay", "CONMEBOL"]);
     const conmebol = groups[1]!.countries.find((c) => c.country === "CONMEBOL")!;
     assert.deepEqual(conmebol.leagues.map((l) => l.name), ["Copa Libertadores", "Copa Sudamericana"]);
   });
@@ -496,5 +496,31 @@ describe("Argentina's annual table", async () => {
   it("is configured with Libertadores 1–3, Sudamericana 4–9 and relegation for the last", () => {
     const arg = getLeagueBySlug("argentina-primera-division")!;
     assert.deepEqual(arg.annual!.zones.map((z) => [z.kind, z.from, z.to]), [["libertadores", 1, 3], ["sudamericana", 4, 9], ["relegation", 30, 30]]);
+  });
+});
+
+describe("several tournaments a season (Colombia, Uruguay, Paraguay)", async () => {
+  const { inferGroups } = await import("./leagueData.ts");
+  const { isStage } = await import("../config/leagues.ts");
+
+  it("recognises groups from who plays whom", () => {
+    const f = (homeId: number, awayId: number, id: number) => ({ id, matchday: 1, utcDate: "", homeId, awayId, result: null });
+    const groups = inferGroups([f(1, 2, 1), f(3, 4, 2), f(2, 5, 3), f(4, 6, 4)], ["A", "B"]);
+    assert.deepEqual(groups, [{ id: "A", teamIds: [1, 2, 5] }, { id: "B", teamIds: [3, 4, 6] }]);
+  });
+
+  it("matches ESPN stage tags with or without a year", () => {
+    assert.ok(isStage("torneo-apertura-2026", "torneo-apertura"));
+    assert.ok(isStage("apertura", "apertura"));
+    assert.ok(!isStage("apertura---finals", "apertura"));
+  });
+
+  it("gives Uruguay's Intermedio its own format", () => {
+    const uru = getLeagueBySlug("uruguay-primera-division")!;
+    const stages = uru.espn.stages as readonly { table: string; gamesPerTeam?: number; playoff?: unknown }[];
+    const intermedio = stages.find((s) => s.table === "torneo-intermedio")!;
+    assert.equal(intermedio.gamesPerTeam, 7);
+    assert.ok(intermedio.playoff);
+    assert.equal(uru.playoff, undefined);
   });
 });
