@@ -120,7 +120,10 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
   const button = (active: boolean) =>
     `whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-700" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"}`;
 
-  const shownGroups = shown ? (shown.groups ?? (shown.id === current ? groups : undefined)) : undefined;
+  // A tournament's own groups (Uruguay's Intermedio), else the league's: ESPN's
+  // standings only describe the current tournament, but a league's groups last
+  // the whole year (Argentina's Zones A and B in both the Apertura and Clausura).
+  const shownGroups = shown ? (shown.groups ?? groups) : undefined;
 
   return (
     <div className="space-y-3">

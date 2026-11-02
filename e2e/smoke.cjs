@@ -713,6 +713,12 @@ async function step(name, fn) {
       await switcher.nth(0).click();
       await p.locator('[data-testid="matchday-select"]').waitFor();
       assert.equal(await p.locator('[data-testid="matchday-select"] option').count(), 17);
+      // …in the same Zones A and B as the current tournament, with its play-off seeded across them.
+      assert.deepEqual(await p.locator('[data-testid="group-switch"] button').allInnerTexts(), ["Zone A", "Zone B"]);
+      assert.equal(await rows.count(), 15);
+      await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Play-off" });
+      assert.doesNotMatch(await p.locator('[data-testid="playoff"]').innerText(), /in Zone A|The pairings are set/, "the zones are complete: real clubs, not slots");
+      await p.locator('[data-testid="matchday-select"]').selectOption({ index: 0 });
       const played = async () => (await rows.evaluateAll((r) => r.map((x) => Number(x.children[2].textContent)))).reduce((a, b) => a + b, 0);
       // The annual table: all 30 clubs; the Apertura champion (sample: club 1) is in the
       // Libertadores already, so the places pass down; the last club goes down.
