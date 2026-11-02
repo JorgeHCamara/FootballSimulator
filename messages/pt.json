@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League e Libertadores. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
@@ -35,7 +35,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League e Libertadores. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -126,11 +126,12 @@
     "finalChance": "Final",
     "winChance": "Título",
     "knockoutRoundShort": "{round, select, knockoutPlayoff {Playoff} roundOf16 {Oitavas} quarterFinals {Quartas} semiFinals {Semis} final {Final} other {Fase}}",
-    "topChance": "Top {count}",
+    "topChance": "{count, plural, =1 {1º} other {Top #}}",
     "group": "Grupo",
     "knockoutProjectedGroups": "O mata-mata é definido pelas tabelas dos grupos quando a fase de grupos terminar: os primeiros colocados (ordenados pela campanha no grupo) contra os segundos. Até o sorteio real, os confrontos mostrados são um sorteio possível que segue os cabeças de chave.",
     "championPendingGroups": "Complete a fase de grupos e o mata-mata para ver o campeão.",
-    "championPendingLeaguePhase": "Complete a fase de liga e o mata-mata para ver o campeão."
+    "championPendingLeaguePhase": "Complete a fase de liga e o mata-mata para ver o campeão.",
+    "knockoutProjectedGroupsExternal": "O mata-mata é definido quando a fase de grupos termina: os primeiros colocados (cabeças 1–8) vão direto às oitavas; os segundos (9–16) jogam um playoff contra os terceiros colocados dos grupos da Libertadores (17–24). Até o sorteio real, os confrontos mostrados são um sorteio possível que segue os cabeças de chave."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -178,8 +179,14 @@
     "step2CupBracket": "Clique em Simular fase ou Simular até a final. Os vencedores avançam pela chave fixa.",
     "introContinental": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule a fase de liga: a tabela dos 36 clubes é atualizada na hora com os critérios de desempate da UEFA. Os 8 primeiros vão direto às oitavas, do 9º ao 24º jogam o playoff, e o mata-mata pode ser jogado até a final.",
     "step3Continental": "Abra a aba Chances para ver as chances de cada clube de terminar no top 8, de chegar ao mata-mata, de chegar à final e de ganhar a {league}.",
-    "introContinentalGroups": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule a fase de grupos: as oito tabelas são atualizadas na hora. Os dois primeiros de cada grupo vão às oitavas de final e o terceiro cai para a Copa Sul-Americana, e o mata-mata pode ser jogado até a final.",
-    "step3ContinentalGroups": "Abra a aba Chances para ver as chances de cada clube de terminar entre os dois primeiros do grupo, de chegar à final e de ganhar a {league}."
+    "introContinentalGroups": {
+      "LIB": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule a fase de grupos: as oito tabelas são atualizadas na hora. Os dois primeiros de cada grupo vão às oitavas de final e o terceiro cai para a Copa Sul-Americana, e o mata-mata pode ser jogado até a final.",
+      "SUD": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule a fase de grupos: as oito tabelas são atualizadas na hora. Os primeiros colocados vão direto às oitavas, os segundos jogam um playoff contra os clubes que caem da Libertadores, e o mata-mata pode ser jogado até a final."
+    },
+    "step3ContinentalGroups": {
+      "LIB": "Abra a aba Chances para ver as chances de cada clube de terminar entre os dois primeiros do grupo, de chegar à final e de ganhar a {league}.",
+      "SUD": "Abra a aba Chances para ver as chances de cada clube de ganhar o grupo, de terminar entre os dois primeiros, de chegar à final e de ganhar a {league}."
+    }
   },
   "Faq": {
     "league": [
@@ -233,7 +240,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League e Libertadores, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -310,28 +317,52 @@
         "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
       }
     ],
-    "continentalGroups": [
-      {
-        "q": "Como funciona o {simulator}?",
-        "a": "Ele começa com as tabelas e os jogos reais da fase de grupos da {league} {season} (as fases preliminares antes dos grupos não entram). Digite o placar de qualquer jogo ou clique em Simular: as tabelas dos grupos são atualizadas na hora. Quando a fase de grupos termina, o mata-mata é definido pelas tabelas e pode ser jogado até a final."
-      },
-      {
-        "q": "Como os clubes são avaliados?",
-        "a": "Os clubes vêm de vários países, então os brasileiros começam com o seu desempenho no Brasileirão nesta temporada, ajustado pela divisão, e os clubes de ligas que não estão no Foot Simu começam com um valor padrão da competição. Os resultados na {league} atualizam a avaliação ao longo da temporada."
-      },
-      {
-        "q": "Como funciona o mata-mata?",
-        "a": "Os primeiros colocados dos grupos, ordenados do 1º ao 8º pela campanha no grupo, enfrentam os segundos colocados, do 9º ao 16º, em oitavas de final de ida e volta. O clube com melhor campanha decide em casa em todas as fases, e um empate no placar agregado vai direto para os pênaltis. A final é em jogo único. Até o sorteio real, os confrontos seguem os cabeças de chave."
-      },
-      {
-        "q": "Como as chances são calculadas?",
-        "a": "A aba Chances joga o resto da fase de grupos e todo o mata-mata 5.000 vezes a partir dos resultados atuais, incluindo seus palpites na fase de grupos, e conta quantas vezes cada clube termina entre os dois primeiros do grupo, chega à final e ganha a {league}."
-      },
-      {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
-      }
-    ]
+    "continentalGroups": {
+      "LIB": [
+        {
+          "q": "Como funciona o {simulator}?",
+          "a": "Ele começa com as tabelas e os jogos reais da fase de grupos da {league} {season} (as fases preliminares antes dos grupos não entram). Digite o placar de qualquer jogo ou clique em Simular: as tabelas dos grupos são atualizadas na hora. Quando a fase de grupos termina, o mata-mata é definido pelas tabelas e pode ser jogado até a final."
+        },
+        {
+          "q": "Como os clubes são avaliados?",
+          "a": "Os clubes vêm de vários países, então os brasileiros começam com o seu desempenho no Brasileirão nesta temporada, ajustado pela divisão, e os clubes de ligas que não estão no Foot Simu começam com um valor padrão da competição. Os resultados na {league} atualizam a avaliação ao longo da temporada."
+        },
+        {
+          "q": "Como funciona o mata-mata?",
+          "a": "Os primeiros colocados dos grupos, ordenados do 1º ao 8º pela campanha no grupo, enfrentam os segundos colocados, do 9º ao 16º, em oitavas de final de ida e volta. O clube com melhor campanha decide em casa em todas as fases, e um empate no placar agregado vai direto para os pênaltis. A final é em jogo único. Até o sorteio real, os confrontos seguem os cabeças de chave."
+        },
+        {
+          "q": "Como as chances são calculadas?",
+          "a": "A aba Chances joga o resto da fase de grupos e todo o mata-mata 5.000 vezes a partir dos resultados atuais, incluindo seus palpites na fase de grupos, e conta quantas vezes cada clube termina entre os dois primeiros do grupo, chega à final e ganha a {league}."
+        },
+        {
+          "q": "O Foot Simu é grátis?",
+          "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+        }
+      ],
+      "SUD": [
+        {
+          "q": "Como funciona o {simulator}?",
+          "a": "Ele começa com as tabelas e os jogos reais da fase de grupos da {league} {season} (as fases preliminares antes dos grupos não entram). Digite o placar de qualquer jogo ou clique em Simular: as tabelas dos grupos são atualizadas na hora. Quando a fase de grupos termina, o mata-mata é definido pelas tabelas e pode ser jogado até a final."
+        },
+        {
+          "q": "Como os clubes são avaliados?",
+          "a": "Os clubes vêm de vários países, então os brasileiros começam com o seu desempenho no Brasileirão nesta temporada, ajustado pela divisão, e os clubes de ligas que não estão no Foot Simu começam com um valor padrão da competição. Os resultados na {league} atualizam a avaliação ao longo da temporada."
+        },
+        {
+          "q": "Como funciona o mata-mata?",
+          "a": "Os primeiros colocados dos grupos, ordenados do 1º ao 8º pela campanha, vão direto às oitavas de final. Os segundos, do 9º ao 16º, jogam um playoff de ida e volta contra os oito terceiros colocados dos grupos da Libertadores (do 17º ao 24º), e os vencedores enfrentam os primeiros colocados nas oitavas. O clube com melhor campanha decide em casa em todas as fases, e um empate no placar agregado vai direto para os pênaltis. A final é em jogo único. Até o sorteio real, os confrontos seguem os cabeças de chave."
+        },
+        {
+          "q": "Como as chances são calculadas?",
+          "a": "A aba Chances joga o resto da fase de grupos e todo o mata-mata 5.000 vezes a partir dos resultados atuais, incluindo seus palpites na fase de grupos, e conta quantas vezes cada clube ganha o grupo, termina entre os dois primeiros, chega à final e ganha a {league}."
+        },
+        {
+          "q": "O Foot Simu é grátis?",
+          "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+        }
+      ]
+    }
   },
   "Countries": {
     "England": "Inglaterra",

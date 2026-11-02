@@ -97,21 +97,38 @@ export interface PlayoffConfig {
    * difference, goals scored), then all runners-up, and so on. Positions in
    * `pairs` and `entrants` refer to that ranking (see seedByGroupPlace).
    */
-  seedFromGroups?: { places: number };
+  seedFromGroups?: {
+    places: number;
+    /**
+     * Clubs joining from another competition's group stage, ranked right after
+     * this competition's qualifiers (Copa Sudamericana: the Libertadores
+     * third-placed clubs, seeds 17–24).
+     */
+    external?: { league: string; place: number };
+  };
 }
+
+const byRecord = (a: StandingRow, b: StandingRow) =>
+  b.points - a.points || b.goalDifference - a.goalDifference || b.goalsFor - a.goalsFor || a.teamId - b.teamId;
 
 /**
  * One ranking from several group tables: every group's 1st (best record first),
- * then every 2nd, and so on, numbered 1, 2, 3… (see `seedFromGroups`).
+ * then every 2nd, and so on, numbered 1, 2, 3… (see `seedFromGroups`). Clubs
+ * joining from another competition (`external`, by record) come right after
+ * the first `places` places, before the clubs that went out.
  */
-export function seedByGroupPlace(groups: readonly (readonly StandingRow[])[]): StandingRow[] {
+export function seedByGroupPlace(
+  groups: readonly (readonly StandingRow[])[],
+  external: readonly StandingRow[] = [],
+  places = Infinity,
+): StandingRow[] {
   const deepest = Math.max(0, ...groups.map((g) => g.length));
   const ranked: StandingRow[] = [];
   for (let place = 1; place <= deepest; place++) {
-    const atPlace = groups.flatMap((g) => g.filter((row) => row.position === place));
-    atPlace.sort((a, b) => b.points - a.points || b.goalDifference - a.goalDifference || b.goalsFor - a.goalsFor || a.teamId - b.teamId);
-    ranked.push(...atPlace);
+    if (place === places + 1) ranked.push(...[...external].sort(byRecord));
+    ranked.push(...groups.flatMap((g) => g.filter((row) => row.position === place)).sort(byRecord));
   }
+  if (places >= deepest) ranked.push(...[...external].sort(byRecord));
   return ranked.map((row, i) => ({ ...row, position: i + 1 }));
 }
 

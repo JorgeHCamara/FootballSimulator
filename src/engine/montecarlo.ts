@@ -3,7 +3,7 @@ import { seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, typ
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
 import { computeStandings, type StandingsOptions } from "./standings.ts";
-import type { Fixture, ResultMap, Team, TeamId } from "./types.ts";
+import type { Fixture, ResultMap, StandingRow, Team, TeamId } from "./types.ts";
 
 export interface MonteCarloInput {
   teams: readonly Team[];
@@ -24,7 +24,12 @@ export interface MonteCarloInput {
    * results stand, everything else is simulated. With `groups`, only for a
    * knockout seeded from the group places (`seedFromGroups`, Libertadores).
    */
-  playoff?: { config: PlayoffConfig; options: Omit<BracketOptions, "seasonComplete"> };
+  playoff?: {
+    config: PlayoffConfig;
+    options: Omit<BracketOptions, "seasonComplete">;
+    /** Clubs joining the knockout phase from another competition (see `seedFromGroups.external`). */
+    external?: readonly StandingRow[];
+  };
 }
 
 export interface MonteCarloResult {
@@ -75,7 +80,7 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
       groupRows.push(rows);
     }
     if (playoff) {
-      const rows = grouped ? seedByGroupPlace(groupRows) : groupRows[0]!;
+      const rows = grouped ? seedByGroupPlace(groupRows, playoff.external, playoff.config.seedFromGroups?.places) : groupRows[0]!;
       // The bracket only needs the table and knockout results (real ones come with the options).
       const roundCount = playoff.config.rounds.length;
       let final: PlayoffTie | undefined;

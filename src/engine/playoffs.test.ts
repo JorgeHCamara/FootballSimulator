@@ -426,4 +426,15 @@ describe("seedByGroupPlace (Libertadores knockout seeding)", () => {
     const seeds = seedByGroupPlace(groups);
     assert.deepEqual(seeds.map((r) => [r.position, r.teamId]), [[1, 11], [2, 1], [3, 2], [4, 12], [5, 3], [6, 13]]);
   });
+
+  it("puts clubs from another competition right after the qualifying places (Sudamericana)", () => {
+    const groups = [
+      [groupRow(1, 1, 10), groupRow(2, 2, 8), groupRow(3, 3, 4)],
+      [groupRow(1, 11, 13), groupRow(2, 12, 9), groupRow(3, 13, 2)],
+    ];
+    const external = [groupRow(3, 91, 5), groupRow(3, 92, 7)];
+    const seeds = seedByGroupPlace(groups, external, 2);
+    assert.deepEqual(seeds.map((r) => r.teamId), [11, 1, 12, 2, 92, 91, 3, 13]);
+    assert.deepEqual(seeds.map((r) => r.position), [1, 2, 3, 4, 5, 6, 7, 8]);
+  });
 });

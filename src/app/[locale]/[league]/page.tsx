@@ -12,7 +12,7 @@ import type { LeagueConfig, SiteLocale } from "../../../config/leagues.ts";
 import { Link } from "../../../i18n/navigation.ts";
 import { routing } from "../../../i18n/routing.ts";
 import { getCupData, type CupData } from "../../../lib/cupData.ts";
-import { getContinentalPriors } from "../../../lib/continental.ts";
+import { getContinentalPriors, getExternalSeeds } from "../../../lib/continental.ts";
 import { getLeagueData, type LeagueData } from "../../../lib/leagueData.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd, fill, type FaqItem } from "../../../lib/site.ts";
 
@@ -119,7 +119,9 @@ export default async function LeaguePage({ params }: { params: Params }) {
   // Cups: the FAQ explains where this cup's ratings come from.
   const cupT = await getTranslations("Cup");
   const faqValues = loaded.kind === "cup" ? { ...values, ratingNote: cupT(`ratingNote.${loaded.config.code}`) } : values;
-  const faq = (faqT.raw(faqKey) as FaqItem[]).map((item) => ({ q: fill(item.q, faqValues), a: fill(item.a, faqValues) }));
+  // Group-stage formats differ per competition (Libertadores, Sudamericana).
+  const faqPath = wording === "continentalGroups" ? `${faqKey}.${config.code}` : faqKey;
+  const faq = (faqT.raw(faqPath) as FaqItem[]).map((item) => ({ q: fill(item.q, faqValues), a: fill(item.a, faqValues) }));
   const pageUrl = `${SITE_URL}/${locale}/${config.slug}`;
   const lang = locale as SiteLocale;
   const intro =
@@ -130,12 +132,19 @@ export default async function LeaguePage({ params }: { params: Params }) {
         : wording === "continental"
           ? "introContinental"
           : wording === "continentalGroups"
-            ? "introContinentalGroups"
+            ? (`introContinentalGroups.${config.code}` as "intro")
           : wording === "playoffs"
             ? "introPlayoffs"
             : "intro";
-  // Continental competitions: ratings start from each club's domestic league.
-  const priorStrengths = loaded.kind === "league" && loaded.config.continental ? await getContinentalPriors(loaded.config, loaded.data.teams.map((t) => t.id)) : undefined;
+  // Continental competitions: clubs joining the knockout phase from another
+  // competition (Sudamericana: Libertadores third places), and ratings that
+  // start from each club's domestic league.
+  const external = loaded.kind === "league" ? await getExternalSeeds(loaded.config) : undefined;
+  const leagueTeams =
+    loaded.kind === "league"
+      ? [...loaded.data.teams, ...(external?.teams ?? []).filter((t) => !loaded.data.teams.some((own) => own.id === t.id))]
+      : [];
+  const priorStrengths = loaded.kind === "league" && loaded.config.continental ? await getContinentalPriors(loaded.config, leagueTeams.map((t) => t.id)) : undefined;
   const stepKey = (step: "step1" | "step2" | "step3") =>
     wording === "cupBracket" && step === "step2"
       ? "step2CupBracket"
@@ -146,7 +155,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           : step === "step3" && wording === "continental"
             ? "step3Continental"
             : step === "step3" && wording === "continentalGroups"
-              ? "step3ContinentalGroups"
+              ? (`step3ContinentalGroups.${config.code}` as "step3")
               : step;
 
   return (
@@ -201,13 +210,14 @@ export default async function LeaguePage({ params }: { params: Params }) {
       ) : (
         <LeagueSimulator
           league={loaded.config}
-          teams={loaded.data.teams}
+          teams={leagueTeams}
           fixtures={loaded.data.fixtures}
           seasonKey={loaded.data.seasonKey}
           season={loaded.data.season}
           {...(loaded.data.postseason ? { postseason: loaded.data.postseason } : {})}
           {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
+          {...(external ? { externalSeeds: external.rows } : {})}
         />
       )}
 

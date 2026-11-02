@@ -24,7 +24,7 @@ export interface PlayoffView {
   /** Not held this season (Serie B: 3rd finished far enough clear of 4th). */
   cancelled?: { position: number; over: number; points: number };
   /** A continental knockout phase, seeded from a league phase (UEFA) or a group stage (Libertadores): its own wording, and drawn pairings. */
-  knockout?: "leaguePhase" | "groupStage";
+  knockout?: "leaguePhase" | "groupStage" | "groupStageExternal";
 }
 
 interface Props {
@@ -169,7 +169,15 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
 
   return (
     <div data-testid="playoff">
-      {!seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t(playoff.knockout === "groupStage" ? "knockoutProjectedGroups" : playoff.knockout ? "knockoutProjected" : "playoffProjected")}</p>}
+      {!seasonComplete && <p className="px-3 pt-2 text-xs text-zinc-500">{t(
+            playoff.knockout === "groupStageExternal"
+              ? "knockoutProjectedGroupsExternal"
+              : playoff.knockout === "groupStage"
+                ? "knockoutProjectedGroups"
+                : playoff.knockout
+                  ? "knockoutProjected"
+                  : "playoffProjected",
+          )}</p>}
       {seasonComplete && playoff.knockout && (
         <p className="px-3 pt-2 text-xs text-zinc-500" data-testid="knockout-draw-note">
           {t("knockoutDrawNote")}

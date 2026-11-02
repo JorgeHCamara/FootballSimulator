@@ -44,6 +44,8 @@ interface Props {
   groups?: { id: string; teamIds: number[] }[];
   /** Starting ratings (continental competitions: from each club's domestic league). */
   priorStrengths?: Record<number, TeamStrength>;
+  /** Clubs joining the knockout phase from another competition, with their records there (see `seedFromGroups.external`). */
+  externalSeeds?: StandingRow[];
 }
 
 type Tab = "table" | "chances";
@@ -57,7 +59,7 @@ function nextSeasonLabel(season: string): string {
   return "";
 }
 
-export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason, groups, priorStrengths }: Props) {
+export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: seasonLabel, postseason, groups, priorStrengths, externalSeeds }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const [hydrated, setHydrated] = useState(false);
@@ -122,7 +124,8 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
       computeStandings(g.teamIds.flatMap((id) => teamMap.get(id) ?? []), ordered, results, standingsOptions),
     );
     // A knockout seeded from the group places (Libertadores): one ranking, winners first.
-    if (league.playoff?.seedFromGroups) return { overall: seedByGroupPlace(groupTables), groups: undefined };
+    const seeding = league.playoff?.seedFromGroups;
+    if (seeding) return { overall: seedByGroupPlace(groupTables, externalSeeds, seeding.places), groups: undefined };
     return { overall, groups: groupTables };
   };
 
@@ -306,10 +309,12 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             seed: 2026,
             ...(groupTabs.length ? { groups: groupTabs.map((g) => g.teamIds) } : {}),
             // Continental competitions: the chance of winning it takes the knockout phase too.
-            ...(league.continental && playoff ? { playoff: { config: playoff, options: bracketOptions } } : {}),
+            ...(league.continental && playoff
+              ? { playoff: { config: playoff, options: bracketOptions, ...(externalSeeds ? { external: externalSeeds } : {}) } }
+              : {}),
           }
         : null,
-    [tab, hydrated, teams, fixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions],
+    [tab, hydrated, teams, fixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds],
   );
 
   const actionButton =
@@ -449,7 +454,9 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
                     ...(playoff.winnerPlays ? { winnerPlays: playoff.winnerPlays } : {}),
                     ...(cancelled && playoff.directIfClear ? { cancelled: playoff.directIfClear } : {}),
                     groupNames: (league.groups ?? []).map((g) => g.shortName[lang]),
-                    ...(league.continental ? { knockout: playoff.seedFromGroups ? "groupStage" : "leaguePhase" } : {}),
+                    ...(league.continental
+                      ? { knockout: playoff.seedFromGroups ? (playoff.seedFromGroups.external ? "groupStageExternal" : "groupStage") : "leaguePhase" }
+                      : {}),
                   },
                 }
               : {})}

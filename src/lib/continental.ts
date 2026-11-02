@@ -1,9 +1,10 @@
 import { continentOf } from "../config/competitions.ts";
-import { LEAGUES, type CompetitionCode, type LeagueConfig } from "../config/leagues.ts";
+import { LEAGUES, getLeagueByCode, type CompetitionCode, type LeagueConfig } from "../config/leagues.ts";
 import { tierStrength } from "../engine/cupModel.ts";
 import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
-import type { TeamId } from "../engine/types.ts";
+import { computeStandings } from "../engine/standings.ts";
+import type { StandingRow, Team, TeamId } from "../engine/types.ts";
 import { getLeagueData } from "./leagueData.ts";
 
 // Starting ratings for a continental competition, whose clubs come from many
@@ -82,4 +83,32 @@ export async function getContinentalPriors(league: LeagueConfig, clubs: readonly
   // Top divisions first, so a club is rated from the strongest league it's in.
   domestic.sort((a, b) => a.tier - b.tier);
   return continentalPriors(clubs, domestic, league.continental.outsiderTier);
+}
+
+/**
+ * Clubs that join the knockout phase from another competition's group stage
+ * (Copa Sudamericana: the Libertadores third-placed clubs), from that
+ * competition's real results: final once its group stage is over, the current
+ * places before that.
+ */
+export async function getExternalSeeds(league: LeagueConfig): Promise<{ rows: StandingRow[]; teams: Team[] } | undefined> {
+  const external = league.playoff?.seedFromGroups?.external;
+  if (!external || process.env.FOOTSIMU_SAMPLE_DATA === "1") return undefined;
+  const other = getLeagueByCode(external.league);
+  if (!other) return undefined;
+  try {
+    const data = await getLeagueData(other);
+    if (data.source !== "live" || !data.groups) return undefined;
+    const byId = new Map(data.teams.map((t) => [t.id, t]));
+    const results = realResults(data.fixtures);
+    const rows = data.groups.flatMap((group) => {
+      const table = computeStandings(group.teamIds.flatMap((id) => byId.get(id) ?? []), data.fixtures, results, { tiebreakers: other.tiebreakers, includeForm: false });
+      return table.filter((row) => row.position === external.place);
+    });
+    return { rows, teams: rows.flatMap((row) => byId.get(row.teamId) ?? []) };
+  } catch (error) {
+    // The play-off then shows only this competition's clubs until the feed lists the real games.
+    console.warn(`${league.code}: no ${external.league} clubs for the knockout phase:`, error);
+    return undefined;
+  }
 }

@@ -659,6 +659,28 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Copa Sudamericana: group winners to the round of 16, runners-up to the play-off", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/copa-sudamericana`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.deepEqual(await rows.evaluateAll((r) => r.map((x) => x.dataset.zone)), ["knockoutRoundOf16", "knockoutPlayoff", "eliminated", "eliminated"]);
+      await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Knockout phase" });
+      assert.deepEqual(await p.locator('[data-testid="knockout-rounds"] button').allInnerTexts(), ["Play-off", "Round of 16", "QF", "SF", "Final"]);
+      assert.match(await p.locator('[data-testid="playoff"]').innerText(), /Copa Libertadores/);
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Copa Sudamericana/);
+      // Round of 16: the eight group winners against the eight play-off winners.
+      await p.locator('[data-testid="knockout-rounds"] button', { hasText: "Round of 16" }).click();
+      assert.equal(await p.locator('[data-testid="playoff-tie"]').count(), 8);
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="win-chance"]').first().waitFor({ timeout: 90000 });
+      assert.match(await p.locator('[data-testid="chances"] thead').innerText(), /1st[\s\S]*Top 2[\s\S]*Final[\s\S]*Win/);
+      await p.close();
+    });
+
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/mls`);
@@ -762,7 +784,7 @@ async function step(name, fn) {
       const [conmebol, brazil] = await Promise.all(["#menu-conmebol", "#menu-br"].map((id) => menu.locator(id).boundingBox()));
       const widest = await menu.locator("#menu-conmebol a").evaluateAll((els) => Math.max(...els.map((e) => e.getBoundingClientRect().right)));
       assert.ok(widest <= brazil.x && conmebol.x + conmebol.width <= brazil.x, `columns overlap: ${widest} > ${brazil.x}`);
-      assert.deepEqual((await menu.locator("#menu-conmebol a").allInnerTexts()).map((x) => x.trim()), ["Copa Libertadores"]);
+      assert.deepEqual((await menu.locator("#menu-conmebol a").allInnerTexts()).map((x) => x.trim()), ["Copa Libertadores", "Copa Sudamericana"]);
       await menu.getByRole("button", { name: "North America" }).click();
       assert.deepEqual((await menu.locator("#menu-us a").allInnerTexts()).map((x) => x.trim()), ["MLS"]);
       await desktop.close();

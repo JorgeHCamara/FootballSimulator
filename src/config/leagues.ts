@@ -27,7 +27,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -769,6 +769,78 @@ export const LEAGUES: readonly LeagueConfig[] = [
       title: "Copa Libertadores",
     },
     continental: { outsiderTier: 1.4 },
+  },
+  {
+    code: "SUD",
+    slug: "copa-sudamericana",
+    name: "Copa Sudamericana",
+    country: "CONMEBOL",
+    flag: "conmebol",
+    simulatorName: { en: "Copa Sudamericana Simulator", pt: "Simulador da Sul-Americana", es: "Simulador de la Copa Sudamericana" },
+    aka: { en: "CONMEBOL Sudamericana", pt: "Copa Sul-Americana", es: "CONMEBOL Sudamericana" },
+    teams: 32,
+    gamesPerTeam: 6,
+    // Group stage: 8 groups of 4, home and away (the first stage before it is
+    // left out). Group winners go straight to the round of 16; runners-up play
+    // the knockout play-off against the Libertadores third-placed clubs.
+    groups: [
+      { id: "A", espnName: "Group A", name: { en: "Group A", pt: "Grupo A", es: "Grupo A" }, shortName: { en: "Group A", pt: "Grupo A", es: "Grupo A" } },
+      { id: "B", espnName: "Group B", name: { en: "Group B", pt: "Grupo B", es: "Grupo B" }, shortName: { en: "Group B", pt: "Grupo B", es: "Grupo B" } },
+      { id: "C", espnName: "Group C", name: { en: "Group C", pt: "Grupo C", es: "Grupo C" }, shortName: { en: "Group C", pt: "Grupo C", es: "Grupo C" } },
+      { id: "D", espnName: "Group D", name: { en: "Group D", pt: "Grupo D", es: "Grupo D" }, shortName: { en: "Group D", pt: "Grupo D", es: "Grupo D" } },
+      { id: "E", espnName: "Group E", name: { en: "Group E", pt: "Grupo E", es: "Grupo E" }, shortName: { en: "Group E", pt: "Grupo E", es: "Grupo E" } },
+      { id: "F", espnName: "Group F", name: { en: "Group F", pt: "Grupo F", es: "Grupo F" }, shortName: { en: "Group F", pt: "Grupo F", es: "Grupo F" } },
+      { id: "G", espnName: "Group G", name: { en: "Group G", pt: "Grupo G", es: "Grupo G" }, shortName: { en: "Group G", pt: "Grupo G", es: "Grupo G" } },
+      { id: "H", espnName: "Group H", name: { en: "Group H", pt: "Grupo H", es: "Grupo H" }, shortName: { en: "Group H", pt: "Grupo H", es: "Grupo H" } },
+    ],
+    espn: {
+      slug: "conmebol.sudamericana",
+      seasons: "calendar",
+      stages: { table: "group-stage", knockout: ["knockout-round-playoffs", "round-of-16", "quarterfinals", "semifinals", "final"] },
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "headToHeadPoints"],
+    zones: [
+      { kind: "knockoutRoundOf16", from: 1, to: 1 },
+      { kind: "knockoutPlayoff", from: 2, to: 2 },
+      { kind: "eliminated", from: 3, to: 4 },
+    ],
+    // Knockout phase, ranked group winners 1–8, runners-up 9–16, then the eight
+    // Libertadores third-placed clubs 17–24 (each by record). Play-off:
+    // runners-up v Libertadores thirds; round of 16: group winners v play-off
+    // winners. Two legs throughout, the better-ranked club at home second,
+    // level on aggregate straight to penalties. Drawn: the projection pairs
+    // 9th v 24th… and the draw replaces it. Single final at a neutral venue
+    // (2026: Estadio Metropolitano Roberto Meléndez, Barranquilla).
+    playoff: {
+      seedFromGroups: { places: 2, external: { league: "LIB", place: 3 } },
+      rounds: [
+        {
+          key: "knockoutPlayoff",
+          legs: 2,
+          levelTie: "penalties",
+          noExtraTime: true,
+          drawn: true,
+          gapWeeks: 8,
+          pairs: [[9, 24], [10, 23], [11, 22], [12, 21], [13, 20], [14, 19], [15, 18], [16, 17]],
+        },
+        {
+          key: "roundOf16",
+          legs: 2,
+          levelTie: "penalties",
+          noExtraTime: true,
+          drawn: true,
+          fixedBracket: true,
+          gapWeeks: 3,
+          entrants: [1, 2, 3, 4, 5, 6, 7, 8],
+        },
+        { key: "quarterFinals", legs: 2, levelTie: "penalties", noExtraTime: true, drawn: true, fixedBracket: true, gapWeeks: 4 },
+        { key: "semiFinals", legs: 2, levelTie: "penalties", noExtraTime: true, drawn: true, fixedBracket: true, gapWeeks: 5 },
+        { key: "final", legs: 1, levelTie: "penalties", venue: "Estadio Metropolitano Roberto Meléndez", gapWeeks: 5 },
+      ],
+      title: "Copa Sudamericana",
+    },
+    continental: { outsiderTier: 1.6 },
   },
 ];
 

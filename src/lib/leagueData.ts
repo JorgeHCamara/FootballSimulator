@@ -85,15 +85,19 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
   for (const year of [current, current - 1]) {
     let all = await fetchEspnSeason(slug, year, seasons, init);
     const groups = league.groups ? await loadEspnGroups(league, year, init) : undefined;
+    const stages = league.espn.stages;
     if (groups) {
       // Only games between member clubs: drops exhibitions such as the MLS All-Star game.
+      // With stages, only the table's: knockout games can bring in clubs from
+      // another competition (Sudamericana: the Libertadores third-placed clubs).
       const members = new Set(groups.flatMap((g) => g.teamIds));
       const isMember = (id: string | undefined) => members.has(Number(id));
-      all = all.filter((e) => (e.competitions[0]?.competitors ?? []).every((c) => isMember(c.team.id)));
+      all = all.filter(
+        (e) => (stages && e.season?.slug !== stages.table) || (e.competitions[0]?.competitors ?? []).every((c) => isMember(c.team.id)),
+      );
     }
     // Games after a club's full league schedule are post-season (play-offs);
     // they feed the play-off bracket, or are left out when the site has none.
-    const stages = league.espn.stages;
     const { league: events, postseason } = stages
       ? {
           league: all.filter((e) => e.season?.slug === stages.table),
@@ -105,7 +109,8 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
     if (fixtures.length < (league.teams * perTeam) / 4) continue;
     const label = seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year);
     return {
-      teams: withFallbackCrests(applyTeamOverrides(espnTeams(events), { league: league.code })),
+      // Knockout games can bring in clubs from outside the table (see above), which need names too.
+      teams: withFallbackCrests(applyTeamOverrides(espnTeams(stages ? [...events, ...postseason] : events), { league: league.code })),
       fixtures,
       season: label,
       // ESPN and football-data.org use different match ids, so each source keeps

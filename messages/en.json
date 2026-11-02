@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Football Simulator – Simulate the Premier League, La Liga, Brasileirão and more",
-    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League and the Copa Libertadores. Live table plus title, Europe and relegation chances.",
+    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana. Live table plus title, Europe and relegation chances.",
     "leagueTitle": "{simulator} {season} – Predict the Table",
     "leagueDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Europe and relegation chances.",
     "leagueDescriptionPlayoffs": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the conference tables update live and see every club's playoff chances.",
@@ -35,7 +35,7 @@
     "heading": "Football Simulator",
     "tagline": "Simulate the season before it happens",
     "aboutTitle": "A free football simulator for the top leagues",
-    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League and the Copa Libertadores. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
+    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
   },
   "Simulator": {
     "table": "Table",
@@ -126,11 +126,12 @@
     "finalChance": "Final",
     "winChance": "Win",
     "knockoutRoundShort": "{round, select, knockoutPlayoff {Play-off} roundOf16 {Round of 16} quarterFinals {QF} semiFinals {SF} final {Final} other {Round}}",
-    "topChance": "Top {count}",
+    "topChance": "{count, plural, =1 {1st} other {Top #}}",
     "group": "Group",
     "knockoutProjectedGroups": "The knockout phase is seeded from the group tables once the group stage is over: group winners (ranked by their group record) against runners-up. Until the real draw, the pairings shown are one possible draw that follows the seeding.",
     "championPendingGroups": "Complete the group stage and the knockout phase to see the champion.",
-    "championPendingLeaguePhase": "Complete the league phase and the knockout phase to see the champion."
+    "championPendingLeaguePhase": "Complete the league phase and the knockout phase to see the champion.",
+    "knockoutProjectedGroupsExternal": "The knockout phase is seeded once the group stage is over: group winners (seeds 1–8) go straight to the round of 16; runners-up (9–16) play a play-off against the clubs finishing 3rd in the Copa Libertadores groups (17–24). Until the real draw, the pairings shown are one possible draw that follows the seeding."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -178,8 +179,14 @@
     "step2CupBracket": "Press Simulate round or Simulate to the final. The winners move on along the fixed bracket.",
     "introContinental": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the league phase: the 36-club table updates instantly with UEFA's tiebreakers. The top 8 go straight to the round of 16, 9th to 24th play the knockout play-off, and the knockout phase can be played all the way to the final.",
     "step3Continental": "Open the Chances tab to see every club's chance of finishing in the top 8, of reaching the knockout phase, of reaching the final and of winning the {league}.",
-    "introContinentalGroups": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the group stage: the eight group tables update instantly. The top two of each group go to the round of 16 and third place drops into the Copa Sudamericana, then the knockout phase can be played all the way to the final.",
-    "step3ContinentalGroups": "Open the Chances tab to see every club's chance of finishing in its group's top two, of reaching the final and of winning the {league}."
+    "introContinentalGroups": {
+      "LIB": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the group stage: the eight group tables update instantly. The top two of each group go to the round of 16 and third place drops into the Copa Sudamericana, then the knockout phase can be played all the way to the final.",
+      "SUD": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the group stage: the eight group tables update instantly. Group winners go straight to the round of 16, runners-up play a knockout play-off against the clubs dropping in from the Copa Libertadores, and the knockout phase can be played all the way to the final."
+    },
+    "step3ContinentalGroups": {
+      "LIB": "Open the Chances tab to see every club's chance of finishing in its group's top two, of reaching the final and of winning the {league}.",
+      "SUD": "Open the Chances tab to see every club's chance of winning its group, of finishing in its group's top two, of reaching the final and of winning the {league}."
+    }
   },
   "Faq": {
     "league": [
@@ -233,7 +240,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League and the Copa Libertadores, with real fixtures and results for the current season."
+        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",
@@ -310,28 +317,52 @@
         "a": "Yes. Foot Simu is completely free and you don't need an account."
       }
     ],
-    "continentalGroups": [
-      {
-        "q": "How does the {simulator} work?",
-        "a": "It starts from the real {league} {season} group tables and fixtures (the qualifying stages before the groups aren't included). Type a score for any remaining match or press Simulate: the group tables update instantly. Once the group stage is complete, the knockout phase is seeded from the tables and can be played to the final."
-      },
-      {
-        "q": "How are the clubs rated?",
-        "a": "Clubs come from many countries, so Brazilian clubs start from their form in the Brasileirão this season, scaled by the division, and clubs from leagues not on Foot Simu start from a default for the competition. Their results in the {league} then update the rating as the season goes on."
-      },
-      {
-        "q": "How is the knockout phase decided?",
-        "a": "The group winners, ranked 1st to 8th by their group record, meet the runners-up, ranked 9th to 16th, in a two-legged round of 16. The better-ranked club plays the second leg at home in every round, and a tie level on aggregate goes straight to penalties. The final is a single match. Until the real draw, the pairings follow the seeding."
-      },
-      {
-        "q": "How are the chances calculated?",
-        "a": "The Chances tab plays the rest of the group stage and the whole knockout phase 5,000 times from the current results, including your predictions on the group stage, and counts how often each club finishes in its group's top two, reaches the final and wins the {league}."
-      },
-      {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
-      }
-    ]
+    "continentalGroups": {
+      "LIB": [
+        {
+          "q": "How does the {simulator} work?",
+          "a": "It starts from the real {league} {season} group tables and fixtures (the qualifying stages before the groups aren't included). Type a score for any remaining match or press Simulate: the group tables update instantly. Once the group stage is complete, the knockout phase is seeded from the tables and can be played to the final."
+        },
+        {
+          "q": "How are the clubs rated?",
+          "a": "Clubs come from many countries, so Brazilian clubs start from their form in the Brasileirão this season, scaled by the division, and clubs from leagues not on Foot Simu start from a default for the competition. Their results in the {league} then update the rating as the season goes on."
+        },
+        {
+          "q": "How is the knockout phase decided?",
+          "a": "The group winners, ranked 1st to 8th by their group record, meet the runners-up, ranked 9th to 16th, in a two-legged round of 16. The better-ranked club plays the second leg at home in every round, and a tie level on aggregate goes straight to penalties. The final is a single match. Until the real draw, the pairings follow the seeding."
+        },
+        {
+          "q": "How are the chances calculated?",
+          "a": "The Chances tab plays the rest of the group stage and the whole knockout phase 5,000 times from the current results, including your predictions on the group stage, and counts how often each club finishes in its group's top two, reaches the final and wins the {league}."
+        },
+        {
+          "q": "Is Foot Simu free?",
+          "a": "Yes. Foot Simu is completely free and you don't need an account."
+        }
+      ],
+      "SUD": [
+        {
+          "q": "How does the {simulator} work?",
+          "a": "It starts from the real {league} {season} group tables and fixtures (the qualifying stages before the groups aren't included). Type a score for any remaining match or press Simulate: the group tables update instantly. Once the group stage is complete, the knockout phase is seeded from the tables and can be played to the final."
+        },
+        {
+          "q": "How are the clubs rated?",
+          "a": "Clubs come from many countries, so Brazilian clubs start from their form in the Brasileirão this season, scaled by the division, and clubs from leagues not on Foot Simu start from a default for the competition. Their results in the {league} then update the rating as the season goes on."
+        },
+        {
+          "q": "How is the knockout phase decided?",
+          "a": "Group winners, ranked 1st to 8th by their group record, go straight to the round of 16. Runners-up, ranked 9th to 16th, play a two-legged knockout play-off against the eight clubs that finished 3rd in the Copa Libertadores groups (17th to 24th), and the winners meet the group winners in the round of 16. The better-ranked club plays the second leg at home in every round, and a tie level on aggregate goes straight to penalties. The final is a single match. Until the real draw, the pairings follow the seeding."
+        },
+        {
+          "q": "How are the chances calculated?",
+          "a": "The Chances tab plays the rest of the group stage and the whole knockout phase 5,000 times from the current results, including your predictions on the group stage, and counts how often each club wins its group, finishes in its group's top two, reaches the final and wins the {league}."
+        },
+        {
+          "q": "Is Foot Simu free?",
+          "a": "Yes. Foot Simu is completely free and you don't need an account."
+        }
+      ]
+    }
   },
   "Countries": {
     "England": "England",
