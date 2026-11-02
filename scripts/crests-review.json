@@ -1,0 +1,1561 @@
+{
+ "generated": "2026-11-02T00:22:21.514Z",
+ "clubs": [
+  {
+   "espnId": 4489,
+   "name": "Oxford City",
+   "shortName": "Oxford City",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "136147",
+   "candidates": [
+    {
+     "idTeam": "136147",
+     "team": "Oxford City",
+     "location": "Marston, Oxford, England",
+     "league": "English National League North",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ru26hi1690091917.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 10167,
+   "name": "AFC Hornchurch",
+   "shortName": "Hornchurh",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 20771,
+   "name": "Marine",
+   "shortName": "Marine",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140385",
+   "candidates": [
+    {
+     "idTeam": "140385",
+     "team": "Marine",
+     "location": "Crosby, Merseyside, England",
+     "league": "English National League North",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3gdt7q1603574867.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 132415,
+   "name": "AFC Rushden & Diamonds",
+   "shortName": "AFC Rushden",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "145219",
+   "candidates": [
+    {
+     "idTeam": "145219",
+     "team": "AFC Rushden and Diamonds",
+     "location": "Rushden, Northamptonshire, England",
+     "league": "English Northern Premier League Division One Midlands",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/v5z2ay1682313898.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 649,
+   "name": "Worcester City",
+   "shortName": "Worcester Ci",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "134764",
+   "candidates": [
+    {
+     "idTeam": "134764",
+     "team": "Worcester City",
+     "location": "Worcestershire, England",
+     "league": "English Southern Premier League Central Division",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/lv883n1626192658.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 319,
+   "name": "Kidderminster Harriers",
+   "shortName": "Kid'minster",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "134448",
+   "candidates": [
+    {
+     "idTeam": "134448",
+     "team": "Kidderminster Harriers",
+     "location": "Kidderminster, England",
+     "league": "English National League",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/w3lw031675965943.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22468,
+   "name": "Harborough Town",
+   "shortName": "Harborough",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146607",
+   "candidates": [
+    {
+     "idTeam": "146607",
+     "team": "Harborough Town",
+     "location": "Market Harborough, England",
+     "league": "English National League North",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/tyexrx1701146532.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21711,
+   "name": "Alvechurch",
+   "shortName": "Alvechurch",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "145220",
+   "candidates": [
+    {
+     "idTeam": "145220",
+     "team": "Alvechurch",
+     "location": "Alvechurch, Worcestershire, England",
+     "league": "English Southern Premier League Central Division",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/8lsefb1682314056.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 132144,
+   "name": "Salisbury FC",
+   "shortName": "Salisbury",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138025",
+   "candidates": [
+    {
+     "idTeam": "138025",
+     "team": "Salisbury",
+     "location": "Salisbury",
+     "league": "English National League South",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/93wjuz1721324565.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133366,
+   "name": "Sholing",
+   "shortName": "Sholing",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "145205",
+   "candidates": [
+    {
+     "idTeam": "145205",
+     "team": "Sholing",
+     "location": "Sholing, Southampton, Hampshire, England",
+     "league": "English Southern Premier League South Division",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fu98zx1729184939.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 2589,
+   "name": "Stafford Rangers",
+   "shortName": "Stafford",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137889",
+   "candidates": [
+    {
+     "idTeam": "137889",
+     "team": "Stafford Rangers",
+     "location": "Stafford",
+     "league": "English Northern Premier League Division One West",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3qitli1586181691.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20770,
+   "name": "Cray Wanderers",
+   "shortName": "Cray",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137946",
+   "candidates": [
+    {
+     "idTeam": "137946",
+     "team": "Cray Wanderers",
+     "location": "Bromley, London, England",
+     "league": "English Isthmian League Premier Division",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1wutjn1635866370.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133370,
+   "name": "Wimborne Town",
+   "shortName": "Wimborne",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138241",
+   "candidates": [
+    {
+     "idTeam": "138241",
+     "team": "Wimborne Town",
+     "location": "Wimborne, Dorset, England",
+     "league": "English Southern Premier League South Division",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/h8km3y1709444783.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 132948,
+   "name": "Plymouth Parkway",
+   "shortName": "Plymouth",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "145238",
+   "candidates": [
+    {
+     "idTeam": "145238",
+     "team": "Plymouth Parkway",
+     "location": "Plymouth, Devon, England",
+     "league": "English Southern Premier League South Division",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/69am4a1682318191.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 132350,
+   "name": "Berkhamsted",
+   "shortName": "Berkhamsted",
+   "country": "England",
+   "competitions": [
+    "FAC"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "145121",
+   "candidates": [
+    {
+     "idTeam": "145121",
+     "team": "Berkhamsted",
+     "location": "Berkhamsted, Hertfordshire, England",
+     "league": "English Southern Premier League South Division",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/wjnrfu1783311988.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20855,
+   "name": "Sampaio Correa RJ",
+   "shortName": "Sampaio RJ",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "134745",
+     "team": "Sampaio Corrêa",
+     "location": "São Luís, MA, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2jjjlk1701366513.png",
+     "score": 0.3
+    }
+   ]
+  },
+  {
+   "espnId": 17326,
+   "name": "Ferroviaria",
+   "shortName": "Ferroviaria",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142270",
+   "candidates": [
+    {
+     "idTeam": "142270",
+     "team": "Ferroviária",
+     "location": "Araraquara, São Paulo, Brazil",
+     "league": "Brazilian Serie C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/zfo1y81766506623.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131673,
+   "name": "Porta BA",
+   "shortName": "Porta BA",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 131680,
+   "name": "Serra Branca",
+   "shortName": "Serra Branca",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152647",
+   "candidates": [
+    {
+     "idTeam": "152647",
+     "team": "Serra Branca",
+     "location": "Campina Grande, PB",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/rqvm0c1754133400.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131681,
+   "name": "Maguary PE",
+   "shortName": "Maguary PE",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152656",
+   "candidates": [
+    {
+     "idTeam": "152656",
+     "team": "Maguary",
+     "location": "Bonito, Pernambuco",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/30c5n21754137348.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131672,
+   "name": "Clube Laguna",
+   "shortName": "Laguna",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152662",
+   "candidates": [
+    {
+     "idTeam": "152662",
+     "team": "Laguna",
+     "location": "Tibau do Sul, Rio Grande do Norte",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/c60elh1754140116.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131671,
+   "name": "Bare",
+   "shortName": "Bare",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152671",
+   "candidates": [
+    {
+     "idTeam": "152671",
+     "team": "Baré",
+     "location": "Boa Vista, RR",
+     "league": "Brazilian Campeonato Roraimense",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3es47f1754152695.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131670,
+   "name": "Araguaiana",
+   "shortName": "Araguaiana",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 131564,
+   "name": "Primavera SP",
+   "shortName": "Primavera",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "152636",
+     "team": "Primavera",
+     "location": "Primavera do Leste, Mato Grosso",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1igj3v1754126944.png",
+     "score": 0.3
+    }
+   ]
+  },
+  {
+   "espnId": 131677,
+   "name": "América SE",
+   "shortName": "América SE",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 131678,
+   "name": "Tirol",
+   "shortName": "Tirol",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152623",
+   "candidates": [
+    {
+     "idTeam": "152623",
+     "team": "Tirol",
+     "location": "Fortaleza, Ceará, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/wn0i2k1754113916.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22489,
+   "name": "Betim FC",
+   "shortName": "Betim",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152640",
+   "candidates": [
+    {
+     "idTeam": "152640",
+     "team": "Betim",
+     "location": "Betim, Minas Gerais",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3adbop1769912270.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17710,
+   "name": "Piauí Teresina",
+   "shortName": "Piauí Teresina",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 131676,
+   "name": "Santa Catarina",
+   "shortName": "Santa Catarina",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152619",
+   "candidates": [
+    {
+     "idTeam": "152619",
+     "team": "Santa Catarina",
+     "location": "Rio do Sul, Santa Catarina, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/n5g1521768446890.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131684,
+   "name": "IAPE",
+   "shortName": "IAPE",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152633",
+   "candidates": [
+    {
+     "idTeam": "152633",
+     "team": "IAPE",
+     "location": "São Luís, Maranhão, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/e8drop1754117586.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6277,
+   "name": "SE Gama",
+   "shortName": "SE Gama",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142251",
+   "candidates": [
+    {
+     "idTeam": "142251",
+     "team": "Gama",
+     "location": "Gama, Federal District",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/dkcdrr1625418083.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 131682,
+   "name": "Monte Roraima",
+   "shortName": "Monte Roraima",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152672",
+   "candidates": [
+    {
+     "idTeam": "152672",
+     "team": "Monte Roraima",
+     "location": "Boa Vista, RR",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/e9xmzn1767644167.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18195,
+   "name": "Ivinhema",
+   "shortName": "Ivinhema",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152682",
+   "candidates": [
+    {
+     "idTeam": "152682",
+     "team": "Ivinhema",
+     "location": "Ivinhema, Mato Grosso do Sul",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/gisff51754208998.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22193,
+   "name": "Independente AP",
+   "shortName": "Independente",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152600",
+   "candidates": [
+    {
+     "idTeam": "152600",
+     "team": "Independente-AP",
+     "location": "Santana, Amapá, Brazil",
+     "league": "Brazilian Campeonato Amapaense",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/5i8ske1754031322.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22191,
+   "name": "Ji-Paraná FC",
+   "shortName": "Ji-Paraná",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 131685,
+   "name": "Pantanal Corumba",
+   "shortName": "Pantanal Corumba",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 18190,
+   "name": "Galvez",
+   "shortName": "Galvez",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142253",
+   "candidates": [
+    {
+     "idTeam": "142253",
+     "team": "Galvez",
+     "location": "Rio Branco, Acre",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/e2y8mj1753338368.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131674,
+   "name": "Guapore",
+   "shortName": "Guapore",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152668",
+   "candidates": [
+    {
+     "idTeam": "152668",
+     "team": "Guaporé",
+     "location": "Rolim de Moura, Rondônia",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/8n8kvr1754151742.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131679,
+   "name": "Primavera MG",
+   "shortName": "Primavera MG",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "152636",
+     "team": "Primavera",
+     "location": "Primavera do Leste, Mato Grosso",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1igj3v1754126944.png",
+     "score": 0.3
+    }
+   ]
+  },
+  {
+   "espnId": 19398,
+   "name": "Bragantino PA",
+   "shortName": "Bragantino",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "134736",
+     "team": "Bragantino",
+     "location": "Bragança Paulista, São Paulo",
+     "league": "Brazilian Serie A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2p7tl41701423595.png",
+     "score": 0.3
+    }
+   ]
+  },
+  {
+   "espnId": 131683,
+   "name": "Vasco da Gama AC",
+   "shortName": "Vasco AC",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "134282",
+     "team": "Vasco da Gama",
+     "location": "Rio de Janeiro",
+     "league": "Brazilian Serie A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ynqlxo1630521109.png",
+     "score": 0.3
+    }
+   ]
+  },
+  {
+   "espnId": 22487,
+   "name": "AE Velo Clube",
+   "shortName": "Velo Clube",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152654",
+   "candidates": [
+    {
+     "idTeam": "152654",
+     "team": "Velo Clube",
+     "location": "Rio Claro, São Paulo",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/07wd4q1754136987.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17715,
+   "name": "Maringá",
+   "shortName": "Maringá",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "147148",
+   "candidates": [
+    {
+     "idTeam": "147148",
+     "team": "Maringá",
+     "location": "Maringá, Paraná, Brazil",
+     "league": "Brazilian Serie C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/u8cdlj1677056366.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22189,
+   "name": "GA Sampaio",
+   "shortName": "Sampaio",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "134745",
+     "team": "Sampaio Corrêa",
+     "location": "São Luís, MA, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2jjjlk1701366513.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 19962,
+   "name": "Castanhal U20",
+   "shortName": "Castanhal",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142297",
+   "candidates": [
+    {
+     "idTeam": "142297",
+     "team": "Castanhal",
+     "location": "Castanhal, Pará",
+     "league": "Brazilian Campeonato Paraense",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/xj9d3n1625417602.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22557,
+   "name": "Capital CF",
+   "shortName": "Capital CF",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150114",
+   "candidates": [
+    {
+     "idTeam": "150114",
+     "team": "Capital CF",
+     "location": "Paranoá, Distrito Federal, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/nigkyb1733802131.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131686,
+   "name": "SC Penedense",
+   "shortName": "Penedense",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150124",
+   "candidates": [
+    {
+     "idTeam": "150124",
+     "team": "Penedense",
+     "location": "Penedo, Alagoas, Brazil",
+     "league": "Brazilian Campeonato Alagoano",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/m27zmj1733810252.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20896,
+   "name": "Retró",
+   "shortName": "Retró",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142296",
+   "candidates": [
+    {
+     "idTeam": "142296",
+     "team": "Retrô",
+     "location": "Camaragibe, Pernambuco",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/7mo4kh1688105552.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 9303,
+   "name": "Maranhao",
+   "shortName": "Maranhao",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "147314",
+   "candidates": [
+    {
+     "idTeam": "147314",
+     "team": "Maranhão",
+     "location": "São Luís, Brazil",
+     "league": "Brazilian Serie C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/rkxo201679387874.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 15557,
+   "name": "Oratorio",
+   "shortName": "Oratorio",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150127",
+   "candidates": [
+    {
+     "idTeam": "150127",
+     "team": "Oratório",
+     "location": "Macapá, Amapá, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/vocfau1733848999.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6195,
+   "name": "Sociedade Imperatriz de Desportos",
+   "shortName": "Imperatiz",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137815",
+   "candidates": [
+    {
+     "idTeam": "137815",
+     "team": "Imperatriz",
+     "location": "Imperatriz, Maranhão, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/7b83521579340502.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17713,
+   "name": "Jacuipense",
+   "shortName": "Jacuipense",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137816",
+   "candidates": [
+    {
+     "idTeam": "137816",
+     "team": "Jacuipense",
+     "location": "Riachão do Jacuípe, Bahia, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/tpvm951579343879.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 15562,
+   "name": "Aguia de Maraba",
+   "shortName": "Aguia de Mar",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "147141",
+   "candidates": [
+    {
+     "idTeam": "147141",
+     "team": "Águia de Marabá",
+     "location": "Marabá, Pará, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/j58nnm1733799372.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22559,
+   "name": "Independência",
+   "shortName": "Independência",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150120",
+   "candidates": [
+    {
+     "idTeam": "150120",
+     "team": "Independência",
+     "location": "Rio Branco, Acre, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/a8y08e1733805359.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 19400,
+   "name": "Operário MS",
+   "shortName": "Operario MS",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 21369,
+   "name": "Guarany de Bagé",
+   "shortName": "Guarany de Bagé",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150118",
+   "candidates": [
+    {
+     "idTeam": "150118",
+     "team": "Guarany de Bagé",
+     "location": "Bagé, Rio Grande do Sul, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/hivyq21768792194.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21550,
+   "name": "Atletico Alagoinhas",
+   "shortName": "Atletico Alagoin",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142278",
+   "candidates": [
+    {
+     "idTeam": "142278",
+     "team": "Atlético de Alagoinhas",
+     "location": "Alagoinhas, Bahia, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/sn8hzw1688967156.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 15559,
+   "name": "Mixto",
+   "shortName": "Mixto",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "148209",
+   "candidates": [
+    {
+     "idTeam": "148209",
+     "team": "Mixto",
+     "location": "Cuiabá, MT, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/6388y31713439332.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20699,
+   "name": "CEOV Operário",
+   "shortName": "CEOV Operário",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "144964",
+   "candidates": [
+    {
+     "idTeam": "144964",
+     "team": "Operário Várzea-Grandense",
+     "location": "Várzea Grande, Mato Grosso, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/12rm2f1688967372.png",
+     "score": 0.4
+    }
+   ]
+  },
+  {
+   "espnId": 20897,
+   "name": "Porto Velho",
+   "shortName": "Porto Velho",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142294",
+   "candidates": [
+    {
+     "idTeam": "142294",
+     "team": "Porto Velho",
+     "location": "Porto Velho, Rondônia, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/jzt3wf1708233908.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18433,
+   "name": "Altos",
+   "shortName": "Altos",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "141179",
+   "candidates": [
+    {
+     "idTeam": "141179",
+     "team": "Altos",
+     "location": "Altos, Piauí, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/x9cimn1740845897.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21384,
+   "name": "Azuriz",
+   "shortName": "Azuriz",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144970",
+   "candidates": [
+    {
+     "idTeam": "144970",
+     "team": "Azuriz",
+     "location": "Marmeleiro, Paraná, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/sy5amu1688106820.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17332,
+   "name": "Lagarto",
+   "shortName": "Lagarto",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144965",
+   "candidates": [
+    {
+     "idTeam": "144965",
+     "team": "Lagarto",
+     "location": "Lagarto, Sergipe, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/c2ckbi1733807843.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21389,
+   "name": "Tuna Luso",
+   "shortName": "Tuna Luso",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144975",
+   "candidates": [
+    {
+     "idTeam": "144975",
+     "team": "Tuna Luso",
+     "location": "Belém, Pará, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/r4id9r1768861243.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18192,
+   "name": "Tocantinopolis",
+   "shortName": "Tocantinopolis",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142276",
+   "candidates": [
+    {
+     "idTeam": "142276",
+     "team": "Tocantinópolis",
+     "location": "Tocantinópolis, Tocantins",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/15uys71625423613.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131687,
+   "name": "Porto Vitória FC",
+   "shortName": "Porto Vitória",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150125",
+   "candidates": [
+    {
+     "idTeam": "150125",
+     "team": "Porto Vitória",
+     "location": "Vitória, Espírito Santo, Brazil",
+     "league": "Brazilian Campeonato Capixaba",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/6q80921733810436.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22190,
+   "name": "Capital",
+   "shortName": "Capital",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "148203",
+   "candidates": [
+    {
+     "idTeam": "148203",
+     "team": "Capital",
+     "location": "Palmas, TO, Brazil",
+     "league": "Brazilian Campeonato Tocantinense",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/e64m471769577148.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18198,
+   "name": "Rio Branco (ES)",
+   "shortName": "R. Branco ES",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "152833",
+     "team": "Rio Branco",
+     "location": "Americana, São Paulo",
+     "league": "_No League Soccer",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/tmq2kt1754478725.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 22194,
+   "name": "Manauara",
+   "shortName": "Manauara",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "148207",
+   "candidates": [
+    {
+     "idTeam": "148207",
+     "team": "Manauara",
+     "location": "Manaus, AM, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/50h5jf1713439328.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21553,
+   "name": "Trem",
+   "shortName": "Trem",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144963",
+   "candidates": [
+    {
+     "idTeam": "144963",
+     "team": "Trem",
+     "location": "Macapá",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/60kd0z1739636097.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21401,
+   "name": "Fluminense PI",
+   "shortName": "Fluminense PI",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "134296",
+     "team": "Fluminense",
+     "location": "Rio de Janeiro",
+     "league": "Brazilian Serie A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/stvvwp1473538082.png",
+     "score": 0.3
+    }
+   ]
+  },
+  {
+   "espnId": 22561,
+   "name": "Maracanã",
+   "shortName": "Maracanã",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "148208",
+   "candidates": [
+    {
+     "idTeam": "148208",
+     "team": "Maracanã",
+     "location": "Maracanaú, CE, Brazil",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/zxxyv51713439330.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 15561,
+   "name": "Sousa EC",
+   "shortName": "Sousa EC",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142274",
+   "candidates": [
+    {
+     "idTeam": "142274",
+     "team": "Sousa",
+     "location": "Sousa, Paraíba",
+     "league": "Brazil Serie D",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/pvc4701769049035.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131708,
+   "name": "Barra FC",
+   "shortName": "BARRA",
+   "country": "Brazil",
+   "competitions": [
+    "CDB"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "148201",
+   "candidates": [
+    {
+     "idTeam": "148201",
+     "team": "Barra",
+     "location": "Balneário Camboriú, SC, Brazil",
+     "league": "Brazilian Serie C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/bu1jtg1713439315.png",
+     "score": 1
+    }
+   ]
+  }
+ ]
+}
