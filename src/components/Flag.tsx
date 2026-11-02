@@ -154,6 +154,15 @@ function shapes(code: FlagCode) {
           <rect x="10" width="10" height="20" fill="#ffffff" />
         </>
       );
+    case "sa":
+      // Simplified: the inscription can't be read at icon size; the sword as a white bar.
+      return (
+        <>
+          <rect width="30" height="20" fill="#006c35" />
+          <rect x="8" y="13" width="14" height="1.3" rx="0.6" fill="#ffffff" />
+          <rect x="9" y="7" width="12" height="2.2" rx="1" fill="#ffffff" opacity="0.85" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

@@ -27,6 +27,8 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
   // South American leagues: the Copa Libertadores and Sudamericana places
   // (positions among clubs not already qualified, when some pass down).
   const libertadores = league.zones.find((z) => z.kind === "libertadores");
+  // Asian leagues: the AFC Champions League Elite places.
+  const aclElite = league.zones.find((z) => z.kind === "aclElite");
   // Groups with their own places (Ecuador's split): 1st only matters in the title group.
   const groupZones = league.groups?.some((g) => g.zones) ?? false;
   const titleZone = league.zones.some((z) => z.kind === "title");
@@ -76,6 +78,7 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
               ) : null}
               {playoffs && <th className="px-2 text-right">{t("playoffChance")}</th>}
               {libertadores && <th className="px-2 text-right">{tz("libertadores")}</th>}
+              {aclElite && <th className="px-2 text-right">{t("aclEliteChance")}</th>}
               {sudamericana && <th className="px-2 text-right">{tz("sudamericana")}</th>}
               {relegation && <th className="px-2 text-right">{t("relegationChance")}</th>}
               {/* A title play-off simulated with the table (Argentina): the chance of winning it. */}
@@ -126,6 +129,11 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                   {libertadores && (
                     <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="libertadores-chance">
                       {passDown?.has(row.teamId) ? "✓" : pct(probabilityInRange(result, row.teamId, libertadores.from, libertadores.to, true))}
+                    </td>
+                  )}
+                  {aclElite && (
+                    <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="acl-chance">
+                      {pct(probabilityInRange(result, row.teamId, aclElite.from, aclElite.to))}
                     </td>
                   )}
                   {sudamericana && (

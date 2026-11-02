@@ -455,7 +455,8 @@ describe("continental competitions (UEFA, CONMEBOL)", async () => {
 
   it("groups the menu by continent, UEFA under Europe and CONMEBOL under South America", () => {
     const groups = continents();
-    assert.deepEqual(groups.map((g) => g.continent), ["Europe", "South America", "North America"]);
+    assert.deepEqual(groups.map((g) => g.continent), ["Europe", "South America", "North America", "Asia"]);
+    assert.deepEqual(groups[3]!.countries.map((c) => [c.country, c.leagues.map((l) => l.name)]), [["Saudi Arabia", ["Saudi Pro League"]]]);
     const uefa = groups[0]!.countries.find((c) => c.country === "UEFA")!;
     assert.deepEqual(uefa.leagues.map((l) => l.name), ["Champions League", "Europa League", "Conference League"]);
     assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "Argentina", "Chile", "Colombia", "Uruguay", "Paraguay", "Ecuador", "Peru", "CONMEBOL"]);

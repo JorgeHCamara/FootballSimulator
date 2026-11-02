@@ -16,6 +16,10 @@ export type ZoneKind =
   | "playoffs"
   | "playoffWildCard"
   | "title"
+  | "aclElite"
+  | "aclEliteQualifying"
+  | "aclTwo"
+  | "gulfClub"
   | "splitTitle"
   | "splitMiddle"
   | "splitRelegation"
@@ -32,7 +36,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -95,7 +99,7 @@ export interface LeagueGroup {
   zones?: readonly Zone[];
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -1060,6 +1064,29 @@ export const LEAGUES: readonly LeagueConfig[] = [
         { kind: "relegation", from: 18, to: 18 },
       ],
     },
+  },
+  {
+    code: "SPL",
+    slug: "saudi-pro-league",
+    name: "Saudi Pro League",
+    country: "Saudi Arabia",
+    flag: "sa",
+    simulatorName: { en: "Saudi Pro League Simulator", pt: "Simulador da Saudi Pro League", es: "Simulador de la Saudi Pro League" },
+    aka: { en: "Roshn Saudi League", pt: "Campeonato Saudita", es: "Liga Saudí" },
+    teams: 18,
+    espn: { slug: "ksa.1", seasons: "split" },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
+    // 2026/27: the top 4 to the AFC Champions League Elite league stage, 5th to
+    // its preliminary stage, 6th to the AFC Champions League Two, 7th–8th to
+    // the Gulf Club Champions League; the bottom three go down.
+    zones: [
+      { kind: "aclElite", from: 1, to: 4 },
+      { kind: "aclEliteQualifying", from: 5, to: 5 },
+      { kind: "aclTwo", from: 6, to: 6 },
+      { kind: "gulfClub", from: 7, to: 8 },
+      { kind: "relegation", from: 16, to: 18 },
+    ],
   },
   {
     code: "UCL",

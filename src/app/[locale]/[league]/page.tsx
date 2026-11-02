@@ -37,7 +37,7 @@ const pageSeason = (data: { season: string; tournaments?: unknown[] }) => (data.
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
 /** Which set of texts a page uses: league, play-off league, continental competition, or cup. */
-type Wording = "league" | "leagueAmericas" | "zones" | "tournaments" | "liguilla" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
+type Wording = "league" | "leagueAmericas" | "leagueAsia" | "zones" | "tournaments" | "liguilla" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
 
 type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
@@ -64,7 +64,9 @@ async function load(slug: string): Promise<Loaded | undefined> {
         ? "playoffs"
         : [...league.zones, ...(league.groups ?? []).flatMap((g) => g.zones ?? [])].some((z) => z.kind === "libertadores")
           ? "leagueAmericas" // continental places are the Libertadores, not Europe
-          : "league";
+          : league.zones.some((z) => z.kind === "aclElite")
+            ? "leagueAsia" // the AFC Champions League
+            : "league";
   return { kind: "league", config: league, data: await getLeagueData(league), wording };
 }
 
@@ -76,6 +78,7 @@ const META_KEYS: Record<
       | "leagueDescription"
       | "leagueDescriptionPlayoffs"
       | "leagueDescriptionAmericas"
+      | "leagueDescriptionAsia"
       | "zonesDescription"
       | "tournamentsDescription"
       | "liguillaDescription"
@@ -87,6 +90,7 @@ const META_KEYS: Record<
 > = {
   league: { title: "leagueTitle", description: "leagueDescription" },
   leagueAmericas: { title: "leagueTitle", description: "leagueDescriptionAmericas" },
+  leagueAsia: { title: "leagueTitle", description: "leagueDescriptionAsia" },
   zones: { title: "leagueTitle", description: "zonesDescription" },
   tournaments: { title: "leagueTitle", description: "tournamentsDescription" },
   liguilla: { title: "leagueTitle", description: "liguillaDescription" },
@@ -202,7 +206,9 @@ export default async function LeaguePage({ params }: { params: Params }) {
                     ? "step3Liguilla"
                   : step === "step3" && wording === "leagueAmericas"
                   ? "step3Americas"
-                  : step;
+                  : step === "step3" && wording === "leagueAsia"
+                    ? "step3Asia"
+                    : step;
 
   return (
     <div className="space-y-4" data-source={data.source}>

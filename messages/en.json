@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Football Simulator – Simulate the Premier League, La Liga, Brasileirão and more",
-    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, Argentina's Liga Profesional, Chile's Liga de Primera, Colombia's Liga BetPlay, Uruguay's, Paraguay's, Ecuador's and Peru's top divisions, Liga MX, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana. Live table plus title, Europe and relegation chances.",
+    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão, Argentina's Liga Profesional, Chile's Liga de Primera, Colombia's Liga BetPlay, Uruguay's, Paraguay's, Ecuador's and Peru's top divisions, Liga MX, MLS, the Saudi Pro League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana. Live table plus title, Europe and relegation chances.",
     "leagueTitle": "{simulator} {season} – Predict the Table",
     "leagueDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Europe and relegation chances.",
     "leagueDescriptionPlayoffs": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the conference tables update live and see every club's playoff chances.",
@@ -17,7 +17,8 @@
     "leagueDescriptionAmericas": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Copa Libertadores and relegation chances.",
     "zonesDescription": "Free {simulator} for the {season} tournament ({aka}). Enter your scores or simulate the remaining matches, watch both zone tables update live, then play the play-offs to the final, with every club's chance of the play-offs and the title.",
     "tournamentsDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate each tournament of the year, play its play-offs where it has them, and see the annual table with the Copa Libertadores and Sudamericana places.",
-    "liguillaDescription": "Free {simulator} for the {season} tournament ({aka}). Enter your scores or simulate the remaining matches, watch the table update live, then play the Liguilla to the final, with every club's chance of the Liguilla and the title."
+    "liguillaDescription": "Free {simulator} for the {season} tournament ({aka}). Enter your scores or simulate the remaining matches, watch the table update live, then play the Liguilla to the final, with every club's chance of the Liguilla and the title.",
+    "leagueDescriptionAsia": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, AFC Champions League and relegation chances."
   },
   "Nav": {
     "home": "Home",
@@ -39,7 +40,7 @@
     "heading": "Football Simulator",
     "tagline": "Simulate the season before it happens",
     "aboutTitle": "A free football simulator for the top leagues",
-    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
+    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the Saudi Pro League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
   },
   "Simulator": {
     "table": "Table",
@@ -150,7 +151,8 @@
       "PAR": "The places follow the usual allocation; the official rules for this season may differ. Relegation is decided by the averages table (not shown).",
       "PER": "Approximate: the Copa Libertadores places are decided by a play-off between the tournament champions and the best-placed clubs, and the official rules may differ. Points deductions are those in ESPN's current standings."
     },
-    "pointsDeducted": "{points} points deducted"
+    "pointsDeducted": "{points} points deducted",
+    "aclEliteChance": "ACL Elite"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -173,7 +175,11 @@
     "title": "Champion",
     "splitTitle": "Title hexagonal",
     "splitMiddle": "Quadrangular",
-    "splitRelegation": "Relegation hexagonal"
+    "splitRelegation": "Relegation hexagonal",
+    "aclElite": "AFC Champions League Elite",
+    "aclEliteQualifying": "ACL Elite preliminary stage",
+    "aclTwo": "AFC Champions League Two",
+    "gulfClub": "Gulf Club Champions League"
   },
   "Footer": {
     "attribution": "Data: football-data.org",
@@ -217,7 +223,8 @@
     "introTournaments": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). The year has several tournaments, each with its own table and champion: switch between them and the annual table, which adds them all up and decides the Copa Libertadores and Sudamericana places. Type your own scores or simulate the remaining matches, and the tables update instantly.",
     "step3Tournaments": "Open the Chances tab to see every club's chance of winning the tournament and, in the annual table, of the Copa Libertadores and the Sudamericana.",
     "introLiguilla": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the remaining matches: the table updates instantly with the official tiebreakers. The top 8 go to the Liguilla, played over two legs down to the final.",
-    "step3Liguilla": "Open the Chances tab to see every club's chance of finishing first, of reaching the Liguilla and of winning the title."
+    "step3Liguilla": "Open the Chances tab to see every club's chance of finishing first, of reaching the Liguilla and of winning the title.",
+    "step3Asia": "Open the Chances tab to see every team's chances of the title, the AFC Champions League Elite and relegation."
   },
   "Faq": {
     "league": [
@@ -271,7 +278,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
+        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Brasileirão Série A and Série B, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the Saudi Pro League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",
@@ -480,7 +487,8 @@
     "Paraguay": "Paraguay",
     "Mexico": "Mexico",
     "Ecuador": "Ecuador",
-    "Peru": "Peru"
+    "Peru": "Peru",
+    "Saudi Arabia": "Saudi Arabia"
   },
   "Cup": {
     "fixtures": "Fixtures",
@@ -572,6 +580,7 @@
   "Continents": {
     "Europe": "Europe",
     "South America": "South America",
-    "North America": "North America"
+    "North America": "North America",
+    "Asia": "Asia"
   }
 }

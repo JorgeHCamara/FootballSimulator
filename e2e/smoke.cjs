@@ -807,6 +807,23 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Saudi Pro League: Asian places, the AFC Champions League wording and chances", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/saudi-pro-league`);
+      const zones = await p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.equal(zones.length, 18);
+      assert.deepEqual(
+        [zones[0], zones[3], zones[4], zones[5], zones[6], zones[7], zones[8], zones[15], zones[17]],
+        ["aclElite", "aclElite", "aclEliteQualifying", "aclTwo", "gulfClub", "gulfClub", "", "relegation", "relegation"],
+      );
+      const text = await p.locator("main").innerText();
+      assert.match(text, /AFC Champions League/);
+      assert.doesNotMatch(text, /Europe and relegation|Copa Libertadores and relegation/);
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="acl-chance"]').first().waitFor({ timeout: 90000 });
+      await p.close();
+    });
+
     await step("Chile: 16 clubs, Libertadores, Sudamericana and relegation zones", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/chile-primera-division`);
@@ -897,7 +914,7 @@ async function step(name, fn) {
       await desktop.goto(`${BASE_URL}/en`);
       const menu = desktop.locator('[data-testid="league-menu"]');
       const continents = (await menu.locator(":scope > li > button").allInnerTexts()).map((x) => x.trim());
-      assert.deepEqual(continents, ["Europe", "South America", "North America"]);
+      assert.deepEqual(continents, ["Europe", "South America", "North America", "Asia"]);
       const overflow = await menu.evaluate((el) => el.scrollWidth - el.clientWidth);
       assert.equal(overflow, 0, "no horizontal scroll in the menu");
 
@@ -924,12 +941,14 @@ async function step(name, fn) {
       await menu.getByRole("button", { name: "North America" }).click();
       assert.deepEqual((await menu.locator("#menu-us a").allInnerTexts()).map((x) => x.trim()), ["MLS"]);
       assert.deepEqual((await menu.locator("#menu-mx a").allInnerTexts()).map((x) => x.trim()), ["Liga MX"]);
+      await menu.getByRole("button", { name: "Asia" }).click();
+      assert.deepEqual((await menu.locator("#menu-sa a").allInnerTexts()).map((x) => x.trim()), ["Saudi Pro League"]);
       await desktop.close();
 
       const pt = await browser.newPage({ viewport: { width: 1280, height: 800 } });
       await pt.goto(`${BASE_URL}/pt`);
       const ptMenu = pt.locator('[data-testid="league-menu"]');
-      assert.deepEqual((await ptMenu.locator(":scope > li > button").allInnerTexts()).map((x) => x.trim()), ["Europa", "América do Sul", "América do Norte"]);
+      assert.deepEqual((await ptMenu.locator(":scope > li > button").allInnerTexts()).map((x) => x.trim()), ["Europa", "América do Sul", "América do Norte", "Ásia"]);
       await ptMenu.getByRole("button", { name: "Europa" }).click();
       const ptColumns = (await ptMenu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase());
       assert.deepEqual(ptColumns.slice(0, 2), ["uefa", "alemanha"]);
@@ -942,9 +961,9 @@ async function step(name, fn) {
       await burger.tap();
       const mobile = phone.locator('[data-testid="mobile-menu"]');
       await mobile.waitFor();
-      assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America"]);
+      assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America", "Asia"]);
       const headings = (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "peru", "uruguay", "mexico", "usa"]);
+      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "peru", "uruguay", "mexico", "usa", "saudi arabia"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();

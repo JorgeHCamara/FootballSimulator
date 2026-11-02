@@ -37,10 +37,10 @@ export function countries(): CountryGroup[] {
   return [...groups.values()];
 }
 
-export type Continent = "Europe" | "South America" | "North America";
+export type Continent = "Europe" | "South America" | "North America" | "Asia";
 
 /** Continent order in the menus. */
-export const CONTINENTS: readonly Continent[] = ["Europe", "South America", "North America"];
+export const CONTINENTS: readonly Continent[] = ["Europe", "South America", "North America", "Asia"];
 
 /** Continent of each country (by English name, as in the configs); "UEFA" holds the continental competitions. */
 const CONTINENT_OF: Record<string, Continent> = {
@@ -63,6 +63,7 @@ const CONTINENT_OF: Record<string, Continent> = {
   Peru: "South America",
   USA: "North America",
   Mexico: "North America",
+  "Saudi Arabia": "Asia",
 };
 
 export function continentOf(country: string): Continent {
