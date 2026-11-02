@@ -21,6 +21,8 @@ interface Props {
   /** The current tournament's groups (from ESPN's standings). */
   groups?: { id: string; teamIds: number[] }[];
   priorStrengths?: Record<number, TeamStrength>;
+  /** Points deducted in the current tournament's table (ESPN), also applied to the annual table. */
+  deductions?: Record<number, number>;
 }
 
 /** A tournament's own format: the league's, with what its stage config changes. */
@@ -60,7 +62,7 @@ export function tournamentChampion(config: LeagueConfig, teams: readonly Team[],
  * (and in some leagues relegation). The annual table shares the current
  * tournament's predictions.
  */
-export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths }: Props) {
+export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths, deductions }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const [view, setView] = useState<string>(current);
@@ -143,6 +145,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           {...(shown.postseason ? { postseason: shown.postseason } : {})}
           {...(shownGroups ? { groups: shownGroups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
+          {...(deductions && shown.id === current ? { deductions } : {})}
         />
       ) : (
         <LeagueSimulator
@@ -155,6 +158,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           season={live.season}
           {...(annual.champions.length ? { qualifiedElsewhere: annual.champions.map((c) => c.id) } : {})}
           {...(notes.length ? { qualifiedNote: notes.join(" ") } : {})}
+          {...(deductions ? { deductions } : {})}
         />
       )}
     </div>

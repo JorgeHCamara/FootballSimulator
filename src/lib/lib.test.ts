@@ -458,7 +458,7 @@ describe("continental competitions (UEFA, CONMEBOL)", async () => {
     assert.deepEqual(groups.map((g) => g.continent), ["Europe", "South America", "North America"]);
     const uefa = groups[0]!.countries.find((c) => c.country === "UEFA")!;
     assert.deepEqual(uefa.leagues.map((l) => l.name), ["Champions League", "Europa League", "Conference League"]);
-    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "Argentina", "Chile", "Colombia", "Uruguay", "Paraguay", "Ecuador", "CONMEBOL"]);
+    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "Argentina", "Chile", "Colombia", "Uruguay", "Paraguay", "Ecuador", "Peru", "CONMEBOL"]);
     const conmebol = groups[1]!.countries.find((c) => c.country === "CONMEBOL")!;
     assert.deepEqual(conmebol.leagues.map((l) => l.name), ["Copa Libertadores", "Copa Sudamericana"]);
   });
@@ -522,5 +522,36 @@ describe("several tournaments a season (Colombia, Uruguay, Paraguay)", async () 
     assert.equal(intermedio.gamesPerTeam, 7);
     assert.ok(intermedio.playoff);
     assert.equal(uru.playoff, undefined);
+  });
+});
+
+describe("points deductions from ESPN's standings (Peru)", async () => {
+  const { espnDeductions } = await import("./espn.ts");
+  const { computeStandings } = await import("../engine/standings.ts");
+
+  it("reads the deductions stat, ignoring clubs without one", () => {
+    const standings = {
+      children: [
+        {
+          name: "2026 Clausura",
+          standings: {
+            entries: [
+              { team: { id: "10122" }, stats: [{ name: "points", value: 0 }, { name: "deductions", value: 5 }] },
+              { team: { id: "131655" }, stats: [{ name: "points", value: 11 }, { name: "deductions", value: 0 }] },
+            ],
+          },
+        },
+      ],
+    };
+    assert.deepEqual(espnDeductions(standings), { 10122: 5 });
+  });
+
+  it("drops a docked club below a rival it would otherwise top", () => {
+    const teams = [1, 2].map((id) => ({ id, name: `T${id}`, shortName: `T${id}`, tla: `T${id}` }));
+    const fixtures = [{ id: 1, matchday: 1, utcDate: "2026-01-01", homeId: 1, awayId: 2, result: { home: 1, away: 0 } }];
+    const results = { 1: { home: 1, away: 0 } };
+    assert.equal(computeStandings(teams, fixtures, results, { tiebreakers: ["points"] })[0]!.teamId, 1);
+    const docked = computeStandings(teams, fixtures, results, { tiebreakers: ["points"], deductions: { 1: 5 } });
+    assert.deepEqual(docked.map((r) => [r.teamId, r.points]), [[2, 0], [1, -2]]);
   });
 });

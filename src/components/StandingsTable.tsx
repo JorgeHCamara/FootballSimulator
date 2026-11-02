@@ -27,9 +27,11 @@ interface Props {
   qualified?: ReadonlySet<TeamId>;
   /** Note explaining `qualified` (replaces the reserve-side note). */
   qualifiedNote?: string;
+  /** Points deducted by the league, by club (already taken off the points). */
+  deductions?: Readonly<Record<TeamId, number>>;
 }
 
-export function StandingsTable({ league, rows, teams, zonePositions, qualified, qualifiedNote }: Props) {
+export function StandingsTable({ league, rows, teams, zonePositions, qualified, qualifiedNote, deductions }: Props) {
   const t = useTranslations("Simulator");
   const tz = useTranslations("Zones");
   const cell = "px-1.5 py-2 text-center tabular-nums";
@@ -106,6 +108,11 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
                   <td className={cell}>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
                   <td className={`${cell} pr-2 font-bold`} data-testid="points">
                     {row.points}
+                    {deductions?.[row.teamId] ? (
+                      <span className="ml-1 text-[10px] font-semibold text-red-600 dark:text-red-400" title={t("pointsDeducted", { points: deductions[row.teamId]! })} data-testid="deduction">
+                        −{deductions[row.teamId]}
+                      </span>
+                    ) : null}
                   </td>
                   <td className="hidden py-2 pr-3 lg:table-cell">
                     <span className="flex gap-1">

@@ -2,7 +2,7 @@ import { gamesPerTeam, isStage, type EspnStages, type LeagueConfig } from "../co
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
-import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
+import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnDeductions, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
 
@@ -24,6 +24,8 @@ export interface LeagueData {
    * current one's.
    */
   tournaments?: Tournament[];
+  /** Points deducted in the current table (ESPN's standings), by club. */
+  deductions?: Record<number, number>;
 }
 
 export interface Tournament {
@@ -189,6 +191,13 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
         });
       }
     }
+    // Deductions in ESPN's current standings: the current tournament's table.
+    const deductions = league.espn.deductions
+      ? await fetchEspnDeductions(slug, year, init).catch((error) => {
+          console.warn(`${league.code}: no ESPN standings for deductions:`, error);
+          return {};
+        })
+      : {};
     return {
       // Knockout games can bring in clubs from outside the table (see above), which need names too.
       teams: withFallbackCrests(
@@ -202,6 +211,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       ...(league.playoff && postseason.length ? { postseason: realPostseason(postseason) } : {}),
       ...(groups ? { groups } : {}),
       ...(tournaments.length > 1 ? { tournaments } : {}),
+      ...(Object.keys(deductions).length ? { deductions } : {}),
     };
   }
   throw new Error(`No ${league.code} fixtures on ESPN for ${current} or ${current - 1}`);

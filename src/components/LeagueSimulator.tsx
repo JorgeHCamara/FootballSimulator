@@ -54,6 +54,8 @@ interface Props {
   qualifiedElsewhere?: number[];
   /** Note under the table for `qualifiedElsewhere`, e.g. who the champions are. */
   qualifiedNote?: string;
+  /** Points deducted by the league (ESPN's standings), by club. */
+  deductions?: Record<number, number>;
 }
 
 type Tab = "table" | "chances";
@@ -79,6 +81,7 @@ export function LeagueSimulator({
   externalSeeds,
   qualifiedElsewhere,
   qualifiedNote,
+  deductions,
 }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
@@ -112,7 +115,7 @@ export function LeagueSimulator({
       buildLeagueModel(teams, fixtures, real, priorStrengths ? { priorStrengths: new Map(Object.entries(priorStrengths).map(([id, st]) => [Number(id), st])) } : {}),
     [teams, fixtures, real, priorStrengths],
   );
-  const standingsOptions = useMemo(() => ({ tiebreakers: league.tiebreakers }), [league.tiebreakers]);
+  const standingsOptions = useMemo(() => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}) }), [league.tiebreakers, deductions]);
 
   const effective = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
   const tableTeams = useMemo(
@@ -413,6 +416,7 @@ export function LeagueSimulator({
                 {...(zonePositions ? { zonePositions } : {})}
                 {...(qualified.size ? { qualified } : {})}
                 {...(qualifiedNote ? { qualifiedNote } : {})}
+                {...(deductions ? { deductions } : {})}
               />
               {playoff?.title && bracket.length > 0 && (
                 <PlayoffChampion

@@ -61,7 +61,26 @@ export async function fetchEspnYear(slug: string, year: number, init: RequestIni
 }
 
 interface EspnStandings {
-  children?: { name: string; standings?: { entries?: { team: { id: string } }[] } }[];
+  children?: { name: string; standings?: { entries?: { team: { id: string }; stats?: { name: string; value?: number }[] }[] } }[];
+}
+
+/** Points deductions in ESPN's standings (the `deductions` stat), by club; none when empty. */
+export function espnDeductions(data: EspnStandings): Record<number, number> {
+  const deductions: Record<number, number> = {};
+  for (const group of data.children ?? []) {
+    for (const entry of group.standings?.entries ?? []) {
+      const value = entry.stats?.find((s) => s.name === "deductions")?.value;
+      if (value && value > 0) deductions[Number(entry.team.id)] = value;
+    }
+  }
+  return deductions;
+}
+
+/** Points deductions in the league's current ESPN standings. */
+export async function fetchEspnDeductions(slug: string, year: number, init: RequestInit = {}): Promise<Record<number, number>> {
+  const res = await fetch(`https://site.api.espn.com/apis/v2/sports/soccer/${slug}/standings?season=${year}`, init);
+  if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} standings ${year}: HTTP ${res.status}`);
+  return espnDeductions((await res.json()) as EspnStandings);
 }
 
 /** Separate tables of a league (MLS conferences) from ESPN's standings feed. */

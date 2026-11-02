@@ -32,7 +32,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -51,6 +51,8 @@ export interface EspnFeed {
    * (qualifying rounds before a group stage) are left out.
    */
   stages?: EspnStages | readonly EspnStages[];
+  /** Apply the points deductions in ESPN's standings (current table only; Peru). */
+  deductions?: boolean;
 }
 
 /**
@@ -93,7 +95,7 @@ export interface LeagueGroup {
   zones?: readonly Zone[];
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -1020,6 +1022,44 @@ export const LEAGUES: readonly LeagueConfig[] = [
         zones: [{ kind: "relegation", from: 5, to: 6 }],
       },
     ],
+  },
+  {
+    code: "PER",
+    slug: "peru-liga-1",
+    name: "Liga 1",
+    country: "Peru",
+    flag: "pe",
+    simulatorName: { en: "Peruvian Liga 1 Simulator", pt: "Simulador do Campeonato Peruano", es: "Simulador de la Liga 1 de Perú" },
+    aka: { en: "Liga 1 Perú", pt: "Liga 1 Perú", es: "Liga 1 Te Apuesto" },
+    teams: 18,
+    // Two tournaments a year (Apertura, Clausura), one round robin of 17 games
+    // each; the leader wins.
+    gamesPerTeam: 17,
+    espn: {
+      slug: "per.1",
+      seasons: "calendar",
+      stages: [
+        { table: "clausura", knockout: [], name: "Clausura" },
+        { table: "apertura", knockout: [], name: "Apertura" },
+      ],
+      // Clubs docked points (2026: UTC).
+      deductions: true,
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
+    zones: [{ kind: "title", from: 1, to: 1 }],
+    // Cumulative table: the Sudamericana places and relegation (the last club,
+    // 2026). The Libertadores places come from a play-off between the
+    // tournament champions and the best-placed clubs, so they are approximate.
+    annual: {
+      name: { en: "Cumulative table", pt: "Tabela acumulada", es: "Tabla acumulada" },
+      championsQualify: true,
+      zones: [
+        { kind: "libertadores", from: 1, to: 2 },
+        { kind: "sudamericana", from: 3, to: 6 },
+        { kind: "relegation", from: 18, to: 18 },
+      ],
+    },
   },
   {
     code: "UCL",

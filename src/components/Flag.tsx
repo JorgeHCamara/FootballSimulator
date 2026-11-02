@@ -147,6 +147,13 @@ function shapes(code: FlagCode) {
           <circle cx="15" cy="10" r="2.4" fill="#5b8c3a" stroke="#0072ce" strokeWidth="0.5" />
         </>
       );
+    case "pe":
+      return (
+        <>
+          <rect width="30" height="20" fill="#d91023" />
+          <rect x="10" width="10" height="20" fill="#ffffff" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

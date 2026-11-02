@@ -742,10 +742,11 @@ async function step(name, fn) {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       const rows = p.locator('[data-testid="standings-row"]');
       const switcher = p.locator('[data-testid="tournament-switch"] button');
-      for (const [slug, names, clubs, title] of [
+      for (const [slug, names, clubs, title] of [ // Colombia, Uruguay, Paraguay and Peru
         ["colombia-primera-a", ["Apertura", "Finalización", "Reclassification"], 20, "titlePlayoffs"],
         ["uruguay-primera-division", ["Apertura", "Intermedio", "Clausura", "Annual table"], 16, "title"],
         ["paraguay-primera-division", ["Apertura", "Clausura", "Cumulative table"], 12, "title"],
+        ["peru-liga-1", ["Apertura", "Clausura", "Cumulative table"], 18, "title"],
       ]) {
         await p.goto(`${BASE_URL}/en/${slug}`);
         assert.deepEqual(await switcher.allInnerTexts(), names, slug);
@@ -914,7 +915,7 @@ async function step(name, fn) {
       await england.getByRole("link", { name: "Championship" }).click();
       await desktop.waitForURL(/\/en\/championship$/);
       await menu.getByRole("button", { name: "South America" }).click();
-      assert.deepEqual((await menu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase()), ["conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "uruguay"]);
+      assert.deepEqual((await menu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase()), ["conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "peru", "uruguay"]);
       // No column (or link) overlaps the next.
       const [conmebol, brazil] = await Promise.all(["#menu-conmebol", "#menu-ar"].map((id) => menu.locator(id).boundingBox()));
       const widest = await menu.locator("#menu-conmebol a").evaluateAll((els) => Math.max(...els.map((e) => e.getBoundingClientRect().right)));
@@ -943,7 +944,7 @@ async function step(name, fn) {
       await mobile.waitFor();
       assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America"]);
       const headings = (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "uruguay", "mexico", "usa"]);
+      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "peru", "uruguay", "mexico", "usa"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();

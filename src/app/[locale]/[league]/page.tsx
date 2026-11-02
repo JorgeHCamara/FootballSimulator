@@ -262,6 +262,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           current={loaded.data.tournaments.find((x) => x.seasonKey === loaded.data.seasonKey)?.id ?? loaded.data.tournaments[0]!.id}
           {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
+          {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
         />
       ) : (
         <LeagueSimulator
@@ -274,6 +275,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
           {...(external ? { externalSeeds: external.rows } : {})}
+          {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
         />
       )}
 
