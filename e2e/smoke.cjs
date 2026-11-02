@@ -626,6 +626,39 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Copa Libertadores: eight group tables, knockout seeded from the groups, win chances", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/copa-libertadores`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.equal(await rows.count(), 4, "one group at a time");
+      assert.deepEqual(await rows.evaluateAll((r) => r.map((x) => x.dataset.zone)), ["knockoutRoundOf16", "knockoutRoundOf16", "sudamericana", "eliminated"]);
+      const groups = p.locator('[data-testid="group-switch"] button');
+      assert.deepEqual(await groups.allInnerTexts(), ["Group A", "B", "C", "D", "E", "F", "G", "H"]);
+      const groupA = await rows.allInnerTexts();
+      await p.getByRole("button", { name: "Group C" }).click();
+      await p.waitForFunction((before) => document.querySelector('[data-testid="standings-row"]')?.textContent !== before, groupA[0]);
+      assert.deepEqual(await groups.allInnerTexts(), ["A", "B", "Group C", "D", "E", "F", "G", "H"]);
+      const options = await p.locator('[data-testid="matchday-select"] option').allInnerTexts();
+      assert.equal(options.length, 7, "6 matchdays and the knockout phase");
+      // Before the groups end: the round of 16 is projected by seed (1st v 16th…).
+      await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Knockout phase" });
+      assert.deepEqual(await p.locator('[data-testid="knockout-rounds"] button').allInnerTexts(), ["Round of 16", "QF", "SF", "Final"]);
+      assert.match(await p.locator('[data-testid="playoff-round"]').innerText(), /1st place[\s\S]*16th place/);
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Copa Libertadores/);
+      assert.match(await p.locator('[data-testid="playoff"]').innerText(), /Estadio Centenario/);
+      // Every group's top two are in the round of 16.
+      await p.locator('[data-testid="knockout-rounds"] button', { hasText: "Round of 16" }).click();
+      assert.equal(await p.locator('[data-testid="playoff-tie"]').count(), 8);
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="win-chance"]').first().waitFor({ timeout: 90000 });
+      assert.match(await p.locator('[data-testid="chances"] thead').innerText(), /Top 2/);
+      await p.close();
+    });
+
     await step("MLS: East/West conference tables, playoff zones and chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/mls`);
@@ -723,6 +756,9 @@ async function step(name, fn) {
       assert.ok(box.x >= 0 && box.x + box.width <= 1280, `panel within the viewport: ${box.x}–${box.x + box.width}`);
       await england.getByRole("link", { name: "Championship" }).click();
       await desktop.waitForURL(/\/en\/championship$/);
+      await menu.getByRole("button", { name: "South America" }).click();
+      assert.deepEqual((await menu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase()), ["conmebol", "brazil"]);
+      assert.deepEqual((await menu.locator("#menu-conmebol a").allInnerTexts()).map((x) => x.trim()), ["Copa Libertadores"]);
       await menu.getByRole("button", { name: "North America" }).click();
       assert.deepEqual((await menu.locator("#menu-us a").allInnerTexts()).map((x) => x.trim()), ["MLS"]);
       await desktop.close();
@@ -745,7 +781,7 @@ async function step(name, fn) {
       await mobile.waitFor();
       assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America"]);
       const headings = (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "brazil", "usa"]);
+      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "brazil", "usa"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();

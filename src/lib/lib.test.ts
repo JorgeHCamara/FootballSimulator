@@ -348,7 +348,7 @@ describe("ESPN feed mapping", () => {
 
   it("every league has an ESPN feed as fallback", () => {
     // Domestic leagues ("eng.1"), or UEFA competitions ("uefa.champions").
-    for (const league of LEAGUES) assert.match(league.espn.slug, league.continental ? /^uefa\.[a-z.]+$/ : /^[a-z]{3}\.\d$/, league.code);
+    for (const league of LEAGUES) assert.match(league.espn.slug, league.continental ? /^(uefa|conmebol)\.[a-z.]+$/ : /^[a-z]{3}\.\d$/, league.code);
   });
 
   it("gives ESPN club names the same display names as football-data.org", () => {
@@ -385,7 +385,7 @@ describe("fallback crests", () => {
   });
 });
 
-describe("continental competitions (UEFA)", async () => {
+describe("continental competitions (UEFA, CONMEBOL)", async () => {
   const { continentalPriors } = await import("./continental.ts");
   const { runMonteCarlo } = await import("../engine/montecarlo.ts");
   const { buildLeagueModel } = await import("../engine/ratings.ts");
@@ -427,11 +427,37 @@ describe("continental competitions (UEFA)", async () => {
     assert.equal(reached.reduce((sum, r) => sum + r[4]!, 0), 200 * 2);
   });
 
-  it("groups the menu by continent, UEFA under Europe", () => {
+  it("plays a sample Libertadores: groups of 4 within themselves, knockout seeded from group places", () => {
+    const lib = getLeagueBySlug("copa-libertadores")!;
+    const { teams, fixtures } = sampleLeague(lib);
+    assert.equal(teams.length, 32);
+    // Teams 1–4 are group A: they only meet each other, home and away.
+    const groupA = fixtures.filter((f) => f.homeId <= 4 || f.awayId <= 4);
+    assert.equal(groupA.length, 12);
+    assert.ok(groupA.every((f) => f.homeId <= 4 && f.awayId <= 4));
+    const fixed = realResults(fixtures);
+    const groups = Array.from({ length: 8 }, (_, g) => teams.slice(g * 4, g * 4 + 4).map((t) => t.id));
+    const result = runMonteCarlo({
+      teams,
+      fixtures,
+      fixed,
+      model: buildLeagueModel(teams, fixtures, fixed),
+      standings: { tiebreakers: lib.tiebreakers },
+      iterations: 200,
+      seed: 2,
+      groups,
+      playoff: { config: lib.playoff!, options: { afterMatchday: 6, afterDate: "2027-05-28T20:00:00Z" } },
+    });
+    assert.equal(Object.values(result.playoffWins!).reduce((a, b) => a + b, 0), 200);
+    // Exactly two clubs per group in the round of 16 every run.
+    for (const ids of groups) assert.equal(ids.reduce((n, id) => n + (result.playoffReached![id]?.[0] ?? 0), 0), 400);
+  });
+
+  it("groups the menu by continent, UEFA under Europe and CONMEBOL under South America", () => {
     const groups = continents();
     assert.deepEqual(groups.map((g) => g.continent), ["Europe", "South America", "North America"]);
     const uefa = groups[0]!.countries.find((c) => c.country === "UEFA")!;
     assert.deepEqual(uefa.leagues.map((l) => l.name), ["Champions League", "Europa League", "Conference League"]);
-    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil"]);
+    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "CONMEBOL"]);
   });
 });

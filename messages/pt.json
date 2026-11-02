@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League e Conference League. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Championship, League One, League Two, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League e Libertadores. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
@@ -11,7 +11,9 @@
     "cupTitleBracket": "{simulator} {season} – Preveja a chave e a final",
     "cupDescriptionBracket": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule todas as fases até a final pela chave fixa, e veja as chances de cada clube de ganhar a copa.",
     "continentalTitle": "{simulator} {season} – Tabela da Fase de Liga e Mata-mata",
-    "continentalDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule a fase de liga, veja a tabela ao vivo e jogue o mata-mata até a final, com as chances de cada clube de ficar no top 8, no top 24 e de ser campeão."
+    "continentalDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule a fase de liga, veja a tabela ao vivo e jogue o mata-mata até a final, com as chances de cada clube de ficar no top 8, no top 24 e de ser campeão.",
+    "continentalGroupsTitle": "{simulator} {season} – Tabelas dos Grupos e Mata-mata",
+    "continentalGroupsDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule a fase de grupos, veja as oito tabelas ao vivo e jogue o mata-mata até a final, com as chances de cada clube de chegar às oitavas e de ser campeão."
   },
   "Nav": {
     "home": "Início",
@@ -33,7 +35,7 @@
     "heading": "Simulador de Futebol",
     "tagline": "Simule a temporada antes que ela aconteça",
     "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League e Conference League. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League e Libertadores. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
   },
   "Simulator": {
     "table": "Tabela",
@@ -121,11 +123,14 @@
     "knockoutPhase": "Fase eliminatória",
     "knockoutProjected": "A fase eliminatória é definida pela tabela da fase de liga quando ela terminar. Até o sorteio real, os confrontos mostrados são um sorteio possível que segue os cabeças de chave.",
     "knockoutDrawNote": "Os confrontos seguem os cabeças de chave até o sorteio real, que os substitui assim que for publicado.",
-    "top8Chance": "Top 8",
-    "top24Chance": "Top 24",
     "finalChance": "Final",
     "winChance": "Título",
-    "knockoutRoundShort": "{round, select, knockoutPlayoff {Playoff} roundOf16 {Oitavas} quarterFinals {Quartas} semiFinals {Semis} final {Final} other {Fase}}"
+    "knockoutRoundShort": "{round, select, knockoutPlayoff {Playoff} roundOf16 {Oitavas} quarterFinals {Quartas} semiFinals {Semis} final {Final} other {Fase}}",
+    "topChance": "Top {count}",
+    "group": "Grupo",
+    "knockoutProjectedGroups": "O mata-mata é definido pelas tabelas dos grupos quando a fase de grupos terminar: os primeiros colocados (ordenados pela campanha no grupo) contra os segundos. Até o sorteio real, os confrontos mostrados são um sorteio possível que segue os cabeças de chave.",
+    "championPendingGroups": "Complete a fase de grupos e o mata-mata para ver o campeão.",
+    "championPendingLeaguePhase": "Complete a fase de liga e o mata-mata para ver o campeão."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -172,7 +177,9 @@
     "introCupBracket": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule cada fase: confronto empatado vai para os pênaltis, e os vencedores avançam pela chave fixa, sem sorteios.",
     "step2CupBracket": "Clique em Simular fase ou Simular até a final. Os vencedores avançam pela chave fixa.",
     "introContinental": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule a fase de liga: a tabela dos 36 clubes é atualizada na hora com os critérios de desempate da UEFA. Os 8 primeiros vão direto às oitavas, do 9º ao 24º jogam o playoff, e o mata-mata pode ser jogado até a final.",
-    "step3Continental": "Abra a aba Chances para ver as chances de cada clube de terminar no top 8, de chegar ao mata-mata, de chegar à final e de ganhar a {league}."
+    "step3Continental": "Abra a aba Chances para ver as chances de cada clube de terminar no top 8, de chegar ao mata-mata, de chegar à final e de ganhar a {league}.",
+    "introContinentalGroups": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule a fase de grupos: as oito tabelas são atualizadas na hora. Os dois primeiros de cada grupo vão às oitavas de final e o terceiro cai para a Copa Sul-Americana, e o mata-mata pode ser jogado até a final.",
+    "step3ContinentalGroups": "Abra a aba Chances para ver as chances de cada clube de terminar entre os dois primeiros do grupo, de chegar à final e de ganhar a {league}."
   },
   "Faq": {
     "league": [
@@ -226,7 +233,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League e Conference League, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, MLS, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League e Libertadores, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -302,6 +309,28 @@
         "q": "O Foot Simu é grátis?",
         "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
       }
+    ],
+    "continentalGroups": [
+      {
+        "q": "Como funciona o {simulator}?",
+        "a": "Ele começa com as tabelas e os jogos reais da fase de grupos da {league} {season} (as fases preliminares antes dos grupos não entram). Digite o placar de qualquer jogo ou clique em Simular: as tabelas dos grupos são atualizadas na hora. Quando a fase de grupos termina, o mata-mata é definido pelas tabelas e pode ser jogado até a final."
+      },
+      {
+        "q": "Como os clubes são avaliados?",
+        "a": "Os clubes vêm de vários países, então os brasileiros começam com o seu desempenho no Brasileirão nesta temporada, ajustado pela divisão, e os clubes de ligas que não estão no Foot Simu começam com um valor padrão da competição. Os resultados na {league} atualizam a avaliação ao longo da temporada."
+      },
+      {
+        "q": "Como funciona o mata-mata?",
+        "a": "Os primeiros colocados dos grupos, ordenados do 1º ao 8º pela campanha no grupo, enfrentam os segundos colocados, do 9º ao 16º, em oitavas de final de ida e volta. O clube com melhor campanha decide em casa em todas as fases, e um empate no placar agregado vai direto para os pênaltis. A final é em jogo único. Até o sorteio real, os confrontos seguem os cabeças de chave."
+      },
+      {
+        "q": "Como as chances são calculadas?",
+        "a": "A aba Chances joga o resto da fase de grupos e todo o mata-mata 5.000 vezes a partir dos resultados atuais, incluindo seus palpites na fase de grupos, e conta quantas vezes cada clube termina entre os dois primeiros do grupo, chega à final e ganha a {league}."
+      },
+      {
+        "q": "O Foot Simu é grátis?",
+        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+      }
     ]
   },
   "Countries": {
@@ -314,7 +343,8 @@
     "Netherlands": "Holanda",
     "Brazil": "Brasil",
     "USA": "EUA",
-    "UEFA": "UEFA"
+    "UEFA": "UEFA",
+    "CONMEBOL": "CONMEBOL"
   },
   "Cup": {
     "fixtures": "Jogos",

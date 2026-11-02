@@ -25,8 +25,8 @@ export function useContinentGroups(): ContinentGroup[] {
   );
 }
 
-/** A continental federation's group (UEFA), listed before the countries. */
-const isFederation = (group: CountryGroup) => group.flag === "eu";
+/** A continental federation's group (UEFA, CONMEBOL), listed before the countries. */
+const isFederation = (group: CountryGroup) => group.flag === "eu" || group.flag === "conmebol";
 
 /** One country (or UEFA) and its competitions, as a column of a mega-menu panel. */
 export function CountryColumn({ group, onPick, large = false }: { group: CountryGroup; onPick: () => void; large?: boolean }) {

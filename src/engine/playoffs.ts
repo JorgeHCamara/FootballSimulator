@@ -91,6 +91,28 @@ export interface PlayoffConfig {
    * winners together, seeded by the overall table.
    */
   groupStage?: { count: number; rounds: number };
+  /**
+   * Seeded from a group stage (Copa Libertadores): the top `places` of every
+   * group go through, ranked as all group winners first (by points, goal
+   * difference, goals scored), then all runners-up, and so on. Positions in
+   * `pairs` and `entrants` refer to that ranking (see seedByGroupPlace).
+   */
+  seedFromGroups?: { places: number };
+}
+
+/**
+ * One ranking from several group tables: every group's 1st (best record first),
+ * then every 2nd, and so on, numbered 1, 2, 3… (see `seedFromGroups`).
+ */
+export function seedByGroupPlace(groups: readonly (readonly StandingRow[])[]): StandingRow[] {
+  const deepest = Math.max(0, ...groups.map((g) => g.length));
+  const ranked: StandingRow[] = [];
+  for (let place = 1; place <= deepest; place++) {
+    const atPlace = groups.flatMap((g) => g.filter((row) => row.position === place));
+    atPlace.sort((a, b) => b.points - a.points || b.goalDifference - a.goalDifference || b.goalsFor - a.goalsFor || a.teamId - b.teamId);
+    ranked.push(...atPlace);
+  }
+  return ranked.map((row, i) => ({ ...row, position: i + 1 }));
 }
 
 /** Play-off legs get synthetic fixture ids far above any real one. */

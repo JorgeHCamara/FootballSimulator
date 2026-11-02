@@ -72,6 +72,14 @@ function shapes(code: FlagCode) {
           <circle cx="12.00" cy="4.80" r="0.9" fill="#ffcc00" />
         </>
       );
+    case "conmebol":
+      // South America (CONMEBOL competitions): a gold star on navy.
+      return (
+        <>
+          <rect width="30" height="20" fill="#0b2a5b" />
+          <polygon points="15.00,5.00 16.23,8.30 19.76,8.45 17.00,10.65 17.94,14.05 15.00,12.10 12.06,14.05 13.00,10.65 10.24,8.45 13.77,8.30" fill="#f2b705" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

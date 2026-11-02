@@ -9,6 +9,7 @@ import {
   playoffCancelled,
   playoffIds,
   playoffWinners,
+  seedByGroupPlace,
   seriesGames,
   simulatePenalties,
   simulatePlayoff,
@@ -412,5 +413,17 @@ describe("UEFA knockout phase (league-phase seeding, drawn pairings)", () => {
     assert.equal(bracket[4]![0]!.legs[0]!.neutral, true);
     const [winner] = playoffWinners(bracket, results);
     assert.ok(winner !== null && winner! >= 101 && winner! <= 124);
+  });
+});
+
+describe("seedByGroupPlace (Libertadores knockout seeding)", () => {
+  const groupRow = (position: number, teamId: number, points: number, goalDifference = 0): StandingRow => ({ ...row(position, teamId), points, goalDifference });
+  it("ranks every group winner before any runner-up, each by record", () => {
+    const groups = [
+      [groupRow(1, 1, 10), groupRow(2, 2, 12, 1), groupRow(3, 3, 4)],
+      [groupRow(1, 11, 13), groupRow(2, 12, 9), groupRow(3, 13, 2)],
+    ];
+    const seeds = seedByGroupPlace(groups);
+    assert.deepEqual(seeds.map((r) => [r.position, r.teamId]), [[1, 11], [2, 1], [3, 2], [4, 12], [5, 3], [6, 13]]);
   });
 });

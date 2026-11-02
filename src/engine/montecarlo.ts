@@ -1,5 +1,5 @@
 import { expectedGoals, simulateScore } from "./match.ts";
-import { simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
+import { seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
 import { computeStandings, type StandingsOptions } from "./standings.ts";
@@ -21,7 +21,8 @@ export interface MonteCarloInput {
   groups?: readonly (readonly TeamId[])[];
   /**
    * Also play the knockout phase after each run's table (UEFA): real knockout
-   * results stand, everything else is simulated. Not with `groups`.
+   * results stand, everything else is simulated. With `groups`, only for a
+   * knockout seeded from the group places (`seedFromGroups`, Libertadores).
    */
   playoff?: { config: PlayoffConfig; options: Omit<BracketOptions, "seasonComplete"> };
 }
@@ -58,18 +59,23 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
 
   const tableOptions: StandingsOptions = { ...standings, includeForm: false };
   const results: ResultMap = { ...fixed };
-  const playoff = input.groups?.length ? undefined : input.playoff;
+  const grouped = Boolean(input.groups?.length);
+  const playoff = !grouped || input.playoff?.config.seedFromGroups ? input.playoff : undefined;
   const playoffReached: Record<TeamId, number[]> = {};
   const playoffWins: Record<TeamId, number> = {};
   for (let i = 0; i < iterations; i++) {
     for (const r of remaining) results[r.id] = simulateScore(r.xg, rng);
+    const groupRows: ReturnType<typeof computeStandings>[] = [];
     for (const group of tables) {
       const rows = computeStandings(group, fixtures, results, tableOptions);
       for (const row of rows) {
         positionCounts[row.teamId]![row.position - 1]!++;
         pointsTotal[row.teamId]! += row.points;
       }
-      if (!playoff) continue;
+      groupRows.push(rows);
+    }
+    if (playoff) {
+      const rows = grouped ? seedByGroupPlace(groupRows) : groupRows[0]!;
       // The bracket only needs the table and knockout results (real ones come with the options).
       const roundCount = playoff.config.rounds.length;
       let final: PlayoffTie | undefined;

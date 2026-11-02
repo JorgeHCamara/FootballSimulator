@@ -33,7 +33,7 @@ function seoValues(competition: CompetitionConfig, locale: string, season: strin
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
 /** Which set of texts a page uses: league, play-off league, continental competition, or cup. */
-type Wording = "league" | "playoffs" | "continental" | "cup" | "cupBracket";
+type Wording = "league" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
 
 type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
@@ -46,19 +46,26 @@ async function load(slug: string): Promise<Loaded | undefined> {
     return { kind: "cup", config: competition.cup, data: await getCupData(competition.cup), wording };
   }
   const { league } = competition;
-  const wording = league.continental ? "continental" : playoffWording(league) ? "playoffs" : "league";
+  const wording = league.continental ? (league.groups ? "continentalGroups" : "continental") : playoffWording(league) ? "playoffs" : "league";
   return { kind: "league", config: league, data: await getLeagueData(league), wording };
 }
 
 const META_KEYS: Record<
   Wording,
   {
-    title: "leagueTitle" | "continentalTitle" | "cupTitle" | "cupTitleBracket";
-    description: "leagueDescription" | "leagueDescriptionPlayoffs" | "continentalDescription" | "cupDescription" | "cupDescriptionBracket";
+    title: "leagueTitle" | "continentalTitle" | "continentalGroupsTitle" | "cupTitle" | "cupTitleBracket";
+    description:
+      | "leagueDescription"
+      | "leagueDescriptionPlayoffs"
+      | "continentalDescription"
+      | "continentalGroupsDescription"
+      | "cupDescription"
+      | "cupDescriptionBracket";
   }
 > = {
   league: { title: "leagueTitle", description: "leagueDescription" },
   continental: { title: "continentalTitle", description: "continentalDescription" },
+  continentalGroups: { title: "continentalGroupsTitle", description: "continentalGroupsDescription" },
   playoffs: { title: "leagueTitle", description: "leagueDescriptionPlayoffs" },
   cup: { title: "cupTitle", description: "cupDescription" },
   cupBracket: { title: "cupTitleBracket", description: "cupDescriptionBracket" },
@@ -103,7 +110,12 @@ export default async function LeaguePage({ params }: { params: Params }) {
   ]);
   const { config, data, wording } = loaded;
   const values = seoValues(config, locale, data.season);
-  const faqKey = wording === "cup" || wording === "cupBracket" || wording === "continental" ? wording : wording === "playoffs" ? "leaguePlayoffs" : "league";
+  const faqKey =
+    wording === "cup" || wording === "cupBracket" || wording === "continental" || wording === "continentalGroups"
+      ? wording
+      : wording === "playoffs"
+        ? "leaguePlayoffs"
+        : "league";
   // Cups: the FAQ explains where this cup's ratings come from.
   const cupT = await getTranslations("Cup");
   const faqValues = loaded.kind === "cup" ? { ...values, ratingNote: cupT(`ratingNote.${loaded.config.code}`) } : values;
@@ -117,6 +129,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
         ? "introCup"
         : wording === "continental"
           ? "introContinental"
+          : wording === "continentalGroups"
+            ? "introContinentalGroups"
           : wording === "playoffs"
             ? "introPlayoffs"
             : "intro";
@@ -131,7 +145,9 @@ export default async function LeaguePage({ params }: { params: Params }) {
           ? "step3Playoffs"
           : step === "step3" && wording === "continental"
             ? "step3Continental"
-            : step;
+            : step === "step3" && wording === "continentalGroups"
+              ? "step3ContinentalGroups"
+              : step;
 
   return (
     <div className="space-y-4" data-source={data.source}>

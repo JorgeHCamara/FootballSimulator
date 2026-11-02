@@ -6,7 +6,18 @@ import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
-import { buildBracket, isShootoutId, needsShootout, playoffCancelled, playoffIds, seriesGames, simulatePenalties, simulatePlayoff, tieIds } from "../engine/playoffs.ts";
+import {
+  buildBracket,
+  isShootoutId,
+  needsShootout,
+  playoffCancelled,
+  playoffIds,
+  seedByGroupPlace,
+  seriesGames,
+  simulatePenalties,
+  simulatePlayoff,
+  tieIds,
+} from "../engine/playoffs.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
@@ -110,6 +121,8 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
     const groupTables = groupTabs.map((g) =>
       computeStandings(g.teamIds.flatMap((id) => teamMap.get(id) ?? []), ordered, results, standingsOptions),
     );
+    // A knockout seeded from the group places (Libertadores): one ranking, winners first.
+    if (league.playoff?.seedFromGroups) return { overall: seedByGroupPlace(groupTables), groups: undefined };
     return { overall, groups: groupTables };
   };
 
@@ -329,18 +342,30 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
             </button>
           </div>
           {groupTabs.length > 1 && (
-            <div className="flex rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="group" aria-label={t("conference")} data-testid="group-switch">
-              {groupTabs.map((g) => (
-                <button
-                  key={g.id}
-                  type="button"
-                  aria-pressed={g.id === group?.id}
-                  className={`whitespace-nowrap ${tabButton(g.id === group?.id)}`}
-                  onClick={() => setGroupId(g.id)}
-                >
-                  {g.name}
-                </button>
-              ))}
+            <div
+              className="flex max-w-full overflow-x-auto rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800"
+              role="group"
+              aria-label={t(groupTabs.length > 4 ? "group" : "conference")}
+              data-testid="group-switch"
+            >
+              {groupTabs.map((g) => {
+                const selected = g.id === group?.id;
+                // Many groups (Libertadores A–H): the selected one by name, the others by letter.
+                const label = groupTabs.length > 4 && !selected ? g.id : g.name;
+                return (
+                  <button
+                    key={g.id}
+                    type="button"
+                    aria-pressed={selected}
+                    aria-label={g.name}
+                    title={g.name}
+                    className={`whitespace-nowrap ${tabButton(selected)}`}
+                    onClick={() => setGroupId(g.id)}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -357,6 +382,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
                   seasonComplete={seasonComplete}
                   title={playoff.title}
                   season={seasonLabel}
+                  {...(league.continental ? { knockout: playoff.seedFromGroups ? ("groupStage" as const) : ("leaguePhase" as const) } : {})}
                 />
               )}
               {playoff?.promotedTo && (bracket.length > 0 || cancelled) && (
@@ -423,7 +449,7 @@ export function LeagueSimulator({ league, teams, fixtures, seasonKey, season: se
                     ...(playoff.winnerPlays ? { winnerPlays: playoff.winnerPlays } : {}),
                     ...(cancelled && playoff.directIfClear ? { cancelled: playoff.directIfClear } : {}),
                     groupNames: (league.groups ?? []).map((g) => g.shortName[lang]),
-                    ...(league.continental ? { knockout: true } : {}),
+                    ...(league.continental ? { knockout: playoff.seedFromGroups ? "groupStage" : "leaguePhase" } : {}),
                   },
                 }
               : {})}

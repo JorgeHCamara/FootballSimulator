@@ -1,3 +1,4 @@
+import { continentOf } from "../config/competitions.ts";
 import { LEAGUES, type CompetitionCode, type LeagueConfig } from "../config/leagues.ts";
 import { tierStrength } from "../engine/cupModel.ts";
 import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
@@ -30,6 +31,10 @@ export const LEAGUE_TIERS: Partial<Record<CompetitionCode, number>> = {
   SB: 1.6,
   FL2: 1.8,
   DJL: 2.4,
+  // Only meets other leagues in the Libertadores, where scores are relative to
+  // the competition: Brazil's clubs start a little above the rest.
+  BSA: 0.9,
+  BSB: 2.1,
 };
 
 /** Combines domestic ratings into priors for the competition's clubs, averaging 1 across them. */
@@ -55,7 +60,9 @@ export function continentalPriors(
 /** Priors for a continental competition's clubs from the domestic leagues on the site. */
 export async function getContinentalPriors(league: LeagueConfig, clubs: readonly TeamId[]): Promise<Record<TeamId, TeamStrength>> {
   if (!league.continental || process.env.FOOTSIMU_SAMPLE_DATA === "1") return {};
-  const feeders = LEAGUES.filter((l) => LEAGUE_TIERS[l.code] !== undefined);
+  // Domestic leagues of the competition's own continent (Europe for UEFA, South America for CONMEBOL).
+  const continent = continentOf(league.country);
+  const feeders = LEAGUES.filter((l) => LEAGUE_TIERS[l.code] !== undefined && continentOf(l.country) === continent);
   const domestic = (
     await Promise.all(
       feeders.map(async (feeder) => {

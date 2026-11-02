@@ -93,7 +93,13 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
     }
     // Games after a club's full league schedule are post-season (play-offs);
     // they feed the play-off bracket, or are left out when the site has none.
-    const { league: events, postseason } = espnSplitSeason(all, perTeam);
+    const stages = league.espn.stages;
+    const { league: events, postseason } = stages
+      ? {
+          league: all.filter((e) => e.season?.slug === stages.table),
+          postseason: all.filter((e) => stages.knockout.includes(e.season?.slug ?? "")),
+        }
+      : espnSplitSeason(all, perTeam);
     const fixtures = espnFixtures(events, weeklyRounds ? { weekly: true } : { roundCount: perTeam });
     // Skip a year until at least half of its games are published.
     if (fixtures.length < (league.teams * perTeam) / 4) continue;

@@ -27,7 +27,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -40,6 +40,12 @@ export interface EspnFeed {
    * fixtures by calendar week instead of rebuilt rounds.
    */
   weeklyRounds?: boolean;
+  /**
+   * Split the season by ESPN's stage tags (`season.slug`) instead of by game
+   * counts: the table's stage, and the knockout stages after it. Other stages
+   * (qualifying rounds before a group stage) are left out.
+   */
+  stages?: { table: string; knockout: readonly string[] };
 }
 
 /** A separate table within a league, e.g. an MLS conference. */
@@ -52,7 +58,7 @@ export interface LeagueGroup {
   name: Record<SiteLocale, string>;
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -703,6 +709,66 @@ export const LEAGUES: readonly LeagueConfig[] = [
     ],
     playoff: UEFA_KNOCKOUT("Beşiktaş Park", "Conference League"),
     continental: { outsiderTier: 1.7 },
+  },
+  {
+    code: "LIB",
+    slug: "copa-libertadores",
+    name: "Copa Libertadores",
+    country: "CONMEBOL",
+    flag: "conmebol",
+    simulatorName: { en: "Copa Libertadores Simulator", pt: "Simulador da Libertadores", es: "Simulador de la Copa Libertadores" },
+    aka: { en: "CONMEBOL Libertadores", pt: "Copa Libertadores da América", es: "CONMEBOL Libertadores" },
+    teams: 32,
+    gamesPerTeam: 6,
+    // Group stage: 8 groups of 4, home and away (the qualifying stages before it
+    // are left out). The top 2 go to the round of 16, 3rd drops into the Copa
+    // Sudamericana.
+    groups: [
+      { id: "A", espnName: "Group A", name: { en: "Group A", pt: "Grupo A", es: "Grupo A" }, shortName: { en: "Group A", pt: "Grupo A", es: "Grupo A" } },
+      { id: "B", espnName: "Group B", name: { en: "Group B", pt: "Grupo B", es: "Grupo B" }, shortName: { en: "Group B", pt: "Grupo B", es: "Grupo B" } },
+      { id: "C", espnName: "Group C", name: { en: "Group C", pt: "Grupo C", es: "Grupo C" }, shortName: { en: "Group C", pt: "Grupo C", es: "Grupo C" } },
+      { id: "D", espnName: "Group D", name: { en: "Group D", pt: "Grupo D", es: "Grupo D" }, shortName: { en: "Group D", pt: "Grupo D", es: "Grupo D" } },
+      { id: "E", espnName: "Group E", name: { en: "Group E", pt: "Grupo E", es: "Grupo E" }, shortName: { en: "Group E", pt: "Grupo E", es: "Grupo E" } },
+      { id: "F", espnName: "Group F", name: { en: "Group F", pt: "Grupo F", es: "Grupo F" }, shortName: { en: "Group F", pt: "Grupo F", es: "Grupo F" } },
+      { id: "G", espnName: "Group G", name: { en: "Group G", pt: "Grupo G", es: "Grupo G" }, shortName: { en: "Group G", pt: "Grupo G", es: "Grupo G" } },
+      { id: "H", espnName: "Group H", name: { en: "Group H", pt: "Grupo H", es: "Grupo H" }, shortName: { en: "Group H", pt: "Grupo H", es: "Grupo H" } },
+    ],
+    espn: {
+      slug: "conmebol.libertadores",
+      seasons: "calendar",
+      stages: { table: "group-stage", knockout: ["round-of-16", "quarterfinals", "semifinals", "final"] },
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "headToHeadPoints"],
+    zones: [
+      { kind: "knockoutRoundOf16", from: 1, to: 2 },
+      { kind: "sudamericana", from: 3, to: 3 },
+      { kind: "eliminated", from: 4, to: 4 },
+    ],
+    // Knockout phase: group winners (ranked 1–8 by their group record) v
+    // runners-up (9–16), two legs, the better-ranked club hosting the second;
+    // level on aggregate: straight to penalties. The round of 16 is drawn (the
+    // projection pairs 1st v 16th…) and the draw fixes the bracket. Single final
+    // at a neutral venue (2026: Estadio Centenario, Montevideo).
+    playoff: {
+      seedFromGroups: { places: 2 },
+      rounds: [
+        {
+          key: "roundOf16",
+          legs: 2,
+          levelTie: "penalties",
+          noExtraTime: true,
+          drawn: true,
+          gapWeeks: 10,
+          pairs: [[1, 16], [2, 15], [3, 14], [4, 13], [5, 12], [6, 11], [7, 10], [8, 9]],
+        },
+        { key: "quarterFinals", legs: 2, levelTie: "penalties", noExtraTime: true, drawn: true, fixedBracket: true, gapWeeks: 4 },
+        { key: "semiFinals", legs: 2, levelTie: "penalties", noExtraTime: true, drawn: true, fixedBracket: true, gapWeeks: 5 },
+        { key: "final", legs: 1, levelTie: "penalties", venue: "Estadio Centenario", gapWeeks: 6 },
+      ],
+      title: "Copa Libertadores",
+    },
+    continental: { outsiderTier: 1.4 },
   },
 ];
 

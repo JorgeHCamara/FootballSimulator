@@ -67,7 +67,15 @@ export function sampleLeague(league: LeagueConfig, playedShare = 0.4): SampleLea
   const start = new Date(Date.now() - playedRounds * weekMs + weekMs / 2);
   start.setUTCHours(15, 0, 0, 0);
 
-  const schedule = doubleRoundRobin(teams.map((t) => t.id), start.toISOString()).filter((f) => f.matchday <= rounds);
+  // A continental group stage (Libertadores) plays within each group, split in
+  // order like the sample groups in leagueData.ts.
+  const groupCount = league.continental ? (league.groups?.length ?? 0) : 0;
+  const size = groupCount ? Math.ceil(teams.length / groupCount) : teams.length;
+  const chunks = Array.from({ length: Math.max(groupCount, 1) }, (_, g) => teams.slice(g * size, (g + 1) * size).map((t) => t.id));
+  const schedule = chunks
+    .flatMap((ids) => doubleRoundRobin(ids, start.toISOString()))
+    .filter((f) => f.matchday <= rounds)
+    .map((f, i) => ({ ...f, id: i + 1 }));
   const played = schedule.filter((f) => f.matchday <= playedRounds);
   const results = simulateFixtures(played, {}, truth, rng);
   const fixtures = schedule.map((f) => ({ ...f, result: results[f.id] ?? null }));

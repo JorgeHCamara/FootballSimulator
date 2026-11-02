@@ -13,10 +13,12 @@ interface Props {
   /** Competition the play-off decides, e.g. "MLS Cup". */
   title: string;
   season: string;
+  /** Continental competition: what comes before the knockout phase (its own wording). */
+  knockout?: "leaguePhase" | "groupStage";
 }
 
 /** The winner of a title play-off (MLS Cup), once the bracket is decided. */
-export function PlayoffChampion({ bracket, teams, predictions, seasonComplete, title, season }: Props) {
+export function PlayoffChampion({ bracket, teams, predictions, seasonComplete, title, season, knockout }: Props) {
   const t = useTranslations("Simulator");
   const [winner] = seasonComplete ? playoffWinners(bracket, predictions) : [];
   const team = winner != null ? teams.get(winner) : undefined;
@@ -33,7 +35,7 @@ export function PlayoffChampion({ bracket, teams, predictions, seasonComplete, t
           </span>
         </p>
       ) : (
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{t("championPending")}</p>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{t(knockout === "groupStage" ? "championPendingGroups" : knockout ? "championPendingLeaguePhase" : "championPending")}</p>
       )}
     </section>
   );
