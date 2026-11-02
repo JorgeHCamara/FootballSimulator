@@ -458,7 +458,7 @@ describe("continental competitions (UEFA, CONMEBOL)", async () => {
     assert.deepEqual(groups.map((g) => g.continent), ["Europe", "South America", "North America"]);
     const uefa = groups[0]!.countries.find((c) => c.country === "UEFA")!;
     assert.deepEqual(uefa.leagues.map((l) => l.name), ["Champions League", "Europa League", "Conference League"]);
-    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "Argentina", "Chile", "Colombia", "Uruguay", "Paraguay", "CONMEBOL"]);
+    assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "Argentina", "Chile", "Colombia", "Uruguay", "Paraguay", "Ecuador", "CONMEBOL"]);
     const conmebol = groups[1]!.countries.find((c) => c.country === "CONMEBOL")!;
     assert.deepEqual(conmebol.leagues.map((l) => l.name), ["Copa Libertadores", "Copa Sudamericana"]);
   });

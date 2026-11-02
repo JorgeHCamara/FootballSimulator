@@ -59,6 +59,7 @@ const CONTINENT_OF: Record<string, Continent> = {
   Colombia: "South America",
   Uruguay: "South America",
   Paraguay: "South America",
+  Ecuador: "South America",
   USA: "North America",
   Mexico: "North America",
 };

@@ -88,12 +88,14 @@ export function LeagueSimulator({
   const groupTabs = useMemo(
     () => (league.groups ?? []).flatMap((g) => {
       const members = groups?.find((m) => m.id === g.id);
-      return members ? [{ id: g.id, name: g.name[lang], teamIds: members.teamIds }] : [];
+      return members ? [{ id: g.id, name: g.name[lang], teamIds: members.teamIds, ...(g.zones ? { zones: g.zones } : {}) }] : [];
     }),
     [league.groups, groups, lang],
   );
   const [groupId, setGroupId] = useState(groupTabs[0]?.id);
   const group = groupTabs.find((g) => g.id === groupId) ?? groupTabs[0];
+  // A group with its own zones (Ecuador's final stage) shows and simulates those.
+  const tableLeague = useMemo(() => (group?.zones ? { ...league, zones: group.zones } : league), [league, group]);
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -405,7 +407,7 @@ export function LeagueSimulator({
           {tab === "table" ? (
             <>
               <StandingsTable
-                league={league}
+                league={tableLeague}
                 rows={rows}
                 teams={teamMap}
                 {...(zonePositions ? { zonePositions } : {})}
@@ -440,7 +442,7 @@ export function LeagueSimulator({
               )}
             </>
           ) : (
-            <ProbabilityGrid league={league} input={monteCarloInput} rows={rows} teams={teamMap} />
+            <ProbabilityGrid league={tableLeague} input={monteCarloInput} rows={rows} teams={teamMap} />
           )}
         </div>
 

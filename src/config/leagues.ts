@@ -16,6 +16,9 @@ export type ZoneKind =
   | "playoffs"
   | "playoffWildCard"
   | "title"
+  | "splitTitle"
+  | "splitMiddle"
+  | "splitRelegation"
   | "titlePlayoffs"
   | "knockoutRoundOf16"
   | "knockoutPlayoff"
@@ -29,7 +32,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -86,9 +89,11 @@ export interface LeagueGroup {
   /** Matched against the group names in ESPN's standings feed. */
   espnName: string;
   name: Record<SiteLocale, string>;
+  /** This table's own zones (Ecuador's final-stage groups), instead of the league's. */
+  zones?: readonly Zone[];
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -107,6 +112,11 @@ export interface LeagueConfig {
   gamesPerTeam?: number;
   /** Separate tables (MLS conferences); zones then apply within each group. */
   groups?: readonly LeagueGroup[];
+  /**
+   * The groups only exist for part of the season (Ecuador: after the first
+   * stage splits the table); until ESPN's standings show them, one table.
+   */
+  groupsOptional?: boolean;
   /**
    * Real data comes from ESPN and falls back to football-data.org (with `code`
    * as the competition code); leagues outside football-data.org's free tier set
@@ -952,6 +962,64 @@ export const LEAGUES: readonly LeagueConfig[] = [
       ],
       title: "Liga MX",
     },
+  },
+  {
+    code: "ECU",
+    slug: "ecuador-ligapro",
+    name: "LigaPro",
+    country: "Ecuador",
+    flag: "ec",
+    simulatorName: { en: "Ecuadorian LigaPro Simulator", pt: "Simulador do Campeonato Equatoriano", es: "Simulador de la LigaPro Ecuador" },
+    aka: { en: "LigaPro Serie A", pt: "LigaPro Ecuador", es: "LigaPro Serie A" },
+    teams: 16,
+    // 2026: a first stage of 30 games (home and away, plus a few extra
+    // fixtures), then the table splits, points carried over, into a title
+    // hexagonal (1st–6th), a quadrangular (7th–10th) and a relegation hexagonal
+    // (11th–16th), each home and away within itself. Rounds by calendar week.
+    gamesPerTeam: 42,
+    espn: { slug: "ecu.1", seasons: "calendar", weeklyRounds: true },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
+    // Before the split: where each place leads.
+    zones: [
+      { kind: "splitTitle", from: 1, to: 6 },
+      { kind: "splitMiddle", from: 7, to: 10 },
+      { kind: "splitRelegation", from: 11, to: 16 },
+    ],
+    // After it (ESPN's standings groups): each group's own places. Title
+    // hexagonal: the champion and runner-up to the Libertadores group stage,
+    // 3rd to its qualifying rounds, 4th–6th to the Sudamericana; the
+    // quadrangular winner to the Sudamericana; the relegation hexagonal's
+    // bottom two go down.
+    groupsOptional: true,
+    groups: [
+      {
+        id: "1",
+        espnName: "Group 1",
+        name: { en: "Title hexagonal", pt: "Hexagonal do título", es: "Hexagonal por el título" },
+        shortName: { en: "Title hexagonal", pt: "Hexagonal do título", es: "Hexagonal por el título" },
+        zones: [
+          { kind: "title", from: 1, to: 1 },
+          { kind: "libertadores", from: 2, to: 2 },
+          { kind: "libertadoresQualifying", from: 3, to: 3 },
+          { kind: "sudamericana", from: 4, to: 6 },
+        ],
+      },
+      {
+        id: "2",
+        espnName: "Group 2",
+        name: { en: "Quadrangular", pt: "Quadrangular", es: "Cuadrangular" },
+        shortName: { en: "Quadrangular", pt: "Quadrangular", es: "Cuadrangular" },
+        zones: [{ kind: "sudamericana", from: 1, to: 1 }],
+      },
+      {
+        id: "3",
+        espnName: "Group 3",
+        name: { en: "Relegation hexagonal", pt: "Hexagonal do rebaixamento", es: "Hexagonal del descenso" },
+        shortName: { en: "Relegation hexagonal", pt: "Hexagonal do rebaixamento", es: "Hexagonal del descenso" },
+        zones: [{ kind: "relegation", from: 5, to: 6 }],
+      },
+    ],
   },
   {
     code: "UCL",

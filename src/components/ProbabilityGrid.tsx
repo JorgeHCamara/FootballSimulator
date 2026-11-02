@@ -27,6 +27,10 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
   // South American leagues: the Copa Libertadores and Sudamericana places
   // (positions among clubs not already qualified, when some pass down).
   const libertadores = league.zones.find((z) => z.kind === "libertadores");
+  // Groups with their own places (Ecuador's split): 1st only matters in the title group.
+  const groupZones = league.groups?.some((g) => g.zones) ?? false;
+  const titleZone = league.zones.some((z) => z.kind === "title");
+  const showFirst = !groupZones || titleZone;
   const sudamericana = league.zones.find((z) => z.kind === "sudamericana");
   // MLS: the chance of any playoff place, wild card included.
   const playoffZones = league.zones.filter((z) => z.kind === "playoffs" || z.kind === "playoffWildCard" || z.kind === "titlePlayoffs");
@@ -67,9 +71,9 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                   <th className="px-2 text-right">{t("finalChance")}</th>
                   <th className="px-2 text-right">{t("winChance")}</th>
                 </>
-              ) : (
-                <th className="px-2 text-right">{league.groups || result.playoffWins ? t("firstPlaceChance") : t("titleChance")}</th>
-              )}
+              ) : showFirst ? (
+                <th className="px-2 text-right">{(league.groups && !titleZone) || result.playoffWins ? t("firstPlaceChance") : t("titleChance")}</th>
+              ) : null}
               {playoffs && <th className="px-2 text-right">{t("playoffChance")}</th>}
               {libertadores && <th className="px-2 text-right">{tz("libertadores")}</th>}
               {sudamericana && <th className="px-2 text-right">{tz("sudamericana")}</th>}
@@ -109,11 +113,11 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                         {pct((result.playoffWins?.[row.teamId] ?? 0) / result.iterations)}
                       </td>
                     </>
-                  ) : (
+                  ) : showFirst ? (
                     <td className="px-2 text-right font-semibold tabular-nums" data-testid="title-chance">
                       {pct(probabilityInRange(result, row.teamId, 1, 1))}
                     </td>
-                  )}
+                  ) : null}
                   {playoffs && (
                     <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="playoff-chance">
                       {pct(probabilityInRange(result, row.teamId, playoffs.from, playoffs.to))}

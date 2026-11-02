@@ -62,7 +62,7 @@ async function load(slug: string): Promise<Loaded | undefined> {
           ? "liguilla" // one table and a title play-off (Liga MX)
       : playoffWording(league)
         ? "playoffs"
-        : league.zones.some((z) => z.kind === "libertadores")
+        : [...league.zones, ...(league.groups ?? []).flatMap((g) => g.zones ?? [])].some((z) => z.kind === "libertadores")
           ? "leagueAmericas" // continental places are the Libertadores, not Europe
           : "league";
   return { kind: "league", config: league, data: await getLeagueData(league), wording };

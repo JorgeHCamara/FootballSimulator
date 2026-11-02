@@ -785,6 +785,27 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Ecuador: the split into title, middle and relegation groups, each with its own places", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/ecuador-ligapro`);
+      const groups = p.locator('[data-testid="group-switch"] button');
+      assert.deepEqual(await groups.allInnerTexts(), ["Title hexagonal", "Quadrangular", "Relegation hexagonal"]);
+      const zones = () => p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.deepEqual((await zones()).slice(0, 4), ["title", "libertadores", "libertadoresQualifying", "sudamericana"]);
+      await groups.nth(1).click();
+      await p.waitForFunction(() => document.querySelector('[data-testid="standings-row"]')?.dataset.zone === "sudamericana");
+      await groups.nth(2).click();
+      // (Sample groups split 6/6/4, so check the legend rather than the last row.)
+      await p.waitForFunction(() => /Relegation/.test(document.querySelector("main")?.innerText ?? "") && document.querySelector('[data-testid="standings-row"]')?.dataset.zone === "");
+      // Chances: no "1st place" in the relegation group.
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="chances"] tbody tr').first().waitFor({ timeout: 90000 });
+      assert.doesNotMatch(await p.locator('[data-testid="chances"] thead').innerText(), /1st place|Title/);
+      await groups.nth(0).click();
+      await p.waitForFunction(() => /Title/.test(document.querySelector('[data-testid="chances"] thead')?.textContent ?? ""));
+      await p.close();
+    });
+
     await step("Chile: 16 clubs, Libertadores, Sudamericana and relegation zones", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/chile-primera-division`);
@@ -893,7 +914,7 @@ async function step(name, fn) {
       await england.getByRole("link", { name: "Championship" }).click();
       await desktop.waitForURL(/\/en\/championship$/);
       await menu.getByRole("button", { name: "South America" }).click();
-      assert.deepEqual((await menu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase()), ["conmebol", "argentina", "brazil", "chile", "colombia", "paraguay", "uruguay"]);
+      assert.deepEqual((await menu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase()), ["conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "uruguay"]);
       // No column (or link) overlaps the next.
       const [conmebol, brazil] = await Promise.all(["#menu-conmebol", "#menu-ar"].map((id) => menu.locator(id).boundingBox()));
       const widest = await menu.locator("#menu-conmebol a").evaluateAll((els) => Math.max(...els.map((e) => e.getBoundingClientRect().right)));
@@ -922,7 +943,7 @@ async function step(name, fn) {
       await mobile.waitFor();
       assert.deepEqual((await mobile.locator("h2").allInnerTexts()).map((x) => x.trim()), ["Europe", "South America", "North America"]);
       const headings = (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "paraguay", "uruguay", "mexico", "usa"]);
+      assert.deepEqual(headings, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "spain", "conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "uruguay", "mexico", "usa"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();

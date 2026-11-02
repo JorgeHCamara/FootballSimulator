@@ -128,7 +128,13 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
   const current = currentSeasonYear(league);
   for (const year of [current, current - 1]) {
     let all = await fetchEspnSeason(slug, year, seasons, init);
-    const groups = league.groups ? await loadEspnGroups(league, year, init) : undefined;
+    // Optional groups (a split later in the season): one table until they exist.
+    const groups = league.groups
+      ? await loadEspnGroups(league, year, init).catch((error) => {
+          if (league.groupsOptional) return undefined;
+          throw error;
+        })
+      : undefined;
     // The tournament to show: the first listed (latest) with at least half its
     // table published; a single tournament is always used.
     const stageSets = league.espn.stages === undefined ? [] : "table" in league.espn.stages ? [league.espn.stages] : [...league.espn.stages];
