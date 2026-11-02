@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-02T00:22:21.514Z",
+ "generated": "2026-11-02T02:18:38.034Z",
  "clubs": [
   {
    "espnId": 4489,
@@ -1553,6 +1553,1651 @@
      "location": "Balneário Camboriú, SC, Brazil",
      "league": "Brazilian Serie C",
      "badge": "https://r2.thesportsdb.com/images/media/team/badge/bu1jtg1713439315.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20776,
+   "name": "Anaitasuna",
+   "shortName": "Anaitasuna",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140456",
+   "candidates": [
+    {
+     "idTeam": "140456",
+     "team": "Anaitasuna",
+     "location": "Azkoitia, Basque Country, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/um09uy1726501356.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133838,
+   "name": "CD Tedeón",
+   "shortName": "Tedeon",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150469",
+   "candidates": [
+    {
+     "idTeam": "150469",
+     "team": "Tedeón",
+     "location": "Navarrete, La Rioja, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ut6ya01735189726.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131403,
+   "name": "Atlético Calatayud",
+   "shortName": "Calatayud",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153377",
+   "candidates": [
+    {
+     "idTeam": "153377",
+     "team": "Atlético Calatayud",
+     "location": "Calatayud, Aragon, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/swagpw1759033603.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22372,
+   "name": "CD Baztán",
+   "shortName": "Baztán",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149514",
+   "candidates": [
+    {
+     "idTeam": "149514",
+     "team": "Baztán",
+     "location": "Cirauqui, Navarre, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/e1slce1730696354.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133844,
+   "name": "UB Lebrijana",
+   "shortName": "Lebrijana",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157204",
+   "candidates": [
+    {
+     "idTeam": "157204",
+     "team": "Lebrijana",
+     "location": "Lebrija, Andalusia, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1btvny1789163333.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133851,
+   "name": "Ceuta 6 de Junio",
+   "shortName": "Ceuta 6",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149515",
+   "candidates": [
+    {
+     "idTeam": "149515",
+     "team": "Ceuta 6 de Junio",
+     "location": "Ceuta, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3677k91730697441.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133842,
+   "name": "Ribadesella",
+   "shortName": "Ribadesella",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157201",
+   "candidates": [
+    {
+     "idTeam": "157201",
+     "team": "Ribadesella",
+     "location": "Ribadesella, Asturias, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/5fmhti1789164054.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133850,
+   "name": "SD Noja",
+   "shortName": "Noja",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152238",
+   "candidates": [
+    {
+     "idTeam": "152238",
+     "team": "Noja",
+     "location": "Noja, Cantabria, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/wuj6jp1750022764.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133832,
+   "name": "Atlético Pinatarense",
+   "shortName": "Pinatarens",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "157203",
+     "team": "Pinatar",
+     "location": "San Pedro del Pinatar, Region of Murcia, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2dtjpt1789163704.png",
+     "score": 0.25
+    }
+   ]
+  },
+  {
+   "espnId": 131419,
+   "name": "Atlético Melilla",
+   "shortName": "Atlético Melilla",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153364",
+   "candidates": [
+    {
+     "idTeam": "153364",
+     "team": "Atlético Melilla",
+     "location": "Melilla, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/w46lam1759033912.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133847,
+   "name": "Auriense Cented Academy",
+   "shortName": "Auriense CA",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157202",
+   "candidates": [
+    {
+     "idTeam": "157202",
+     "team": "Auriense",
+     "location": "Ourense, Galicia, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/cviku81789163117.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133836,
+   "name": "CD San José",
+   "shortName": "San Jose",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 133831,
+   "name": "Sporting Hortaleza",
+   "shortName": "Hortaleza",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157199",
+   "candidates": [
+    {
+     "idTeam": "157199",
+     "team": "Sporting de Hortaleza",
+     "location": "Madrid, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/i9a5zo1789164604.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133833,
+   "name": "Atlético Unión Güímar",
+   "shortName": "Guimar",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157205",
+   "candidates": [
+    {
+     "idTeam": "157205",
+     "team": "Atlético Unión Güímar",
+     "location": "Güímar, Tenerife, Canary Islands, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/yazhtq1789162862.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133840,
+   "name": "CF San Rafael",
+   "shortName": "San Rafael",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "157196",
+     "team": "Sant Rafel",
+     "location": "San Rafael de Sa Creu, Balearic Islands, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/nmef6u1789164281.png",
+     "score": 0.4
+    }
+   ]
+  },
+  {
+   "espnId": 18334,
+   "name": "AE Prat",
+   "shortName": "AE Prat",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "138277",
+   "candidates": [
+    {
+     "idTeam": "138277",
+     "team": "Prat",
+     "location": "El Prat, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/azzje41677474953.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 133841,
+   "name": "CP Talayuela",
+   "shortName": "Talayuela",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157198",
+   "candidates": [
+    {
+     "idTeam": "157198",
+     "team": "Talayuela",
+     "location": "Talayuela, Extremadura, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/v7p0211789164986.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133843,
+   "name": "Sporting de Alcázar",
+   "shortName": "Alcázar",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157197",
+   "candidates": [
+    {
+     "idTeam": "157197",
+     "team": "Sporting de Alcázar",
+     "location": "Alcázar de San Juan, Ciudad Real, Castilla–La Mancha, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/f7yr6k1789164395.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131412,
+   "name": "Maracena",
+   "shortName": "Maracena",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153368",
+   "candidates": [
+    {
+     "idTeam": "153368",
+     "team": "Maracena",
+     "location": "Maracena, Andalusia, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/orafsh1758951972.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133846,
+   "name": "Tavernes de la Valldigna",
+   "shortName": "UE Tavernes",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157200",
+   "candidates": [
+    {
+     "idTeam": "157200",
+     "team": "Tavernes de la Valldigna",
+     "location": "Tavernes de la Valldigna, Valencian Community, Spain",
+     "league": "Copa del Rey",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/mzldoy1789165250.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22432,
+   "name": "CD Cuarte",
+   "shortName": "Cuarte",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149509",
+   "candidates": [
+    {
+     "idTeam": "149509",
+     "team": "Cuarte",
+     "location": "Cuarte de Huerva, Spain",
+     "league": "Spanish Tercera Federación Group 17",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/v2p2zk1730693630.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133839,
+   "name": "CF Calamocha",
+   "shortName": "CF Calamocha",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150476",
+   "candidates": [
+    {
+     "idTeam": "150476",
+     "team": "Calamocha",
+     "location": "Calamocha, Aragon, Spain",
+     "league": "Spanish Segunda Federación Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/jwsjcm1735191139.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21290,
+   "name": "CE Europa",
+   "shortName": "Europa",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144229",
+   "candidates": [
+    {
+     "idTeam": "144229",
+     "team": "CE Europa",
+     "location": "Barcelona",
+     "league": "Spanish Primera RFEF Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/xdfie41784675774.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6856,
+   "name": "Sestao",
+   "shortName": "Sestao",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "137753",
+   "candidates": [
+    {
+     "idTeam": "137753",
+     "team": "Sestao River",
+     "location": "Sestao, Spain",
+     "league": "Spanish Segunda Federación Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/h1lcyw1578743379.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 133845,
+   "name": "UD Castellonense",
+   "shortName": "UD Castellonense",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "150336",
+   "candidates": [
+    {
+     "idTeam": "150336",
+     "team": "Castellonense",
+     "location": "Villanueva de Castellón, Valencia, Valencian Community, Spain",
+     "league": "Spanish Segunda Federación Group 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/dgx47w1784764586.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 131463,
+   "name": "Alcalá",
+   "shortName": "Alcalá",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150349",
+   "candidates": [
+    {
+     "idTeam": "150349",
+     "team": "Alcalá",
+     "location": "Alcalá de Henares, Community of Madrid, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/of99241734924655.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131465,
+   "name": "Atlético Tordesillas",
+   "shortName": "Tordesillas",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150367",
+   "candidates": [
+    {
+     "idTeam": "150367",
+     "team": "Atlético Tordesillas",
+     "location": "Tordesillas, Castile and León",
+     "league": "Spanish Segunda RFEF Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1bq3yt1735014628.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133834,
+   "name": "Ciudad De Lucena",
+   "shortName": "Lucena",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142540",
+   "candidates": [
+    {
+     "idTeam": "142540",
+     "team": "Ciudad de Lucena",
+     "location": "Lucena, Andalusia, Spain",
+     "league": "Spanish Segunda RFEF Group 4",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/pnbi0v1726852115.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6825,
+   "name": "Gimnastica Segoviana",
+   "shortName": "Segoviana",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142537",
+   "candidates": [
+    {
+     "idTeam": "142537",
+     "team": "Gimnástica Segoviana",
+     "location": "Segovia, Castile and León, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/utgefq1678163451.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20824,
+   "name": "Llanera",
+   "shortName": "Llanera",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142538",
+   "candidates": [
+    {
+     "idTeam": "142538",
+     "team": "Llanera",
+     "location": "Posada de Llanera, Asturias, Spain",
+     "league": "Spanish Segunda Federación Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/h3atnm1626277009.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 9141,
+   "name": "Don Benito",
+   "shortName": "Don Benito",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138304",
+   "candidates": [
+    {
+     "idTeam": "138304",
+     "team": "Don Benito",
+     "location": "Don Benito, Extremadura, Spain",
+     "league": "Spanish Segunda Federación Group 4",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/zs6ils1579988738.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22430,
+   "name": "CD Extremadura",
+   "shortName": "Extremadura",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150519",
+   "candidates": [
+    {
+     "idTeam": "150519",
+     "team": "Extremadura",
+     "location": "Almendralejo, Extremadura, Spain",
+     "league": "Spanish Primera RFEF Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ye7j261736043777.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21722,
+   "name": "Manresa",
+   "shortName": "Manresa",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146800",
+   "candidates": [
+    {
+     "idTeam": "146800",
+     "team": "Manresa",
+     "location": "Manresa, Catalonia, Spain",
+     "league": "Spanish Segunda Federación Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fbkssg1784093954.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 5424,
+   "name": "Sant Andreu",
+   "shortName": "Sant Andreu",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144942",
+   "candidates": [
+    {
+     "idTeam": "144942",
+     "team": "Sant Andreu",
+     "location": "Barcelona, Spain",
+     "league": "Spanish Primera RFEF Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/rbs1t11790546825.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22080,
+   "name": "Arosa",
+   "shortName": "Arosa",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144212",
+   "candidates": [
+    {
+     "idTeam": "144212",
+     "team": "Arosa",
+     "location": "Vilagarcía de Arousa, Galicia, Spain",
+     "league": "Spanish Segunda Federación Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/8uq1771697090245.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 3748,
+   "name": "Pontevedra",
+   "shortName": "Pontevedra",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137822",
+   "candidates": [
+    {
+     "idTeam": "137822",
+     "team": "Pontevedra",
+     "location": "Pontevedra, Spain",
+     "league": "Spanish Primera RFEF Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/sndafh1578852533.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21717,
+   "name": "Atlético Paso",
+   "shortName": "Atl Paso",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146792",
+   "candidates": [
+    {
+     "idTeam": "146792",
+     "team": "Atlético Paso",
+     "location": "El Paso, La Palma, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/a9zyjq1678163315.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 12585,
+   "name": "CD Tudelano",
+   "shortName": "CD Tudelano",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138245",
+   "candidates": [
+    {
+     "idTeam": "138245",
+     "team": "Tudelano",
+     "location": "Tudela, Spain",
+     "league": "Spanish Segunda Federación Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/bpdo7z1579896260.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21713,
+   "name": "Manacor",
+   "shortName": "Manacor",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150408",
+   "candidates": [
+    {
+     "idTeam": "150408",
+     "team": "Manacor",
+     "location": "Manacor, Mallorca, Balearic Islands, Spain",
+     "league": "Spanish Tercera Federación Group 11",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fkrmst1735100950.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 2571,
+   "name": "Recreativo Huelva",
+   "shortName": "R Huelva",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "133855",
+   "candidates": [
+    {
+     "idTeam": "133855",
+     "team": "Recreativo de Huelva",
+     "location": "Huelva, Andalusia, Spain",
+     "league": "Spanish Segunda Federación Group 4",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/s2pii11626207918.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 7041,
+   "name": "Peña Sport",
+   "shortName": "Peña Sport",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144220",
+   "candidates": [
+    {
+     "idTeam": "144220",
+     "team": "Peña Sport",
+     "location": "Tafalla, Navarre, Spain",
+     "league": "Spanish Segunda Federación Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/lhc4b41784093899.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 14263,
+   "name": "Atlético Baleares",
+   "shortName": "Baleares",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137843",
+   "candidates": [
+    {
+     "idTeam": "137843",
+     "team": "Atlético Baleares",
+     "location": "Palma, Spain",
+     "league": "Spanish Segunda RFEF Group 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fnquz91680936023.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 8961,
+   "name": "Coruxo",
+   "shortName": "Coruxo",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137824",
+   "candidates": [
+    {
+     "idTeam": "137824",
+     "team": "Coruxo",
+     "location": "Coruxo, Spain",
+     "league": "Spanish Segunda Federación Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2nm2911690066521.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17565,
+   "name": "Zamora CF",
+   "shortName": "Zamora CF",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137745",
+   "candidates": [
+    {
+     "idTeam": "137745",
+     "team": "Zamora",
+     "location": "Zamora, Spain",
+     "league": "Spanish Primera Federación Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/61dbsg1578737886.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 9414,
+   "name": "Poblense",
+   "shortName": "Poblense",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140505",
+   "candidates": [
+    {
+     "idTeam": "140505",
+     "team": "Poblense",
+     "location": "Sa Pobla, Spain",
+     "league": "Spanish Segunda RFEF Group 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/10uu6b1782369400.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18342,
+   "name": "San Sebastián de los Reyes",
+   "shortName": "San Sebastiá",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137757",
+   "candidates": [
+    {
+     "idTeam": "137757",
+     "team": "San Sebastián de los Reyes",
+     "location": "San Sebastián de los Reyes, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/g3n61q1677554949.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20821,
+   "name": "Coria",
+   "shortName": "Coria",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "150396",
+     "team": "Coria CF",
+     "location": "Coria del Río, Andalusia, Spain",
+     "league": "_No League Soccer",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/8ctt4r1735079651.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131466,
+   "name": "Cieza",
+   "shortName": "Cieza",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150429",
+   "candidates": [
+    {
+     "idTeam": "150429",
+     "team": "Cieza",
+     "location": "Cieza, Murcia, Spain",
+     "league": "Spanish Segunda RFEF Group 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fn3p6l1735147881.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 9449,
+   "name": "Antequera CF",
+   "shortName": "Antequera CF",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144237",
+   "candidates": [
+    {
+     "idTeam": "144237",
+     "team": "Antequera",
+     "location": "Antequera, Andalusia, Spain",
+     "league": "Spanish Primera RFEF Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/f7brqy1721094011.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21299,
+   "name": "Aguilas",
+   "shortName": "Aguilas",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144249",
+   "candidates": [
+    {
+     "idTeam": "144249",
+     "team": "Águilas",
+     "location": "Águilas, Murcia, Spain",
+     "league": "Spanish Primera Federación Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/h70lhf1677639069.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17888,
+   "name": "CD Laredo",
+   "shortName": "Laredo",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140493",
+   "candidates": [
+    {
+     "idTeam": "140493",
+     "team": "Laredo",
+     "location": "Laredo, Cantabria, Spain",
+     "league": "Spanish Tercera Federación Group 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/uhwa9p1791179505.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17569,
+   "name": "CD Varea",
+   "shortName": "CD Varea",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142545",
+   "candidates": [
+    {
+     "idTeam": "142545",
+     "team": "Varea",
+     "location": "Varea, La Rioja, Spain",
+     "league": "Spanish Tercera Federación Group 16",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/vlhpfz1697091159.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 4475,
+   "name": "Conquense",
+   "shortName": "Conquense",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144987",
+   "candidates": [
+    {
+     "idTeam": "144987",
+     "team": "Conquense",
+     "location": "Cuenca, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/qpuqau1642851385.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22084,
+   "name": "Covadonga",
+   "shortName": "Covadonga",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140491",
+   "candidates": [
+    {
+     "idTeam": "140491",
+     "team": "Covadonga",
+     "location": "Oviedo, Asturias, Spain",
+     "league": "Spanish Tercera Federación Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/iibarx1689794009.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6858,
+   "name": "Guijuelo",
+   "shortName": "Guijuelo",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137851",
+   "candidates": [
+    {
+     "idTeam": "137851",
+     "team": "Guijuelo",
+     "location": "Guijuelo, Spain",
+     "league": "Spanish Tercera Federación Group 8",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/b690oy1690066433.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22043,
+   "name": "Mijas Las Lagunas",
+   "shortName": "ML Lagunas",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150387",
+   "candidates": [
+    {
+     "idTeam": "150387",
+     "team": "Mijas-Las Lagunas",
+     "location": "Las Lagunas, Andalusia, Spain",
+     "league": "Spanish Segunda Federación Group 4",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/o4tqma1735058621.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 5401,
+   "name": "Real Jaen CF",
+   "shortName": "Real Jaen CF",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137763",
+   "candidates": [
+    {
+     "idTeam": "137763",
+     "team": "Real Jaén",
+     "location": "Jaén, Spain",
+     "league": "Spanish Primera RFEF Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/may3aj1735056799.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22439,
+   "name": "Real Ávila",
+   "shortName": "Real Ávila",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149455",
+   "candidates": [
+    {
+     "idTeam": "149455",
+     "team": "Real Ávila",
+     "location": "Ávila, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ymdv3f1730648785.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 19294,
+   "name": "Unionistas de Salamanca",
+   "shortName": "Salamanca",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137758",
+   "candidates": [
+    {
+     "idTeam": "137758",
+     "team": "Unionistas de Salamanca",
+     "location": "Salamanca, Spain",
+     "league": "Spanish Primera Federación Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/gq2sls1578745068.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17570,
+   "name": "Gimnástica Torrelavega",
+   "shortName": "Gim. Torrelavega",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142535",
+   "candidates": [
+    {
+     "idTeam": "142535",
+     "team": "Gimnástica de Torrelavega",
+     "location": "Torrelavega, Cantabria, Spain",
+     "league": "Spanish Segunda Federación Group 1",
+     "badge": "https://www.thesportsdb.com/images/media/team/badge/k69u391792255341.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131474,
+   "name": "UD Ourense",
+   "shortName": "UD Ourense",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150250",
+   "candidates": [
+    {
+     "idTeam": "150250",
+     "team": "UD Ourense",
+     "location": "Ourense, Galicia, Spain",
+     "league": "Spanish Primera RFEF Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/q1c9cv1734456934.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 3835,
+   "name": "Xerez",
+   "shortName": "Xerez",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "133842",
+   "candidates": [
+    {
+     "idTeam": "133842",
+     "team": "Xerez",
+     "location": "Chapín, Jerez, Andalusia, Spain",
+     "league": "Spanish Segunda Federación Group 4",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/cxpzkp1511516976.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133835,
+   "name": "CD Pamplona",
+   "shortName": "CD Pamplona",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "150456",
+   "candidates": [
+    {
+     "idTeam": "150456",
+     "team": "Pamplona",
+     "location": "Pamplona, Navarre, Spain",
+     "league": "Spanish Tercera Federación Group 15",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/yrwhj31735183909.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 5464,
+   "name": "Portugalete",
+   "shortName": "Portugalete",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137746",
+   "candidates": [
+    {
+     "idTeam": "137746",
+     "team": "Portugalete",
+     "location": "Portugalete, Basque Country, Spain",
+     "league": "Spanish Segunda RFEF Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/g8utq11734747233.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 8678,
+   "name": "Real Unión Irun",
+   "shortName": "Real Unión",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138243",
+   "candidates": [
+    {
+     "idTeam": "138243",
+     "team": "Real Unión",
+     "location": "Irun, Spain",
+     "league": "Spanish Primera Federación Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/45alur1786122180.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22437,
+   "name": "CD Minera",
+   "shortName": "Minera",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 131470,
+   "name": "Reus FC Reddis",
+   "shortName": "Reus FCR",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150225",
+   "candidates": [
+    {
+     "idTeam": "150225",
+     "team": "Reus FC Reddis",
+     "location": "Reus, Catalonia, Spain",
+     "league": "Spanish Segunda RFEF Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ieqtyv1734390600.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 5421,
+   "name": "Barakaldo",
+   "shortName": "Barakaldo",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137764",
+   "candidates": [
+    {
+     "idTeam": "137764",
+     "team": "Barakaldo",
+     "location": "Barakaldo, Spain",
+     "league": "Spanish Primera Federación Group 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/v6ugnf1578747360.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21723,
+   "name": "Utebo",
+   "shortName": "Utebo",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146803",
+   "candidates": [
+    {
+     "idTeam": "146803",
+     "team": "Utebo",
+     "location": "Utebo, Spain",
+     "league": "Spanish Segunda RFEF Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/k19kig1660660164.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21291,
+   "name": "Calvo Sotelo",
+   "shortName": "Calvo Sotelo",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "144250",
+   "candidates": [
+    {
+     "idTeam": "144250",
+     "team": "Calvo Sotelo Puertollano",
+     "location": "Puertollano, Ciudad Real, Castilla–La Mancha, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/krh52y1735230576.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 5535,
+   "name": "Badajoz",
+   "shortName": "Badajoz",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137750",
+   "candidates": [
+    {
+     "idTeam": "137750",
+     "team": "Badajoz",
+     "location": "Badajoz, Extremadura, Spain",
+     "league": "Spanish Segunda Federación Group 4",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2heu6p1690613064.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 133837,
+   "name": "CD Tarancon",
+   "shortName": "CD Tarancon",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "150488",
+   "candidates": [
+    {
+     "idTeam": "150488",
+     "team": "Tarancón",
+     "location": "Tarancón, Cuenca, Castilla–La Mancha, Spain",
+     "league": "Spanish Tercera Federación Group 18",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/f4et441735231180.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 6827,
+   "name": "Alcoyano",
+   "shortName": "Alcoyano",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140497",
+   "candidates": [
+    {
+     "idTeam": "140497",
+     "team": "Alcoyano",
+     "location": "Alcoy, Spain",
+     "league": "Spanish Segunda Federación Group 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/4f60su1639481382.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17573,
+   "name": "Trival Valderas",
+   "shortName": "Trival Valde",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150356",
+   "candidates": [
+    {
+     "idTeam": "150356",
+     "team": "Trival Valderas",
+     "location": "Alcorcón, Community of Madrid, Spain",
+     "league": "Spanish Tercera Federación Group 7",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/iajqel1734926818.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 19288,
+   "name": "CD Artistico Navalcarnero",
+   "shortName": "CDA Navalcarnero",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 22440,
+   "name": "Salamanca UDS",
+   "shortName": "Salamanca UDS",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138249",
+   "candidates": [
+    {
+     "idTeam": "138249",
+     "team": "Salamanca UDS",
+     "location": "Salamanca, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ea70171579897018.png",
      "score": 1
     }
    ]
