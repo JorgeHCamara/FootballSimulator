@@ -148,10 +148,11 @@ export function LeagueMenu() {
                 <div
                   id={id}
                   data-testid="menu-panel"
-                  className={`absolute top-full z-30 mt-1 rounded-xl border border-zinc-200 bg-white p-3 text-zinc-900 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 ${wide ? "left-1/2 w-[min(56rem,calc(100vw-2rem))] -translate-x-1/2" : "left-0 min-w-52"}`}
+                  className={`absolute top-full z-30 mt-1 rounded-xl border border-zinc-200 bg-white p-3 text-zinc-900 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 ${wide ? "left-1/2 w-[min(56rem,calc(100vw-2rem))] -translate-x-1/2" : "left-0 w-max min-w-52"}`}
                   onPointerEnter={cancelClose}
                 >
-                  <div className={`grid gap-x-4 gap-y-4 ${columns === 4 ? "grid-cols-4" : columns === 3 ? "grid-cols-3" : columns === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
+                  {/* Wide panels share their width in a grid; small ones size to their columns. */}
+                  <div className={wide ? `grid gap-4 ${columns === 4 ? "grid-cols-4" : "grid-cols-3"}` : "flex gap-6"}>
                     {group.countries.map((country) => (
                       <CountryColumn key={country.country} group={country} onPick={() => setOpen(null)} />
                     ))}

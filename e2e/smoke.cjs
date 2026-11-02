@@ -758,6 +758,10 @@ async function step(name, fn) {
       await desktop.waitForURL(/\/en\/championship$/);
       await menu.getByRole("button", { name: "South America" }).click();
       assert.deepEqual((await menu.locator('[data-testid="menu-panel"] p').allInnerTexts()).map((x) => x.trim().toLowerCase()), ["conmebol", "brazil"]);
+      // Small panels size to their columns: no column (or link) overlaps the next.
+      const [conmebol, brazil] = await Promise.all(["#menu-conmebol", "#menu-br"].map((id) => menu.locator(id).boundingBox()));
+      const widest = await menu.locator("#menu-conmebol a").evaluateAll((els) => Math.max(...els.map((e) => e.getBoundingClientRect().right)));
+      assert.ok(widest <= brazil.x && conmebol.x + conmebol.width <= brazil.x, `columns overlap: ${widest} > ${brazil.x}`);
       assert.deepEqual((await menu.locator("#menu-conmebol a").allInnerTexts()).map((x) => x.trim()), ["Copa Libertadores"]);
       await menu.getByRole("button", { name: "North America" }).click();
       assert.deepEqual((await menu.locator("#menu-us a").allInnerTexts()).map((x) => x.trim()), ["MLS"]);
