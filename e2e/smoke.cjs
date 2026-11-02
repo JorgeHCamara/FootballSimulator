@@ -375,6 +375,13 @@ async function step(name, fn) {
       await line.locator("input").nth(0).fill("4");
       await line.locator("input").nth(1).fill("3");
       assert.equal(await tie.getAttribute("data-winner"), await tie.getAttribute("data-home"));
+      // Every card in the round is as tall as the one with penalties, at 3 and 2 columns.
+      for (const width of [1280, 900]) {
+        await p.setViewportSize({ width, height: 900 });
+        const heights = await ties.evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().height)))]);
+        assert.equal(heights.length, 1, `equal card heights at ${width}px: ${heights.join(", ")}`);
+      }
+      await p.setViewportSize({ width: 1280, height: 900 });
       await tie.locator("input").nth(0).fill("2");
       await line.waitFor({ state: "detached" });
       assert.equal(await tie.getAttribute("data-winner"), await tie.getAttribute("data-home"));
@@ -471,6 +478,8 @@ async function step(name, fn) {
       assert.match(legs[0], /1st leg/);
       assert.match(legs[1], /2nd leg/);
       assert.match(await first.locator('[data-testid="cup-aggregate"]').innerText(), /Aggregate: .+ \d+–\d+ /);
+      const fifthHeights = await ties.evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().height)))]);
+      assert.equal(fifthHeights.length, 1, `equal two-legged card heights: ${fifthHeights.join(", ")}`);
       // Bracket: two-legged quarter- and semi-finals, a single neutral final.
       await bar.nth(8).click();
       const bracketTies = p.locator('[data-testid="cup-bracket"] [data-testid="cup-tie"]');

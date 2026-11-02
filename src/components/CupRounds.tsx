@@ -209,10 +209,13 @@ export function CupRounds(props: RoundsProps) {
       ) : round.drawn === "pending" && round.ties.length === 0 ? (
         <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" data-testid="round-grid">
-          {round.ties.map((tie) => (
-            <TieCard key={tie.game.id} tie={tie} {...props} />
-          ))}
+        <div className="space-y-3">
+          {/* Equal rows: every card in the round is as tall as the tallest (e.g. one with penalties). */}
+          <div className="grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-3" data-testid="round-grid">
+            {round.ties.map((tie) => (
+              <TieCard key={tie.game.id} tie={tie} {...props} />
+            ))}
+          </div>
           {round.drawn === "pending" && <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} />}
         </div>
       )}
