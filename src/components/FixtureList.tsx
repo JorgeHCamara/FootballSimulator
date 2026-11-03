@@ -408,7 +408,6 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
             {label && <span className="font-semibold"> · {label}</span>}
           </span>
         )}
-        {fixture.result && !prediction && <span className="font-semibold uppercase tracking-wide">{t("realResult")}</span>}
         {inlineDice && showInputsFor(fixture, prediction, editing) && !disabled && (
           <button
             type="button"

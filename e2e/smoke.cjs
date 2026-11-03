@@ -171,6 +171,11 @@ async function step(name, fn) {
       };
       assert.ok(lightness(colors.background) < 20, `dark background: ${colors.background}`);
       assert.ok(lightness(colors.color) > 80, `light text: ${colors.color}`);
+      // Played games show their score and kick-off only: no "Final" label that reads like a cup final.
+      await p.locator('[data-testid="matchday-select"]').selectOption({ index: 0 });
+      const played = p.locator('[data-testid="fixtures"] [data-testid="match-row"]');
+      assert.ok((await played.count()) > 0);
+      for (const row of await played.allInnerTexts()) assert.doesNotMatch(row, /\bfinal\b/i, row);
       await ctx.close();
     });
 
