@@ -159,7 +159,6 @@ export default async function LeaguePage({ params }: { params: Params }) {
   const faqPath = wording === "continentalGroups" ? `${faqKey}.${config.code}` : faqKey;
   const faq = (faqT.raw(faqPath) as FaqItem[]).map((item) => ({ q: fill(item.q, faqValues), a: fill(item.a, faqValues) }));
   const pageUrl = `${SITE_URL}/${locale}/${config.slug}`;
-  const lang = locale as SiteLocale;
   const intro =
     wording === "cupBracket"
       ? "introCupBracket"
@@ -296,20 +295,6 @@ export default async function LeaguePage({ params }: { params: Params }) {
               </li>
             ))}
           </ol>
-          <h2 className="pt-4 text-xl font-bold tracking-tight">{seo("otherLeagues")}</h2>
-          <ul className="flex flex-wrap gap-2">
-            {COMPETITIONS.filter((c) => c.slug !== config.slug).map((c) => (
-              <li key={c.slug}>
-                <Link
-                  href={`/${c.slug}`}
-                  className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium hover:border-pitch-500 dark:border-zinc-800 dark:bg-zinc-900"
-                >
-                  <Flag code={c.flag} width={18} />
-                  {c.simulatorName[lang]}
-                </Link>
-              </li>
-            ))}
-          </ul>
         </section>
         <Faq title={seo("faqTitle")} items={faq} />
       </div>

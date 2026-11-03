@@ -1,13 +1,11 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { COMPETITIONS } from "../config/competitions.ts";
-import type { SiteLocale } from "../config/leagues.ts";
 import { Link } from "../i18n/navigation.ts";
 import { Flag } from "./Flag.tsx";
 
 export function SiteFooter() {
   const t = useTranslations("Footer");
   const seo = useTranslations("Seo");
-  const locale = useLocale() as SiteLocale;
   return (
     <footer className="mt-16 border-t border-zinc-200 py-8 text-xs text-zinc-500 dark:border-zinc-800">
       <div className="mx-auto max-w-6xl px-4">
@@ -17,7 +15,7 @@ export function SiteFooter() {
               <li key={l.code}>
                 <Link href={`/${l.slug}`} className="flex items-center gap-1.5 text-zinc-600 hover:text-pitch-700 dark:text-zinc-400 dark:hover:text-pitch-100">
                   <Flag code={l.flag} width={16} />
-                  {l.simulatorName[locale]}
+                  {l.name}
                 </Link>
               </li>
             ))}

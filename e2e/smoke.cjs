@@ -1110,6 +1110,17 @@ async function step(name, fn) {
 
     assert.deepEqual(errors, [], `browser errors:\n${errors.join("\n")}`);
 
+    await step("footer lists every competition by name; no 'other simulators' block", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
+      const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
+      assert.equal(links.length, 40, "every competition once");
+      assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
+      assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
+      await p.close();
+    });
+
     await step("unknown league returns 404", async () => {
       const res = await page.goto(`${BASE_URL}/en/not-a-league`);
       assert.equal(res.status(), 404);
