@@ -177,6 +177,14 @@ function shapes(code: FlagCode) {
           <circle cx="15" cy="10" r="6" fill="#bc002d" />
         </>
       );
+    case "be":
+      return (
+        <>
+          <rect width="10" height="20" fill="#000000" />
+          <rect x="10" width="10" height="20" fill="#fdda24" />
+          <rect x="20" width="10" height="20" fill="#ef3340" />
+        </>
+      );
     case "tr":
       return (
         <>

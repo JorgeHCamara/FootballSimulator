@@ -835,7 +835,7 @@ async function step(name, fn) {
       await p.close();
     });
 
-    await step("J1 League, Scottish Premiership and Süper Lig: zones, menus", async () => {
+    await step("J1 League, Scottish Premiership, Süper Lig and Pro League: zones, menus", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       const zonesOf = () => p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
       await p.goto(`${BASE_URL}/en/j1-league`);
@@ -851,11 +851,16 @@ async function step(name, fn) {
       await menu.getByRole("button", { name: "Europe" }).click();
       assert.deepEqual((await menu.locator("#menu-gb-sct a").allInnerTexts()).map((x) => x.trim()), ["Scottish Premiership"]);
       assert.deepEqual((await menu.locator("#menu-tr a").allInnerTexts()).map((x) => x.trim()), ["Süper Lig"]);
+      assert.deepEqual((await menu.locator("#menu-be a").allInnerTexts()).map((x) => x.trim()), ["Pro League"]);
       await p.keyboard.press("Escape");
       await p.goto(`${BASE_URL}/en/super-lig`);
       const tsl = await zonesOf();
       assert.equal(tsl.length, 18);
       assert.deepEqual([tsl[0], tsl[1], tsl[2], tsl[3], tsl[4], tsl[15], tsl[17]], ["championsLeague", "championsLeagueQualifying", "europaLeague", "conferenceLeague", "", "relegation", "relegation"]);
+      await p.goto(`${BASE_URL}/en/belgian-pro-league`);
+      const bpl = await zonesOf();
+      assert.equal(bpl.length, 18);
+      assert.deepEqual([bpl[0], bpl[1], bpl[2], bpl[3], bpl[4], bpl[15], bpl[16], bpl[17]], ["championsLeague", "championsLeagueQualifying", "europaLeague", "conferenceLeague", "", "", "relegation", "relegation"]);
       await p.close();
     });
 
@@ -957,7 +962,7 @@ async function step(name, fn) {
       const panel = menu.locator('[data-testid="menu-panel"]');
       await panel.waitFor();
       const columns = (await panel.locator("p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(columns, ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
+      assert.deepEqual(columns, ["uefa", "belgium", "england", "france", "germany", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
       assert.deepEqual((await menu.locator("#menu-eu a").allInnerTexts()).map((x) => x.trim()), ["Champions League", "Europa League", "Conference League"]);
       const england = menu.locator("#menu-gb-eng");
       assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship", "League One", "League Two", "FA Cup"]);
@@ -1011,7 +1016,7 @@ async function step(name, fn) {
       assert.deepEqual(await countriesShown(), ["conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "peru", "uruguay"]);
       assert.equal(await rows.nth(3).getAttribute("aria-expanded"), "false");
       await rows.nth(0).tap();
-      assert.deepEqual(await countriesShown(), ["uefa", "england", "france", "germany", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
+      assert.deepEqual(await countriesShown(), ["uefa", "belgium", "england", "france", "germany", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();
@@ -1115,7 +1120,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 40, "every competition once");
+      assert.equal(links.length, 41, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();

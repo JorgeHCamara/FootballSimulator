@@ -36,7 +36,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -99,7 +99,7 @@ export interface LeagueGroup {
   zones?: readonly Zone[];
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct" | "tr";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct" | "tr" | "be";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -660,6 +660,31 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "europaLeague", from: 3, to: 3 },
       { kind: "conferenceLeague", from: 4, to: 4 },
       { kind: "relegation", from: 16, to: 18 },
+    ],
+  },
+  {
+    code: "BPL",
+    slug: "belgian-pro-league",
+    name: "Pro League",
+    country: "Belgium",
+    flag: "be",
+    simulatorName: { en: "Belgian Pro League Simulator", pt: "Simulador da Pro League belga", es: "Simulador de la Pro League belga" },
+    aka: { en: "Jupiler Pro League", pt: "Campeonato Belga", es: "Liga belga" },
+    teams: 18,
+    // 2026/27: back to 18 clubs and a plain 34-game league, no play-offs.
+    espn: { slug: "bel.1", seasons: "split" },
+    espnOnly: true,
+    tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadPoints"],
+    // Base case (the European places shift with the Belgian Cup winner and
+    // UEFA's coefficients): champion to the Champions League, 2nd to its
+    // qualifying rounds, 3rd to the Europa League, 4th to the Conference
+    // League qualifying; the bottom two go down.
+    zones: [
+      { kind: "championsLeague", from: 1, to: 1 },
+      { kind: "championsLeagueQualifying", from: 2, to: 2 },
+      { kind: "europaLeague", from: 3, to: 3 },
+      { kind: "conferenceLeague", from: 4, to: 4 },
+      { kind: "relegation", from: 17, to: 18 },
     ],
   },
   {
