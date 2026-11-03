@@ -1121,6 +1121,15 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("home page: no long list of every competition, feature cards stay", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en`);
+      const text = await p.locator("main").innerText();
+      assert.doesNotMatch(text, /A free football simulator for the top leagues/);
+      assert.match(text, /Your predictions[\s\S]*Realistic simulation[\s\S]*Season chances/);
+      await p.close();
+    });
+
     await step("unknown league returns 404", async () => {
       const res = await page.goto(`${BASE_URL}/en/not-a-league`);
       assert.equal(res.status(), 404);

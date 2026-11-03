@@ -38,9 +38,7 @@
     "featureChancesTitle": "Chances na temporada",
     "featureChancesBody": "10.000 temporadas simuladas mostram as chances de título, vaga continental e rebaixamento.",
     "heading": "Simulador de Futebol",
-    "tagline": "Simule a temporada antes que ela aconteça",
-    "aboutTitle": "Um simulador de futebol grátis para os principais campeonatos",
-    "aboutBody": "O Foot Simu é um simulador de futebol grátis para o Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Cada campeonato começa com a tabela e os jogos reais. Dê seus palpites ou simule as rodadas restantes e veja como podem terminar a briga pelo título, as vagas na Libertadores e na Champions e a luta contra o rebaixamento."
+    "tagline": "Simule a temporada antes que ela aconteça"
   },
   "Simulator": {
     "table": "Tabela",

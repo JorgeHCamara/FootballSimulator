@@ -38,9 +38,7 @@
     "featureChancesTitle": "Season chances",
     "featureChancesBody": "10,000 simulated seasons show the odds of the title, Europe and relegation.",
     "heading": "Football Simulator",
-    "tagline": "Simulate the season before it happens",
-    "aboutTitle": "A free football simulator for the top leagues",
-    "aboutBody": "Foot Simu is a free football simulator for the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Brasileirão Série A and Série B, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the Saudi Pro League, the J1 League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana. Each league starts from the real table and fixtures. Type your own predictions or simulate the remaining matches, and see how the title race, the European places and the relegation battle could end."
+    "tagline": "Simulate the season before it happens"
   },
   "Simulator": {
     "table": "Table",

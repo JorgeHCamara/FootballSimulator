@@ -88,8 +88,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </ul>
 
       <section className="space-y-4">
-        <h2 className="text-xl font-bold tracking-tight">{t("aboutTitle")}</h2>
-        <p className="max-w-3xl leading-relaxed text-zinc-600 dark:text-zinc-400">{t("aboutBody")}</p>
         <ul className="grid gap-4 sm:grid-cols-3">
           {features.map((f) => (
             <li key={f.title} className="rounded-xl border-l-4 border-pitch-500 bg-pitch-50 p-4 dark:bg-pitch-900/30">
