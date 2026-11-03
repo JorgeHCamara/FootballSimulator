@@ -177,6 +177,15 @@ function shapes(code: FlagCode) {
           <circle cx="15" cy="10" r="6" fill="#bc002d" />
         </>
       );
+    case "tr":
+      return (
+        <>
+          <rect width="30" height="20" fill="#e30a17" />
+          <circle cx="11" cy="10" r="5" fill="#ffffff" />
+          <circle cx="12.25" cy="10" r="4" fill="#e30a17" />
+          <polygon points="15.10,10.00 16.57,9.47 16.62,7.91 17.58,9.14 19.08,8.71 18.20,10.00 19.08,11.29 17.58,10.86 16.62,12.09 16.57,10.53" fill="#ffffff" />
+        </>
+      );
     case "us":
       // Simplified: 13 stripes and a plain canton (stars are unreadable at icon size).
       return (

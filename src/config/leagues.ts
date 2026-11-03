@@ -36,7 +36,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -99,7 +99,7 @@ export interface LeagueGroup {
   zones?: readonly Zone[];
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct" | "tr";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -636,6 +636,30 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "conferenceLeague", from: 4, to: 4 },
       { kind: "relegationPlayoff", from: 11, to: 11 },
       { kind: "relegation", from: 12, to: 12 },
+    ],
+  },
+  {
+    code: "TSL",
+    slug: "super-lig",
+    name: "Süper Lig",
+    country: "Turkey",
+    flag: "tr",
+    simulatorName: { en: "Süper Lig Simulator", pt: "Simulador da Süper Lig", es: "Simulador de la Süper Lig" },
+    aka: { en: "Trendyol Süper Lig", pt: "Campeonato Turco", es: "Liga turca" },
+    teams: 18,
+    espn: { slug: "tur.1", seasons: "split" },
+    espnOnly: true,
+    tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
+    // Base case (the European places shift with the Turkish Cup winner and
+    // UEFA's coefficients): champion to the Champions League, 2nd to its
+    // qualifying rounds, 3rd to the Europa League, 4th to the Conference
+    // League qualifying; the bottom three go down.
+    zones: [
+      { kind: "championsLeague", from: 1, to: 1 },
+      { kind: "championsLeagueQualifying", from: 2, to: 2 },
+      { kind: "europaLeague", from: 3, to: 3 },
+      { kind: "conferenceLeague", from: 4, to: 4 },
+      { kind: "relegation", from: 16, to: 18 },
     ],
   },
   {
