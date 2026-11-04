@@ -1,3 +1,4 @@
+import { domesticPriors } from "../../../lib/priors.ts";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -186,7 +187,14 @@ export default async function LeaguePage({ params }: { params: Params }) {
     loaded.kind === "league"
       ? [...loaded.data.teams, ...(external?.teams ?? []).filter((t) => !loaded.data.teams.some((own) => own.id === t.id))]
       : [];
-  const priorStrengths = loaded.kind === "league" && loaded.config.continental ? await getContinentalPriors(loaded.config, leagueTeams.map((t) => t.id)) : undefined;
+  // Starting ratings: continental competitions from each club's domestic
+  // league, domestic leagues from last season (src/data/priors).
+  const priorStrengths =
+    loaded.kind !== "league"
+      ? undefined
+      : loaded.config.continental
+        ? await getContinentalPriors(loaded.config, leagueTeams.map((t) => t.id))
+        : domesticPriors(loaded.config.code, loaded.data.seasonYear);
   const stepKey = (step: "step1" | "step2" | "step3") =>
     wording === "cupBracket" && step === "step2"
       ? "step2CupBracket"

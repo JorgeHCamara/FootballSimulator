@@ -1,3 +1,4 @@
+import { domesticModelOptions } from "./priors.ts";
 import { continentOf } from "../config/competitions.ts";
 import { LEAGUES, getLeagueByCode, type CompetitionCode, type LeagueConfig } from "../config/leagues.ts";
 import { tierStrength } from "../engine/cupModel.ts";
@@ -70,7 +71,8 @@ export async function getContinentalPriors(league: LeagueConfig, clubs: readonly
         try {
           const data = await getLeagueData(feeder);
           if (data.source !== "live") return null;
-          const model = buildLeagueModel(data.teams, data.fixtures, realResults(data.fixtures));
+          // The domestic model, with its own starting ratings (last season).
+          const model = buildLeagueModel(data.teams, data.fixtures, realResults(data.fixtures), domesticModelOptions(feeder, data.seasonYear));
           return { tier: LEAGUE_TIERS[feeder.code]!, strengths: model.strengths };
         } catch (error) {
           // Its clubs then start like clubs from leagues the site doesn't cover.

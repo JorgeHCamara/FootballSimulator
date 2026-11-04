@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
-import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
+import { buildLeagueModel, DOMESTIC_PRIOR_GAMES, type TeamStrength } from "../engine/ratings.ts";
 import {
   buildBracket,
   isShootoutId,
@@ -115,8 +115,12 @@ export function LeagueSimulator({
   // Ratings come from real results only: predictions shouldn't change how good a team is.
   const model = useMemo(
     () =>
-      buildLeagueModel(teams, fixtures, real, priorStrengths ? { priorStrengths: new Map(Object.entries(priorStrengths).map(([id, st]) => [Number(id), st])) } : {}),
-    [teams, fixtures, real, priorStrengths],
+      buildLeagueModel(teams, fixtures, real, {
+        // Domestic leagues: last season's ratings count for a good part of the season.
+        ...(league.continental ? {} : { priorGames: league.ratingPriorGames ?? DOMESTIC_PRIOR_GAMES }),
+        ...(priorStrengths ? { priorStrengths: new Map(Object.entries(priorStrengths).map(([id, st]) => [Number(id), st])) } : {}),
+      }),
+    [teams, fixtures, real, priorStrengths, league], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const baseOptions = useMemo(() => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}) }), [league.tiebreakers, deductions]);
 

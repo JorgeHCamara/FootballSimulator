@@ -13,6 +13,8 @@ export interface LeagueData {
   season: string;
   /** Stable key for saved predictions: a new season starts with a clean slate. */
   seasonKey: string;
+  /** The year the season starts (2026 = 2026/27): its starting ratings (src/data/priors). */
+  seasonYear?: number;
   source: "live" | "sample";
   /** Real post-season games (e.g. play-off legs) once the feed lists them. */
   postseason?: Fixture[];
@@ -107,6 +109,7 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
     fixtures,
     season: seasonLabel(season),
     seasonKey: `${league.code}:${season.id || season.startDate.slice(0, 4)}`,
+    seasonYear: Number(season.startDate.slice(0, 4)),
     source: "live",
     ...(postseason.length ? { postseason } : {}),
   };
@@ -211,6 +214,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       season: stages?.name ? `${stages.name} ${stages.yearOffset !== undefined ? year + stages.yearOffset : yearLabel}` : yearLabel,
       // Each tournament of a season (Apertura, Clausura) keeps its own predictions.
       seasonKey: `${baseKey}${stageSets.length > 1 && stages ? `:${stages.table}` : ""}`,
+      seasonYear: year,
       source: "live",
       ...(league.playoff && postseason.length ? { postseason: realPostseason(postseason) } : {}),
       ...(groups ? { groups } : {}),

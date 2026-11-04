@@ -1257,6 +1257,25 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("domestic chances carry a note on early-season estimates; continental ones don't", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      for (const [path, text] of [
+        ["en/premier-league", /Early in the season these chances are rough estimates, based on current form and last season's results\./],
+        ["pt/brasileirao", /No começo da temporada, essas chances são estimativas aproximadas/],
+        ["es/la-liga", /Al principio de la temporada, estas probabilidades son estimaciones aproximadas/],
+      ]) {
+        await p.goto(`${BASE_URL}/${path}`);
+        await p.getByRole("tab", { name: /Chances|Probabilidades/ }).click();
+        await p.locator('[data-testid="chances-note"]').waitFor({ timeout: 90000 });
+        assert.match(await p.locator('[data-testid="chances-note"]').innerText(), text);
+      }
+      await p.goto(`${BASE_URL}/en/champions-league`);
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="chances"] tbody tr').first().waitFor({ timeout: 90000 });
+      assert.equal(await p.locator('[data-testid="chances-note"]').count(), 0);
+      await p.close();
+    });
+
     await step("league pages explain their format and places", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/premier-league`);

@@ -16,7 +16,10 @@ export interface LeagueModel {
 }
 
 export interface ModelOptions {
-  /** Pseudo-games of prior evidence each team's rating is shrunk toward. */
+  /**
+   * Pseudo-games of prior evidence each team's rating is shrunk toward: after
+   * n games, this season's form weighs n / (n + priorGames).
+   */
   priorGames?: number;
   /** Pseudo-matches of prior evidence for the league goal averages. */
   priorMatches?: number;
@@ -25,19 +28,28 @@ export interface ModelOptions {
   defaultAwayGoals?: number;
   /** Optional starting strengths (e.g. last season); defaults to 1.0 for all teams. */
   priorStrengths?: ReadonlyMap<TeamId, TeamStrength>;
+  /** Passes of the opponent adjustment (0: raw goal ratios). */
+  iterations?: number;
 }
+
+/** Domestic leagues: last season's ratings count for this many games of this season's. */
+export const DOMESTIC_PRIOR_GAMES = 18;
 
 const DEFAULTS = {
   priorGames: 6,
+  iterations: 8,
   priorMatches: 30,
   defaultHomeGoals: 1.55,
   defaultAwayGoals: 1.25,
 } as const;
 
 /**
- * Estimates attack/defence strengths from played matches. Each team's raw ratio of
- * goals scored (conceded) to what an average team would have scored (conceded) in
- * the same home/away mix is shrunk toward the prior so early-season ratings stay sane.
+ * Estimates attack/defence strengths from played matches. Each team's ratio of
+ * goals scored (conceded) to what it would have scored (conceded) against the
+ * same opponents with an average attack and defence, in the same home/away mix,
+ * is shrunk toward its prior so early-season ratings stay sane. The opponents'
+ * strengths come from the previous pass, so scoring three against a strong
+ * defence counts for more than three against a weak one.
  */
 export function buildLeagueModel(
   teams: readonly Team[],
@@ -65,37 +77,48 @@ export function buildLeagueModel(
     (awayGoals + priorMatches * (options.defaultAwayGoals ?? DEFAULTS.defaultAwayGoals)) /
     (played + priorMatches);
 
-  const acc = new Map<TeamId, { games: number; gf: number; ga: number; xgf: number; xga: number }>();
-  for (const t of teams) acc.set(t.id, { games: 0, gf: 0, ga: 0, xgf: 0, xga: 0 });
+  // Each team's games: where it played, the goals, and the opponent.
+  const games = new Map<TeamId, { home: boolean; gf: number; ga: number; opponent: TeamId }[]>();
+  for (const t of teams) games.set(t.id, []);
   for (const f of fixtures) {
     const r = results[f.id];
     if (!r) continue;
-    const h = acc.get(f.homeId);
-    const a = acc.get(f.awayId);
+    const h = games.get(f.homeId);
+    const a = games.get(f.awayId);
     if (!h || !a) continue;
-    h.games++;
-    h.gf += r.home;
-    h.ga += r.away;
-    h.xgf += avgHomeGoals;
-    h.xga += avgAwayGoals;
-    a.games++;
-    a.gf += r.away;
-    a.ga += r.home;
-    a.xgf += avgAwayGoals;
-    a.xga += avgHomeGoals;
+    h.push({ home: true, gf: r.home, ga: r.away, opponent: f.awayId });
+    a.push({ home: false, gf: r.away, ga: r.home, opponent: f.homeId });
   }
 
-  const strengths = new Map<TeamId, TeamStrength>();
-  for (const t of teams) {
-    const s = acc.get(t.id)!;
-    const prior = options.priorStrengths?.get(t.id) ?? { attack: 1, defence: 1 };
-    const rawAttack = s.xgf > 0 ? s.gf / s.xgf : prior.attack;
-    const rawDefence = s.xga > 0 ? s.ga / s.xga : prior.defence;
-    const w = s.games / (s.games + priorGames);
-    strengths.set(t.id, {
-      attack: w * rawAttack + (1 - w) * prior.attack,
-      defence: w * rawDefence + (1 - w) * prior.defence,
-    });
+  const neutral = { attack: 1, defence: 1 };
+  const priorOf = (id: TeamId) => options.priorStrengths?.get(id) ?? neutral;
+  let strengths = new Map<TeamId, TeamStrength>(teams.map((t) => [t.id, priorOf(t.id)]));
+  const iterations = Math.max(1, options.iterations ?? DEFAULTS.iterations);
+  for (let pass = 0; pass < iterations; pass++) {
+    // Pass 0 compares with average opponents (raw ratios); later passes with the opponents' ratings.
+    const opponents = pass === 0 ? null : strengths;
+    const next = new Map<TeamId, TeamStrength>();
+    for (const t of teams) {
+      const own = games.get(t.id)!;
+      let gf = 0;
+      let ga = 0;
+      let xgf = 0;
+      let xga = 0;
+      for (const g of own) {
+        const opp = opponents?.get(g.opponent) ?? neutral;
+        gf += g.gf;
+        ga += g.ga;
+        xgf += (g.home ? avgHomeGoals : avgAwayGoals) * opp.defence;
+        xga += (g.home ? avgAwayGoals : avgHomeGoals) * opp.attack;
+      }
+      const prior = priorOf(t.id);
+      const w = own.length / (own.length + priorGames);
+      next.set(t.id, {
+        attack: w * (xgf > 0 ? gf / xgf : prior.attack) + (1 - w) * prior.attack,
+        defence: w * (xga > 0 ? ga / xga : prior.defence) + (1 - w) * prior.defence,
+      });
+    }
+    strengths = next;
   }
 
   return { avgHomeGoals, avgAwayGoals, strengths };

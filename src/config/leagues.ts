@@ -123,6 +123,11 @@ export interface LeagueConfig {
   teams: number;
   /** League games per club; defaults to a double round robin, (teams − 1) × 2. */
   gamesPerTeam?: number;
+  /**
+   * Games of prior evidence (last season's ratings) each club's rating starts
+   * with; defaults to DOMESTIC_PRIOR_GAMES. Continental competitions use their own.
+   */
+  ratingPriorGames?: number;
   /** Separate tables (MLS conferences); zones then apply within each group. */
   groups?: readonly LeagueGroup[];
   /**

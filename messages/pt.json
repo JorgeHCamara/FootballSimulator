@@ -158,7 +158,8 @@
       "PER": "Aproximado: as vagas na Libertadores são definidas num playoff entre os campeões de torneio e os mais bem colocados, e o regulamento oficial pode ser diferente. Os pontos descontados são os da classificação atual da ESPN."
     },
     "pointsDeducted": "{points} pontos descontados",
-    "aclEliteChance": "ACL Elite"
+    "aclEliteChance": "ACL Elite",
+    "chancesEarlyNote": "No começo da temporada, essas chances são estimativas aproximadas, com base na fase atual e nos resultados da temporada passada."
   },
   "Zones": {
     "championsLeague": "Champions League",

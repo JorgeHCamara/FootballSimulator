@@ -158,7 +158,8 @@
       "PER": "Approximate: the Copa Libertadores places are decided by a play-off between the tournament champions and the best-placed clubs, and the official rules may differ. Points deductions are those in ESPN's current standings."
     },
     "pointsDeducted": "{points} points deducted",
-    "aclEliteChance": "ACL Elite"
+    "aclEliteChance": "ACL Elite",
+    "chancesEarlyNote": "Early in the season these chances are rough estimates, based on current form and last season's results."
   },
   "Zones": {
     "championsLeague": "Champions League",

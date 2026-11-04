@@ -1,3 +1,4 @@
+import { domesticModelOptions } from "./priors.ts";
 import type { CupConfig, CupRoundKey } from "../config/cups.ts";
 import { LEAGUES, type CompetitionCode } from "../config/leagues.ts";
 import { withFallbackCrests } from "../config/crests.ts";
@@ -86,7 +87,7 @@ async function loadFeeders(cup: CupConfig) {
       const league = LEAGUES.find((l) => l.code === code)!;
       try {
         const data = await getLeagueData(league);
-        feeders.push({ tier, model: buildLeagueModel(data.teams, data.fixtures, realResults(data.fixtures)) });
+        feeders.push({ tier, model: buildLeagueModel(data.teams, data.fixtures, realResults(data.fixtures), domesticModelOptions(league, data.seasonYear)) });
         members[code] = data.teams.map((t) => t.id);
         for (const team of data.teams) {
           teams.set(team.id, team);

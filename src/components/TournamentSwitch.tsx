@@ -160,6 +160,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           seasonKey={live.seasonKey}
           season={live.season}
           {...(annual.champions.length ? { qualifiedElsewhere: annual.champions.map((c) => c.id) } : {})}
+          {...(priorStrengths ? { priorStrengths } : {})}
           {...(notes.length ? { qualifiedNote: notes.join(" ") } : {})}
           {...(deductions ? { deductions } : {})}
         />

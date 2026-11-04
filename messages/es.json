@@ -158,7 +158,8 @@
       "PER": "Aproximado: los cupos a la Copa Libertadores se definen en un playoff entre los campeones de torneo y los mejor ubicados, y el reglamento oficial puede ser distinto. Los puntos descontados son los de la clasificación actual de ESPN."
     },
     "pointsDeducted": "{points} puntos descontados",
-    "aclEliteChance": "ACL Élite"
+    "aclEliteChance": "ACL Élite",
+    "chancesEarlyNote": "Al principio de la temporada, estas probabilidades son estimaciones aproximadas, basadas en la forma actual y en los resultados de la temporada pasada."
   },
   "Zones": {
     "championsLeague": "Champions League",
