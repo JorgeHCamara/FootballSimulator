@@ -26,7 +26,7 @@ import {
 } from "./cup.ts";
 import { CUP_AVG_AWAY_GOALS, CUP_AVG_HOME_GOALS, buildCupModel, cupModelFor, tierStrength } from "./cupModel.ts";
 import { runCupMonteCarlo } from "./cupMontecarlo.ts";
-import { expectedGoals } from "./match.ts";
+import { expectedGoals, expectedGoalsNeutral, likelyScoreSet } from "./match.ts";
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
 import type { Fixture, ResultMap, TeamId } from "./types.ts";
@@ -335,7 +335,22 @@ describe("Copa do Brasil (two legs, Série A entering in the fifth round, neutra
     assert.ok(cupWinner(rounds, results) !== null);
   });
 
-  it("runs the Monte Carlo through two-legged rounds", () => {
+  it("Simulate all with likely rolls: every leg of every two-legged tie from its likely set", () => {
+    const results = simulateCup(copa, real, {}, model, createRng(8), copaOptions, { likely: true });
+    let checked = 0;
+    for (const tie of buildCup(copa, real, results, copaOptions).flatMap((r) => r.ties)) {
+      for (const leg of tie.legs) {
+        const score = results[leg.id];
+        if (!score || isCupShootoutId(leg.id)) continue;
+        const xg = leg.neutral ? expectedGoalsNeutral(model, leg.homeId, leg.awayId) : expectedGoals(model, leg.homeId, leg.awayId);
+        assert.ok(likelyScoreSet(xg, model.rho).some((s) => s.home === score.home && s.away === score.away), `${score.home}-${score.away}`);
+        checked++;
+      }
+    }
+    assert.ok(checked > 30, `${checked} legs`);
+  });
+
+    it("runs the Monte Carlo through two-legged rounds", () => {
     const mc = runCupMonteCarlo({ config: copa, real, fixed: {}, strengths: {}, options: { entrants: { fifthRound: serieA } }, iterations: 40, seed: 5 });
     for (const [r, clubs] of [[4, 32], [5, 16], [6, 8], [7, 4], [8, 2]] as const) {
       assert.equal(Object.values(mc.reached).reduce((n, c) => n + c[r]!, 0), 40 * clubs, `round ${r}`);
@@ -509,5 +524,69 @@ describe("DFB-Pokal (amateur clubs host professional ones)", () => {
       assert.equal(r16.ties.length, 8);
       for (const tie of r16.ties) assert.ok(!(tiers[tie.homeId]! < 2 && tiers[tie.awayId]! >= 2), `pro hosts amateur: ${tie.homeId} v ${tie.awayId}`);
     }
+  });
+});
+
+describe("cup buttons fill in likely rolls; the cup chances keep the full distribution", () => {
+  // Clubs of different strengths, so the likely sets differ from game to game.
+  const strengths = new Map(
+    [...firstRound, ...entrants.thirdRound].map((id) => [id, { attack: 0.7 + ((id * 37) % 60) / 60, defence: 0.7 + ((id * 53) % 60) / 60 }]),
+  );
+  const varied: LeagueModel = { avgHomeGoals: 1.5, avgAwayGoals: 1.2, strengths, rho: -0.1 };
+  /** Every simulated game (not a shoot-out) has a score from its likely set. */
+  const assertLikely = (config: typeof faCup, real: readonly RealCupTie[], results: ResultMap, buildOptions: Parameters<typeof buildCup>[3]) => {
+    const rounds = buildCup(config, real, results, buildOptions);
+    let checked = 0;
+    for (const tie of rounds.flatMap((r) => r.ties)) {
+      for (const leg of tie.legs) {
+        const score = results[leg.id];
+        if (!score || isCupShootoutId(leg.id)) continue;
+        const xg = leg.neutral ? expectedGoalsNeutral(varied, leg.homeId, leg.awayId) : expectedGoals(varied, leg.homeId, leg.awayId);
+        const set = likelyScoreSet(xg, varied.rho);
+        assert.ok(set.some((s) => s.home === score.home && s.away === score.away), `${leg.homeId} v ${leg.awayId}: ${score.home}-${score.away}`);
+        checked++;
+      }
+    }
+    return checked;
+  };
+
+  it("Simulate round: every game of the round from its likely set", () => {
+    const round = buildCup(faCup, realFirstRound, {}, options)[0]!;
+    for (const seed of [1, 2, 3]) {
+      const added = simulateCupRound(round, {}, varied, createRng(seed), { likely: true });
+      assert.equal(assertLikely(faCup, realFirstRound, added, options), 40);
+    }
+  });
+
+  it("Simulate all: every game down to the final from its likely set", () => {
+    for (const seed of [4, 5]) {
+      const results = simulateCup(faCup, realFirstRound, {}, varied, createRng(seed), options, { likely: true });
+      assert.equal(assertLikely(faCup, realFirstRound, results, options), 40 + 20 + 32 + 16 + 8 + 4 + 2 + 1);
+      assert.ok(cupWinner(buildCup(faCup, realFirstRound, results, options), results) !== null);
+    }
+  });
+
+  it("without the option, games can come out of the likely set (the full distribution)", () => {
+    const round = buildCup(faCup, realFirstRound, {}, options)[0]!;
+    let outside = 0;
+    for (let seed = 1; seed <= 10; seed++) {
+      const added = simulateCupRound(round, {}, varied, createRng(seed));
+      for (const tie of round.ties) {
+        const score = added[tie.game.id]!;
+        const set = likelyScoreSet(expectedGoals(varied, tie.game.homeId, tie.game.awayId), varied.rho);
+        if (!set.some((s) => s.home === score.home && s.away === score.away)) outside++;
+      }
+    }
+    assert.ok(outside > 0);
+  });
+
+  it("the cup chances are the same as before for the same seed", () => {
+    const strengths = Object.fromEntries(entrants.thirdRound.map((id) => [id, { attack: 1 + (45 - id) / 50, defence: 1 - (45 - id) / 120 }]));
+    const mc = runCupMonteCarlo({ config: faCup, real: realFirstRound, fixed: {}, strengths, options: { entrants }, iterations: 300, seed: 11 });
+    // Recorded with the code before the cup buttons' likely rolls: titles and finals by club.
+    const won: Record<string, number> = {"1": 31, "2": 25, "3": 24, "4": 14, "5": 23, "6": 9, "7": 10, "8": 12, "9": 14, "10": 11, "11": 15, "12": 17, "13": 9, "14": 10, "15": 10, "16": 6, "17": 4, "18": 6, "19": 3, "20": 6, "21": 4, "22": 2, "23": 3, "24": 7, "25": 3, "26": 2, "27": 4, "28": 1, "29": 2, "30": 2, "31": 1, "32": 1, "33": 1, "36": 2, "37": 1, "38": 1, "40": 3, "44": 1};
+    const finals: Record<string, number> = {"1": 51, "2": 38, "3": 43, "4": 22, "5": 42, "6": 20, "7": 19, "8": 27, "9": 29, "10": 19, "11": 30, "12": 28, "13": 18, "14": 24, "15": 16, "16": 10, "17": 14, "18": 12, "19": 13, "20": 11, "21": 13, "22": 6, "23": 6, "24": 12, "25": 8, "26": 9, "27": 9, "28": 4, "29": 5, "30": 5, "31": 1, "32": 2, "33": 8, "34": 2, "35": 1, "36": 4, "37": 3, "38": 3, "39": 2, "40": 4, "41": 3, "42": 2, "44": 2};
+    assert.deepEqual(Object.fromEntries(Object.entries(mc.won).filter(([, n]) => n > 0)), won);
+    assert.deepEqual(Object.fromEntries(Object.entries(mc.reached).filter(([, c]) => c[7]! > 0).map(([id, c]) => [id, c[7]])), finals);
   });
 });

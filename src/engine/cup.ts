@@ -370,10 +370,15 @@ export function clubsAlive(rounds: readonly CupRound[], results: ResultMap, allE
 }
 
 /** Simulates a round's unplayed games and needed shoot-outs; returns the new results only. */
-export function simulateCupRound(round: CupRound, known: ResultMap, model: LeagueModel, rng: Rng): ResultMap {
+/**
+ * Simulates a round's games and shoot-outs. With `likely`, the games get
+ * likely rolls (the "Simulate round" and "Simulate all" buttons); without,
+ * the full score distribution.
+ */
+export function simulateCupRound(round: CupRound, known: ResultMap, model: LeagueModel, rng: Rng, { likely = false }: { likely?: boolean } = {}): ResultMap {
   const added: ResultMap = {};
   const now = () => ({ ...known, ...added });
-  Object.assign(added, simulateFixtures(round.ties.flatMap((t) => t.legs).filter((g) => !scoreOf(g, known)), now(), model, rng));
+  Object.assign(added, simulateFixtures(round.ties.flatMap((t) => t.legs).filter((g) => !scoreOf(g, known)), now(), model, rng, { likely }));
   for (const tie of round.ties) {
     if (needsShootout(tie, now()) && !scoreOf(tie.shootout, now())) added[tie.shootout.id] = simulatePenalties(rng);
   }
@@ -391,13 +396,15 @@ export function simulateCup(
   model: LeagueModel,
   rng: Rng,
   options: CupBuildOptions,
+  /** Likely rolls for the games (the "Simulate all" button); see simulateCupRound. */
+  { likely = false }: { likely?: boolean } = {},
 ): ResultMap {
   const added: ResultMap = {};
   for (let r = 0; r < config.rounds.length; r++) {
     const now = { ...known, ...added };
     const round = buildCup(config, real, now, options)[r]!;
     if (round.drawn === "pending") break;
-    Object.assign(added, simulateCupRound(round, now, model, rng));
+    Object.assign(added, simulateCupRound(round, now, model, rng, { likely }));
   }
   return added;
 }

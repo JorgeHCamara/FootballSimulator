@@ -137,12 +137,13 @@ export function CupSimulator({ cup, data }: Props) {
 
   const simulateRound = () => {
     if (round.drawn === "pending") return;
-    applyResults(seasonKey, simulateCupRound(round, season.predictions, model, createRng(randomSeed())));
+    // Likely rolls, as for the dice; the cup chances keep the full distribution.
+    applyResults(seasonKey, simulateCupRound(round, season.predictions, model, createRng(randomSeed()), { likely: true }));
     // Show the next round, which has just been drawn.
     if (roundIndex < rounds.length - 1) setRoundIndex(roundIndex + 1);
   };
   const simulateAll = () => {
-    applyResults(seasonKey, simulateCup(cup, data.real, season.predictions, model, createRng(randomSeed()), buildOptions));
+    applyResults(seasonKey, simulateCup(cup, data.real, season.predictions, model, createRng(randomSeed()), buildOptions, { likely: true }));
     setRoundIndex(rounds.length - 1);
   };
   const simulateOne = (fixture: Fixture) => {

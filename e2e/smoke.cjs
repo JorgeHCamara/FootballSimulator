@@ -214,6 +214,31 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("cup buttons: Simulate round and Simulate to the final fill in realistic scores", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const goals = () =>
+        p.locator('[data-testid="match-row"]').evaluateAll((rows) =>
+          rows.map((r) => [...r.querySelectorAll('input[type="number"]')].slice(0, 2).map((x) => Number(x.value || 0))).filter((s) => s.length === 2),
+        );
+      await p.goto(`${BASE_URL}/en/fa-cup`);
+      await p.getByRole("button", { name: "Simulate round" }).click();
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      // Every round's games (shown round by round): none a long shot.
+      const select = p.locator("select").first();
+      const rounds = await select.locator("option").count().catch(() => 0);
+      let checked = 0;
+      for (let r = 0; r < Math.max(1, rounds); r++) {
+        if (rounds) await select.selectOption({ index: r });
+        for (const [home, away] of await goals()) {
+          assert.ok(home + away <= 5, `${home}-${away}`);
+          checked++;
+        }
+      }
+      assert.ok(checked > 0);
+      await p.close();
+    });
+
     await step("icons are Lucide icons, not emojis", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       const emoji = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1D400}-\u{1D7FF}]/u;
