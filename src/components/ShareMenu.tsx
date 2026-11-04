@@ -190,7 +190,7 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
         <button
           type="button"
           onClick={onPrimary}
-          className="flex h-11 grow items-center justify-center gap-2 rounded-lg bg-pitch-600 px-4 text-base font-semibold text-white active:bg-pitch-700"
+          className="flex h-11 shrink-0 grow items-center justify-center gap-2 rounded-lg bg-pitch-600 px-4 text-base font-semibold text-white active:bg-pitch-700"
           data-testid="share-button"
         >
           <ShareIcon />
@@ -201,11 +201,13 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
             type="button"
             onClick={() => void shareImage()}
             disabled={image.state === "loading"}
-            className="flex h-11 items-center justify-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900"
+            className="flex h-11 min-w-0 items-center justify-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900"
+            aria-label={imageLabel}
             data-testid="share-image"
           >
-            <Icon name="image" />
-            <span className="max-w-32 truncate">{imageLabel}</span>
+            <Icon name="image" className="shrink-0" />
+            {/* Narrow phones: the icon alone, so the bar never runs past the screen. */}
+            <span className="hidden min-w-0 max-w-32 truncate min-[375px]:block">{imageLabel}</span>
           </button>
         )}
         <button
@@ -241,7 +243,7 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
 }
 
 function ShareIcon() {
-  return <Icon name="share" />;
+  return <Icon name="share" className="shrink-0" />;
 }
 
 /** Lucide has no brand logos: generic icons for each network. */
