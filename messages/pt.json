@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Championship, League One, League Two, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Championship, League One, League Two, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
@@ -185,6 +185,9 @@
     "championshipPlayoffs": "Play-offs do título",
     "europePlayoffs": "Play-offs europeus",
     "relegationPlayouts": "Play-outs do rebaixamento",
+    "championshipGroup": "Grupo do título",
+    "qualificationGroup": "Grupo de qualificação",
+    "conferenceLeaguePlayoff": "Play-off da Conference League",
     "aclElite": "Liga dos Campeões da AFC Elite",
     "aclEliteQualifying": "Fase preliminar da ACL Elite",
     "aclTwo": "Liga dos Campeões da AFC Two",
@@ -287,7 +290,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A e B, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -502,7 +505,8 @@
     "Scotland": "Escócia",
     "Turkey": "Turquia",
     "Belgium": "Bélgica",
-    "Greece": "Grécia"
+    "Greece": "Grécia",
+    "Austria": "Áustria"
   },
   "Cup": {
     "fixtures": "Jogos",

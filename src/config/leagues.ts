@@ -27,6 +27,9 @@ export type ZoneKind =
   | "championshipPlayoffs"
   | "europePlayoffs"
   | "relegationPlayouts"
+  | "championshipGroup"
+  | "qualificationGroup"
+  | "conferenceLeaguePlayoff"
   | "titlePlayoffs"
   | "knockoutRoundOf16"
   | "knockoutPlayoff"
@@ -40,7 +43,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL" | "ABL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -103,7 +106,7 @@ export interface LeagueGroup {
   zones?: readonly Zone[];
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct" | "tr" | "be" | "gr";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct" | "tr" | "be" | "gr" | "at";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -781,6 +784,75 @@ export const LEAGUES: readonly LeagueConfig[] = [
         name: { en: "Relegation play-outs", pt: "Play-outs do rebaixamento", es: "Play-outs del descenso" },
         shortName: { en: "Relegation", pt: "Rebaixamento", es: "Descenso" },
         zones: [{ kind: "relegation", from: 5, to: 6 }],
+      },
+    ],
+  },
+  {
+    code: "ABL",
+    slug: "austrian-bundesliga",
+    name: "Austrian Bundesliga",
+    country: "Austria",
+    flag: "at",
+    simulatorName: { en: "Austrian Bundesliga Simulator", pt: "Simulador da Bundesliga austríaca", es: "Simulador de la Bundesliga austriaca" },
+    aka: { en: "ADMIRAL Bundesliga", pt: "Campeonato Austríaco", es: "Liga austriaca" },
+    teams: 12,
+    // 2026/27: 22 games (home and away), then the table splits into a
+    // championship group (1st–6th) and a qualification group (7th–12th), each
+    // home and away within itself (10 more games). From this season the
+    // points are carried over in full (no more halving).
+    espn: { slug: "aut.1", seasons: "split" },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadGoalDifference"],
+    split: {
+      afterRound: 22,
+      espnStage: "regular-season",
+      groups: [
+        { size: 6, legs: 2 },
+        { size: 6, legs: 2 },
+      ],
+      finalZones: [
+        { kind: "title", from: 1, to: 1 },
+        { kind: "championsLeagueQualifying", from: 2, to: 2 },
+        { kind: "conferenceLeague", from: 3, to: 3 },
+        { kind: "conferenceLeaguePlayoff", from: 4, to: 5 },
+        { kind: "conferenceLeaguePlayoff", from: 7, to: 7 },
+        { kind: "relegation", from: 12, to: 12 },
+      ],
+    },
+    // Before the split: where each place leads.
+    zones: [
+      { kind: "championshipGroup", from: 1, to: 6 },
+      { kind: "qualificationGroup", from: 7, to: 12 },
+    ],
+    // After it (ESPN's standings groups), base case with five European places
+    // (they shift with the Austrian Cup winner and UEFA's coefficients): the
+    // champion to the Champions League, 2nd to its qualifying rounds, 3rd to
+    // the Conference League; the qualification group's winner plays 5th, and
+    // that winner 4th, for the last Conference League place; the
+    // qualification group's last goes down.
+    groupsOptional: true,
+    groups: [
+      {
+        id: "1",
+        espnName: "Championship",
+        name: { en: "Championship group", pt: "Grupo do título", es: "Grupo por el título" },
+        shortName: { en: "Title", pt: "Título", es: "Título" },
+        zones: [
+          { kind: "title", from: 1, to: 1 },
+          { kind: "championsLeagueQualifying", from: 2, to: 2 },
+          { kind: "conferenceLeague", from: 3, to: 3 },
+          { kind: "conferenceLeaguePlayoff", from: 4, to: 5 },
+        ],
+      },
+      {
+        id: "2",
+        espnName: "Relegation",
+        name: { en: "Qualification group", pt: "Grupo de qualificação", es: "Grupo de clasificación" },
+        shortName: { en: "Qualification", pt: "Qualificação", es: "Clasificación" },
+        zones: [
+          { kind: "conferenceLeaguePlayoff", from: 1, to: 1 },
+          { kind: "relegation", from: 6, to: 6 },
+        ],
       },
     ],
   },

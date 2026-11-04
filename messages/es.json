@@ -1,7 +1,7 @@
 {
   "Metadata": {
     "homeTitle": "Simulador de Fútbol – Simula LaLiga, Premier League, Brasileirão y más",
-    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Brasileirão, Liga Profesional Argentina, Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana. Clasificación en directo y probabilidades de título, Europa y descenso.",
+    "homeDescription": "Simulador de fútbol gratis: predice o simula todos los partidos restantes de LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Bundesliga austriaca, Brasileirão, Liga Profesional Argentina, Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana. Clasificación en directo y probabilidades de título, Europa y descenso.",
     "leagueTitle": "{simulator} {season} – Predice la Clasificación",
     "leagueDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Europa y descenso.",
     "leagueDescriptionPlayoffs": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira las clasificaciones de las conferencias en directo y las probabilidades de cada equipo de llegar a los playoffs.",
@@ -185,6 +185,9 @@
     "championshipPlayoffs": "Play-offs por el título",
     "europePlayoffs": "Play-offs europeos",
     "relegationPlayouts": "Play-outs del descenso",
+    "championshipGroup": "Grupo por el título",
+    "qualificationGroup": "Grupo de clasificación",
+    "conferenceLeaguePlayoff": "Play-off de la Conference League",
     "aclElite": "Liga de Campeones de la AFC Élite",
     "aclEliteQualifying": "Fase preliminar de la ACL Élite",
     "aclTwo": "Liga de Campeones de la AFC Two",
@@ -287,7 +290,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Brasileirão Série A y Série B, la Liga Profesional Argentina, la Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Bundesliga austriaca, Brasileirão Série A y Série B, la Liga Profesional Argentina, la Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",
@@ -502,7 +505,8 @@
     "Scotland": "Escocia",
     "Turkey": "Turquía",
     "Belgium": "Bélgica",
-    "Greece": "Grecia"
+    "Greece": "Grecia",
+    "Austria": "Austria"
   },
   "Cup": {
     "fixtures": "Partidos",

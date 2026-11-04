@@ -864,6 +864,7 @@ async function step(name, fn) {
       assert.deepEqual((await menu.locator("#menu-tr a").allInnerTexts()).map((x) => x.trim()), ["Süper Lig"]);
       assert.deepEqual((await menu.locator("#menu-be a").allInnerTexts()).map((x) => x.trim()), ["Pro League"]);
       assert.deepEqual((await menu.locator("#menu-gr a").allInnerTexts()).map((x) => x.trim()), ["Super League Greece"]);
+      assert.deepEqual((await menu.locator("#menu-at a").allInnerTexts()).map((x) => x.trim()), ["Austrian Bundesliga"]);
       await p.keyboard.press("Escape");
       await p.goto(`${BASE_URL}/en/super-lig`);
       const tsl = await zonesOf();
@@ -939,6 +940,38 @@ async function step(name, fn) {
       await gsl.first().waitFor();
       assert.equal(await gsl.nth(1).getAttribute("aria-pressed"), "true", "the play-offs show first once known");
       assert.ok((await rowTexts()).every((r) => playedOf(r) === 6));
+      await p.close();
+    });
+
+    await step("Austrian Bundesliga: the regular season, then the championship and qualification groups", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const zonesOf = () => p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
+      const playedOf = (text) => Number(text.split(/\s+/).find((x, i, all) => i > 1 && /^\d+$/.test(x) && !/^\d+$/.test(all[i - 1] ?? "")));
+      await p.goto(`${BASE_URL}/en/austrian-bundesliga`);
+      const tabs = p.locator('[data-testid="group-switch"] button');
+      const select = p.locator('[data-testid="matchday-select"]');
+      assert.deepEqual(await tabs.allInnerTexts(), ["Regular season", "Championship group", "Qualification group"]);
+      const before = await zonesOf();
+      assert.deepEqual(before, [...Array(6).fill("championshipGroup"), ...Array(6).fill("qualificationGroup")]);
+      const options = (await select.locator("option").allInnerTexts()).map((x) => x.trim());
+      assert.equal(options.length, 22 + 10 + 10);
+      assert.deepEqual([options[21], options[22], options[32], options[41]], ["Matchday 22", "Championship group 1", "Qualification group 1", "Qualification group 10"]);
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await tabs.nth(1).click();
+      await p.waitForFunction(() => document.querySelectorAll('[data-testid="standings-row"]').length === 6 && !/1st place/.test(document.querySelector('[data-testid="standings"]')?.textContent ?? ""));
+      assert.deepEqual(await zonesOf(), ["title", "championsLeagueQualifying", "conferenceLeague", "conferenceLeaguePlayoff", "conferenceLeaguePlayoff", ""]);
+      assert.ok((await p.locator('[data-testid="standings-row"]').allInnerTexts()).every((r) => playedOf(r) === 10), "10 group games each");
+      // Points carried over in full: a club's carried points are its regular-season points.
+      await tabs.nth(0).click();
+      await p.waitForFunction(() => document.querySelectorAll('[data-testid="standings-row"]').length === 12);
+      const leader = (await p.locator('[data-testid="standings-row"]').first().locator('[data-testid="points"]').innerText()).trim();
+      await tabs.nth(1).click();
+      await p.waitForFunction(() => document.querySelectorAll('[data-testid="carried"]').length === 6);
+      const carried = await p.locator('[data-testid="carried"]').allInnerTexts();
+      assert.ok(carried.includes(leader), `the regular-season leader's ${leader} points carried over in full`);
+      await tabs.nth(2).click();
+      await p.waitForFunction(() => document.querySelector('[data-testid="standings-row"]')?.dataset.zone === "conferenceLeaguePlayoff");
+      assert.deepEqual(await zonesOf(), ["conferenceLeaguePlayoff", "", "", "", "", "relegation"]);
       await p.close();
     });
 
@@ -1056,7 +1089,7 @@ async function step(name, fn) {
       const panel = menu.locator('[data-testid="menu-panel"]');
       await panel.waitFor();
       const columns = (await panel.locator("p").allInnerTexts()).map((x) => x.trim().toLowerCase());
-      assert.deepEqual(columns, ["uefa", "belgium", "england", "france", "germany", "greece", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
+      assert.deepEqual(columns, ["uefa", "austria", "belgium", "england", "france", "germany", "greece", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
       assert.deepEqual((await menu.locator("#menu-eu a").allInnerTexts()).map((x) => x.trim()), ["Champions League", "Europa League", "Conference League"]);
       const england = menu.locator("#menu-gb-eng");
       assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship", "League One", "League Two", "FA Cup"]);
@@ -1112,7 +1145,7 @@ async function step(name, fn) {
       assert.deepEqual(await countriesShown(), ["conmebol", "argentina", "brazil", "chile", "colombia", "ecuador", "paraguay", "peru", "uruguay"]);
       assert.equal(await rows.nth(3).getAttribute("aria-expanded"), "false");
       await rows.nth(0).tap();
-      assert.deepEqual(await countriesShown(), ["uefa", "belgium", "england", "france", "germany", "greece", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
+      assert.deepEqual(await countriesShown(), ["uefa", "austria", "belgium", "england", "france", "germany", "greece", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
       await phone.keyboard.press("Escape");
       await mobile.waitFor({ state: "detached" });
       await burger.tap();
@@ -1216,7 +1249,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 42, "every competition once");
+      assert.equal(links.length, 43, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();

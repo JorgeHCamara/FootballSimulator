@@ -191,6 +191,13 @@ function shapes(code: FlagCode) {
           <circle cx="15" cy="10" r="6" fill="#bc002d" />
         </>
       );
+    case "at":
+      return (
+        <>
+          <rect width="30" height="20" fill="#c8102e" />
+          <rect y="6.667" width="30" height="6.667" fill="#ffffff" />
+        </>
+      );
     case "be":
       return (
         <>

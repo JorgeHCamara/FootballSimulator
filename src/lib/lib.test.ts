@@ -461,6 +461,7 @@ describe("continental competitions (UEFA, CONMEBOL)", async () => {
     assert.ok(groups[0]!.countries.some((c) => c.country === "Turkey" && c.leagues.some((l) => l.name === "Süper Lig")));
     assert.ok(groups[0]!.countries.some((c) => c.country === "Belgium" && c.leagues.some((l) => l.name === "Pro League")));
     assert.ok(groups[0]!.countries.some((c) => c.country === "Greece" && c.leagues.some((l) => l.name === "Super League Greece")));
+    assert.ok(groups[0]!.countries.some((c) => c.country === "Austria" && c.leagues.some((l) => l.name === "Austrian Bundesliga")));
     assert.deepEqual(uefa.leagues.map((l) => l.name), ["Champions League", "Europa League", "Conference League"]);
     assert.deepEqual(groups[1]!.countries.map((c) => c.country), ["Brazil", "Argentina", "Chile", "Colombia", "Uruguay", "Paraguay", "Ecuador", "Peru", "CONMEBOL"]);
     const conmebol = groups[1]!.countries.find((c) => c.country === "CONMEBOL")!;
