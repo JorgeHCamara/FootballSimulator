@@ -783,7 +783,6 @@
     "position": "#",
     "team": "Equipo",
     "points": "Pts",
-    "chance": "Prob.",
     "genericTitle": "{league} {season}",
     "genericSubtitle": "Pronostica la tabla y mira las opciones de cada club"
   },

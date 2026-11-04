@@ -155,6 +155,25 @@ async function step(name, fn) {
       await fresh.close();
     });
 
+    await step("icons are Lucide icons, not emojis", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const emoji = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1D400}-\u{1D7FF}]/u;
+      for (const path of ["en/premier-league", "en/fa-cup", "en/argentina-primera-division"]) {
+        await p.goto(`${BASE_URL}/${path}`);
+        await p.locator("main").waitFor();
+        const share = p.locator('[data-testid="actions"] [data-testid="share-button"]').first();
+        if (await share.count()) await share.click();
+        assert.doesNotMatch(await p.locator("body").innerText(), emoji, path);
+      }
+      // The dice, the share menu and the matchday arrows are Lucide's.
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      assert.ok((await p.locator('[data-testid="fixtures"] svg[data-icon="dices"]').count()) > 0);
+      assert.equal(await p.locator('[data-testid="fixtures"] svg[data-icon="chevron-left"]').count(), 1);
+      await p.locator('[data-testid="actions"] [data-testid="share-button"]').click();
+      assert.deepEqual(await p.locator('[data-testid="share-menu"] svg').evaluateAll((s) => s.map((x) => x.dataset.icon)), ["link", "send", "message-circle", "messages-square", "thumbs-up", "download"]);
+      await p.close();
+    });
+
     await step("share card: a 1200×630 PNG per league and language, cached, with a branded fallback", async () => {
       const png = async (path) => {
         const res = await page.request.get(`${BASE_URL}${path}`);
@@ -211,11 +230,20 @@ async function step(name, fn) {
       assert.equal(await p.locator('[data-testid="actions"] [data-testid="share-button"]').isVisible(), false, "phones: no Share among the actions");
       const button = bar.locator('[data-testid="share-button"]');
       assert.ok((await button.boundingBox()).height >= 44, "at least 44px tall");
-      // Sticky at the bottom of the screen while the table is on it.
+      // Static, right under the results: it never covers the table when scrolling.
+      assert.equal(await bar.evaluate((e) => getComputedStyle(e.parentElement).position), "static");
+      const tableBox = await p.locator('[data-testid="standings"]').boundingBox();
+      const barBox = await bar.boundingBox();
+      assert.ok(barBox.y >= tableBox.y + tableBox.height, "the bar is below the table");
       await p.locator('[data-testid="standings-row"]').nth(5).scrollIntoViewIfNeeded();
-      await p.evaluate(() => window.scrollBy(0, -200));
-      const box = await bar.boundingBox();
-      assert.ok(Math.abs(box.y + box.height - 760) < 16, `bar at the bottom: ${box.y + box.height}`);
+      const covered = await p.evaluate(() => {
+        const bar = document.querySelector('[data-testid="share-bar"]').getBoundingClientRect();
+        return [...document.querySelectorAll('[data-testid="standings-row"]')].some((r) => {
+          const row = r.getBoundingClientRect();
+          return row.bottom > bar.top && row.top < bar.bottom;
+        });
+      });
+      assert.equal(covered, false, "no table row under the bar");
       await button.tap();
       await p.waitForFunction(() => window.__shares.length === 1);
       const shared = await p.evaluate(() => window.__shares[0]);

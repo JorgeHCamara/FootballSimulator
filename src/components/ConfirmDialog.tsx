@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Icon } from "./Icon.tsx";
 
 interface Props {
   open: boolean;
@@ -51,10 +52,7 @@ export function ConfirmDialog({ open, title, message, confirmLabel, cancelLabel,
               danger ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300" : "bg-pitch-100 text-pitch-700 dark:bg-pitch-900/40 dark:text-pitch-100"
             }`}
           >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 12a9 9 0 1 0 3-6.7" />
-              <path d="M3 4v5h5" />
-            </svg>
+            <Icon name="rotate-ccw" size={20} />
           </span>
           <div className="pt-0.5">
             <h2 id="confirm-title" className="text-base font-bold">

@@ -18,6 +18,7 @@ import { getCupData, type CupData } from "../../../lib/cupData.ts";
 import { getContinentalPriors, getExternalSeeds } from "../../../lib/continental.ts";
 import { getLeagueData, type LeagueData } from "../../../lib/leagueData.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd, fill, type FaqItem } from "../../../lib/site.ts";
+import { Icon } from "../../../components/Icon.tsx";
 
 export const revalidate = 3600;
 
@@ -250,7 +251,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
         <Link href="/" className="hover:underline">
           {seo("breadcrumbHome")}
         </Link>
-        <span aria-hidden> › </span>
+        <Icon name="chevron-right" size={12} className="mx-1 inline-block align-[-1px]" />
         <span>{values.simulator}</span>
       </nav>
 

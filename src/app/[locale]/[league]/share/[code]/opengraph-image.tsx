@@ -51,9 +51,8 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
         : {}),
       basedOn: t("basedOn", { count: new Intl.NumberFormat(lang).format(SCENARIO_ITERATIONS) }),
       cta: t("cta"),
-      columns: { position: t("position"), team: t("team"), points: t("points"), chance: t("chance") },
+      columns: { position: t("position"), team: t("team"), points: t("points") },
       zones,
-      percent,
     },
   });
 }

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { continents, type ContinentGroup, type CountryGroup } from "../config/competitions.ts";
 import { Link, usePathname } from "../i18n/navigation.ts";
 import { Flag } from "./Flag.tsx";
+import { Icon } from "./Icon.tsx";
 
 const CLOSE_DELAY_MS = 150;
 
@@ -140,9 +141,7 @@ export function LeagueMenu() {
                 className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium text-pitch-50 hover:bg-white/10 ${isOpen || active ? "bg-white/10" : ""}`}
               >
                 {t(group.continent)}
-                <svg aria-hidden viewBox="0 0 12 12" width="10" height="10" className={`transition ${isOpen ? "rotate-180" : ""}`}>
-                  <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Icon name="chevron-down" size={14} className={`transition ${isOpen ? "rotate-180" : ""}`} />
               </button>
               {isOpen && (
                 <div

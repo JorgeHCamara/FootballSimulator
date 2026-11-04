@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { CupBracket } from "./CupBracket.tsx";
 import { MatchRow } from "./FixtureList.tsx";
+import { Icon } from "./Icon.tsx";
 
 export interface CupViewProps {
   cup: CupConfig;
@@ -136,8 +137,8 @@ function ShootoutLine({ fixture, prediction, onScore, onSimulate }: { fixture: F
       </span>
       <span>
         {!(locked && !editing) && (
-          <button type="button" onClick={onSimulate} title={t("simulateMatch")} aria-label={t("simulateMatch")} className="rounded-md px-1 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800">
-            🎲
+          <button type="button" onClick={onSimulate} title={t("simulateMatch")} aria-label={t("simulateMatch")} className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
+            <Icon name="dices" size={16} />
           </button>
         )}
       </span>
@@ -189,7 +190,7 @@ export function CupRounds(props: RoundsProps) {
               >
                 <span className="text-sm font-semibold">
                   {t(`round.${r.config.key}`)}
-                  {complete && <span className="ml-1 text-pitch-600 dark:text-pitch-100">✓</span>}
+                  {complete && <Icon name="check" size={14} strokeWidth={3} className="ml-1 inline-block align-[-2px] text-pitch-600 dark:text-pitch-100" />}
                 </span>
                 <span className="text-[11px] text-zinc-500 dark:text-zinc-400">{[when(r), status(r)].filter(Boolean).join(" · ")}</span>
               </button>

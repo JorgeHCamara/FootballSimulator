@@ -3,6 +3,7 @@
 import { track } from "@vercel/analytics";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { Icon, type IconName } from "./Icon.tsx";
 
 interface Props {
   /** The page to share, e.g. "/en/premier-league/share/Ag…" (made absolute when shared). */
@@ -160,23 +161,23 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
     >
       {notice && <p className="px-3 py-2 text-xs text-zinc-500" role="status">{notice}</p>}
       <button type="button" role="menuitem" className={item} onClick={copy} data-testid="share-copy">
-        <span aria-hidden>🔗</span>
+        <Icon name={copied ? "check" : "link"} />
         {copied ? t("copied") : t("copyLink")}
       </button>
       {typeof window !== "undefined" &&
         links().map((link) => (
           <a key={link.channel} role="menuitem" className={item} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => report(link.channel, league)} data-testid={`share-${link.channel}`}>
-            <span aria-hidden>{{ x: "𝕏", whatsapp: "💬", reddit: "👽", facebook: "📘" }[link.channel]}</span>
+            <Icon name={CHANNEL_ICONS[link.channel]} />
             {link.label}
           </a>
         ))}
       <a role="menuitem" className={item} href={imagePath} download="footsimu-prediction.png" onClick={() => report("download", league)} data-testid="share-download">
-        <span aria-hidden>⬇️</span>
+        <Icon name="download" />
         {t("downloadImage")}
       </a>
       {hasNativeShare() && (
         <button type="button" role="menuitem" className={item} onClick={() => void nativeShare()}>
-          <span aria-hidden>↗️</span>
+          <Icon name="share-2" />
           {t("shareNative")}
         </button>
       )}
@@ -203,7 +204,8 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
             className="flex h-11 items-center justify-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900"
             data-testid="share-image"
           >
-            🖼️ <span className="max-w-32 truncate">{imageLabel}</span>
+            <Icon name="image" />
+            <span className="max-w-32 truncate">{imageLabel}</span>
           </button>
         )}
         <button
@@ -214,7 +216,7 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-zinc-300 bg-white text-lg font-bold dark:border-zinc-700 dark:bg-zinc-900"
           data-testid="share-more"
         >
-          ⋯
+          <Icon name="ellipsis" size={20} />
         </button>
         {menu}
       </div>
@@ -239,9 +241,13 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
 }
 
 function ShareIcon() {
-  return (
-    <svg aria-hidden viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13" />
-    </svg>
-  );
+  return <Icon name="share" />;
 }
+
+/** Lucide has no brand logos: generic icons for each network. */
+const CHANNEL_ICONS: Record<"x" | "whatsapp" | "reddit" | "facebook", IconName> = {
+  x: "send",
+  whatsapp: "message-circle",
+  reddit: "messages-square",
+  facebook: "thumbs-up",
+};

@@ -639,11 +639,10 @@ export function LeagueSimulator({
           ) : (
             <ProbabilityGrid league={chancesLeague} input={monteCarloInput} rows={rows} teams={teamMap} />
           )}
-          {/* Phones: sharing within thumb reach, sticky at the bottom while the
-              results are on screen (in the page's flow, so it never covers
-              anything once they're scrolled past; ads stay above it). */}
+          {/* Phones: sharing right under the results, in the page's flow
+              (never over the table or an ad). */}
           {!readOnly && (
-            <div className="sticky bottom-0 z-10 -mx-4 mt-3 border-t border-zinc-200 bg-white/95 px-4 py-2 backdrop-blur pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden dark:border-zinc-800 dark:bg-zinc-950/95">
+            <div className="mt-3 lg:hidden">
               <ShareMenu {...shareProps} variant="bar" />
             </div>
           )}

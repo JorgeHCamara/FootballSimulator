@@ -7,6 +7,7 @@ import type { StandingRow, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { ITERATIONS, useMonteCarlo } from "./useMonteCarlo.ts";
 import { ZONE_STYLES } from "./zones.ts";
+import { Icon } from "./Icon.tsx";
 
 export { ITERATIONS };
 
@@ -134,7 +135,7 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                   )}
                   {libertadores && (
                     <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="libertadores-chance">
-                      {passDown?.has(row.teamId) ? "✓" : pct(probabilityInRange(result, row.teamId, libertadores.from, libertadores.to, true))}
+                      {passDown?.has(row.teamId) ? <Icon name="check" size={14} strokeWidth={3} className="ml-auto" /> : pct(probabilityInRange(result, row.teamId, libertadores.from, libertadores.to, true))}
                     </td>
                   )}
                   {aclElite && (

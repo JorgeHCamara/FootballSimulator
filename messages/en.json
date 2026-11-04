@@ -783,7 +783,6 @@
     "position": "#",
     "team": "Team",
     "points": "Pts",
-    "chance": "Chance",
     "genericTitle": "{league} {season}",
     "genericSubtitle": "Predict the table and see every club's chances"
   },

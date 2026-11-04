@@ -6,6 +6,7 @@ import { needsShootout, seriesGames, tieOutcome, type PlayoffSide, type PlayoffT
 import { isSlotTeamId } from "../engine/split.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
+import { Icon } from "./Icon.tsx";
 
 /** Value of the "Playoff" entry in the matchday selector (after the last matchday). */
 export const PLAYOFF_MATCHDAY = -1;
@@ -66,7 +67,7 @@ export function FixtureList(props: Props) {
           disabled={index <= 0}
           onClick={() => onMatchdayChange(matchdays[index - 1]!)}
         >
-          ‹
+          <Icon name="chevron-left" size={20} />
         </button>
         <select
           className="cursor-pointer rounded-md border border-transparent bg-white px-2 py-1 text-sm font-semibold text-zinc-900 hover:border-zinc-300 focus:border-pitch-500 focus:outline-none dark:bg-zinc-900 dark:text-zinc-100 dark:[color-scheme:dark] dark:hover:border-zinc-700"
@@ -88,7 +89,7 @@ export function FixtureList(props: Props) {
           disabled={index >= matchdays.length - 1}
           onClick={() => onMatchdayChange(matchdays[index + 1]!)}
         >
-          ›
+          <Icon name="chevron-right" size={20} />
         </button>
       </header>
       {note && (
@@ -426,9 +427,9 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
             onClick={onSimulate}
             title={t("simulateMatch")}
             aria-label={t("simulateMatch")}
-            className="-my-1 rounded-md px-1 text-sm leading-none hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="-my-1 rounded-md p-1 leading-none text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
           >
-            🎲
+            <Icon name="dices" size={16} />
           </button>
         )}
       </div>
@@ -489,9 +490,9 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
             onClick={onSimulate}
             title={t("simulateMatch")}
             aria-label={t("simulateMatch")}
-            className="rounded-md px-1.5 text-base hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
           >
-            🎲
+            <Icon name="dices" size={18} />
           </button>
         </div>
       )}

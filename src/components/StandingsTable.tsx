@@ -5,6 +5,7 @@ import { zoneForPosition, type LeagueConfig, type Zone } from "../config/leagues
 import type { FormResult, StandingRow, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { ZONE_STYLES } from "./zones.ts";
+import { Icon } from "./Icon.tsx";
 
 const FORM_STYLES: Record<FormResult, string> = {
   W: "bg-pitch-500",
@@ -105,8 +106,8 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
                         </span>
                       )}
                       {isQualified && (
-                        <span className="shrink-0 text-xs" title={qualifiedNote} aria-label={qualifiedNote} data-testid="qualified-tag">
-                          🏆
+                        <span className="shrink-0 text-yellow-500" title={qualifiedNote} aria-label={qualifiedNote} data-testid="qualified-tag">
+                          <Icon name="trophy" size={14} />
                         </span>
                       )}
                     </span>

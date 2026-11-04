@@ -39,9 +39,8 @@ export interface ShareCardText {
   badge?: string;
   basedOn: string;
   cta: string;
-  columns: { position: string; team: string; points: string; chance: string };
+  columns: { position: string; team: string; points: string };
   zones: Partial<Record<ZoneKind, string>>;
-  percent: (share: number) => string;
 }
 
 const truncate = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
@@ -100,8 +99,7 @@ export async function renderShareCard({
             <div style={{ display: "flex", fontSize: 16, fontWeight: 700, color: "#71717a", paddingBottom: 8, borderBottom: "2px solid #e4e4e7" }}>
               <span style={{ width: 52 }}>{text.columns.position}</span>
               <span style={{ flex: 1 }}>{text.columns.team}</span>
-              <span style={{ width: 64, textAlign: "right", justifyContent: "flex-end" }}>{text.columns.points}</span>
-              <span style={{ width: 92, textAlign: "right", justifyContent: "flex-end" }}>{text.columns.chance}</span>
+              <span style={{ width: 72, textAlign: "right", justifyContent: "flex-end" }}>{text.columns.points}</span>
             </div>
             {rows.map((row, i) =>
               row === "gap" ? (
@@ -123,9 +121,8 @@ export async function renderShareCard({
                 >
                   <span style={{ width: 6, height: rowHeight - 10, borderRadius: 3, marginRight: 12, background: row.zone ? zoneHex(row.zone.kind) : "transparent" }} />
                   <span style={{ width: 34, color: "#52525b" }}>{row.position}</span>
-                  <span style={{ flex: 1, overflow: "hidden", whiteSpace: "nowrap" }}>{truncate(teams.get(row.teamId)?.shortName ?? "", 18)}</span>
-                  <span style={{ width: 64, justifyContent: "flex-end", fontWeight: 800 }}>{row.points}</span>
-                  <span style={{ width: 92, justifyContent: "flex-end", color: "#52525b" }}>{row.chance === undefined ? "–" : text.percent(row.chance)}</span>
+                  <span style={{ flex: 1, overflow: "hidden", whiteSpace: "nowrap" }}>{truncate(teams.get(row.teamId)?.shortName ?? "", 22)}</span>
+                  <span style={{ width: 72, justifyContent: "flex-end", fontWeight: 800 }}>{row.points}</span>
                 </div>
               ),
             )}

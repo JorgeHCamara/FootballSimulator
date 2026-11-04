@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "../i18n/navigation.ts";
 import { Flag } from "./Flag.tsx";
 import { CountryColumn, useContinentGroups } from "./LeagueMenu.tsx";
+import { Icon } from "./Icon.tsx";
 
 /** Flags shown on a continent's row, in this order whatever the menu's (else the first six). */
 const PREVIEW: Partial<Record<string, readonly string[]>> = {
@@ -19,7 +20,7 @@ function previewCountries<T extends { country: string }>(continent: string, coun
 }
 
 /**
- * Phones and small tablets: a ☰ button beside the logo opens a panel with one
+ * Phones and small tablets: a menu button beside the logo opens a panel with one
  * row per continent; tapping a continent shows its countries and their
  * competitions (one continent at a time, so Asia is as close as Europe). On a
  * competition's page its continent starts open. Closes on the button, Esc, a
@@ -69,9 +70,7 @@ export function MobileMenu() {
         className="-ml-1 flex h-9 w-9 items-center justify-center rounded-md hover:bg-white/10"
         data-testid="mobile-menu-button"
       >
-        <svg aria-hidden viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
-        </svg>
+        <Icon name={open ? "x" : "menu"} size={22} />
       </button>
       {open && (
         <nav
@@ -105,9 +104,7 @@ export function MobileMenu() {
                         ))}
                         {group.countries.length > 6 && <span className="text-xs text-zinc-500">+{group.countries.length - 6}</span>}
                       </span>
-                      <svg aria-hidden viewBox="0 0 12 12" width="12" height="12" className={`shrink-0 text-zinc-500 transition ${isOpen ? "rotate-180" : ""}`}>
-                        <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
+                      <Icon name="chevron-down" size={16} className={`shrink-0 text-zinc-500 transition ${isOpen ? "rotate-180" : ""}`} />
                     </button>
                   </h2>
                   {isOpen && (

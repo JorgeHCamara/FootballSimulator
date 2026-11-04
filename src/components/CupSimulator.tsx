@@ -30,6 +30,7 @@ import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { CupChances } from "./CupChances.tsx";
 import { CupRounds } from "./CupRounds.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
+import { Icon } from "./Icon.tsx";
 
 /** Fewer runs than a league: every run plays up to 123 games. */
 const CUP_ITERATIONS = 5_000;
@@ -302,9 +303,7 @@ function CupChampion({ cup, rounds, winner, predictions, teams, season }: { cup:
           <p className="mt-2 flex items-center gap-2 rounded-lg bg-white px-3 py-2 dark:bg-zinc-900" data-testid="champion-team">
             <TeamBadge team={team} size={28} />
             <span className="text-lg font-semibold">{team.name}</span>
-            <span className="ml-auto text-xl" aria-hidden>
-              🏆
-            </span>
+            <Icon name="trophy" size={24} className="ml-auto text-yellow-500" />
           </p>
           <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">{t("road")}</p>
           <ul className="mt-1 grid gap-x-4 text-sm text-zinc-700 sm:grid-cols-2 dark:text-zinc-300">
