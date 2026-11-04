@@ -23,6 +23,9 @@ export type ZoneKind =
   | "splitTitle"
   | "splitMiddle"
   | "splitRelegation"
+  | "championshipPlayoffs"
+  | "europePlayoffs"
+  | "relegationPlayouts"
   | "titlePlayoffs"
   | "knockoutRoundOf16"
   | "knockoutPlayoff"
@@ -36,7 +39,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -99,7 +102,7 @@ export interface LeagueGroup {
   zones?: readonly Zone[];
 }
 
-export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct" | "tr" | "be";
+export type FlagCode = "gb-eng" | "es" | "de" | "it" | "fr" | "pt" | "nl" | "br" | "us" | "eu" | "conmebol" | "ar" | "cl" | "co" | "uy" | "py" | "mx" | "ec" | "pe" | "sa" | "jp" | "gb-sct" | "tr" | "be" | "gr";
 
 export type SiteLocale = "en" | "pt" | "es";
 
@@ -685,6 +688,63 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "europaLeague", from: 3, to: 3 },
       { kind: "conferenceLeague", from: 4, to: 4 },
       { kind: "relegation", from: 17, to: 18 },
+    ],
+  },
+  {
+    code: "GSL",
+    slug: "greek-super-league",
+    name: "Super League Greece",
+    country: "Greece",
+    flag: "gr",
+    simulatorName: { en: "Greek Super League Simulator", pt: "Simulador da Super League grega", es: "Simulador de la Super League griega" },
+    aka: { en: "Stoiximan Super League", pt: "Campeonato Grego", es: "Liga griega" },
+    teams: 14,
+    // 2026/27: 26 games (home and away), then the table splits, points carried
+    // over, into the championship play-offs (1st–4th, home and away: 32
+    // games), the Europe play-offs (5th–8th, 32 games) and the relegation
+    // play-outs (9th–14th, 36 games). The split's fixtures appear once ESPN
+    // publishes them (from April 2027).
+    espn: { slug: "gre.1", seasons: "split", deductions: true },
+    espnOnly: true,
+    tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
+    // Before the split: where each place leads.
+    zones: [
+      { kind: "championshipPlayoffs", from: 1, to: 4 },
+      { kind: "europePlayoffs", from: 5, to: 8 },
+      { kind: "relegationPlayouts", from: 9, to: 14 },
+    ],
+    // After it (ESPN's standings groups), base case (the European places shift
+    // with the Greek Cup winner and UEFA's coefficients): the top two to the
+    // Champions League qualifying, 3rd to the Europa League, 4th and the Europe
+    // play-offs winner to the Conference League qualifying; the play-outs'
+    // bottom two go down.
+    groupsOptional: true,
+    groups: [
+      {
+        id: "1",
+        espnName: "Championship",
+        name: { en: "Championship play-offs", pt: "Play-offs do título", es: "Play-offs por el título" },
+        shortName: { en: "Championship", pt: "Título", es: "Título" },
+        zones: [
+          { kind: "championsLeagueQualifying", from: 1, to: 2 },
+          { kind: "europaLeague", from: 3, to: 3 },
+          { kind: "conferenceLeague", from: 4, to: 4 },
+        ],
+      },
+      {
+        id: "2",
+        espnName: "Europe",
+        name: { en: "Europe play-offs", pt: "Play-offs europeus", es: "Play-offs europeos" },
+        shortName: { en: "Europe", pt: "Europa", es: "Europa" },
+        zones: [{ kind: "conferenceLeague", from: 1, to: 1 }],
+      },
+      {
+        id: "3",
+        espnName: "Relegation",
+        name: { en: "Relegation play-outs", pt: "Play-outs do rebaixamento", es: "Play-outs del descenso" },
+        shortName: { en: "Relegation", pt: "Rebaixamento", es: "Descenso" },
+        zones: [{ kind: "relegation", from: 5, to: 6 }],
+      },
     ],
   },
   {

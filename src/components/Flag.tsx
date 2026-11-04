@@ -170,6 +170,20 @@ function shapes(code: FlagCode) {
           <path d="M0 0L30 20M30 0L0 20" stroke="#ffffff" strokeWidth="3.2" />
         </>
       );
+    case "gr":
+      return (
+        <>
+          <rect width="30" height="20" fill="#ffffff" />
+          <rect y="0.000" width="30" height="2.222" fill="#0d5eaf" />
+          <rect y="4.444" width="30" height="2.222" fill="#0d5eaf" />
+          <rect y="8.889" width="30" height="2.222" fill="#0d5eaf" />
+          <rect y="13.333" width="30" height="2.222" fill="#0d5eaf" />
+          <rect y="17.778" width="30" height="2.222" fill="#0d5eaf" />
+          <rect width="11.111" height="11.111" fill="#0d5eaf" />
+          <rect x="4.444" width="2.222" height="11.111" fill="#ffffff" />
+          <rect y="4.444" width="11.111" height="2.222" fill="#ffffff" />
+        </>
+      );
     case "jp":
       return (
         <>
