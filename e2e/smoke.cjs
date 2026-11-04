@@ -155,13 +155,38 @@ async function step(name, fn) {
       await fresh.close();
     });
 
-    await step("unplayed games show only the dice, no odds or likely scores", async () => {
+    await step("a game's row: only the dice and the score; the dice rolls likely scores", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/premier-league`);
       const fixtures = p.locator('[data-testid="fixtures"]');
-      await fixtures.locator('svg[data-icon="dices"]').first().waitFor();
+      const row = fixtures.locator('[data-testid="match-row"]').filter({ has: p.locator('svg[data-icon="dices"]') }).first();
+      await row.waitFor();
+      // No chances, likeliest scores or tooltips by the game.
       assert.equal(await p.locator('[data-testid="match-odds"]').count(), 0);
-      assert.doesNotMatch(await fixtures.innerText(), /Likely/);
+      assert.doesNotMatch(await fixtures.innerText(), /%|Likely/);
+      assert.equal(await row.locator("[title]").count(), 0, "no tooltips in the row");
+      const dice = row.getByRole("button", { name: "Simulate this match" });
+      assert.equal(await row.getByRole("button").count(), 1, "the dice is the only button");
+      // Rolling fills in a realistic score, a different one each time.
+      const scores = [];
+      const read = () => row.locator("input").evaluateAll((inputs) => inputs.map((x) => x.value).join("-"));
+      for (let i = 0; i < 8; i++) {
+        const before = await read();
+        await dice.click();
+        // The score changes (a re-roll never repeats the one already there).
+        await p.waitForFunction(
+          ([id, previous]) => [...document.querySelectorAll(`[data-fixture="${id}"] input`)].map((x) => x.value).join("-") !== previous,
+          [await row.getAttribute("data-fixture"), before],
+        );
+        const [home, away] = (await read()).split("-").map(Number);
+        scores.push(`${home}-${away}`);
+        assert.ok(home + away <= 5, `${home}-${away}`);
+      }
+      for (let i = 1; i < scores.length; i++) assert.notEqual(scores[i], scores[i - 1], "each roll changes the score");
+      assert.ok(new Set(scores).size <= 6, `at most 6 different scores: ${[...new Set(scores)]}`);
+      await p.getByRole("button", { name: "Reset" }).click();
+      const confirm = p.getByRole("dialog");
+      if (await confirm.count()) await confirm.getByRole("button", { name: /Reset/ }).click();
       await p.close();
     });
 

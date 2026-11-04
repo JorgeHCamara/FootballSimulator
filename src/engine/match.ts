@@ -163,18 +163,108 @@ export function likelyScores(xg: ExpectedGoals, rho = 0, count = 3): (Score & { 
     .slice(0, count);
 }
 
-/** Simulates every fixture that has no entry in `known`; returns only the new results. */
+/*
+ * "Likely roll": how the simulator's buttons fill in a score (the dice, and
+ * simulating a matchday or the rest of the season). Only the likeliest scores
+ * can come out, so a click never gives a long shot like 4–1 or 3–3. The
+ * chances (season Monte Carlo) keep drawing from the full distribution.
+ */
+/** Share of the probability the likely scores cover, taken likeliest first. */
+export const LIKELY_COVERAGE = 0.7;
+/** At most this many likely scores, and at least this many. */
+export const LIKELY_MAX_SCORES = 6;
+export const LIKELY_MIN_SCORES = 3;
+/** Their chances raised to this power (then renormalised): the likeliest comes up most, the others still do. */
+export const LIKELY_SHARPEN = 1.5;
+/** A result (home win, draw, away win) at least this likely always has a score in the set. */
+export const LIKELY_RESULT_MIN = 0.2;
+
+export interface LikelyScore extends Score {
+  /** Its chance of being rolled (they add up to 1). */
+  p: number;
+}
+
+const resultOf = (s: Score) => Math.sign(s.home - s.away);
+
+/**
+ * The scores a likely roll can give: the likeliest ones until they cover
+ * LIKELY_COVERAGE (LIKELY_MIN_SCORES to LIKELY_MAX_SCORES of them), plus the
+ * likeliest score of any result at least LIKELY_RESULT_MIN likely that none
+ * of them has (in place of the least likely one whose result another covers,
+ * when the set is full); their chances sharpened with LIKELY_SHARPEN.
+ */
+export function likelyScoreSet(xg: ExpectedGoals, rho = 0): LikelyScore[] {
+  const matrix = scoreMatrix(xg, rho);
+  const size = MAX_SCORE + 1;
+  const cells = [...matrix]
+    .map((p, k) => ({ home: Math.floor(k / size), away: k % size, p }))
+    .sort((a, b) => b.p - a.p || a.home + a.away - (b.home + b.away));
+  const set: (Score & { p: number })[] = [];
+  let covered = 0;
+  for (const cell of cells) {
+    if (set.length >= LIKELY_MIN_SCORES && (covered >= LIKELY_COVERAGE || set.length >= LIKELY_MAX_SCORES)) break;
+    set.push(cell);
+    covered += cell.p;
+  }
+  // Every likely enough result (a 30% draw) can come out.
+  const results = outcomeProbabilities(xg, rho);
+  for (const [result, p] of [[1, results.home], [0, results.draw], [-1, results.away]] as const) {
+    if (p < LIKELY_RESULT_MIN || set.some((s) => resultOf(s) === result)) continue;
+    const best = cells.find((c) => resultOf(c) === result)!;
+    if (set.length < LIKELY_MAX_SCORES) {
+      set.push(best);
+      continue;
+    }
+    // Full: drop the least likely score whose result another score still covers.
+    for (let i = set.length - 1; i >= 0; i--) {
+      const r = resultOf(set[i]!);
+      if (set.filter((s) => resultOf(s) === r).length > 1) {
+        set.splice(i, 1, best);
+        break;
+      }
+    }
+  }
+  set.sort((a, b) => b.p - a.p);
+  const weights = set.map((s) => Math.pow(s.p, LIKELY_SHARPEN));
+  const total = weights.reduce((a, b) => a + b, 0);
+  return set.map((s, i) => ({ home: s.home, away: s.away, p: weights[i]! / total }));
+}
+
+/**
+ * A likely roll: one score from likelyScoreSet. With `avoid` (the score
+ * already there), a re-roll gives another score from the set.
+ */
+export function sampleLikelyScore(xg: ExpectedGoals, rng: Rng, rho = 0, avoid?: Score): Score {
+  const all = likelyScoreSet(xg, rho);
+  const others = avoid ? all.filter((s) => s.home !== avoid.home || s.away !== avoid.away) : all;
+  const set = others.length ? others : all;
+  const total = set.reduce((sum, s) => sum + s.p, 0);
+  let u = rng() * total;
+  for (const s of set) {
+    u -= s.p;
+    if (u < 0) return { home: s.home, away: s.away };
+  }
+  const last = set.at(-1)!;
+  return { home: last.home, away: last.away };
+}
+
+/**
+ * Simulates every fixture that has no entry in `known`; returns only the new
+ * results. Draws from the full score distribution, or with `likely`, makes
+ * likely rolls (the simulator's buttons; never for the chances).
+ */
 export function simulateFixtures(
   fixtures: readonly Fixture[],
   known: ResultMap,
   model: LeagueModel,
   rng: Rng,
+  { likely = false }: { likely?: boolean } = {},
 ): ResultMap {
   const out: ResultMap = {};
   for (const f of fixtures) {
     if (known[f.id]) continue;
     const xg = f.neutral ? expectedGoalsNeutral(model, f.homeId, f.awayId) : expectedGoals(model, f.homeId, f.awayId);
-    out[f.id] = simulateScore(xg, rng, model.rho ?? 0);
+    out[f.id] = likely ? sampleLikelyScore(xg, rng, model.rho ?? 0) : simulateScore(xg, rng, model.rho ?? 0);
   }
   return out;
 }

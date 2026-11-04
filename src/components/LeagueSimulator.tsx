@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
-import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
+import { expectedGoals, expectedGoalsNeutral, sampleLikelyScore, simulateFixtures } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel, DOMESTIC_PRIOR_GAMES, matchParamOptions, NO_DATA_PRIOR, ratingHalfLife, type MatchParams, type TeamStrength } from "../engine/ratings.ts";
 import {
@@ -414,18 +414,20 @@ export function LeagueSimulator({
     };
   }, [fixtures, seasonKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // The buttons fill in likely rolls (realistic scores, never long shots);
+  // the chances keep drawing from the full score distribution.
   const simulate = (targets: readonly Fixture[]) =>
-    applyResults(seasonKey, simulateFixtures(targets, effective, model, createRng(randomSeed())));
+    applyResults(seasonKey, simulateFixtures(targets, effective, model, createRng(randomSeed()), { likely: true }));
 
   /** Rest of the league and, where there is one, the whole promotion play-off in one step. */
   const simulateRest = () => {
     const rng = createRng(randomSeed());
-    const leagueResults = simulateFixtures(ordered, effective, model, rng);
+    const leagueResults = simulateFixtures(ordered, effective, model, rng, { likely: true });
     // Then the split's games, from the table the first phase ends with.
     if (canGenerate && splitConfig && lastReal && (phase ? !phase.members : !extraRounds)) {
       const all = { ...effective, ...leagueResults };
       const groupTeams = splitGroupsFrom(computeStandings(teams, fixtures, all, { ...baseOptions, includeForm: false }), splitConfig.groups);
-      Object.assign(leagueResults, simulateFixtures(splitFixtures(groupTeams, splitConfig.groups, splitRound, lastReal.utcDate), season.predictions, model, rng));
+      Object.assign(leagueResults, simulateFixtures(splitFixtures(groupTeams, splitConfig.groups, splitRound, lastReal.utcDate), season.predictions, model, rng, { likely: true }));
     }
     if (!playoff) return applyResults(seasonKey, leagueResults);
     const all = { ...effective, ...leagueResults };
@@ -433,6 +435,7 @@ export function LeagueSimulator({
     const playoffResults = simulatePlayoff(overall, playoff, { ...season.predictions, ...all }, model, rng, {
       ...bracketOptions,
       ...(groupTables ? { groups: groupTables } : {}),
+      likely: true,
     });
     applyResults(seasonKey, { ...leagueResults, ...playoffResults });
   };
@@ -445,6 +448,7 @@ export function LeagueSimulator({
       simulatePlayoff(overall, playoff, season.predictions, model, createRng(randomSeed()), {
         ...bracketOptions,
         ...(groupTables ? { groups: groupTables } : {}),
+        likely: true,
       }),
     );
   };
@@ -453,10 +457,12 @@ export function LeagueSimulator({
     const rng = createRng(randomSeed());
     const score = isShootoutId(fixture.id)
       ? simulatePenalties(rng)
-      : simulateScore(
+      : // A likely roll; clicking again gives another score from the likely set.
+        sampleLikelyScore(
           fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId),
           rng,
           model.rho ?? 0,
+          season.predictions[fixture.id],
         );
     setScore(seasonKey, fixture, score);
   };

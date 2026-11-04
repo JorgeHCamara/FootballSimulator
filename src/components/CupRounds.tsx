@@ -137,7 +137,7 @@ function ShootoutLine({ fixture, prediction, onScore, onSimulate }: { fixture: F
       </span>
       <span>
         {!(locked && !editing) && (
-          <button type="button" onClick={onSimulate} title={t("simulateMatch")} aria-label={t("simulateMatch")} className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
+          <button type="button" onClick={onSimulate} aria-label={t("simulateMatch")} className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
             <Icon name="dices" size={16} />
           </button>
         )}

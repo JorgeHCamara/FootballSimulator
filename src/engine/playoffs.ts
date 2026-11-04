@@ -540,7 +540,10 @@ export function simulatePlayoff(
   known: ResultMap,
   model: LeagueModel,
   rng: Rng,
-  options: Omit<BracketOptions, "seasonComplete">,
+  options: Omit<BracketOptions, "seasonComplete"> & {
+    /** Likely rolls for the games (the simulator's buttons), not the full distribution (the chances). */
+    likely?: boolean;
+  },
   /** Called with each round's ties as they are played (saves rebuilding the bracket afterwards). */
   onRound?: (round: number, ties: readonly PlayoffTie[]) => void,
 ): ResultMap {
@@ -560,14 +563,14 @@ export function simulatePlayoff(
         for (let i = 0; i < tie.legs.length; i++) {
           let state = seriesGames(tie, now())[i]!;
           if (!state.needed) break;
-          if (!scoreOf(state.game, now())) add(simulateFixtures([state.game], now(), model, rng));
+          if (!scoreOf(state.game, now())) add(simulateFixtures([state.game], now(), model, rng, { likely: options.likely ?? false }));
           state = seriesGames(tie, now())[i]!;
           if (state.needsPenalties && !scoreOf(state.shootout, now())) add({ [state.shootout.id]: simulatePenalties(rng) });
         }
         continue;
       }
       const legs = tie.legs.filter((leg) => !leg.result);
-      add(simulateFixtures(legs, now(), model, rng));
+      add(simulateFixtures(legs, now(), model, rng, { likely: options.likely ?? false }));
       if (tie.shootout && !now()[tie.shootout.id] && !tie.shootout.result && needsShootout(tie, now())) {
         add({ [tie.shootout.id]: simulatePenalties(rng) });
       }
