@@ -196,7 +196,10 @@
   "Footer": {
     "attribution": "Data: football-data.org",
     "disclaimer": "Foot Simu is not affiliated with any league or club. Simulations are for entertainment only.",
-    "crestCredit": "Some crests: TheSportsDB"
+    "crestCredit": "Some crests: TheSportsDB",
+    "about": "About",
+    "privacy": "Privacy",
+    "contact": "Contact"
   },
   "NotFound": {
     "title": "Page not found",
@@ -600,5 +603,155 @@
     "South America": "South America",
     "North America": "North America",
     "Asia": "Asia"
+  },
+  "Facts": {
+    "title": "{league} format",
+    "clubs": "{clubs} clubs take part.",
+    "roundRobin": "Each club plays every other club {times, plural, =1 {once} =2 {twice, home and away} other {# times}}: {games} games.",
+    "roundRobinTournament": "In each tournament, each club plays every other club {times, plural, =1 {once} =2 {twice, home and away} other {# times}}: {games} games.",
+    "roundRobinPhase": "In the {phase}, each club plays every other club {times, plural, =1 {once} =2 {twice, home and away} other {# times}}: {games} games.",
+    "games": "Each club plays {games} games.",
+    "tournaments": "The season has {count, plural, =2 {two} =3 {three} other {#}} tournaments ({names}), each with its own champion.",
+    "split": "{hasRound, select, yes {After {round} rounds} other {After the {phase}}} the table splits into separate tables: {groups}. Each is a new table of its own games ({legs, select, one {once} other {home and away}}), and the clubs start it with their {phase} points{carry}.",
+    "carryHalved": " (the {group} start from half of them, rounded up)",
+    "splitHalves": "After {round} rounds the table splits into the top {top} and the bottom {bottom}, who play each other once more; clubs stay in their half whatever their points.",
+    "tables": "The clubs are split into {count, plural, =2 {two} other {#}} tables: {names}.",
+    "titlePlayoff": "A play-off after the regular phase decides the champion.",
+    "annual": "An annual table of every game decides the places below.",
+    "regularSeason": "regular season",
+    "placesTitle": "Places",
+    "placesTitleEach": "Places in each table",
+    "placesTitleAnnual": "Places in the annual table",
+    "place": "{n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
+    "range": "{from}–{to}",
+    "placesNote": "The usual case: cup winners and continental rankings can shift these places.",
+    "gamesTournament": "In each tournament, each club plays {games} games.",
+    "titlePlayoffTournament": "In each tournament, a play-off after the regular phase decides the champion."
+  },
+  "Legal": {
+    "about": {
+      "title": "About Foot Simu",
+      "description": "Foot Simu is a free football simulator: real tables and fixtures, your own predictions and every club's chances, for leagues and cups in Europe, the Americas and Asia.",
+      "sections": [
+        {
+          "h": "What Foot Simu is",
+          "p": [
+            "Foot Simu is a free football simulator. Every league starts from its real table and fixtures, updated through the season. Type a score for any game, simulate a matchday or the rest of the season, and see how the title race, the European or continental places and the relegation battle could end.",
+            "The Chances tab plays the rest of the season thousands of times to show each club's chances of every final position. Cups and continental competitions are played round by round, with their real draws once they're made."
+          ]
+        },
+        {
+          "h": "How the simulation works",
+          "p": [
+            "Each club gets an attacking and a defensive rating from its real results this season, plus home advantage. A simulated game draws a score from those ratings, so stronger clubs usually win but upsets happen. Your predictions never change the ratings: only real results do."
+          ]
+        },
+        {
+          "h": "Where the data comes from",
+          "p": [
+            "Fixtures, results and tables come from ESPN's public feed and football-data.org, refreshed every hour. Some club crests come from TheSportsDB. Data can be late or wrong: if you spot a mistake, [let us know](contact)."
+          ]
+        },
+        {
+          "h": "Independence",
+          "p": [
+            "Foot Simu isn't affiliated with, endorsed by or connected to any league, club or football body. Club names and crests belong to their owners and are only used to identify the clubs. Simulations are for entertainment and aren't betting advice."
+          ]
+        },
+        {
+          "h": "Contact",
+          "p": [
+            "Questions, ideas or a league you'd like to see? Write to [contact@footsimu.com](mailto:contact@footsimu.com)."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "description": "How Foot Simu handles your data: predictions saved in your browser, cookie-free analytics and, where shown, Google ads.",
+      "updated": "Last updated: 4 November 2026",
+      "sections": [
+        {
+          "h": "Who we are",
+          "p": [
+            "Foot Simu (footsimu.com) is a free football simulator. For anything about this policy or your data, write to [contact@footsimu.com](mailto:contact@footsimu.com)."
+          ]
+        },
+        {
+          "h": "Your predictions",
+          "p": [
+            "The scores you type or simulate are saved only in your own browser (its local storage), so they're still there when you come back. They aren't sent to us and we can't see them. Delete them at any time with the Reset button or by clearing your browser's data for this site.",
+            "When you use Share, your predictions are written into the link itself. Anyone with the link can see them; we don't store it."
+          ]
+        },
+        {
+          "h": "Analytics",
+          "p": [
+            "We use Vercel Web Analytics to count visits and see which pages are read. It doesn't use cookies, doesn't follow you across sites and doesn't build a profile of you: it only records aggregated data such as the page, the referring site, the country and the type of device."
+          ]
+        },
+        {
+          "h": "Hosting",
+          "p": [
+            "The site is hosted by Vercel. Like any web server, it processes technical data such as your IP address and browser to deliver the pages and keep them secure, and keeps these logs for a short time."
+          ]
+        },
+        {
+          "h": "Images from other sites",
+          "p": [
+            "Club crests are loaded from ESPN's and TheSportsDB's servers, which receive your IP address and browser details when they send the images, under their own privacy policies."
+          ]
+        },
+        {
+          "h": "Advertising",
+          "p": [
+            "Foot Simu may show ads served by Google AdSense. Google and its partners can use cookies or similar technologies to show ads based on your visits to this and other websites, and to measure them. You can turn off personalised ads in [Google's ad settings](https://adssettings.google.com) and read [how Google uses data from sites that use its services](https://policies.google.com/technologies/partner-sites).",
+            "In the European Economic Area, the UK and Switzerland you're asked for your consent before any ad cookies are used, through a consent message certified by Google, and you can change your choice at any time."
+          ]
+        },
+        {
+          "h": "Your rights",
+          "p": [
+            "Depending on where you live (for example under the GDPR in Europe or the LGPD in Brazil), you can ask to access, correct or delete personal data about you, or object to its use. We don't keep accounts or profiles, so we usually hold nothing we could link to you, but write to us and we'll help."
+          ]
+        },
+        {
+          "h": "Children",
+          "p": [
+            "Foot Simu is a general-audience site and doesn't knowingly collect personal data from children."
+          ]
+        },
+        {
+          "h": "Changes",
+          "p": [
+            "If this policy changes, we'll update this page and its date."
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Get in touch with Foot Simu: report a data mistake, suggest a league or ask about partnerships.",
+      "sections": [
+        {
+          "h": "Write to us",
+          "p": [
+            "Email [contact@footsimu.com](mailto:contact@footsimu.com). We read every message and usually reply within a few days."
+          ]
+        },
+        {
+          "h": "What to write about",
+          "p": [
+            "A wrong score, table or rule in a league; a league or cup you'd like added; a problem on your phone or browser; press or partnership questions."
+          ]
+        },
+        {
+          "h": "Before you write",
+          "p": [
+            "Foot Simu isn't connected to any league or club, so we can't help with tickets, transfers or club matters."
+          ]
+        }
+      ]
+    }
   }
 }

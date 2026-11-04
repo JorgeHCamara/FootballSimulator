@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { CupSimulator } from "../../../components/CupSimulator.tsx";
+import { LeagueFactsSection } from "../../../components/LeagueFactsSection.tsx";
 import { Faq } from "../../../components/Faq.tsx";
 import { Flag } from "../../../components/Flag.tsx";
 import { JsonLd } from "../../../components/JsonLd.tsx";
@@ -284,6 +285,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(loaded.data.firstPhaseIds ? { firstPhaseIds: loaded.data.firstPhaseIds } : {})}
         />
       )}
+
+      {loaded.kind === "league" && <LeagueFactsSection league={loaded.config} locale={locale as SiteLocale} />}
 
       <div className="grid gap-8 pt-8 lg:grid-cols-2">
         <section className="space-y-3">

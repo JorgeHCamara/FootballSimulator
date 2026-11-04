@@ -3,11 +3,12 @@ import { Analytics } from "@vercel/analytics/next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import type { ReactNode } from "react";
 import { SiteFooter } from "../../components/SiteFooter.tsx";
 import { SiteHeader } from "../../components/SiteHeader.tsx";
 import { routing } from "../../i18n/routing.ts";
-import { GOOGLE_SITE_VERIFICATION, HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../lib/site.ts";
+import { ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION, HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../lib/site.ts";
 import "../globals.css";
 
 const CLIENT_NAMESPACES = ["Nav", "Simulator", "Zones", "Countries", "Continents", "Cup"];
@@ -41,6 +42,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     twitter: { card: "summary_large_image", title: t("homeTitle"), description: t("homeDescription") },
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
     verification: { google: GOOGLE_SITE_VERIFICATION },
+    // AdSense's site ownership tag, once a publisher id is set.
+    ...(ADSENSE_CLIENT ? { other: { "google-adsense-account": ADSENSE_CLIENT } } : {}),
   };
 }
 
@@ -63,6 +66,15 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           <SiteFooter />
         </NextIntlClientProvider>
         <Analytics />
+        {/* Google AdSense Auto ads, once approved (consent in the EEA/UK/CH: AdSense's own certified message). */}
+        {ADSENSE_CLIENT && (
+          <Script
+            id="adsense"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+        )}
       </body>
     </html>
   );

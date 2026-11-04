@@ -21,7 +21,16 @@ export function SiteFooter() {
             ))}
           </ul>
         </nav>
-        <p className="mt-6 text-center">{t("disclaimer")}</p>
+        <ul className="mt-6 flex justify-center gap-x-5 text-sm" data-testid="site-links">
+          {(["about", "privacy", "contact"] as const).map((page) => (
+            <li key={page}>
+              <Link href={`/${page}`} className="text-zinc-600 hover:text-pitch-700 hover:underline dark:text-zinc-400 dark:hover:text-pitch-100">
+                {t(page)}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-center">{t("disclaimer")}</p>
         <p className="mt-1 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
           © {new Date().getFullYear()} Foot Simu ·{" "}
           <a href="https://www.football-data.org/" className="hover:text-zinc-600 hover:underline dark:hover:text-zinc-300" rel="noopener">

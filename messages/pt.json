@@ -196,7 +196,10 @@
   "Footer": {
     "attribution": "Dados: football-data.org",
     "disclaimer": "O Foot Simu não tem vínculo com nenhuma liga ou clube. As simulações são apenas para entretenimento.",
-    "crestCredit": "Alguns escudos: TheSportsDB"
+    "crestCredit": "Alguns escudos: TheSportsDB",
+    "about": "Sobre",
+    "privacy": "Privacidade",
+    "contact": "Contato"
   },
   "NotFound": {
     "title": "Página não encontrada",
@@ -600,5 +603,155 @@
     "South America": "América do Sul",
     "North America": "América do Norte",
     "Asia": "Ásia"
+  },
+  "Facts": {
+    "title": "Formato: {league}",
+    "clubs": "{clubs} clubes participam.",
+    "roundRobin": "Cada clube enfrenta todos os outros {times, plural, =1 {uma vez} =2 {duas vezes, em casa e fora} other {# vezes}}: {games} jogos.",
+    "roundRobinTournament": "Em cada torneio, cada clube enfrenta todos os outros {times, plural, =1 {uma vez} =2 {duas vezes, em casa e fora} other {# vezes}}: {games} jogos.",
+    "roundRobinPhase": "Na {phase}, cada clube enfrenta todos os outros {times, plural, =1 {uma vez} =2 {duas vezes, em casa e fora} other {# vezes}}: {games} jogos.",
+    "games": "Cada clube faz {games} jogos.",
+    "tournaments": "A temporada tem {count, plural, =2 {dois} =3 {três} other {#}} torneios ({names}), cada um com seu campeão.",
+    "split": "{hasRound, select, yes {Depois de {round} rodadas} other {Depois da {phase}}} a tabela se divide em tabelas separadas: {groups}. Cada uma é uma nova tabela só com seus jogos ({legs, select, one {turno único} other {ida e volta}}), e os clubes começam com os pontos da {phase}{carry}.",
+    "carryHalved": " (nos {group}, com metade deles, arredondada para cima)",
+    "splitHalves": "Depois de {round} rodadas a tabela se divide entre os {top} primeiros e os {bottom} últimos, que se enfrentam mais uma vez; os clubes não mudam de metade, sejam quais forem os pontos.",
+    "tables": "Os clubes estão divididos em {count, plural, =2 {duas} other {#}} tabelas: {names}.",
+    "titlePlayoff": "Um mata-mata depois da fase de classificação decide o campeão.",
+    "annual": "Uma tabela anual com todos os jogos decide as vagas abaixo.",
+    "regularSeason": "fase regular",
+    "placesTitle": "Vagas",
+    "placesTitleEach": "Vagas em cada tabela",
+    "placesTitleAnnual": "Vagas na tabela anual",
+    "place": "{n}º",
+    "range": "{from}–{to}",
+    "placesNote": "O caso mais comum: campeões das copas e rankings continentais podem mudar essas vagas.",
+    "gamesTournament": "Em cada torneio, cada clube faz {games} jogos.",
+    "titlePlayoffTournament": "Em cada torneio, um mata-mata depois da fase de classificação decide o campeão."
+  },
+  "Legal": {
+    "about": {
+      "title": "Sobre o Foot Simu",
+      "description": "O Foot Simu é um simulador de futebol grátis: tabelas e jogos reais, seus palpites e as chances de cada clube, para ligas e copas da Europa, das Américas e da Ásia.",
+      "sections": [
+        {
+          "h": "O que é o Foot Simu",
+          "p": [
+            "O Foot Simu é um simulador de futebol grátis. Cada campeonato começa da tabela e dos jogos reais, atualizados ao longo da temporada. Digite o placar de qualquer jogo, simule uma rodada ou o resto da temporada e veja como podem terminar a briga pelo título, as vagas continentais e a luta contra o rebaixamento.",
+            "A aba Chances joga o resto da temporada milhares de vezes para mostrar as chances de cada clube em cada posição final. Copas e competições continentais são jogadas fase a fase, com os sorteios reais assim que acontecem."
+          ]
+        },
+        {
+          "h": "Como funciona a simulação",
+          "p": [
+            "Cada clube recebe uma nota de ataque e uma de defesa a partir dos seus resultados reais nesta temporada, mais o fator casa. Um jogo simulado sorteia um placar a partir dessas notas: os mais fortes costumam vencer, mas zebras acontecem. Seus palpites nunca mudam as notas, só os resultados reais."
+          ]
+        },
+        {
+          "h": "De onde vêm os dados",
+          "p": [
+            "Jogos, resultados e tabelas vêm do feed público da ESPN e do football-data.org, atualizados a cada hora. Alguns escudos vêm do TheSportsDB. Os dados podem atrasar ou ter erros: se encontrar algum, [avise a gente](contact)."
+          ]
+        },
+        {
+          "h": "Independência",
+          "p": [
+            "O Foot Simu não é afiliado, patrocinado nem ligado a nenhuma liga, clube ou entidade do futebol. Nomes e escudos pertencem aos seus donos e são usados só para identificar os clubes. As simulações são para diversão e não são dicas de apostas."
+          ]
+        },
+        {
+          "h": "Contato",
+          "p": [
+            "Dúvidas, ideias ou um campeonato que você gostaria de ver? Escreva para [contact@footsimu.com](mailto:contact@footsimu.com)."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Política de privacidade",
+      "description": "Como o Foot Simu trata seus dados: palpites salvos no seu navegador, estatísticas sem cookies e, quando houver, anúncios do Google.",
+      "updated": "Última atualização: 4 de novembro de 2026",
+      "sections": [
+        {
+          "h": "Quem somos",
+          "p": [
+            "O Foot Simu (footsimu.com) é um simulador de futebol grátis. Para qualquer assunto sobre esta política ou seus dados, escreva para [contact@footsimu.com](mailto:contact@footsimu.com)."
+          ]
+        },
+        {
+          "h": "Seus palpites",
+          "p": [
+            "Os placares que você digita ou simula ficam salvos só no seu navegador (no armazenamento local), para continuarem lá quando você voltar. Eles não são enviados para nós e não conseguimos vê-los. Apague quando quiser com o botão Reiniciar ou limpando os dados do site no navegador.",
+            "Quando você usa Compartilhar, seus palpites vão dentro do próprio link. Quem tiver o link pode vê-los; nós não guardamos o link."
+          ]
+        },
+        {
+          "h": "Estatísticas",
+          "p": [
+            "Usamos o Vercel Web Analytics para contar visitas e ver quais páginas são lidas. Ele não usa cookies, não segue você por outros sites e não cria um perfil seu: registra apenas dados agregados, como a página, o site de origem, o país e o tipo de aparelho."
+          ]
+        },
+        {
+          "h": "Hospedagem",
+          "p": [
+            "O site é hospedado pela Vercel. Como qualquer servidor, ela trata dados técnicos como seu endereço IP e navegador para entregar as páginas e mantê-las seguras, e guarda esses registros por pouco tempo."
+          ]
+        },
+        {
+          "h": "Imagens de outros sites",
+          "p": [
+            "Os escudos dos clubes são carregados dos servidores da ESPN e do TheSportsDB, que recebem seu endereço IP e dados do navegador ao enviar as imagens, segundo as políticas de privacidade deles."
+          ]
+        },
+        {
+          "h": "Publicidade",
+          "p": [
+            "O Foot Simu pode exibir anúncios do Google AdSense. O Google e seus parceiros podem usar cookies ou tecnologias parecidas para mostrar anúncios com base nas suas visitas a este e a outros sites, e para medi-los. Você pode desativar anúncios personalizados nas [configurações de anúncios do Google](https://adssettings.google.com) e ler [como o Google usa dados de sites que usam seus serviços](https://policies.google.com/technologies/partner-sites?hl=pt-BR).",
+            "No Espaço Econômico Europeu, no Reino Unido e na Suíça, pedimos seu consentimento antes de usar cookies de anúncios, por meio de uma mensagem de consentimento certificada pelo Google, e você pode mudar sua escolha quando quiser."
+          ]
+        },
+        {
+          "h": "Seus direitos",
+          "p": [
+            "Dependendo de onde você mora (por exemplo, pela LGPD no Brasil ou pelo GDPR na Europa), você pode pedir acesso, correção ou exclusão dos seus dados pessoais, ou se opor ao uso deles. Não temos contas nem perfis, então normalmente não guardamos nada que possa ser ligado a você, mas escreva e a gente ajuda."
+          ]
+        },
+        {
+          "h": "Crianças",
+          "p": [
+            "O Foot Simu é um site para o público em geral e não coleta intencionalmente dados pessoais de crianças."
+          ]
+        },
+        {
+          "h": "Mudanças",
+          "p": [
+            "Se esta política mudar, atualizaremos esta página e a data."
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contato",
+      "description": "Fale com o Foot Simu: avise sobre um erro nos dados, sugira um campeonato ou pergunte sobre parcerias.",
+      "sections": [
+        {
+          "h": "Escreva para nós",
+          "p": [
+            "Mande um e-mail para [contact@footsimu.com](mailto:contact@footsimu.com). Lemos todas as mensagens e costumamos responder em poucos dias."
+          ]
+        },
+        {
+          "h": "Sobre o que escrever",
+          "p": [
+            "Um placar, tabela ou regra errada em um campeonato; uma liga ou copa que você gostaria de ver; um problema no celular ou no navegador; imprensa ou parcerias."
+          ]
+        },
+        {
+          "h": "Antes de escrever",
+          "p": [
+            "O Foot Simu não tem ligação com nenhuma liga ou clube, então não podemos ajudar com ingressos, transferências ou assuntos dos clubes."
+          ]
+        }
+      ]
+    }
   }
 }

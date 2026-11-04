@@ -1216,6 +1216,71 @@ async function step(name, fn) {
       await page.getByRole("button", { name: "Undo" }).click();
     });
 
+    await step("About, Privacy and Contact pages in every language, linked from the footer", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const titles = {
+        en: ["About Foot Simu", "Privacy policy", "Contact"],
+        pt: ["Sobre o Foot Simu", "Política de privacidade", "Contato"],
+        es: ["Acerca de Foot Simu", "Política de privacidad", "Contacto"],
+      };
+      for (const [locale, [about, privacy, contact]] of Object.entries(titles)) {
+        for (const [page, heading] of [["about", about], ["privacy", privacy], ["contact", contact]]) {
+          const response = await p.goto(`${BASE_URL}/${locale}/${page}`);
+          assert.equal(response.status(), 200, `${locale}/${page}`);
+          assert.equal((await p.locator("h1").innerText()).trim(), heading);
+          assert.match(await p.title(), new RegExp(heading));
+          const hreflang = await p.locator('link[rel="alternate"][hreflang]').evaluateAll((l) => l.map((x) => x.getAttribute("href")));
+          assert.ok(hreflang.some((h) => h.endsWith(`/pt/${page}`)) && hreflang.some((h) => h.endsWith(`/es/${page}`)), `${locale}/${page} hreflang`);
+        }
+        assert.equal(await p.locator('a[href="mailto:contact@footsimu.com"]').count(), 1, `${locale} contact email`);
+      }
+      // Privacy: dated, and it says how predictions, analytics and ads are handled.
+      await p.goto(`${BASE_URL}/en/privacy`);
+      const privacy = await p.locator('[data-testid="legal-page"]').innerText();
+      for (const words of [/Last updated/, /local storage/, /Vercel Web Analytics/, /Google AdSense/, /consent/]) assert.match(privacy, words);
+      // The footer reaches them, in the page's language.
+      await p.goto(`${BASE_URL}/pt/premier-league`);
+      const links = p.locator('[data-testid="site-links"] a');
+      assert.deepEqual(await links.allInnerTexts(), ["Sobre", "Privacidade", "Contato"]);
+      await links.nth(1).click();
+      await p.waitForURL(/\/pt\/privacy$/);
+      // About links to Contact inside the site.
+      await p.goto(`${BASE_URL}/en/about`);
+      await p.getByRole("link", { name: "let us know" }).click();
+      await p.waitForURL(/\/en\/contact$/);
+      // No ads until a publisher id is set: no AdSense code, ads.txt is a 404.
+      assert.equal(await p.locator('script[src*="adsbygoogle"]').count(), 0);
+      assert.equal(await p.locator('meta[name="google-adsense-account"]').count(), 0);
+      if (!process.env.EXPECT_ADSENSE) assert.equal((await p.request.get(`${BASE_URL}/ads.txt`)).status(), 404);
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      for (const page of ["about", "privacy", "contact"]) assert.match(sitemap, new RegExp(`footsimu\\.com/es/${page}<`));
+      await p.close();
+    });
+
+    await step("league pages explain their format and places", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      const facts = p.locator('[data-testid="league-facts"]');
+      assert.match(await facts.locator("h2").innerText(), /Premier League format/);
+      assert.match(await facts.innerText(), /20 clubs take part\. Each club plays every other club twice, home and away: 38 games\./);
+      assert.deepEqual((await facts.locator('[data-testid="league-places"] li').allInnerTexts()).map((x) => x.replace(/\s+/g, " ").trim()), [
+        "1st–4th Champions League",
+        "5th Europa League",
+        "6th Conference League",
+        "18th–20th Relegation",
+      ]);
+      await p.goto(`${BASE_URL}/en/greek-super-league`);
+      assert.match(await facts.innerText(), /After 26 rounds the table splits into separate tables: 1st–4th: Championship play-offs, 5th–8th: Europe play-offs, 9th–14th: Relegation play-outs\..*half of them, rounded up/s);
+      await p.goto(`${BASE_URL}/pt/liga-mx`);
+      assert.match(await facts.innerText(), /Em cada torneio, cada clube enfrenta todos os outros uma vez: 17 jogos\./);
+      await p.goto(`${BASE_URL}/es/scottish-premiership`);
+      assert.match(await facts.innerText(), /3 veces: 33 partidos/);
+      // Continental competitions keep their own explanation.
+      await p.goto(`${BASE_URL}/en/champions-league`);
+      assert.equal(await facts.count(), 0);
+      await p.close();
+    });
+
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       assert.match(await page.title(), /^Simulador do Brasileirão .* \| Foot Simu$/);

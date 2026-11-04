@@ -7,6 +7,27 @@ export const GOOGLE_SITE_VERIFICATION =
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://footsimu.com").replace(/\/$/, "");
 
+/** Pages about the site itself, linked from the footer. */
+export const SITE_PAGES = ["about", "privacy", "contact"] as const;
+
+export const CONTACT_EMAIL = "contact@footsimu.com";
+
+/**
+ * Google AdSense publisher id ("ca-pub-…"), set in the deployment once the
+ * site is approved; until then no ad code is loaded and ads.txt is a 404.
+ */
+export const ADSENSE_CLIENT = adsenseClient(process.env.NEXT_PUBLIC_ADSENSE_CLIENT);
+
+export function adsenseClient(value: string | undefined): string | undefined {
+  const id = value?.trim();
+  return id && /^ca-pub-\d{10,20}$/.test(id) ? id : undefined;
+}
+
+/** ads.txt: Google may sell this site's ad space, for this publisher only. */
+export function adsTxt(client: string): string {
+  return `google.com, ${client.replace(/^ca-/, "")}, DIRECT, f08c47fec0942fa0\n`;
+}
+
 /** hreflang codes: Portuguese content is written for Brazil. */
 export const HREFLANG: Record<string, string> = { en: "en", pt: "pt-BR", es: "es" };
 export const OG_LOCALE: Record<string, string> = { en: "en_GB", pt: "pt_BR", es: "es_ES" };
