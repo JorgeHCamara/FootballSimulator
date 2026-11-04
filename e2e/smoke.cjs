@@ -942,6 +942,22 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("split leagues on a phone: no wider than the screen, short table names", async () => {
+      const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+      for (const [slug, labels] of [
+        ["greek-super-league", ["Regular", "Title", "Europe", "Relegation"]],
+        ["ecuador-ligapro", ["1st stage", "Title", "Quadrangular", "Relegation"]],
+      ]) {
+        await phone.goto(`${BASE_URL}/en/${slug}`);
+        const sw = phone.locator('[data-testid="group-switch"]');
+        assert.deepEqual((await sw.locator("button").allInnerTexts()).map((x) => x.trim()), labels);
+        assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, `${slug} fits the screen`);
+        const box = await sw.boundingBox();
+        assert.ok(box.x + box.width <= 390 && (await sw.evaluate((e) => e.scrollWidth <= e.clientWidth)), `${slug}: the table names fit`);
+      }
+      await phone.close();
+    });
+
     await step("Chile: 16 clubs, Libertadores, Sudamericana and relegation zones", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/chile-primera-division`);

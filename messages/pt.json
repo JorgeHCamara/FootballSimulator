@@ -41,6 +41,7 @@
     "tagline": "Simule a temporada antes que ela aconteça"
   },
   "Simulator": {
+    "regularSeasonShort": "Regular",
     "slotName": "{place}º colocado",
     "slotShort": "{place}º",
     "slotNote": "Os clubes aparecem assim que todos os jogos da {phase} tiverem placar.",

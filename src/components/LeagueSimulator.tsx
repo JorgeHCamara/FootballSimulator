@@ -206,13 +206,19 @@ export function LeagueSimulator({
       const size = splitConfig?.groups[i]?.size ?? 0;
       const slots = Array.from({ length: i === (league.groups ?? []).length - 1 ? teams.length - place : size }, () => slotTeamId(++place));
       const teamIds = phase ? (phase.members?.[i] ?? slots) : groups?.find((m) => m.id === g.id)?.teamIds;
-      return teamIds ? [{ id: g.id, index: i, name: g.name[lang], teamIds, ...(g.zones ? { zones: g.zones } : {}) }] : [];
+      return teamIds ? [{ id: g.id, index: i, name: g.name[lang], shortName: g.shortName[lang], teamIds, ...(g.zones ? { zones: g.zones } : {}) }] : [];
     });
   }, [league.groups, groups, phase, splitConfig, teams.length, lang]);
   const [groupId, setGroupId] = useState<string | null>(null);
   const known = Boolean(phase?.members);
   // The first phase's own table comes first; shown until the groups are known.
-  const regularTab = phase ? { id: REGULAR_TAB, name: splitConfig?.firstPhaseName?.[lang] ?? t("regularSeason") } : null;
+  const regularTab = phase
+    ? {
+        id: REGULAR_TAB,
+        name: splitConfig?.firstPhaseName?.[lang] ?? t("regularSeason"),
+        shortName: splitConfig?.firstPhaseShortName?.[lang] ?? t("regularSeasonShort"),
+      }
+    : null;
   const selectedId = groupId ?? (phase && !known ? REGULAR_TAB : groupTabs[0]?.id);
   const showRegular = Boolean(regularTab) && selectedId === REGULAR_TAB && tab === "table";
   // In the chances: before the groups are known, the whole season; after, each group.
@@ -529,8 +535,8 @@ export function LeagueSimulator({
   const actionButton =
     "rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800";
   const primaryButton = "rounded-lg bg-pitch-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-pitch-700";
-  const tabButton = (active: boolean) =>
-    `rounded-md px-3 py-1.5 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-700" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"}`;
+  const tabButton = (active: boolean, compact = false) =>
+    `rounded-md ${compact ? "px-2 sm:px-3" : "px-3"} py-1.5 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-700" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"}`;
 
   return (
     <div className="space-y-4">
@@ -545,8 +551,9 @@ export function LeagueSimulator({
 
       {/* Phones: tabs, table, actions, fixtures. Desktop: tabs and actions on one
           row above the table and fixtures columns. */}
-      <div className="grid gap-4 lg:grid-cols-[auto_minmax(0,1fr)_400px] lg:items-start">
-        <div className="flex flex-wrap items-center gap-2 self-start justify-self-start lg:col-start-1 lg:row-start-1">
+      {/* One column on phones, never wider than the screen (a long group switch scrolls instead). */}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[auto_minmax(0,1fr)_400px] lg:items-start">
+        <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 self-start justify-self-start lg:col-start-1 lg:row-start-1">
           <div className="flex rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="tablist">
             <button type="button" role="tab" aria-selected={tab === "table"} className={tabButton(tab === "table")} onClick={() => setTab("table")}>
               {t("table")}
@@ -573,10 +580,18 @@ export function LeagueSimulator({
                     aria-pressed={selected}
                     aria-label={g.name}
                     title={g.name}
-                    className={`whitespace-nowrap ${tabButton(selected)}`}
+                    className={`whitespace-nowrap ${tabButton(selected, Boolean(phase))}`}
                     onClick={() => pickTable(g.id)}
                   >
-                    {label}
+                    {/* A split's tables: short names on phones ("Title"), in full from tablets up. */}
+                    {phase ? (
+                      <>
+                        <span className="sm:hidden">{g.shortName}</span>
+                        <span className="hidden sm:inline">{g.name}</span>
+                      </>
+                    ) : (
+                      label
+                    )}
                   </button>
                 );
               })}

@@ -141,8 +141,9 @@ export interface LeagueConfig {
     finalZones?: Zone[];
     /** ESPN's stage tag of the first phase's games (postponed ones can be played during the split). */
     espnStage?: string;
-    /** The first phase's tab once split ("Regular season" by default). */
+    /** The first phase's tab once split ("Regular season" by default), and on phones. */
     firstPhaseName?: Record<SiteLocale, string>;
+    firstPhaseShortName?: Record<SiteLocale, string>;
   };
   /**
    * Real data comes from ESPN and falls back to football-data.org (with `code`
@@ -759,7 +760,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
         id: "1",
         espnName: "Championship",
         name: { en: "Championship play-offs", pt: "Play-offs do título", es: "Play-offs por el título" },
-        shortName: { en: "Championship", pt: "Título", es: "Título" },
+        shortName: { en: "Title", pt: "Título", es: "Título" },
         zones: [
           { kind: "title", from: 1, to: 1 },
           { kind: "championsLeagueQualifying", from: 2, to: 2 },
@@ -1165,6 +1166,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     // The first stage ends with the last round published until ESPN shows the groups.
     split: {
       firstPhaseName: { en: "First stage", pt: "Primeira fase", es: "Primera etapa" },
+      firstPhaseShortName: { en: "1st stage", pt: "1ª fase", es: "1ª etapa" },
       espnStage: "first-stage",
       groups: [
         { size: 6, legs: 2 },
@@ -1196,7 +1198,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
         id: "1",
         espnName: "Group 1",
         name: { en: "Title hexagonal", pt: "Hexagonal do título", es: "Hexagonal por el título" },
-        shortName: { en: "Title hexagonal", pt: "Hexagonal do título", es: "Hexagonal por el título" },
+        shortName: { en: "Title", pt: "Título", es: "Título" },
         zones: [
           { kind: "title", from: 1, to: 1 },
           { kind: "libertadores", from: 2, to: 2 },
@@ -1215,7 +1217,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
         id: "3",
         espnName: "Group 3",
         name: { en: "Relegation hexagonal", pt: "Hexagonal do rebaixamento", es: "Hexagonal del descenso" },
-        shortName: { en: "Relegation hexagonal", pt: "Hexagonal do rebaixamento", es: "Hexagonal del descenso" },
+        shortName: { en: "Relegation", pt: "Rebaixamento", es: "Descenso" },
         zones: [{ kind: "relegation", from: 5, to: 6 }],
       },
     ],

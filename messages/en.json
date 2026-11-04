@@ -41,6 +41,7 @@
     "tagline": "Simulate the season before it happens"
   },
   "Simulator": {
+    "regularSeasonShort": "Regular",
     "slotName": "{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place",
     "slotShort": "{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
     "slotNote": "The clubs are filled in once every {phase} game has a score.",
