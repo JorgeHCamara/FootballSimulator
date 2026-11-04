@@ -104,7 +104,10 @@ describe("priors are up to date", () => {
 });
 
 describe("domestic starting ratings", () => {
-  const seasons: Record<number, PriorSeason> = { 2025: { PL: { "1": [1.3, 0.7] } }, 2026: { PL: { "1": [1.5, 0.6], "2": [0.8, 1.3] } } };
+  const seasons: Record<number, PriorSeason> = {
+    2025: { PL: { rho: -0.05, clubs: { "1": [1.3, 0.7] }, home: {} } },
+    2026: { PL: { rho: -0.1, clubs: { "1": [1.5, 0.6], "2": [0.8, 1.3] }, home: { "1": 1.2 } } },
+  };
 
   it("uses the season's own ratings, else the latest earlier season's", () => {
     assert.deepEqual(domesticPriors("PL", 2026, seasons), { 1: { attack: 1.5, defence: 0.6 }, 2: { attack: 0.8, defence: 1.3 } });

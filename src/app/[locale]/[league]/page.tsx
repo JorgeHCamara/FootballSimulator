@@ -1,4 +1,4 @@
-import { domesticPriors } from "../../../lib/priors.ts";
+import { domesticMatchParams, domesticPriors } from "../../../lib/priors.ts";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -196,6 +196,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
       : loaded.config.continental
         ? await getContinentalPriors(loaded.config, leagueTeams.map((t) => t.id))
         : domesticPriors(loaded.config.code, loaded.data.seasonYear);
+  // The league's rho (and home splits) for the match model.
+  const matchParams = loaded.kind === "league" && !loaded.config.continental ? domesticMatchParams(loaded.config.code, loaded.data.seasonYear) : undefined;
   const stepKey = (step: "step1" | "step2" | "step3") =>
     wording === "cupBracket" && step === "step2"
       ? "step2CupBracket"
@@ -277,6 +279,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           current={loaded.data.tournaments.find((x) => x.seasonKey === loaded.data.seasonKey)?.id ?? loaded.data.tournaments[0]!.id}
           {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
+          {...(matchParams ? { matchParams } : {})}
           {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
         />
       ) : (
@@ -289,6 +292,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(loaded.data.postseason ? { postseason: loaded.data.postseason } : {})}
           {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
+          {...(matchParams ? { matchParams } : {})}
           {...(external ? { externalSeeds: external.rows } : {})}
           {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
           {...(loaded.data.firstPhaseIds ? { firstPhaseIds: loaded.data.firstPhaseIds } : {})}

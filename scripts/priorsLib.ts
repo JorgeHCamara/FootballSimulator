@@ -1,0 +1,233 @@
+/**
+ * How a domestic league's starting ratings and match parameters are built
+ * from ESPN's results (used by build-priors.ts and backtest.ts).
+ */
+import { LEAGUES, type LeagueConfig } from "../src/config/leagues.ts";
+import { dixonColesTau, expectedGoals } from "../src/engine/match.ts";
+import { buildLeagueModel, NO_DATA_PRIOR, type LeagueModel, type TeamStrength } from "../src/engine/ratings.ts";
+import { realResults } from "../src/engine/results.ts";
+import type { Fixture, ResultMap, Team, TeamId } from "../src/engine/types.ts";
+import { espnFixtures, espnTeams, fetchEspnSeason } from "../src/lib/espn.ts";
+
+/** The league below each one the site covers (promotion and relegation between them). */
+export const LOWER: Partial<Record<string, string>> = { PL: "ELC", ELC: "EL1", EL1: "EL2", PD: "SD", BL1: "BL2", SA: "SB", FL1: "FL2", DED: "DJL", BSA: "BSB" };
+export const UPPER: Partial<Record<string, string>> = Object.fromEntries(Object.entries(LOWER).map(([up, down]) => [down!, up]));
+
+/** How much of last season's difference from average a club keeps (in log terms). */
+const CARRY = 0.75;
+/** A promoted club: typical rating of a club coming up, and of a club going down. */
+const PROMOTED = { attack: 0.8, defence: 1.25 };
+const RELEGATED = { attack: 1.2, defence: 0.82 };
+/** Typical ratings of those clubs in the league they leave, to compare with. */
+const UP_FROM = { attack: 1.3, defence: 0.75 };
+const DOWN_FROM = { attack: 0.8, defence: 1.25 };
+/** How much a club's rating in the other league moves it from the typical value. */
+const MOVE = 0.4;
+/** Games a club needs last season for its rating to count. */
+const MIN_GAMES = 8;
+
+/** Dixon–Coles rho: the range it's kept in, and the value for leagues with too few games. */
+export const RHO_RANGE = [-0.2, 0] as const;
+export const DEFAULT_RHO = -0.1;
+const MIN_RHO_MATCHES = 150;
+/** Home advantage: home games a club needs to move half way from the league's (w = n / (n + K)), and the clamp. */
+export const HOME_SHRINK_GAMES = 35;
+export const HOME_CLAMP = 0.3;
+
+const byCode = new Map(LEAGUES.map((l) => [l.code as string, l]));
+
+export interface Season {
+  teams: Team[];
+  fixtures: Fixture[];
+  results: ResultMap;
+}
+
+const seasons = new Map<string, Promise<Season>>();
+/** A league's season from ESPN (cached for the run). */
+export function fetchSeason(code: string, year: number): Promise<Season> {
+  const key = `${code}:${year}`;
+  if (!seasons.has(key)) {
+    const league = byCode.get(code)!;
+    seasons.set(
+      key,
+      fetchEspnSeason(league.espn.slug, year, league.espn.seasons).then((events) => {
+        const fixtures = espnFixtures(events);
+        return { teams: espnTeams(events), fixtures, results: realResults(fixtures) };
+      }),
+    );
+  }
+  return seasons.get(key)!;
+}
+
+const gamesPlayed = (season: Season) => {
+  const games = new Map<number, number>();
+  for (const f of season.fixtures) if (season.results[f.id]) for (const id of [f.homeId, f.awayId]) games.set(id, (games.get(id) ?? 0) + 1);
+  return games;
+};
+
+/**
+ * A season's opponent-adjusted ratings. With `halfLife`, its later games
+ * count a bit more, so a club that finished strongly starts a bit higher.
+ */
+export function seasonRatings(season: Season, halfLife = Infinity) {
+  const model = buildLeagueModel(season.teams, season.fixtures, season.results, { priorGames: 3, halfLife, minEffectiveGames: 0 });
+  return { model, games: gamesPlayed(season) };
+}
+
+const pow = (x: number, k: number) => Math.exp(k * Math.log(x));
+const moved = (typical: TeamStrength, from: TeamStrength, s: TeamStrength): TeamStrength => ({
+  attack: typical.attack * pow(s.attack / from.attack, MOVE),
+  defence: typical.defence * pow(s.defence / from.defence, MOVE),
+});
+export const round3 = (x: number) => Math.round(x * 1000) / 1000;
+
+type Ratings = ReturnType<typeof seasonRatings>;
+
+/**
+ * Starting ratings of a season's clubs, from last season: returning clubs
+ * keep most of their rating, promoted ones get their rating below turned
+ * into a below-average one, relegated ones the reverse, others a
+ * below-average default; rescaled to average 1 (geometric mean).
+ */
+export function clubPriors(clubs: readonly Team[], last: Ratings | null, lower: Ratings | null, upper: Ratings | null) {
+  const known = (r: Ratings | null, id: number) => (r && (r.games.get(id) ?? 0) >= MIN_GAMES ? r.model.strengths.get(id) : undefined);
+  const counts = { returning: 0, promoted: 0, relegated: 0, unknown: 0 };
+  const raw = clubs.map((club) => {
+    const same = known(last, club.id);
+    if (same) {
+      counts.returning++;
+      return [club.id, { attack: pow(same.attack, CARRY), defence: pow(same.defence, CARRY) }] as const;
+    }
+    const below = known(lower, club.id);
+    if (below) {
+      counts.promoted++;
+      return [club.id, moved(PROMOTED, UP_FROM, below)] as const;
+    }
+    const above = known(upper, club.id);
+    if (above) {
+      counts.relegated++;
+      return [club.id, moved(RELEGATED, DOWN_FROM, above)] as const;
+    }
+    counts.unknown++;
+    return [club.id, NO_DATA_PRIOR] as const;
+  });
+  const mean = (k: "attack" | "defence") => Math.exp(raw.reduce((sum, [, s]) => sum + Math.log(s[k]), 0) / raw.length);
+  const ma = mean("attack");
+  const md = mean("defence");
+  const clamp = (x: number) => Math.min(2.5, Math.max(0.4, x));
+  const strengths = new Map<TeamId, TeamStrength>(raw.map(([id, s]) => [id, { attack: round3(clamp(s.attack / ma)), defence: round3(clamp(s.defence / md)) }]));
+  return { strengths, counts, returning: new Set(raw.filter(([id]) => known(last, id)).map(([id]) => id)) };
+}
+
+/** Played games of several seasons as one pool (ids are ESPN's, unique across seasons). */
+export function pool(...parts: Season[]): Season {
+  const teams = new Map<number, Team>();
+  for (const part of parts) for (const t of part.teams) teams.set(t.id, t);
+  const fixtures = parts.flatMap((p) => p.fixtures.filter((f) => p.results[f.id]));
+  return { teams: [...teams.values()], fixtures, results: Object.assign({}, ...parts.map((p) => p.results)) };
+}
+
+/**
+ * Dixon–Coles rho by maximum likelihood with the ratings held fixed: only τ
+ * depends on rho, so it maximises Σ log τ over the games (a grid search),
+ * clamped to RHO_RANGE; DEFAULT_RHO with too few games.
+ */
+export function estimateRho(model: LeagueModel, season: Season): { rho: number; matches: number } {
+  const games = season.fixtures.filter((f) => season.results[f.id]);
+  if (games.length < MIN_RHO_MATCHES) return { rho: DEFAULT_RHO, matches: games.length };
+  const xg = games.map((f) => expectedGoals(model, f.homeId, f.awayId));
+  let best = { rho: 0, ll: -Infinity };
+  for (let rho = -0.3; rho <= 0.1 + 1e-9; rho += 0.0025) {
+    let ll = 0;
+    games.forEach((f, i) => {
+      const r = season.results[f.id]!;
+      ll += Math.log(Math.max(1e-12, dixonColesTau(r.home, r.away, xg[i]!, rho)));
+    });
+    if (ll > best.ll) best = { rho, ll };
+  }
+  return { rho: round3(Math.min(RHO_RANGE[1], Math.max(RHO_RANGE[0], best.rho))), matches: games.length };
+}
+
+/**
+ * Each club's home/away split relative to the league's, from its home and
+ * away goals for and against, each against what its opponents would give an
+ * average side at that venue (the pooled model's ratings). Shrunk hard to
+ * the league's (w = n / (n + K), n its home games) and clamped to ±30%.
+ * Only for `clubs` (returning ones); the others play at the league's.
+ */
+export function estimateHomeFactors(model: LeagueModel, season: Season, clubs: ReadonlySet<TeamId>): Map<TeamId, number> {
+  const acc = new Map<TeamId, { n: number; hgf: number; hxgf: number; hga: number; hxga: number; agf: number; axgf: number; aga: number; axga: number }>();
+  const get = (id: TeamId) => {
+    let a = acc.get(id);
+    if (!a) acc.set(id, (a = { n: 0, hgf: 0, hxgf: 0, hga: 0, hxga: 0, agf: 0, axgf: 0, aga: 0, axga: 0 }));
+    return a;
+  };
+  const s = (id: TeamId) => model.strengths.get(id) ?? { attack: 1, defence: 1 };
+  for (const f of season.fixtures) {
+    const r = season.results[f.id];
+    if (!r || f.neutral) continue;
+    const h = get(f.homeId);
+    const a = get(f.awayId);
+    h.n++;
+    // What each side's opponent gives an average side at this venue.
+    h.hgf += r.home;
+    h.hxgf += model.avgHomeGoals * s(f.awayId).defence;
+    h.hga += r.away;
+    h.hxga += model.avgAwayGoals * s(f.awayId).attack;
+    a.agf += r.away;
+    a.axgf += model.avgAwayGoals * s(f.homeId).defence;
+    a.aga += r.home;
+    a.axga += model.avgHomeGoals * s(f.homeId).attack;
+  }
+  const raw = new Map<TeamId, { n: number; log: number }>();
+  for (const [id, a] of acc) {
+    if (a.n < 1 || a.hgf + a.hga === 0 || !(a.hxgf > 0 && a.axgf > 0 && a.hxga > 0 && a.axga > 0)) continue;
+    // Smoothed ratios (half a goal each way) so a club that never scored away isn't infinite.
+    const ratio = (g: number, x: number) => (g + 0.5) / (x + 0.5);
+    const home = ratio(a.hgf, a.hxgf) / ratio(a.hga, a.hxga);
+    const away = ratio(a.agf, a.axgf) / ratio(a.aga, a.axga);
+    raw.set(id, { n: a.n, log: Math.log(home / away) });
+  }
+  const values = [...raw.values()];
+  const leagueLog = values.length ? values.reduce((sum, v) => sum + v.log, 0) / values.length : 0;
+  const out = new Map<TeamId, number>();
+  for (const id of clubs) {
+    const v = raw.get(id);
+    if (!v) continue;
+    const w = v.n / (v.n + HOME_SHRINK_GAMES);
+    const k = Math.exp(w * (v.log - leagueLog));
+    out.set(id, round3(Math.min(1 + HOME_CLAMP, Math.max(1 - HOME_CLAMP, k))));
+  }
+  return out;
+}
+
+export interface LeaguePriors {
+  clubs: Map<TeamId, TeamStrength>;
+  rho: number;
+  rhoMatches: number;
+  home: Map<TeamId, number>;
+  counts: ReturnType<typeof clubPriors>["counts"];
+}
+
+/**
+ * One league's priors for the season starting in `year`: its clubs' starting
+ * ratings from the season before (later games weighing more with
+ * `halfLife`), and rho and the home splits from last season and, with
+ * `includeCurrent`, the current season's games so far.
+ */
+export async function buildLeaguePriors(league: LeagueConfig, year: number, { halfLife = Infinity, includeCurrent = true }: { halfLife?: number; includeCurrent?: boolean } = {}): Promise<LeaguePriors | null> {
+  const current = await fetchSeason(league.code, year);
+  if (current.teams.length < 4) return null;
+  const lastSeason = await fetchSeason(league.code, year - 1).catch(() => null);
+  const last = lastSeason ? seasonRatings(lastSeason, halfLife) : null;
+  const lower = LOWER[league.code] ? await fetchSeason(LOWER[league.code]!, year - 1).then((s) => seasonRatings(s, halfLife)).catch(() => null) : null;
+  const upper = UPPER[league.code] ? await fetchSeason(UPPER[league.code]!, year - 1).then((s) => seasonRatings(s, halfLife)).catch(() => null) : null;
+  const { strengths, counts, returning } = clubPriors(current.teams, last, lower, upper);
+  // rho and home splits: from the league's games, last season (+ this one so far).
+  const parts = [lastSeason, includeCurrent ? current : null].filter((p): p is Season => Boolean(p));
+  const games = pool(...parts);
+  const fitted = buildLeagueModel(games.teams, games.fixtures, games.results, { priorGames: 3 });
+  const { rho, matches } = estimateRho(fitted, games);
+  const home = estimateHomeFactors(fitted, games, returning);
+  return { clubs: strengths, rho, rhoMatches: matches, home, counts };
+}

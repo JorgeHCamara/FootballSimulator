@@ -149,7 +149,7 @@ export function CupSimulator({ cup, data }: Props) {
     const rng = createRng(randomSeed());
     const score = isCupShootoutId(fixture.id)
       ? simulatePenalties(rng)
-      : simulateScore(fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId), rng);
+      : simulateScore(fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId), rng, model.rho ?? 0);
     setScore(seasonKey, fixture, score);
   };
   const onScore = (fixture: Fixture, score: Score | null) => {

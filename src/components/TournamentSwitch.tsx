@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import type { EspnStages, LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import { realChampion } from "../engine/playoffs.ts";
-import type { TeamStrength } from "../engine/ratings.ts";
+import type { MatchParams, TeamStrength } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
 import { computeStandings } from "../engine/standings.ts";
 import type { Fixture, Team, TeamId } from "../engine/types.ts";
@@ -21,6 +21,8 @@ interface Props {
   /** The current tournament's groups (from ESPN's standings). */
   groups?: { id: string; teamIds: number[] }[];
   priorStrengths?: Record<number, TeamStrength>;
+  /** The league's match parameters (rho, home splits). */
+  matchParams?: MatchParams;
   /** Points deducted in the current tournament's table (ESPN), also applied to the annual table. */
   deductions?: Record<number, number>;
 }
@@ -62,7 +64,7 @@ export function tournamentChampion(config: LeagueConfig, teams: readonly Team[],
  * (and in some leagues relegation). The annual table shares the current
  * tournament's predictions.
  */
-export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths, deductions }: Props) {
+export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths, deductions, matchParams }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const [view, setView] = useState<string>(current);
@@ -148,6 +150,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           {...(shown.postseason ? { postseason: shown.postseason } : {})}
           {...(shownGroups ? { groups: shownGroups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
+          {...(matchParams ? { matchParams } : {})}
           {...(deductions && shown.id === current ? { deductions } : {})}
         />
       ) : (
@@ -161,6 +164,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           season={live.season}
           {...(annual.champions.length ? { qualifiedElsewhere: annual.champions.map((c) => c.id) } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
+          {...(matchParams ? { matchParams } : {})}
           {...(notes.length ? { qualifiedNote: notes.join(" ") } : {})}
           {...(deductions ? { deductions } : {})}
         />

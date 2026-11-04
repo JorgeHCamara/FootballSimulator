@@ -71,25 +71,53 @@ After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_
 
 ### Yearly: rebuild priors
 
-The chances in domestic leagues start each club from last season's ratings
-(`src/data/priors/<year>.ts`, by league and ESPN club id; promoted clubs from
-their rating in the league below). Rebuild them once a new season's clubs are on
-ESPN, so promoted and relegated clubs are placed correctly:
+The chances in domestic leagues start from `src/data/priors/<year>.ts`, built
+from ESPN's results by `scripts/build-priors.ts` (logic in `scripts/priorsLib.ts`).
+For each league it holds:
+
+- **clubs**: each club's starting rating, from last season (promoted clubs from
+  their rating in the league below, relegated ones the reverse, clubs without
+  data a below-average default);
+- **rho**: the Dixon–Coles dependence of low scores (negative means more 0–0 and
+  1–1 than independent Poisson counts), by maximum likelihood over last season's
+  and this season's games with the ratings held fixed, kept within −0.2..0
+  (−0.10 for leagues with fewer than 150 games);
+- **home**: each returning club's home/away split relative to the league's,
+  from the same games, opponent-adjusted, shrunk to the league's
+  (w = n / (n + 35), n its home games) and clamped to ±30%. Promoted clubs and
+  clubs without data play at the league's home advantage; neutral grounds have none.
+
+Rebuild it once a new season's clubs are on ESPN:
 
 ```bash
 npm run priors -- 2027
 ```
 
-This runs `scripts/build-priors.ts` for the season starting in 2027 (2027/28 for
-European leagues, 2027 for calendar-year leagues such as the Brasileirão, MLS,
-J1 and the South American leagues). It reads the 2026 season from ESPN, writes
-`src/data/priors/2027.ts` and updates `src/data/priors/index.ts`; commit both.
-Calendar-year leagues start in January, so run it then for them, and again in
-August for the European ones (it rebuilds every league; leagues whose new
-season isn't on ESPN yet are skipped with a warning, so run it once more later).
-Until a season has its own file, the latest earlier one is used and the server
-logs a warning, and `npm test` fails once the newest file is more than one
-season behind any league's current season.
+This builds the season starting in 2027 (2027/28 for European leagues, 2027 for
+calendar-year leagues such as the Brasileirão, MLS, J1 and the South American
+leagues) and writes `src/data/priors/2027.ts` and `src/data/priors/index.ts`;
+commit both. Calendar-year leagues start in January, so run it then for them, and
+again in August for the European ones (leagues whose new season isn't on ESPN yet
+are skipped with a warning). Until a season has its own file, the latest earlier
+one is used and the server logs a warning, and `npm test` fails once the newest
+file is more than one season behind any league's current season.
+
+#### Match model switches and the backtest
+
+`src/engine/ratings.ts` holds three switches, set from a backtest of last season:
+
+| Switch | Now | Why |
+|---|---|---|
+| `DIXON_COLES` (score distribution with rho) | on | slightly better 1X2 log-loss and Brier score, draw rate close to the real one |
+| `TEAM_HOME_ADVANTAGE` (the clubs' home splits) | off | worse in all four leagues tested |
+| `RATING_HALF_LIFE` (recency weighting; `ratingHalfLife` per league) | off (`Infinity`) | every half-life from 6 to 40 games scored worse |
+
+To re-run it (predicting each matchday of a past season from earlier games only,
+with priors, rho and home splits from the season before):
+
+```bash
+npm run backtest -- 2025 PL PD SA BSA
+```
 
 ![League page](docs/screenshots/league.png)
 

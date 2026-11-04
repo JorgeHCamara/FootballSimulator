@@ -49,7 +49,7 @@ function playTie(spec: TieSpec, model: LeagueModel, neutral: boolean, rng: Rng):
   spec.legs.forEach((known, i) => {
     const host = spec.hosts[i]!;
     const guest = host === spec.first ? spec.second : spec.first;
-    const score = known ?? simulateScore(neutral ? expectedGoalsNeutral(model, host, guest) : expectedGoals(model, host, guest), rng);
+    const score = known ?? simulateScore(neutral ? expectedGoalsNeutral(model, host, guest) : expectedGoals(model, host, guest), rng, model.rho ?? 0);
     const firstAtHome = host === spec.first;
     first += firstAtHome ? score.home : score.away;
     second += firstAtHome ? score.away : score.home;

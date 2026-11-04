@@ -1,4 +1,4 @@
-import { expectedGoals, simulateScore } from "./match.ts";
+import { expectedGoals, sampleScore, scoreSampler, type ScoreSampler } from "./match.ts";
 import { seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
@@ -69,9 +69,19 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
     ? input.groups.map((ids) => ids.flatMap((id) => byId.get(id) ?? []))
     : [teams];
   const rng = createRng(input.seed);
+  // Each remaining game's score distribution (Dixon–Coles adjusted), built once.
+  const rho = model.rho ?? 0;
   const remaining = fixtures
     .filter((f) => !fixed[f.id])
-    .map((f) => ({ id: f.id, xg: expectedGoals(model, f.homeId, f.awayId) }));
+    .map((f) => ({ id: f.id, sampler: scoreSampler(expectedGoals(model, f.homeId, f.awayId), rho) }));
+  /** Generated split games: one distribution per pairing. */
+  const pairSamplers = new Map<string, ScoreSampler>();
+  const pairSampler = (homeId: TeamId, awayId: TeamId) => {
+    const key = `${homeId}-${awayId}`;
+    let sampler = pairSamplers.get(key);
+    if (!sampler) pairSamplers.set(key, (sampler = scoreSampler(expectedGoals(model, homeId, awayId), rho)));
+    return sampler;
+  };
 
   const positionCounts: Record<TeamId, number[]> = {};
   const pointsTotal: Record<TeamId, number> = {};
@@ -91,13 +101,13 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
   const playoffReached: Record<TeamId, number[]> = {};
   const playoffWins: Record<TeamId, number> = {};
   for (let i = 0; i < iterations; i++) {
-    for (const r of remaining) results[r.id] = simulateScore(r.xg, rng);
+    for (const r of remaining) results[r.id] = sampleScore(r.sampler, rng);
     let played: readonly Fixture[] = fixtures;
     if (input.project) {
       const { afterRound, afterDate, groups } = input.project;
       const atSplit = computeStandings(teams, fixtures, results, { ...tableOptions, split: undefined });
       const extra = splitFixtures(splitGroupsFrom(atSplit, groups), groups, afterRound, afterDate);
-      for (const f of extra) results[f.id] = fixed[f.id] ?? simulateScore(expectedGoals(model, f.homeId, f.awayId), rng);
+      for (const f of extra) results[f.id] = fixed[f.id] ?? sampleScore(pairSampler(f.homeId, f.awayId), rng);
       played = [...fixtures, ...extra];
     }
     const groupRows: ReturnType<typeof computeStandings>[] = [];

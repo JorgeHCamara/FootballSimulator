@@ -128,6 +128,8 @@ export interface LeagueConfig {
    * with; defaults to DOMESTIC_PRIOR_GAMES. Continental competitions use their own.
    */
   ratingPriorGames?: number;
+  /** Recency weighting of this league's ratings (games for a game's weight to halve); defaults to RATING_HALF_LIFE. */
+  ratingHalfLife?: number;
   /** Separate tables (MLS conferences); zones then apply within each group. */
   groups?: readonly LeagueGroup[];
   /**

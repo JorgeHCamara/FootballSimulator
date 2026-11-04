@@ -155,6 +155,22 @@ async function step(name, fn) {
       await fresh.close();
     });
 
+    await step("unplayed games show the model's 1X2 chances and likeliest scores", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      const odds = p.locator('[data-testid="match-odds"]');
+      await odds.first().waitFor();
+      for (const text of await odds.allInnerTexts()) {
+        const m = text.replace(/\s+/g, " ").match(/1 (\d+)% · X (\d+)% · 2 (\d+)% Likely (\d+–\d+), (\d+–\d+), (\d+–\d+)/);
+        assert.ok(m, text);
+        const total = Number(m[1]) + Number(m[2]) + Number(m[3]);
+        assert.ok(total >= 98 && total <= 102, `${text}: ${total}%`);
+      }
+      // As many lines as games still to play on the matchday.
+      assert.equal(await odds.count(), await p.locator('[data-testid="fixtures"] [data-testid="match-row"] input').count() / 2);
+      await p.close();
+    });
+
     await step("icons are Lucide icons, not emojis", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       const emoji = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1D400}-\u{1D7FF}]/u;
