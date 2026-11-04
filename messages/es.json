@@ -159,7 +159,22 @@
     },
     "pointsDeducted": "{points} puntos descontados",
     "aclEliteChance": "ACL Élite",
-    "chancesEarlyNote": "Al principio de la temporada, estas probabilidades son estimaciones aproximadas, basadas en la forma actual y en los resultados de la temporada pasada."
+    "chancesEarlyNote": "Al principio de la temporada, estas probabilidades son estimaciones aproximadas, basadas en la forma actual y en los resultados de la temporada pasada.",
+    "shareMenu": "Opciones para compartir",
+    "shareNative": "Compartir…",
+    "shareImage": "Compartir imagen",
+    "sharePreparing": "Preparando la imagen…",
+    "shareImageReady": "Imagen lista: toca para compartir",
+    "copyLink": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "shareX": "Publicar en X",
+    "shareWhatsApp": "WhatsApp",
+    "shareReddit": "Reddit",
+    "shareFacebook": "Facebook",
+    "downloadImage": "Descargar imagen",
+    "shareTitle": "Mi pronóstico de {league} {season}",
+    "shareText": "Mi pronóstico de {league} {season} en Foot Simu. Simula el tuyo:",
+    "shareFailed": "No se pudo abrir el menú para compartir. Elige una opción abajo."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -754,5 +769,31 @@
         }
       ]
     }
+  },
+  "ShareCard": {
+    "myPrediction": "Mi pronóstico",
+    "champions": "{team} campeón",
+    "top": "{team} termina líder",
+    "relegated": "{team} desciende",
+    "titleChance": "{pct} de probabilidad de título",
+    "topChance": "{pct} de terminar líder",
+    "relegationChance": "{pct} de probabilidad de descenso",
+    "basedOn": "Basado en {count} temporadas simuladas",
+    "cta": "Simula el tuyo en footsimu.com",
+    "position": "#",
+    "team": "Equipo",
+    "points": "Pts",
+    "chance": "Prob.",
+    "genericTitle": "{league} {season}",
+    "genericSubtitle": "Pronostica la tabla y mira las opciones de cada club"
+  },
+  "SharePage": {
+    "title": "Mi pronóstico de {league} {season}",
+    "description": "Mi tabla final de {league} {season} en Foot Simu. Haz tu pronóstico y mira las opciones de cada club.",
+    "eyebrow": "Pronóstico compartido",
+    "heading": "{league} {season}: mi pronóstico",
+    "note": "Este es un pronóstico compartido: los resultados vienen del enlace y no se pueden cambiar aquí.",
+    "makeOwn": "Haz tu propio pronóstico",
+    "startFrom": "Empezar desde este pronóstico"
   }
 }

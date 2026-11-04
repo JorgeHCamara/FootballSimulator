@@ -159,7 +159,22 @@
     },
     "pointsDeducted": "{points} points deducted",
     "aclEliteChance": "ACL Elite",
-    "chancesEarlyNote": "Early in the season these chances are rough estimates, based on current form and last season's results."
+    "chancesEarlyNote": "Early in the season these chances are rough estimates, based on current form and last season's results.",
+    "shareMenu": "Share options",
+    "shareNative": "Share…",
+    "shareImage": "Share image",
+    "sharePreparing": "Preparing image…",
+    "shareImageReady": "Image ready: tap to share",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "shareX": "Post on X",
+    "shareWhatsApp": "WhatsApp",
+    "shareReddit": "Reddit",
+    "shareFacebook": "Facebook",
+    "downloadImage": "Download image",
+    "shareTitle": "My {league} {season} prediction",
+    "shareText": "My {league} {season} prediction on Foot Simu. Simulate yours:",
+    "shareFailed": "Couldn't open the share sheet. Pick an option below."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -754,5 +769,31 @@
         }
       ]
     }
+  },
+  "ShareCard": {
+    "myPrediction": "My prediction",
+    "champions": "{team} champions",
+    "top": "{team} top the table",
+    "relegated": "{team} relegated",
+    "titleChance": "{pct} title chance",
+    "topChance": "{pct} chance of finishing top",
+    "relegationChance": "{pct} relegation chance",
+    "basedOn": "Based on {count} simulated seasons",
+    "cta": "Simulate yours at footsimu.com",
+    "position": "#",
+    "team": "Team",
+    "points": "Pts",
+    "chance": "Chance",
+    "genericTitle": "{league} {season}",
+    "genericSubtitle": "Predict the table and see every club's chances"
+  },
+  "SharePage": {
+    "title": "My {league} {season} prediction",
+    "description": "My predicted {league} {season} table on Foot Simu. Make your own prediction and see every club's chances.",
+    "eyebrow": "Shared prediction",
+    "heading": "{league} {season}: my prediction",
+    "note": "This is a shared prediction: the scores come from the link, and you can't change them here.",
+    "makeOwn": "Make your own prediction",
+    "startFrom": "Start from this prediction"
   }
 }

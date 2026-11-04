@@ -21,7 +21,6 @@ import {
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
 import {
-  allSplitFixtureIds,
   buildSplitPhase,
   groupOfRound,
   isSlotTeamId,
@@ -33,6 +32,8 @@ import {
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
 import type { Fixture, ResultMap, Score, StandingRow, Team } from "../engine/types.ts";
 import { decodeResults, encodeResults } from "../lib/shareCodec.ts";
+import { canGenerateSplit, shareCardSupported, shareFixtureList, splitRoundOf } from "../lib/splitSetup.ts";
+import { ShareMenu } from "./ShareMenu.tsx";
 import { emptySeason, useSimStore } from "../store/simStore.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
@@ -68,6 +69,11 @@ interface Props {
   deductions?: Record<number, number>;
   /** A split league: its first phase's games, by the feed's stage tag. */
   firstPhaseIds?: number[];
+  /**
+   * A shared prediction shown read-only (the share page): these scores in
+   * place of the visitor's own, which stay untouched; no editing.
+   */
+  scenario?: ResultMap;
 }
 
 type Tab = "table" | "chances";
@@ -98,15 +104,18 @@ export function LeagueSimulator({
   qualifiedNote,
   deductions,
   firstPhaseIds,
+  scenario,
 }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
-  const [hydrated, setHydrated] = useState(false);
+  const readOnly = scenario !== undefined;
+  const [hydrated, setHydrated] = useState(readOnly);
   const [tab, setTab] = useState<Tab>("table");
   const [notice, setNotice] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
-  const season = useSimStore((s) => (hydrated ? s.seasons[seasonKey] : undefined) ?? emptySeason);
+  const stored = useSimStore((s) => (hydrated && !readOnly ? s.seasons[seasonKey] : undefined) ?? emptySeason);
+  const shared = useMemo(() => (scenario ? { predictions: scenario, overrides: [] } : null), [scenario]);
+  const season = shared ?? stored;
   const canUndo = useSimStore((s) => (s.history[seasonKey]?.length ?? 0) > 0);
   const { setScore, applyResults, replace, reset, undo, reconcile, drop } = useSimStore.getState();
 
@@ -131,25 +140,9 @@ export function LeagueSimulator({
   const splitConfig = league.split;
   const lastReal = useMemo(() => sortFixtures(fixtures).at(-1), [fixtures]);
   const realGroups = league.groups && groups?.length ? groups : undefined;
-  const canGenerate = useMemo(() => {
-    if (!splitConfig || !lastReal || realGroups) return false;
-    if (splitConfig.afterRound !== undefined) return lastReal.matchday === splitConfig.afterRound;
-    // The first phase ends with the last round published: only once it is all out (a double round robin at least).
-    const games = new Map<number, number>();
-    for (const f of fixtures) for (const id of [f.homeId, f.awayId]) games.set(id, (games.get(id) ?? 0) + 1);
-    return teams.every((tm) => (games.get(tm.id) ?? 0) >= 2 * (teams.length - 1));
-  }, [splitConfig, lastReal, realGroups, fixtures, teams]);
-  // The last round of the first phase: set, or the last round published, or
-  // (once ESPN has the groups) the last round with a game between two groups.
-  const splitRound = useMemo(() => {
-    if (!splitConfig) return 0;
-    if (splitConfig.afterRound !== undefined) return splitConfig.afterRound;
-    if (realGroups) {
-      const groupOf = new Map(realGroups.flatMap((g) => g.teamIds.map((id) => [id, g.id] as const)));
-      return Math.max(0, ...fixtures.filter((f) => groupOf.get(f.homeId) !== groupOf.get(f.awayId)).map((f) => f.matchday));
-    }
-    return lastReal?.matchday ?? 0;
-  }, [splitConfig, realGroups, fixtures, lastReal]);
+  const canGenerate = useMemo(() => canGenerateSplit(league, fixtures, teams, groups), [league, fixtures, teams, groups]);
+  // The last round of the first phase (see splitRoundOf).
+  const splitRound = useMemo(() => splitRoundOf(league, fixtures, groups), [league, fixtures, groups]);
   // Groups as new tables (Greece, Ecuador): the regular season, then each
   // group with its own games and rounds. Scotland's table carries on instead.
   const phased = Boolean(splitConfig && league.groups && (realGroups || canGenerate || splitConfig.afterRound !== undefined));
@@ -302,13 +295,7 @@ export function LeagueSimulator({
   const playoff = league.playoff;
   const legIds = useMemo(() => (playoff ? playoffIds(playoff) : []), [playoff]);
   // The share codec only needs the ids, which don't depend on who qualifies.
-  const shareFixtures = useMemo<Fixture[]>(
-    () => [
-      ...fixtures,
-      ...[...legIds, ...(canGenerate ? allSplitFixtureIds(teams.map((tm) => tm.id)) : [])].map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null })),
-    ],
-    [fixtures, legIds, canGenerate, teams],
-  );
+  const shareFixtures = useMemo<Fixture[]>(() => shareFixtureList(league, fixtures, teams, groups), [league, fixtures, teams, groups]);
   const seasonComplete = useMemo(() => allFixtures.every((f) => effective[f.id]), [allFixtures, effective]);
   // Serie B: no play-off when 3rd finishes far enough clear of 4th.
   const cancelled = Boolean(playoff && seasonComplete && playoffCancelled(playoff, playoffRows));
@@ -334,7 +321,7 @@ export function LeagueSimulator({
   const pairingKey = seasonComplete ? [...pairings.values()].join(",") : null;
   const lastPairings = useRef<Map<string, string> | null>(null);
   useEffect(() => {
-    if (!hydrated || !playoff) return;
+    if (!hydrated || !playoff || readOnly) return;
     if (!seasonComplete) {
       drop(seasonKey, legIds);
     } else if (lastPairings.current) {
@@ -350,7 +337,7 @@ export function LeagueSimulator({
   // A shoot-out score belongs to a level tie (or, in a series, a drawn game):
   // once it has a winner without penalties, the shoot-out score is cleared.
   useEffect(() => {
-    if (!hydrated || !playoff) return;
+    if (!hydrated || !playoff || readOnly) return;
     const stale = bracket.flat().flatMap((tie) =>
       tie.config.bestOf
         ? seriesGames(tie, season.predictions).filter((g) => season.predictions[g.shootout.id] && !g.needsPenalties).map((g) => g.shootout.id)
@@ -398,6 +385,7 @@ export function LeagueSimulator({
 
   // Load saved predictions, then apply a shared link (?r=...) if present.
   useEffect(() => {
+    if (readOnly) return;
     let cancelled = false;
     void Promise.resolve(useSimStore.persist.rehydrate()).then(() => {
       if (cancelled) return;
@@ -477,16 +465,18 @@ export function LeagueSimulator({
     setScore(seasonKey, fixture, score);
   };
 
-  const share = async () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("r", encodeResults(shareFixtures, season.predictions));
-    try {
-      await navigator.clipboard.writeText(url.toString());
-    } catch {
-      window.prompt(t("share"), url.toString());
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  // Sharing: the predictions go in the link itself (nothing is stored). A
+  // league with one table opens a share page with its own card; others
+  // (conferences, annual tables, continental) their league page (?r=).
+  const shareCode = useMemo(() => encodeResults(shareFixtures, season.predictions), [shareFixtures, season.predictions]);
+  const cardSupported = shareCardSupported(league);
+  const sharePath = cardSupported ? `/${lang}/${league.slug}/share/${shareCode}` : `/${lang}/${league.slug}?r=${shareCode}`;
+  const shareProps = {
+    path: sharePath,
+    imagePath: cardSupported ? `${sharePath}/opengraph-image` : `/${lang}/${league.slug}/opengraph-image`,
+    title: t("shareTitle", { league: league.name, season: seasonLabel }),
+    text: t("shareText", { league: league.name, season: seasonLabel }),
+    league: league.code,
   };
 
   const [confirmReset, setConfirmReset] = useState(false);
@@ -604,7 +594,7 @@ export function LeagueSimulator({
           )}
         </div>
 
-        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2">
+        <div className={`min-w-0 lg:col-start-1 lg:row-start-2 ${readOnly ? "lg:col-span-3" : "lg:col-span-2"}`}>
           {tab === "table" ? (
             <>
               <StandingsTable
@@ -649,8 +639,17 @@ export function LeagueSimulator({
           ) : (
             <ProbabilityGrid league={chancesLeague} input={monteCarloInput} rows={rows} teams={teamMap} />
           )}
+          {/* Phones: sharing within thumb reach, sticky at the bottom while the
+              results are on screen (in the page's flow, so it never covers
+              anything once they're scrolled past; ads stay above it). */}
+          {!readOnly && (
+            <div className="sticky bottom-0 z-10 -mx-4 mt-3 border-t border-zinc-200 bg-white/95 px-4 py-2 backdrop-blur pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden dark:border-zinc-800 dark:bg-zinc-950/95">
+              <ShareMenu {...shareProps} variant="bar" />
+            </div>
+          )}
         </div>
 
+        {!readOnly && (
         <div className="flex flex-wrap gap-2 lg:col-span-2 lg:col-start-2 lg:row-start-1 lg:justify-end" data-testid="actions">
           <button
             type="button"
@@ -669,11 +668,14 @@ export function LeagueSimulator({
           <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={onReset}>
             {t("reset")}
           </button>
-          <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={share}>
-            {copied ? t("linkCopied") : t("share")}
-          </button>
+          {/* Desktop: next to the table (phones: the bar under it). */}
+          <div className="hidden lg:block">
+            <ShareMenu {...shareProps} variant="inline" />
+          </div>
         </div>
+        )}
 
+        {!readOnly && (
         <div className="min-w-0 lg:col-start-3 lg:row-start-2" data-testid="fixtures">
           <FixtureList
             matchday={matchday}
@@ -711,6 +713,7 @@ export function LeagueSimulator({
               : {})}
           />
         </div>
+        )}
       </div>
       <ConfirmDialog
         open={confirmReset}

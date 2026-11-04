@@ -36,3 +36,21 @@ export const ZONE_STYLES: Record<ZoneKind, { row: string; dot: string }> = {
   knockoutPlayoff: { row: "bg-sky-50 dark:bg-sky-700/35", dot: "bg-sky-400" },
   eliminated: { row: "bg-red-50 dark:bg-red-950/40", dot: "bg-red-400" },
 };
+
+/** Hex values of the zone colours (Tailwind's), for images drawn without CSS (the share card). */
+const DOT_HEX: Record<string, string> = {
+  "bg-amber-500": "#f59e0b",
+  "bg-blue-600": "#2563eb",
+  "bg-emerald-500": "#10b981",
+  "bg-orange-500": "#f97316",
+  "bg-red-400": "#f87171",
+  "bg-red-600": "#dc2626",
+  "bg-sky-400": "#38bdf8",
+  "bg-teal-500": "#14b8a6",
+  "bg-yellow-500": "#eab308",
+};
+
+/** A zone's strong colour as hex: the same as its dot in the chances table. */
+export function zoneHex(kind: ZoneKind): string {
+  return DOT_HEX[ZONE_STYLES[kind].dot] ?? "#71717a";
+}

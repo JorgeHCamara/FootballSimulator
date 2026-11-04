@@ -159,7 +159,22 @@
     },
     "pointsDeducted": "{points} pontos descontados",
     "aclEliteChance": "ACL Elite",
-    "chancesEarlyNote": "No começo da temporada, essas chances são estimativas aproximadas, com base na fase atual e nos resultados da temporada passada."
+    "chancesEarlyNote": "No começo da temporada, essas chances são estimativas aproximadas, com base na fase atual e nos resultados da temporada passada.",
+    "shareMenu": "Opções de compartilhamento",
+    "shareNative": "Compartilhar…",
+    "shareImage": "Compartilhar imagem",
+    "sharePreparing": "Preparando a imagem…",
+    "shareImageReady": "Imagem pronta: toque para compartilhar",
+    "copyLink": "Copiar link",
+    "copied": "Copiado!",
+    "shareX": "Postar no X",
+    "shareWhatsApp": "WhatsApp",
+    "shareReddit": "Reddit",
+    "shareFacebook": "Facebook",
+    "downloadImage": "Baixar imagem",
+    "shareTitle": "Meu palpite para {league} {season}",
+    "shareText": "Meu palpite para {league} {season} no Foot Simu. Simule o seu:",
+    "shareFailed": "Não deu para abrir o compartilhamento. Escolha uma opção abaixo."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -754,5 +769,31 @@
         }
       ]
     }
+  },
+  "ShareCard": {
+    "myPrediction": "Meu palpite",
+    "champions": "{team} campeão",
+    "top": "{team} termina em 1º",
+    "relegated": "{team} rebaixado",
+    "titleChance": "{pct} de chance de título",
+    "topChance": "{pct} de chance de terminar em 1º",
+    "relegationChance": "{pct} de chance de rebaixamento",
+    "basedOn": "Com base em {count} temporadas simuladas",
+    "cta": "Simule o seu em footsimu.com",
+    "position": "#",
+    "team": "Time",
+    "points": "Pts",
+    "chance": "Chance",
+    "genericTitle": "{league} {season}",
+    "genericSubtitle": "Dê seus palpites e veja as chances de cada clube"
+  },
+  "SharePage": {
+    "title": "Meu palpite para {league} {season}",
+    "description": "Minha tabela final de {league} {season} no Foot Simu. Faça o seu palpite e veja as chances de cada clube.",
+    "eyebrow": "Palpite compartilhado",
+    "heading": "{league} {season}: meu palpite",
+    "note": "Este é um palpite compartilhado: os placares vêm do link e não podem ser alterados aqui.",
+    "makeOwn": "Faça o seu palpite",
+    "startFrom": "Começar deste palpite"
   }
 }

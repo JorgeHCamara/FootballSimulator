@@ -105,16 +105,158 @@ async function step(name, fn) {
       assert.deepEqual(await tableOrder(page), simulatedOrder);
     });
 
-    await step("share link reproduces the table in a fresh browser", async () => {
-      await page.getByRole("button", { name: "Share" }).click();
-      const url = await page.evaluate(() => navigator.clipboard.readText());
-      assert.match(url, /\?r=/);
+    let shareUrl;
+    await step("share link opens the predicted table read-only in a fresh browser", async () => {
+      // Desktop: the Share button next to the table opens a menu.
+      await page.locator('[data-testid="actions"] [data-testid="share-button"]').click();
+      const menu = page.locator('[data-testid="share-menu"]');
+      await menu.waitFor();
+      assert.deepEqual((await menu.locator('[role="menuitem"]').allInnerTexts()).map((x) => x.replace(/^\W+/u, "").trim()), [
+        "Copy link", "Post on X", "WhatsApp", "Reddit", "Facebook", "Download image",
+      ]);
+      await page.locator('[data-testid="share-copy"]').click();
+      await page.locator('[data-testid="share-copy"]', { hasText: "Copied!" }).waitFor();
+      shareUrl = await page.evaluate(() => navigator.clipboard.readText());
+      assert.match(shareUrl, /\/en\/[a-z0-9-]+\/share\/[A-Za-z0-9_-]+$/);
+      const leaguePath = new URL(shareUrl).pathname.replace(/\/share\/.*$/, "");
+      assert.ok(shareUrl.length < 400, `share link ${shareUrl.length} characters`);
+      // The X, WhatsApp, Reddit and Facebook links carry it.
+      const x = await page.locator('[data-testid="share-x"]').getAttribute("href");
+      assert.ok(x.startsWith("https://x.com/intent/post?text=") && x.includes(encodeURIComponent(shareUrl)));
+      assert.ok((await page.locator('[data-testid="share-whatsapp"]').getAttribute("href")).startsWith("https://wa.me/?text="));
+      assert.ok((await page.locator('[data-testid="share-reddit"]').getAttribute("href")).includes(`url=${encodeURIComponent(shareUrl)}`));
+      assert.ok((await page.locator('[data-testid="share-facebook"]').getAttribute("href")).includes(`u=${encodeURIComponent(shareUrl)}`));
+      assert.equal(await page.locator('[data-testid="share-download"]').getAttribute("href"), `${new URL(shareUrl).pathname}/opengraph-image`);
+      // Each channel is counted (Vercel Analytics custom event).
+      assert.match(await page.evaluate(() => JSON.stringify(window.vaq ?? [])), /"Share".*"copy"/);
+      await page.keyboard.press("Escape");
+      await menu.waitFor({ state: "detached" });
+
       const fresh = await browser.newContext();
       const other = await fresh.newPage();
-      await other.goto(url);
+      await other.goto(shareUrl);
+      await other.locator('[data-testid="share-page"]').waitFor();
+      assert.deepEqual(await tableOrder(other), simulatedOrder);
+      // Read-only: no actions, no fixtures to edit.
+      assert.equal(await other.locator('[data-testid="actions"]').count(), 0);
+      assert.equal(await other.locator('[data-testid="fixtures"]').count(), 0);
+      // Proper link-preview tags.
+      const meta = (selector) => other.locator(selector).getAttribute("content");
+      assert.match(await meta('meta[property="og:title"]'), /^My .+ prediction/);
+      assert.ok((await meta('meta[property="og:image"]')).includes("/share/") && (await meta('meta[property="og:image"]')).includes("opengraph-image"));
+      assert.equal(await meta('meta[name="twitter:card"]'), "summary_large_image");
+      assert.ok((await meta('meta[name="twitter:image"]')).includes("twitter-image"));
+      assert.match(await meta('meta[name="robots"]'), /noindex/);
+      // "Make your own prediction": the league page; "Start from this prediction": loads it there.
+      assert.equal(await other.locator('[data-testid="make-own"]').getAttribute("href"), leaguePath);
+      await other.locator('[data-testid="start-from"]').click();
       await other.getByText("Loaded a shared simulation.").waitFor();
       assert.deepEqual(await tableOrder(other), simulatedOrder);
       await fresh.close();
+    });
+
+    await step("share card: a 1200×630 PNG per league and language, cached, with a branded fallback", async () => {
+      const png = async (path) => {
+        const res = await page.request.get(`${BASE_URL}${path}`);
+        assert.equal(res.status(), 200, path);
+        assert.equal(res.headers()["content-type"], "image/png", path);
+        assert.match(res.headers()["cache-control"], /s-maxage=31536000/, path);
+        const body = await res.body();
+        assert.equal(body.subarray(1, 4).toString(), "PNG", path);
+        return { width: body.readUInt32BE(16), height: body.readUInt32BE(20), bytes: body.length };
+      };
+      const card = await png(`${new URL(shareUrl).pathname}/opengraph-image`);
+      assert.deepEqual([card.width, card.height], [1200, 630]);
+      assert.deepEqual(await png(`${new URL(shareUrl).pathname}/twitter-image`).then((c) => [c.width, c.height]), [1200, 630]);
+      // Other leagues and languages, from their own Share menus.
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      for (const path of ["pt/brasileirao", "es/greek-super-league", "pt/austrian-bundesliga"]) {
+        await p.goto(`${BASE_URL}/${path}`);
+        await p.locator('[data-testid="actions"] [data-testid="share-button"]').click();
+        const image = await p.locator('[data-testid="share-download"]').getAttribute("href");
+        assert.match(image, new RegExp(`^/${path}/share/[A-Za-z0-9_-]+/opengraph-image$`));
+        const c = await png(image);
+        assert.deepEqual([c.width, c.height], [1200, 630], path);
+      }
+      await p.close();
+      // An unreadable link: the league's branded card.
+      const fallback = await png("/en/premier-league/share/not-a-prediction/opengraph-image");
+      assert.deepEqual([fallback.width, fallback.height], [1200, 630]);
+      // …and its page goes to the league page.
+      const res = await page.request.get(`${BASE_URL}/en/premier-league/share/not-a-prediction`, { maxRedirects: 0 });
+      assert.ok([307, 308].includes(res.status()) && res.headers().location.endsWith("/en/premier-league"));
+      // Leagues without a single table (MLS) share their page, as before.
+      const mls = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await mls.goto(`${BASE_URL}/en/mls`);
+      await mls.locator('[data-testid="actions"] [data-testid="share-button"]').click();
+      assert.match(await mls.locator('[data-testid="share-download"]').getAttribute("href"), /^\/en\/mls\/opengraph-image$/);
+      await mls.close();
+    });
+
+    await step("share on phones: native share sheet, image sharing, fallbacks, thumb-sized sticky bar", async () => {
+      const phone = async (init) => {
+        const ctx = await browser.newContext({ viewport: { width: 360, height: 760 }, isMobile: true, hasTouch: true, permissions: ["clipboard-read", "clipboard-write"] });
+        await ctx.addInitScript(init);
+        const p = await ctx.newPage();
+        await p.goto(`${BASE_URL}/en/premier-league`);
+        return { ctx, p, bar: p.locator('[data-testid="share-bar"]') };
+      };
+      // Native share available (Android Chrome, iOS Safari): one tap opens the sheet with the link.
+      let { ctx, p, bar } = await phone(() => {
+        window.__shares = [];
+        navigator.share = async (data) => { window.__shares.push({ ...data, files: data.files?.length ?? 0 }); };
+        navigator.canShare = (data) => Boolean(data?.files);
+      });
+      assert.equal(await p.evaluate(() => document.documentElement.scrollWidth), 360, "no sideways scroll at 360px");
+      assert.equal(await p.locator('[data-testid="actions"] [data-testid="share-button"]').isVisible(), false, "phones: no Share among the actions");
+      const button = bar.locator('[data-testid="share-button"]');
+      assert.ok((await button.boundingBox()).height >= 44, "at least 44px tall");
+      // Sticky at the bottom of the screen while the table is on it.
+      await p.locator('[data-testid="standings-row"]').nth(5).scrollIntoViewIfNeeded();
+      await p.evaluate(() => window.scrollBy(0, -200));
+      const box = await bar.boundingBox();
+      assert.ok(Math.abs(box.y + box.height - 760) < 16, `bar at the bottom: ${box.y + box.height}`);
+      await button.tap();
+      await p.waitForFunction(() => window.__shares.length === 1);
+      const shared = await p.evaluate(() => window.__shares[0]);
+      assert.match(shared.url, /\/en\/premier-league\/share\//);
+      assert.match(shared.title, /Premier League/);
+      assert.equal(await p.locator('[data-testid="share-menu"]').count(), 0, "no menu after sharing");
+      // Files can be shared: the card itself (Stories, Status).
+      await bar.locator('[data-testid="share-image"]').tap();
+      await p.waitForFunction(() => window.__shares.length === 2, null, { timeout: 30000 });
+      assert.equal(await p.evaluate(() => window.__shares[1].files), 1);
+      await ctx.close();
+
+      // Closing the share sheet is not an error: nothing else opens.
+      ({ ctx, p, bar } = await phone(() => {
+        navigator.share = async () => { throw new DOMException("Share canceled", "AbortError"); };
+      }));
+      await bar.locator('[data-testid="share-button"]').tap();
+      await p.waitForTimeout(300);
+      assert.equal(await p.locator('[data-testid="share-menu"]').count(), 0);
+      await ctx.close();
+
+      // A failing share sheet falls back to the menu, with a note.
+      ({ ctx, p, bar } = await phone(() => {
+        navigator.share = async () => { throw new DOMException("Not supported", "NotSupportedError"); };
+      }));
+      await bar.locator('[data-testid="share-button"]').tap();
+      await p.locator('[data-testid="share-menu"]').waitFor();
+      assert.match(await p.locator('[data-testid="share-menu"]').innerText(), /Couldn't open the share sheet/);
+      await ctx.close();
+
+      // No Web Share API (older browsers, desktop Firefox): the menu, and no image button.
+      ({ ctx, p, bar } = await phone(() => {
+        delete Navigator.prototype.share;
+        delete navigator.share;
+      }));
+      assert.equal(await bar.locator('[data-testid="share-image"]').count(), 0);
+      await bar.locator('[data-testid="share-button"]').tap();
+      await p.locator('[data-testid="share-menu"]').waitFor();
+      await p.locator('[data-testid="share-copy"]').tap();
+      await p.locator('[data-testid="share-copy"]', { hasText: "Copied!" }).waitFor();
+      await ctx.close();
     });
 
     await step("chances tab shows probabilities", async () => {

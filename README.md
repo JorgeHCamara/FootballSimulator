@@ -67,7 +67,7 @@ After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_
 | `npm run build && npm start` | Production build and server |
 | `npm test` | Engine and library unit tests |
 | `npm run typecheck` | TypeScript check |
-| `npm run test:e2e` | Browser test against a running server built and started with `FOOTSIMU_SAMPLE_DATA=1` (needs Playwright: `npx playwright install chromium`) |
+| `npm run test:e2e` | Browser test against a running server built and started with `FOOTSIMU_SAMPLE_DATA=1` (`FOOTSIMU_SAMPLE_DATA=1 npm run build && FOOTSIMU_SAMPLE_DATA=1 npm start`: share pages and cards render on request, so the server needs it too; needs Playwright: `npx playwright install chromium`) |
 
 ### Yearly: rebuild priors
 
@@ -102,7 +102,8 @@ season behind any league's current season.
 | `src/store/simStore.ts` | Predictions per league and season, saved in the browser, with undo |
 | `src/workers/montecarlo.worker.ts` | Runs the 10,000-season simulation off the main thread |
 | `src/lib/leagueData.ts` | Loads ESPN data, falls back to football-data.org, or the sample league in local development |
-| `src/lib/shareCodec.ts` | Compact URL encoding of predictions for share links |
+| `src/lib/shareCodec.ts` | Compact URL encoding of predictions for share links (nothing is stored: the prediction is the link) |
+| `src/app/[locale]/[league]/share/[code]/` | Share page (the predicted table, read-only) and its 1200×630 card (`opengraph-image`, `twitter-image`), drawn by `src/lib/shareCard.tsx` from `src/lib/scenario.ts` |
 | `src/config/leagues.ts` | Tiebreakers and qualification/relegation zones per league |
 | `src/i18n/`, `messages/` | Routing and translations (EN, PT, ES) |
 | `src/engine/` | Framework-free simulation engine (see below) |
