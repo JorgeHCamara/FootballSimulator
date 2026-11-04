@@ -6,6 +6,18 @@ import { usePathname } from "../i18n/navigation.ts";
 import { Flag } from "./Flag.tsx";
 import { CountryColumn, useContinentGroups } from "./LeagueMenu.tsx";
 
+/** Flags shown on a continent's row, in this order whatever the menu's (else the first six). */
+const PREVIEW: Partial<Record<string, readonly string[]>> = {
+  Europe: ["UEFA", "England", "Spain", "Germany", "Italy", "France"],
+};
+
+function previewCountries<T extends { country: string }>(continent: string, countries: readonly T[]): T[] {
+  const preferred = PREVIEW[continent];
+  if (!preferred) return countries.slice(0, 6);
+  const picked = preferred.flatMap((name) => countries.filter((c) => c.country === name));
+  return [...picked, ...countries.filter((c) => !picked.includes(c))].slice(0, 6);
+}
+
 /**
  * Phones and small tablets: a ☰ button beside the logo opens a panel with one
  * row per continent; tapping a continent shows its countries and their
@@ -86,8 +98,10 @@ export function MobileMenu() {
                       <span className="grow text-base font-extrabold text-zinc-800 dark:text-zinc-100">{tc(group.continent)}</span>
                       {/* What's inside, at a glance. */}
                       <span className="flex shrink-0 items-center gap-1" aria-hidden>
-                        {group.countries.slice(0, 6).map((country) => (
-                          <Flag key={country.country} code={country.flag} width={16} />
+                        {previewCountries(group.continent, group.countries).map((country) => (
+                          <span key={country.country} className="contents" data-flag={country.flag}>
+                            <Flag code={country.flag} width={16} />
+                          </span>
                         ))}
                         {group.countries.length > 6 && <span className="text-xs text-zinc-500">+{group.countries.length - 6}</span>}
                       </span>
