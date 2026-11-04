@@ -42,10 +42,12 @@ interface Props {
   onScore: (fixture: Fixture, score: Score | null) => void;
   onSimulate: (fixture: Fixture) => void;
   playoff?: PlayoffView;
+  /** A line above the matchday's games (generated fixtures: where they come from). */
+  note?: string;
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -86,6 +88,11 @@ export function FixtureList(props: Props) {
           ›
         </button>
       </header>
+      {note && (
+        <p className="border-b border-zinc-100 bg-zinc-50 px-3 py-2 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300" data-testid="fixtures-note">
+          {note}
+        </p>
+      )}
       {matchday === PLAYOFF_MATCHDAY && playoff ? (
         <PlayoffTies {...props} playoff={playoff} />
       ) : (

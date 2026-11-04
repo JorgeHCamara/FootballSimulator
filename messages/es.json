@@ -41,6 +41,7 @@
     "tagline": "Simula la temporada antes de que ocurra"
   },
   "Simulator": {
+    "projectedSplitNote": "Generados a partir de tu tabla tras la jornada {round}. Los partidos reales los sustituyen en cuanto se publiquen.",
     "table": "Clasificación",
     "chances": "Probabilidades",
     "fixtures": "Partidos",

@@ -801,15 +801,22 @@ async function step(name, fn) {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/ecuador-ligapro`);
       const groups = p.locator('[data-testid="group-switch"] button');
-      assert.deepEqual(await groups.allInnerTexts(), ["Title hexagonal", "Quadrangular", "Relegation hexagonal"]);
       const zones = () => p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
+      // Sample data: the first stage isn't over, so one table with where each place leads.
+      assert.equal(await groups.count(), 0);
+      const before = await zones();
+      assert.deepEqual([before[0], before[5], before[6], before[9], before[10], before[15]], ["splitTitle", "splitTitle", "splitMiddle", "splitMiddle", "splitRelegation", "splitRelegation"]);
+      // Simulating the season generates the final stage from that table.
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await groups.first().waitFor();
+      assert.deepEqual(await groups.allInnerTexts(), ["Title hexagonal", "Quadrangular", "Relegation hexagonal"]);
       assert.deepEqual((await zones()).slice(0, 4), ["title", "libertadores", "libertadoresQualifying", "sudamericana"]);
       await groups.nth(1).click();
       await p.waitForFunction(() => document.querySelector('[data-testid="standings-row"]')?.dataset.zone === "sudamericana");
+      assert.equal((await zones()).length, 4);
       await groups.nth(2).click();
-      // (Sample groups split 6/6/4, so check the legend rather than the last row.)
-      await p.waitForFunction(() => /Relegation/.test(document.querySelector("main")?.innerText ?? "") && document.querySelector('[data-testid="standings-row"]')?.dataset.zone === "");
-      // Chances: no "1st place" in the relegation group.
+      await p.waitForFunction(() => document.querySelectorAll('[data-testid="standings-row"]').length === 6);
+      assert.deepEqual(await zones(), ["", "", "", "", "relegation", "relegation"]);
       await p.getByRole("tab", { name: "Chances" }).click();
       await p.locator('[data-testid="chances"] tbody tr').first().waitFor({ timeout: 90000 });
       assert.doesNotMatch(await p.locator('[data-testid="chances"] thead').innerText(), /1st place|Title/);
@@ -862,13 +869,46 @@ async function step(name, fn) {
       const bpl = await zonesOf();
       assert.equal(bpl.length, 18);
       assert.deepEqual([bpl[0], bpl[1], bpl[2], bpl[3], bpl[4], bpl[15], bpl[16], bpl[17]], ["championsLeague", "championsLeagueQualifying", "europaLeague", "conferenceLeague", "", "", "relegation", "relegation"]);
-      // Greece: the play-off groups (sample data always has them), each with its own places.
+      await p.close();
+    });
+
+    await step("Super League Greece: play-offs generated from the user's table, each group with its own places", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const zonesOf = () => p.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
       await p.goto(`${BASE_URL}/en/greek-super-league`);
       const gsl = p.locator('[data-testid="group-switch"] button');
+      // Before the split: one table, 26 matchdays.
+      assert.equal(await gsl.count(), 0);
+      const before = await zonesOf();
+      assert.deepEqual([before[0], before[3], before[4], before[7], before[8], before[13]], ["championshipPlayoffs", "championshipPlayoffs", "europePlayoffs", "europePlayoffs", "relegationPlayouts", "relegationPlayouts"]);
+      const select = p.locator('[data-testid="matchday-select"]');
+      assert.equal(await select.locator("option").count(), 26);
+      // The chances already cover the play-offs: whole-season places.
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="chances"] tbody tr').first().waitFor({ timeout: 90000 });
+      assert.match(await p.locator('[data-testid="chances"] thead').innerText(), /Title.*Relegation/s);
+      await p.getByRole("tab", { name: "Table" }).click();
+      // Simulating the season plays the play-offs too: three groups, 36 matchdays.
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await gsl.first().waitFor();
       assert.deepEqual(await gsl.allInnerTexts(), ["Championship play-offs", "Europe play-offs", "Relegation play-outs"]);
-      assert.deepEqual((await zonesOf()).slice(0, 4), ["championsLeagueQualifying", "championsLeagueQualifying", "europaLeague", "conferenceLeague"]);
+      assert.deepEqual(await zonesOf(), ["title", "championsLeagueQualifying", "europaLeague", "conferenceLeague"]);
+      assert.equal(await select.locator("option").count(), 36);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.match(await rows.first().innerText(), /\b32\b/, "26 + 6 games");
+      await select.selectOption("27");
+      await p.locator('[data-testid="fixtures-note"]').waitFor();
+      assert.match(await p.locator('[data-testid="fixtures-note"]').innerText(), /after matchday 26/);
       await gsl.nth(1).click();
       await p.waitForFunction(() => document.querySelector('[data-testid="standings-row"]')?.dataset.zone === "conferenceLeague");
+      await gsl.nth(2).click();
+      await p.waitForFunction(() => document.querySelectorAll('[data-testid="standings-row"]').length === 6);
+      assert.deepEqual(await zonesOf(), ["", "", "", "", "relegation", "relegation"]);
+      assert.match(await rows.first().innerText(), /\b36\b/, "26 + 10 games");
+      // Kept after a reload (saved predictions, play-off games included).
+      await p.reload();
+      await gsl.first().waitFor();
+      assert.equal(await select.locator("option").count(), 36);
       await p.close();
     });
 

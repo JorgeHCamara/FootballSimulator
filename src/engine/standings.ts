@@ -12,6 +12,7 @@ interface Totals {
 }
 
 interface PlayedMatch {
+  matchday: number;
   homeId: TeamId;
   awayId: TeamId;
   home: number;
@@ -25,11 +26,18 @@ export interface StandingsOptions {
   /** Skip building the form column (hot path in Monte Carlo runs). Defaults to true. */
   includeForm?: boolean;
   /**
-   * A split league (Scotland): once every game up to round `afterRound` has a
-   * score, the top `top` clubs at that point stay above the rest whatever
-   * their points later (rounds after the split are within each half).
+   * A split league (Scotland, Greece, Ecuador): once every game up to round
+   * `afterRound` has a score and later games exist, the table at that point
+   * cuts the clubs into consecutive groups of `size` (the last takes the
+   * rest), which then stay apart whatever their points later, each ranked on
+   * its own (with its `carryOver`, if any).
    */
-  split?: { afterRound: number; top: number };
+  split?: { afterRound: number; groups: readonly { size: number; carryOver?: number }[] };
+  /**
+   * Points from rounds up to `afterRound` count `factor` times, rounded up
+   * (Greece's Europe play-offs: halved).
+   */
+  carryOver?: { afterRound: number; factor: number };
 }
 
 const emptyTotals = (): Totals => ({
@@ -184,12 +192,40 @@ export function computeStandings(
   const matches: PlayedMatch[] = [];
   for (const f of fixtures) {
     const r = results[f.id];
-    if (r) matches.push({ homeId: f.homeId, awayId: f.awayId, home: r.home, away: r.away });
+    if (r) matches.push({ matchday: f.matchday, homeId: f.homeId, awayId: f.awayId, home: r.home, away: r.away });
+  }
+
+  // The split: the table at the split decides the groups, which then stay apart.
+  if (options.split) {
+    const { afterRound, groups } = options.split;
+    const firstPhase = fixtures.filter((f) => f.matchday <= afterRound);
+    const splitDone = firstPhase.length > 0 && firstPhase.every((f) => results[f.id]) && fixtures.some((f) => f.matchday > afterRound);
+    if (splitDone) {
+      const plain = { ...options, split: undefined, carryOver: undefined };
+      const atSplit = computeStandings(teams, firstPhase, results, { ...plain, includeForm: false }).map((r) => r.teamId);
+      const rows: StandingRow[] = [];
+      let start = 0;
+      groups.forEach((group, i) => {
+        const members = new Set(i === groups.length - 1 ? atSplit.slice(start) : atSplit.slice(start, start + group.size));
+        start += group.size;
+        const carryOver = group.carryOver === undefined ? undefined : { afterRound, factor: group.carryOver };
+        rows.push(...computeStandings(teams.filter((t) => members.has(t.id)), fixtures, results, { ...plain, ...(carryOver ? { carryOver } : {}) }));
+      });
+      return rows.map((r, i) => ({ ...r, position: i + 1 }));
+    }
   }
 
   const ids = teams.map((t) => t.id);
   const names = new Map(teams.map((t) => [t.id, t.name]));
   const overall = accumulate(matches, ids);
+  if (options.carryOver) {
+    const { afterRound, factor } = options.carryOver;
+    const before = accumulate(matches.filter((m) => m.matchday <= afterRound), ids);
+    for (const [id, t] of overall) {
+      const early = before.get(id)!.points;
+      t.points = Math.ceil(early * factor) + t.points - early;
+    }
+  }
   for (const [teamId, deduction] of Object.entries(options.deductions ?? {})) {
     const t = overall.get(Number(teamId));
     if (t) t.points -= deduction;
@@ -198,17 +234,7 @@ export function computeStandings(
   const criteria: Tiebreaker[] = options.tiebreakers[0] === "points"
     ? [...options.tiebreakers]
     : ["points", ...options.tiebreakers];
-  let order = rankGroup(ids, criteria, overall, matches, names);
-  // The split: the table at the split decides the halves, which then stay apart.
-  if (options.split) {
-    const firstPhase = fixtures.filter((f) => f.matchday <= options.split!.afterRound);
-    const splitDone = firstPhase.length > 0 && firstPhase.every((f) => results[f.id]) && fixtures.some((f) => f.matchday > options.split!.afterRound);
-    if (splitDone) {
-      const atSplit = computeStandings(teams, firstPhase, results, { ...options, split: undefined, includeForm: false });
-      const top = new Set(atSplit.slice(0, options.split.top).map((r) => r.teamId));
-      order = [...order.filter((id) => top.has(id)), ...order.filter((id) => !top.has(id))];
-    }
-  }
+  const order = rankGroup(ids, criteria, overall, matches, names);
   const includeForm = options.includeForm ?? true;
   const chronological = includeForm ? sortFixtures(fixtures) : [];
 

@@ -41,6 +41,7 @@
     "tagline": "Simulate the season before it happens"
   },
   "Simulator": {
+    "projectedSplitNote": "Generated from your table after matchday {round}. The real fixtures replace these once they're published.",
     "table": "Table",
     "chances": "Chances",
     "fixtures": "Fixtures",

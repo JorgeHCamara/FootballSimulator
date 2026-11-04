@@ -20,6 +20,7 @@ import {
 } from "../engine/playoffs.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
+import { allSplitFixtureIds, splitFixtures, splitGroupsFrom } from "../engine/split.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
 import type { Fixture, ResultMap, Score, StandingRow, Team } from "../engine/types.ts";
 import { decodeResults, encodeResults } from "../lib/shareCodec.ts";
@@ -87,18 +88,6 @@ export function LeagueSimulator({
   const lang = useLocale() as SiteLocale;
   const [hydrated, setHydrated] = useState(false);
   const [tab, setTab] = useState<Tab>("table");
-  // Leagues split into separate tables (MLS conferences) show one at a time.
-  const groupTabs = useMemo(
-    () => (league.groups ?? []).flatMap((g) => {
-      const members = groups?.find((m) => m.id === g.id);
-      return members ? [{ id: g.id, name: g.name[lang], teamIds: members.teamIds, ...(g.zones ? { zones: g.zones } : {}) }] : [];
-    }),
-    [league.groups, groups, lang],
-  );
-  const [groupId, setGroupId] = useState(groupTabs[0]?.id);
-  const group = groupTabs.find((g) => g.id === groupId) ?? groupTabs[0];
-  // A group with its own zones (Ecuador's final stage) shows and simulates those.
-  const tableLeague = useMemo(() => (group?.zones ? { ...league, zones: group.zones } : league), [league, group]);
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -106,7 +95,6 @@ export function LeagueSimulator({
   const canUndo = useSimStore((s) => (s.history[seasonKey]?.length ?? 0) > 0);
   const { setScore, applyResults, replace, reset, undo, reconcile, drop } = useSimStore.getState();
 
-  const ordered = useMemo(() => sortFixtures(fixtures), [fixtures]);
   const teamMap = useMemo(() => new Map(teams.map((tm) => [tm.id, tm])), [teams]);
   const real = useMemo(() => realResults(fixtures), [fixtures]);
   // Ratings come from real results only: predictions shouldn't change how good a team is.
@@ -115,19 +103,72 @@ export function LeagueSimulator({
       buildLeagueModel(teams, fixtures, real, priorStrengths ? { priorStrengths: new Map(Object.entries(priorStrengths).map(([id, st]) => [Number(id), st])) } : {}),
     [teams, fixtures, real, priorStrengths],
   );
+  const baseOptions = useMemo(() => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}) }), [league.tiebreakers, deductions]);
+
+  // A split league whose split isn't published yet (Greece's play-offs before
+  // April, Ecuador's final stage, Scotland's last five rounds): once every
+  // first-phase game has a score, the split's games are generated from that
+  // table, as extra rounds. Real fixtures replace them once ESPN has them.
+  const splitConfig = league.split;
+  const lastReal = useMemo(() => sortFixtures(fixtures).at(-1), [fixtures]);
+  const projecting = useMemo(() => {
+    if (!splitConfig || !lastReal) return false;
+    if (league.groups && groups?.length) return false;
+    if (splitConfig.afterRound !== undefined) return lastReal.matchday === splitConfig.afterRound;
+    // The first phase ends with the last round published: only once it is complete (a double round robin at least).
+    const games = new Map<number, number>();
+    for (const f of fixtures) for (const id of [f.homeId, f.awayId]) games.set(id, (games.get(id) ?? 0) + 1);
+    return teams.every((tm) => (games.get(tm.id) ?? 0) >= 2 * (teams.length - 1));
+  }, [splitConfig, lastReal, league.groups, groups, fixtures, teams]);
+  const splitRound = splitConfig?.afterRound ?? lastReal?.matchday ?? 0;
   const standingsOptions = useMemo(
-    () => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}), ...(league.split ? { split: league.split } : {}) }),
-    [league.tiebreakers, deductions, league.split],
+    () =>
+      splitConfig && (splitConfig.afterRound !== undefined || projecting)
+        ? { ...baseOptions, split: { afterRound: splitRound, groups: splitConfig.groups } }
+        : baseOptions,
+    [baseOptions, splitConfig, projecting, splitRound],
+  );
+  const firstPhaseResults = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
+  const projected = useMemo(() => {
+    if (!projecting || !splitConfig || !lastReal || !fixtures.every((f) => firstPhaseResults[f.id])) return null;
+    const groupTeams = splitGroupsFrom(computeStandings(teams, fixtures, firstPhaseResults, { ...baseOptions, includeForm: false }), splitConfig.groups);
+    return { groupTeams, fixtures: splitFixtures(groupTeams, splitConfig.groups, splitRound, lastReal.utcDate) };
+  }, [projecting, splitConfig, lastReal, fixtures, firstPhaseResults, teams, baseOptions, splitRound]);
+  const allFixtures = useMemo(() => (projected ? [...fixtures, ...projected.fixtures] : fixtures), [fixtures, projected]);
+  const ordered = useMemo(() => sortFixtures(allFixtures), [allFixtures]);
+
+  // Leagues split into separate tables (MLS conferences) show one at a time;
+  // a split's groups (Greece) once ESPN has them, or once generated.
+  const groupTabs = useMemo(
+    () => (league.groups ?? []).flatMap((g, i) => {
+      const teamIds = groups?.find((m) => m.id === g.id)?.teamIds ?? projected?.groupTeams[i];
+      return teamIds ? [{ id: g.id, name: g.name[lang], teamIds, ...(g.zones ? { zones: g.zones } : {}) }] : [];
+    }),
+    [league.groups, groups, projected, lang],
+  );
+  const [groupId, setGroupId] = useState(groupTabs[0]?.id);
+  const group = groupTabs.find((g) => g.id === groupId) ?? groupTabs[0];
+  // A group with its own zones (Ecuador's final stage) shows and simulates those.
+  const tableLeague = useMemo(() => (group?.zones ? { ...league, zones: group.zones } : league), [league, group]);
+  /** A group's own table: a split's group with its carried-over share of the first phase's points. */
+  const groupOptions = (id: string) => {
+    const carry = splitConfig?.groups[(league.groups ?? []).findIndex((g) => g.id === id)]?.carryOver;
+    return carry === undefined ? baseOptions : { ...baseOptions, carryOver: { afterRound: splitRound, factor: carry } };
+  };
+  // Before the split, the chances are for the whole season's places.
+  const chancesLeague = useMemo(
+    () => (projecting && !projected && splitConfig?.finalZones ? { ...league, zones: splitConfig.finalZones, groups: undefined } : tableLeague),
+    [projecting, projected, splitConfig, league, tableLeague],
   );
 
-  const effective = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
+  const effective = useMemo(() => effectiveResults(allFixtures, season.predictions), [allFixtures, season.predictions]);
   const tableTeams = useMemo(
     () => (group ? group.teamIds.flatMap((id) => teamMap.get(id) ?? []) : teams),
     [group, teamMap, teams],
   );
   const rows = useMemo(
-    () => computeStandings(tableTeams, ordered, effective, standingsOptions),
-    [tableTeams, ordered, effective, standingsOptions],
+    () => computeStandings(tableTeams, ordered, effective, group ? groupOptions(group.id) : standingsOptions),
+    [tableTeams, ordered, effective, standingsOptions, group], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   // Reserve sides (Eerste Divisie's "Jong" teams) can't go up: promotion places
@@ -166,10 +207,13 @@ export function LeagueSimulator({
   const legIds = useMemo(() => (playoff ? playoffIds(playoff) : []), [playoff]);
   // The share codec only needs the ids, which don't depend on who qualifies.
   const shareFixtures = useMemo<Fixture[]>(
-    () => [...fixtures, ...legIds.map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null }))],
-    [fixtures, legIds],
+    () => [
+      ...fixtures,
+      ...[...legIds, ...(projecting ? allSplitFixtureIds(teams.map((tm) => tm.id)) : [])].map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null })),
+    ],
+    [fixtures, legIds, projecting, teams],
   );
-  const seasonComplete = useMemo(() => fixtures.every((f) => effective[f.id]), [fixtures, effective]);
+  const seasonComplete = useMemo(() => allFixtures.every((f) => effective[f.id]), [allFixtures, effective]);
   // Serie B: no play-off when 3rd finishes far enough clear of 4th.
   const cancelled = Boolean(playoff && seasonComplete && playoffCancelled(playoff, playoffRows));
   const bracketOptions = useMemo(
@@ -266,6 +310,12 @@ export function LeagueSimulator({
   const simulateRest = () => {
     const rng = createRng(randomSeed());
     const leagueResults = simulateFixtures(ordered, effective, model, rng);
+    // Then the split's games, from the table the first phase ends with.
+    if (projecting && !projected && splitConfig && lastReal) {
+      const all = { ...effective, ...leagueResults };
+      const groupTeams = splitGroupsFrom(computeStandings(teams, fixtures, all, { ...baseOptions, includeForm: false }), splitConfig.groups);
+      Object.assign(leagueResults, simulateFixtures(splitFixtures(groupTeams, splitConfig.groups, splitRound, lastReal.utcDate), season.predictions, model, rng));
+    }
     if (!playoff) return applyResults(seasonKey, leagueResults);
     const all = { ...effective, ...leagueResults };
     const { overall, groups: groupTables } = tablesFor(all);
@@ -331,7 +381,7 @@ export function LeagueSimulator({
       tab === "chances" && hydrated
         ? {
             teams,
-            fixtures,
+            fixtures: allFixtures,
             fixed: effective,
             model,
             standings: standingsOptions,
@@ -339,6 +389,10 @@ export function LeagueSimulator({
             iterations: league.continental || playoff?.seedFromGroups || (playoff?.title && !league.groups) ? ITERATIONS / 2 : ITERATIONS,
             seed: 2026,
             ...(groupTabs.length ? { groups: groupTabs.map((g) => g.teamIds) } : {}),
+            ...(groupTabs.length && splitConfig ? { groupStandings: groupTabs.map((g) => groupOptions(g.id)) } : {}),
+            ...(projecting && !projected && splitConfig && lastReal
+              ? { project: { afterRound: splitRound, afterDate: lastReal.utcDate, groups: splitConfig.groups } }
+              : {}),
             ...(qualifiedElsewhere?.length ? { passDown: qualifiedElsewhere } : {}),
             // Continental competitions: the chance of winning it takes the knockout phase too.
             // Also a title play-off seeded from groups (Argentina): the chance of winning the tournament.
@@ -348,7 +402,7 @@ export function LeagueSimulator({
               : {}),
           }
         : null,
-    [tab, hydrated, teams, fixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere],
+    [tab, hydrated, teams, allFixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere, projecting, projected, splitConfig, lastReal, splitRound], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const actionButton =
@@ -449,7 +503,7 @@ export function LeagueSimulator({
               )}
             </>
           ) : (
-            <ProbabilityGrid league={tableLeague} input={monteCarloInput} rows={rows} teams={teamMap} />
+            <ProbabilityGrid league={chancesLeague} input={monteCarloInput} rows={rows} teams={teamMap} />
           )}
         </div>
 
@@ -486,6 +540,7 @@ export function LeagueSimulator({
             predictions={season.predictions}
             onScore={onScore}
             onSimulate={simulateOne}
+            {...(projected && matchday > splitRound && matchday !== PLAYOFF_MATCHDAY ? { note: t("projectedSplitNote", { round: splitRound }) } : {})}
             {...(playoff
               ? {
                   playoff: {

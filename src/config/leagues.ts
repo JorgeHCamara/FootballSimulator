@@ -1,3 +1,4 @@
+import type { SplitGroupConfig } from "../engine/split.ts";
 import type { PlayoffConfig } from "../engine/playoffs.ts";
 import type { Tiebreaker } from "../engine/types.ts";
 
@@ -126,8 +127,19 @@ export interface LeagueConfig {
    * stage splits the table); until ESPN's standings show them, one table.
    */
   groupsOptional?: boolean;
-  /** A split league (Scotland): see StandingsOptions.split. */
-  split?: { afterRound: number; top: number };
+  /**
+   * A split league (Scotland, Greece, Ecuador): after round `afterRound` (by
+   * default the last round published, for leagues whose groups come from
+   * ESPN) the table cuts into `groups`, which stay apart (see
+   * StandingsOptions.split). Until the split's real fixtures are published,
+   * they are generated from the table once the first phase is complete.
+   */
+  split?: {
+    afterRound?: number;
+    groups: readonly SplitGroupConfig[];
+    /** Places over the whole season, for the chances before the split (each group's own zones after it). */
+    finalZones?: Zone[];
+  };
   /**
    * Real data comes from ESPN and falls back to football-data.org (with `code`
    * as the competition code); leagues outside football-data.org's free tier set
@@ -624,7 +636,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     // 33 games (three rounds of each other), then the split: the top six and
     // bottom six play each other once more (38 games), keeping their halves.
     gamesPerTeam: 38,
-    split: { afterRound: 33, top: 6 },
+    split: { afterRound: 33, groups: [{ size: 6, legs: 1 }, { size: 6, legs: 1 }] },
     espn: { slug: "sco.1", seasons: "split" },
     espnOnly: true,
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
@@ -707,6 +719,24 @@ export const LEAGUES: readonly LeagueConfig[] = [
     espn: { slug: "gre.1", seasons: "split", deductions: true },
     espnOnly: true,
     tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
+    // The play-offs and play-outs are double round robins; the Europe play-offs
+    // start from half the regular season's points (rounded up), the others
+    // from all of them.
+    split: {
+      afterRound: 26,
+      groups: [
+        { size: 4, legs: 2 },
+        { size: 4, legs: 2, carryOver: 0.5 },
+        { size: 6, legs: 2 },
+      ],
+      finalZones: [
+        { kind: "title", from: 1, to: 1 },
+        { kind: "championsLeagueQualifying", from: 2, to: 2 },
+        { kind: "europaLeague", from: 3, to: 3 },
+        { kind: "conferenceLeague", from: 4, to: 5 },
+        { kind: "relegation", from: 13, to: 14 },
+      ],
+    },
     // Before the split: where each place leads.
     zones: [
       { kind: "championshipPlayoffs", from: 1, to: 4 },
@@ -714,8 +744,8 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "relegationPlayouts", from: 9, to: 14 },
     ],
     // After it (ESPN's standings groups), base case (the European places shift
-    // with the Greek Cup winner and UEFA's coefficients): the top two to the
-    // Champions League qualifying, 3rd to the Europa League, 4th and the Europe
+    // with the Greek Cup winner and UEFA's coefficients): the champion and the
+    // runner-up to the Champions League qualifying, 3rd to the Europa League, 4th and the Europe
     // play-offs winner to the Conference League qualifying; the play-outs'
     // bottom two go down.
     groupsOptional: true,
@@ -726,7 +756,8 @@ export const LEAGUES: readonly LeagueConfig[] = [
         name: { en: "Championship play-offs", pt: "Play-offs do título", es: "Play-offs por el título" },
         shortName: { en: "Championship", pt: "Título", es: "Título" },
         zones: [
-          { kind: "championsLeagueQualifying", from: 1, to: 2 },
+          { kind: "title", from: 1, to: 1 },
+          { kind: "championsLeagueQualifying", from: 2, to: 2 },
           { kind: "europaLeague", from: 3, to: 3 },
           { kind: "conferenceLeague", from: 4, to: 4 },
         ],
@@ -1126,6 +1157,21 @@ export const LEAGUES: readonly LeagueConfig[] = [
     espn: { slug: "ecu.1", seasons: "calendar", weeklyRounds: true },
     espnOnly: true,
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
+    // The first stage ends with the last round published until ESPN shows the groups.
+    split: {
+      groups: [
+        { size: 6, legs: 2 },
+        { size: 4, legs: 2 },
+        { size: 6, legs: 2 },
+      ],
+      finalZones: [
+        { kind: "title", from: 1, to: 1 },
+        { kind: "libertadores", from: 2, to: 2 },
+        { kind: "libertadoresQualifying", from: 3, to: 3 },
+        { kind: "sudamericana", from: 4, to: 7 },
+        { kind: "relegation", from: 15, to: 16 },
+      ],
+    },
     // Before the split: where each place leads.
     zones: [
       { kind: "splitTitle", from: 1, to: 6 },

@@ -232,7 +232,8 @@ function loadSample(league: LeagueConfig): LeagueData {
   const year = new Date().getUTCFullYear();
   // Sample groups: the clubs split evenly, in order.
   const size = league.groups ? Math.ceil(teams.length / league.groups.length) : 0;
-  const groups = league.groups?.map((g, i) => ({ id: g.id, teamIds: teams.slice(i * size, (i + 1) * size).map((t) => t.id) }));
+  // A split league's optional groups (Greece) aren't out yet: they're generated from the table.
+  const groups = league.split && league.groupsOptional ? undefined : league.groups?.map((g, i) => ({ id: g.id, teamIds: teams.slice(i * size, (i + 1) * size).map((t) => t.id) }));
   // Several tournaments a season (Argentina): the current one as above, and an
   // earlier one fully played, its fixture ids and dates moved clear of it.
   const sets = league.espn.stages && !("table" in league.espn.stages) ? league.espn.stages : [];

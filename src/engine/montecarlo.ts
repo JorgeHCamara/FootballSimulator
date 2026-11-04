@@ -2,6 +2,7 @@ import { expectedGoals, simulateScore } from "./match.ts";
 import { seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
+import { splitFixtures, splitGroupsFrom, type SplitGroupConfig } from "./split.ts";
 import { computeStandings, type StandingsOptions } from "./standings.ts";
 import type { Fixture, ResultMap, StandingRow, Team, TeamId } from "./types.ts";
 
@@ -19,6 +20,15 @@ export interface MonteCarloInput {
    * group on its own, and positions are within the team's group.
    */
   groups?: readonly (readonly TeamId[])[];
+  /** With `groups`: each group's own table options (Greece's halved points), in place of `standings`. */
+  groupStandings?: readonly StandingsOptions[];
+  /**
+   * A split not yet published (Greece before its play-offs): each run plays
+   * the first phase (`fixtures`), then the split's games generated from that
+   * run's table (predictions for them, by id, stand). Ranks with `standings`,
+   * whose `split` keeps the groups apart.
+   */
+  project?: { afterRound: number; afterDate: string; groups: readonly SplitGroupConfig[] };
   /**
    * Also play the knockout phase after each run's table (UEFA): real knockout
    * results stand, everything else is simulated. With `groups`, only for a
@@ -80,9 +90,18 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
   const playoffWins: Record<TeamId, number> = {};
   for (let i = 0; i < iterations; i++) {
     for (const r of remaining) results[r.id] = simulateScore(r.xg, rng);
+    let played: readonly Fixture[] = fixtures;
+    if (input.project) {
+      const { afterRound, afterDate, groups } = input.project;
+      const atSplit = computeStandings(teams, fixtures, results, { ...tableOptions, split: undefined });
+      const extra = splitFixtures(splitGroupsFrom(atSplit, groups), groups, afterRound, afterDate);
+      for (const f of extra) results[f.id] = fixed[f.id] ?? simulateScore(expectedGoals(model, f.homeId, f.awayId), rng);
+      played = [...fixtures, ...extra];
+    }
     const groupRows: ReturnType<typeof computeStandings>[] = [];
-    for (const group of tables) {
-      const rows = computeStandings(group, fixtures, results, tableOptions);
+    for (const [g, group] of tables.entries()) {
+      const options = input.groupStandings?.[g] ? { ...input.groupStandings[g], includeForm: false } : tableOptions;
+      const rows = computeStandings(group, played, results, options);
       let zonePosition = 0;
       for (const row of rows) {
         positionCounts[row.teamId]![row.position - 1]!++;

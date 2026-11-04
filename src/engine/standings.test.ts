@@ -143,7 +143,7 @@ describe("a split league (Scotland)", () => {
   ];
   // Round 1: 1 and 2 win (top half). Then 3 wins twice in the bottom half: 6 points, more than 2's 3.
   const results = { 1: { home: 1, away: 0 }, 2: { home: 1, away: 0 }, 3: { home: 1, away: 0 }, 4: { home: 1, away: 0 }, 5: { home: 1, away: 0 } };
-  const split = { afterRound: 1, top: 2 };
+  const split = { afterRound: 1, groups: [{ size: 2 }, { size: 2 }] };
 
   it("keeps the top half above the bottom half after the split", () => {
     const plain = computeStandings(teams, fixtures, results, { tiebreakers: ["points"] });
