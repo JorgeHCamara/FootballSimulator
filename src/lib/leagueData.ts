@@ -116,7 +116,7 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
 }
 
 /** The season currently being played, by its starting year (2026 = 2026/27). */
-function currentSeasonYear(league: LeagueConfig, now = new Date()): number {
+export function currentSeasonYear(league: LeagueConfig, now = new Date()): number {
   const year = now.getUTCFullYear();
   // Split seasons start in August; from June on, try the new season first.
   return league.espn.seasons === "split" && now.getUTCMonth() < 5 ? year - 1 : year;

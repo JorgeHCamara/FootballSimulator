@@ -452,6 +452,10 @@ export const LEAGUES: readonly LeagueConfig[] = [
     aka: { en: "Italian Serie A", pt: "Campeonato Italiano", es: "Liga italiana" },
     teams: 20,
     espn: { slug: "ita.1", seasons: "split" },
+    // Last season's ratings count for 12 games rather than 18: at 18 they
+    // outweighed the table too much (2026/27, matchday 10: Lazio 3 points
+    // clear but only 4th favourites at 9%; at 12, 3rd at 13%).
+    ratingPriorGames: 12,
     tiebreakers: ["points", "headToHeadPoints", "headToHeadGoalDifference", "goalDifference", "goalsFor"],
     zones: [
       { kind: "championsLeague", from: 1, to: 4 },

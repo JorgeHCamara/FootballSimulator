@@ -19,7 +19,7 @@ import { readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { LEAGUES, type LeagueConfig } from "../src/config/leagues.ts";
-import { buildLeagueModel, type TeamStrength } from "../src/engine/ratings.ts";
+import { buildLeagueModel, NO_DATA_PRIOR, type TeamStrength } from "../src/engine/ratings.ts";
 import { realResults } from "../src/engine/results.ts";
 import { espnFixtures, espnTeams, fetchEspnSeason } from "../src/lib/espn.ts";
 
@@ -44,7 +44,7 @@ const DOWN_FROM = { attack: 0.8, defence: 1.25 };
 /** How much a club's rating in the other league moves it from the typical value. */
 const MOVE = 0.4;
 /** No data: below average. */
-const UNKNOWN = { attack: 0.85, defence: 1.15 };
+const UNKNOWN = NO_DATA_PRIOR;
 /** Games a club needs last season for its rating to count. */
 const MIN_GAMES = 8;
 

@@ -1,6 +1,6 @@
 import type { LeagueConfig } from "../config/leagues.ts";
 import { PRIOR_SEASONS } from "../data/priors/index.ts";
-import { DOMESTIC_PRIOR_GAMES, type ModelOptions, type TeamStrength } from "../engine/ratings.ts";
+import { DOMESTIC_PRIOR_GAMES, NO_DATA_PRIOR, type ModelOptions, type TeamStrength } from "../engine/ratings.ts";
 
 /**
  * Starting ratings for one season, by league code and ESPN club id:
@@ -10,10 +10,20 @@ import { DOMESTIC_PRIOR_GAMES, type ModelOptions, type TeamStrength } from "../e
  */
 export type PriorSeason = Readonly<Record<string, Readonly<Record<string, readonly [number, number]>>>>;
 
+/** The newest season with a priors file. */
+export function latestPriorYear(seasons: Readonly<Record<number, PriorSeason>> = PRIOR_SEASONS): number | undefined {
+  const years = Object.keys(seasons).map(Number);
+  return years.length ? Math.max(...years) : undefined;
+}
+
+const warned = new Set<string>();
+
 /**
  * A domestic league's starting ratings for the season starting in `year`:
- * that season's file, else the latest earlier one (clubs it doesn't know start
- * from the average). Undefined for sample data, whose clubs aren't real.
+ * that season's file, else the latest earlier one, with a warning (rerun
+ * scripts/build-priors.ts for the new season). A club the file doesn't list
+ * starts from NO_DATA_PRIOR, below average (see `domesticModelOptions` and
+ * the model's `missingPrior`). Undefined for sample data, whose clubs aren't real.
  */
 export function domesticPriors(code: string, year: number | undefined, seasons: Readonly<Record<number, PriorSeason>> = PRIOR_SEASONS): Record<number, TeamStrength> | undefined {
   if (year === undefined || process.env.FOOTSIMU_SAMPLE_DATA === "1") return undefined;
@@ -23,6 +33,10 @@ export function domesticPriors(code: string, year: number | undefined, seasons: 
     .sort((a, b) => b - a)[0];
   const table = known === undefined ? undefined : seasons[known]![code];
   if (!table) return undefined;
+  if (known !== year && !warned.has(`${code}:${year}`)) {
+    warned.add(`${code}:${year}`);
+    console.warn(`${code}: no starting ratings for the ${year} season, using ${known}'s (run \`npm run priors -- ${year}\` to rebuild them)`);
+  }
   return Object.fromEntries(Object.entries(table).map(([id, [attack, defence]]) => [Number(id), { attack, defence }]));
 }
 
@@ -36,6 +50,6 @@ export function domesticModelOptions(league: LeagueConfig, year: number | undefi
   const priors = domesticPriors(league.code, year);
   return {
     priorGames: domesticPriorGames(league),
-    ...(priors ? { priorStrengths: new Map(Object.entries(priors).map(([id, s]) => [Number(id), s])) } : {}),
+    ...(priors ? { priorStrengths: new Map(Object.entries(priors).map(([id, s]) => [Number(id), s])), missingPrior: NO_DATA_PRIOR } : {}),
   };
 }

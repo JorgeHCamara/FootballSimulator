@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
-import { buildLeagueModel, DOMESTIC_PRIOR_GAMES, type TeamStrength } from "../engine/ratings.ts";
+import { buildLeagueModel, DOMESTIC_PRIOR_GAMES, NO_DATA_PRIOR, type TeamStrength } from "../engine/ratings.ts";
 import {
   buildBracket,
   isShootoutId,
@@ -117,7 +117,8 @@ export function LeagueSimulator({
     () =>
       buildLeagueModel(teams, fixtures, real, {
         // Domestic leagues: last season's ratings count for a good part of the season.
-        ...(league.continental ? {} : { priorGames: league.ratingPriorGames ?? DOMESTIC_PRIOR_GAMES }),
+        // and a club the priors file doesn't know starts below average.
+        ...(league.continental ? {} : { priorGames: league.ratingPriorGames ?? DOMESTIC_PRIOR_GAMES, missingPrior: NO_DATA_PRIOR }),
         ...(priorStrengths ? { priorStrengths: new Map(Object.entries(priorStrengths).map(([id, st]) => [Number(id), st])) } : {}),
       }),
     [teams, fixtures, real, priorStrengths, league], // eslint-disable-line react-hooks/exhaustive-deps

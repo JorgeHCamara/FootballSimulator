@@ -28,12 +28,23 @@ export interface ModelOptions {
   defaultAwayGoals?: number;
   /** Optional starting strengths (e.g. last season); defaults to 1.0 for all teams. */
   priorStrengths?: ReadonlyMap<TeamId, TeamStrength>;
+  /**
+   * Starting strength of a club missing from `priorStrengths` (a domestic
+   * league: a club with no data, see NO_DATA_PRIOR); defaults to average.
+   */
+  missingPrior?: TeamStrength;
   /** Passes of the opponent adjustment (0: raw goal ratios). */
   iterations?: number;
 }
 
 /** Domestic leagues: last season's ratings count for this many games of this season's. */
 export const DOMESTIC_PRIOR_GAMES = 18;
+
+/**
+ * A domestic club without last season's data (it came up from a league the
+ * site doesn't cover): below average. scripts/build-priors.ts uses the same.
+ */
+export const NO_DATA_PRIOR: TeamStrength = { attack: 0.85, defence: 1.15 };
 
 const DEFAULTS = {
   priorGames: 6,
@@ -91,7 +102,7 @@ export function buildLeagueModel(
   }
 
   const neutral = { attack: 1, defence: 1 };
-  const priorOf = (id: TeamId) => options.priorStrengths?.get(id) ?? neutral;
+  const priorOf = (id: TeamId) => options.priorStrengths?.get(id) ?? (options.priorStrengths ? (options.missingPrior ?? neutral) : neutral);
   let strengths = new Map<TeamId, TeamStrength>(teams.map((t) => [t.id, priorOf(t.id)]));
   const iterations = Math.max(1, options.iterations ?? DEFAULTS.iterations);
   for (let pass = 0; pass < iterations; pass++) {
@@ -118,8 +129,27 @@ export function buildLeagueModel(
         defence: w * (xga > 0 ? ga / xga : prior.defence) + (1 - w) * prior.defence,
       });
     }
-    strengths = next;
+    strengths = normalised(next);
   }
 
   return { avgHomeGoals, avgAwayGoals, strengths };
+}
+
+/**
+ * Rescales attack and defence so each averages 1.0 across the league: the
+ * league's goal rates carry the overall level, the strengths only who is
+ * better than whom, and the passes of the opponent adjustment can't drift.
+ */
+function normalised(strengths: ReadonlyMap<TeamId, TeamStrength>): Map<TeamId, TeamStrength> {
+  if (strengths.size === 0) return new Map(strengths);
+  let attack = 0;
+  let defence = 0;
+  for (const s of strengths.values()) {
+    attack += s.attack;
+    defence += s.defence;
+  }
+  const ma = attack / strengths.size;
+  const md = defence / strengths.size;
+  if (!(ma > 0 && md > 0)) return new Map(strengths);
+  return new Map([...strengths].map(([id, s]) => [id, { attack: s.attack / ma, defence: s.defence / md }]));
 }
