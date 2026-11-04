@@ -19,7 +19,7 @@ import {
 } from "../engine/cup.ts";
 import { cupModelFor } from "../engine/cupModel.ts";
 import type { CupMonteCarloInput } from "../engine/cupMontecarlo.ts";
-import { expectedGoals, expectedGoalsNeutral, simulateScore } from "../engine/match.ts";
+import { expectedGoals, expectedGoalsNeutral, sampleLikelyScore } from "../engine/match.ts";
 import { simulatePenalties } from "../engine/playoffs.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
 import type { Fixture, ResultMap, Score, TeamId } from "../engine/types.ts";
@@ -149,7 +149,13 @@ export function CupSimulator({ cup, data }: Props) {
     const rng = createRng(randomSeed());
     const score = isCupShootoutId(fixture.id)
       ? simulatePenalties(rng)
-      : simulateScore(fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId), rng, model.rho ?? 0);
+      : // A likely roll (as in the leagues); clicking again gives another score from the likely set.
+        sampleLikelyScore(
+          fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId),
+          rng,
+          model.rho ?? 0,
+          season.predictions[fixture.id],
+        );
     setScore(seasonKey, fixture, score);
   };
   const onScore = (fixture: Fixture, score: Score | null) => {

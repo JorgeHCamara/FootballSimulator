@@ -190,6 +190,30 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("cup dice: likely scores too, a different one each roll", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/fa-cup`);
+      const row = p.locator('[data-testid="match-row"]').filter({ has: p.getByRole("button", { name: "Simulate this match" }) }).first();
+      await row.waitFor();
+      const dice = row.getByRole("button", { name: "Simulate this match" });
+      const read = () => row.locator('input[type="number"]').evaluateAll((inputs) => inputs.slice(0, 2).map((x) => x.value).join("-"));
+      const scores = [];
+      for (let i = 0; i < 8; i++) {
+        const before = await read();
+        await dice.click();
+        await p.waitForFunction(
+          ([el, previous]) => [...el.querySelectorAll('input[type="number"]')].slice(0, 2).map((x) => x.value).join("-") !== previous,
+          [await row.elementHandle(), before],
+        );
+        const score = await read();
+        const [home, away] = score.split("-").map(Number);
+        assert.ok(home + away <= 5, score);
+        scores.push(score);
+      }
+      assert.ok(new Set(scores).size <= 6, `at most 6 different scores: ${[...new Set(scores)]}`);
+      await p.close();
+    });
+
     await step("icons are Lucide icons, not emojis", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       const emoji = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1D400}-\u{1D7FF}]/u;
