@@ -30,14 +30,15 @@ export interface StandingsOptions {
    * `afterRound` has a score and later games exist, the table at that point
    * cuts the clubs into consecutive groups of `size` (the last takes the
    * rest), which then stay apart whatever their points later, each ranked on
-   * its own (with its `carryOver`, if any).
+   * its own. With `separate`, each group is a new table of its own games,
+   * starting from the points at the split (times `carryOver`, rounded up),
+   * ties going to the higher place at the split; else the table carries on.
    */
-  split?: { afterRound: number; groups: readonly { size: number; carryOver?: number }[] };
-  /**
-   * Points from rounds up to `afterRound` count `factor` times, rounded up
-   * (Greece's Europe play-offs: halved).
-   */
-  carryOver?: { afterRound: number; factor: number };
+  split?: { afterRound: number; groups: readonly { size: number; carryOver?: number }[]; separate?: boolean };
+  /** Points a club starts the table with (a split's carried-over points). */
+  startPoints?: Readonly<Record<TeamId, number>>;
+  /** Order for clubs level on every criterion (else by name). */
+  fallbackOrder?: readonly TeamId[];
 }
 
 const emptyTotals = (): Totals => ({
@@ -127,11 +128,13 @@ function rankGroup(
   overall: Map<TeamId, Totals>,
   matches: readonly PlayedMatch[],
   names: Map<TeamId, string>,
+  fallback?: ReadonlyMap<TeamId, number>,
 ): TeamId[] {
   if (group.length <= 1) return group;
   const [criterion, ...rest] = criteria;
   if (!criterion) {
-    // Fully level: fall back to name so the order is deterministic.
+    // Fully level: a given order (a split's places), else the name, so the order is deterministic.
+    if (fallback) return [...group].sort((a, b) => (fallback.get(a) ?? Infinity) - (fallback.get(b) ?? Infinity));
     return [...group].sort((a, b) => (names.get(a) ?? "").localeCompare(names.get(b) ?? ""));
   }
 
@@ -157,7 +160,7 @@ function rankGroup(
     while (j < valued.length && valued[j]!.value === valued[i]!.value) j++;
     const tied = valued.slice(i, j).map((v) => v.id);
     // If a head-to-head criterion splits nothing, still recurse with the rest.
-    ordered.push(...rankGroup(tied, rest, overall, matches, names));
+    ordered.push(...rankGroup(tied, rest, overall, matches, names, fallback));
     i = j;
   }
   return ordered;
@@ -201,15 +204,24 @@ export function computeStandings(
     const firstPhase = fixtures.filter((f) => f.matchday <= afterRound);
     const splitDone = firstPhase.length > 0 && firstPhase.every((f) => results[f.id]) && fixtures.some((f) => f.matchday > afterRound);
     if (splitDone) {
-      const plain = { ...options, split: undefined, carryOver: undefined };
-      const atSplit = computeStandings(teams, firstPhase, results, { ...plain, includeForm: false }).map((r) => r.teamId);
+      const plain = { ...options, split: undefined };
+      const table = computeStandings(teams, firstPhase, results, { ...plain, includeForm: false });
+      const atSplit = table.map((r) => r.teamId);
+      const later = options.split.separate ? fixtures.filter((f) => f.matchday > afterRound) : fixtures;
       const rows: StandingRow[] = [];
       let start = 0;
       groups.forEach((group, i) => {
         const members = new Set(i === groups.length - 1 ? atSplit.slice(start) : atSplit.slice(start, start + group.size));
         start += group.size;
-        const carryOver = group.carryOver === undefined ? undefined : { afterRound, factor: group.carryOver };
-        rows.push(...computeStandings(teams.filter((t) => members.has(t.id)), fixtures, results, { ...plain, ...(carryOver ? { carryOver } : {}) }));
+        const own = teams.filter((t) => members.has(t.id));
+        const separate = options.split!.separate
+          ? {
+              deductions: undefined,
+              startPoints: Object.fromEntries(table.filter((r) => members.has(r.teamId)).map((r) => [r.teamId, Math.ceil(r.points * (group.carryOver ?? 1))])),
+              fallbackOrder: atSplit,
+            }
+          : {};
+        rows.push(...computeStandings(own, later, results, { ...plain, ...separate }));
       });
       return rows.map((r, i) => ({ ...r, position: i + 1 }));
     }
@@ -218,13 +230,9 @@ export function computeStandings(
   const ids = teams.map((t) => t.id);
   const names = new Map(teams.map((t) => [t.id, t.name]));
   const overall = accumulate(matches, ids);
-  if (options.carryOver) {
-    const { afterRound, factor } = options.carryOver;
-    const before = accumulate(matches.filter((m) => m.matchday <= afterRound), ids);
-    for (const [id, t] of overall) {
-      const early = before.get(id)!.points;
-      t.points = Math.ceil(early * factor) + t.points - early;
-    }
+  for (const [teamId, points] of Object.entries(options.startPoints ?? {})) {
+    const t = overall.get(Number(teamId));
+    if (t) t.points += points;
   }
   for (const [teamId, deduction] of Object.entries(options.deductions ?? {})) {
     const t = overall.get(Number(teamId));
@@ -234,7 +242,8 @@ export function computeStandings(
   const criteria: Tiebreaker[] = options.tiebreakers[0] === "points"
     ? [...options.tiebreakers]
     : ["points", ...options.tiebreakers];
-  const order = rankGroup(ids, criteria, overall, matches, names);
+  const fallback = options.fallbackOrder ? new Map(options.fallbackOrder.map((id, i) => [id, i])) : undefined;
+  const order = rankGroup(ids, criteria, overall, matches, names, fallback);
   const includeForm = options.includeForm ?? true;
   const chronological = includeForm ? sortFixtures(fixtures) : [];
 

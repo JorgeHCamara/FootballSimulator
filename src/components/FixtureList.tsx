@@ -3,6 +3,7 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { needsShootout, seriesGames, tieOutcome, type PlayoffSide, type PlayoffTie } from "../engine/playoffs.ts";
+import { isSlotTeamId } from "../engine/split.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 
@@ -44,10 +45,12 @@ interface Props {
   playoff?: PlayoffView;
   /** A line above the matchday's games (generated fixtures: where they come from). */
   note?: string;
+  /** Names of rounds that aren't plain matchdays (a split's groups: "Championship play-offs 3"). */
+  roundLabels?: Record<number, string>;
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -74,7 +77,7 @@ export function FixtureList(props: Props) {
         >
           {matchdays.map((md) => (
             <option key={md} value={md} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
-              {md === PLAYOFF_MATCHDAY ? t(playoff?.knockout ? "knockoutPhase" : "playoffs") : t("matchday", { number: md })}
+              {md === PLAYOFF_MATCHDAY ? t(playoff?.knockout ? "knockoutPhase" : "playoffs") : (roundLabels?.[md] ?? t("matchday", { number: md }))}
             </option>
           ))}
         </select>
@@ -106,6 +109,8 @@ export function FixtureList(props: Props) {
               prediction={predictions[f.id]}
               onScore={(score) => onScore(f, score)}
               onSimulate={() => onSimulate(f)}
+              // Places standing in for clubs not known yet: nothing to predict.
+              disabled={isSlotTeamId(f.homeId)}
             />
           ))}
         </ul>

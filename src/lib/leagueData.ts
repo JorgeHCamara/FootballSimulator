@@ -26,6 +26,8 @@ export interface LeagueData {
   tournaments?: Tournament[];
   /** Points deducted in the current table (ESPN's standings), by club. */
   deductions?: Record<number, number>;
+  /** A split league: the first phase's games by ESPN's stage tag (see `split.espnStage`). */
+  firstPhaseIds?: number[];
 }
 
 export interface Tournament {
@@ -198,6 +200,8 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
           return {};
         })
       : {};
+    const splitStage = league.split?.espnStage;
+    const firstPhaseIds = splitStage ? events.filter((e) => e.season?.slug === splitStage).map((e) => Number(e.id)) : [];
     return {
       // Knockout games can bring in clubs from outside the table (see above), which need names too.
       teams: withFallbackCrests(
@@ -212,6 +216,8 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       ...(groups ? { groups } : {}),
       ...(tournaments.length > 1 ? { tournaments } : {}),
       ...(Object.keys(deductions).length ? { deductions } : {}),
+      // Only when the split's games are out too (else every game is the first phase's anyway).
+      ...(firstPhaseIds.length && firstPhaseIds.length < fixtures.length ? { firstPhaseIds } : {}),
     };
   }
   throw new Error(`No ${league.code} fixtures on ESPN for ${current} or ${current - 1}`);

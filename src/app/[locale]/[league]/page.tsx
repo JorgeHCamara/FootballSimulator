@@ -281,6 +281,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(priorStrengths ? { priorStrengths } : {})}
           {...(external ? { externalSeeds: external.rows } : {})}
           {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
+          {...(loaded.data.firstPhaseIds ? { firstPhaseIds: loaded.data.firstPhaseIds } : {})}
         />
       )}
 

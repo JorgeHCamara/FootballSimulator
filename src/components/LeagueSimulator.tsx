@@ -20,7 +20,16 @@ import {
 } from "../engine/playoffs.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { createRng, randomSeed } from "../engine/rng.ts";
-import { allSplitFixtureIds, splitFixtures, splitGroupsFrom } from "../engine/split.ts";
+import {
+  allSplitFixtureIds,
+  buildSplitPhase,
+  groupOfRound,
+  isSlotTeamId,
+  slotTeamId,
+  splitFixtures,
+  splitGroupTable,
+  splitGroupsFrom,
+} from "../engine/split.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
 import type { Fixture, ResultMap, Score, StandingRow, Team } from "../engine/types.ts";
 import { decodeResults, encodeResults } from "../lib/shareCodec.ts";
@@ -57,6 +66,8 @@ interface Props {
   qualifiedNote?: string;
   /** Points deducted by the league (ESPN's standings), by club. */
   deductions?: Record<number, number>;
+  /** A split league: its first phase's games, by the feed's stage tag. */
+  firstPhaseIds?: number[];
 }
 
 type Tab = "table" | "chances";
@@ -86,6 +97,7 @@ export function LeagueSimulator({
   qualifiedElsewhere,
   qualifiedNote,
   deductions,
+  firstPhaseIds,
 }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
@@ -108,93 +120,141 @@ export function LeagueSimulator({
   );
   const baseOptions = useMemo(() => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}) }), [league.tiebreakers, deductions]);
 
-  // A split league whose split isn't published yet (Greece's play-offs before
-  // April, Ecuador's final stage, Scotland's last five rounds): once every
-  // first-phase game has a score, the split's games are generated from that
-  // table, as extra rounds. Real fixtures replace them once ESPN has them.
+  // A split league (Greece's play-offs, Ecuador's final stage, Scotland's last
+  // five rounds). Until the split's real games are published they're
+  // generated from the first phase's table once it is complete.
   const splitConfig = league.split;
   const lastReal = useMemo(() => sortFixtures(fixtures).at(-1), [fixtures]);
-  const projecting = useMemo(() => {
-    if (!splitConfig || !lastReal) return false;
-    if (league.groups && groups?.length) return false;
+  const realGroups = league.groups && groups?.length ? groups : undefined;
+  const canGenerate = useMemo(() => {
+    if (!splitConfig || !lastReal || realGroups) return false;
     if (splitConfig.afterRound !== undefined) return lastReal.matchday === splitConfig.afterRound;
-    // The first phase ends with the last round published: only once it is complete (a double round robin at least).
+    // The first phase ends with the last round published: only once it is all out (a double round robin at least).
     const games = new Map<number, number>();
     for (const f of fixtures) for (const id of [f.homeId, f.awayId]) games.set(id, (games.get(id) ?? 0) + 1);
     return teams.every((tm) => (games.get(tm.id) ?? 0) >= 2 * (teams.length - 1));
-  }, [splitConfig, lastReal, league.groups, groups, fixtures, teams]);
+  }, [splitConfig, lastReal, realGroups, fixtures, teams]);
   // The last round of the first phase: set, or the last round published, or
   // (once ESPN has the groups) the last round with a game between two groups.
   const splitRound = useMemo(() => {
     if (!splitConfig) return 0;
     if (splitConfig.afterRound !== undefined) return splitConfig.afterRound;
-    if (league.groups && groups?.length) {
-      const groupOf = new Map(groups.flatMap((g) => g.teamIds.map((id) => [id, g.id] as const)));
+    if (realGroups) {
+      const groupOf = new Map(realGroups.flatMap((g) => g.teamIds.map((id) => [id, g.id] as const)));
       return Math.max(0, ...fixtures.filter((f) => groupOf.get(f.homeId) !== groupOf.get(f.awayId)).map((f) => f.matchday));
     }
     return lastReal?.matchday ?? 0;
-  }, [splitConfig, league.groups, groups, fixtures, lastReal]);
+  }, [splitConfig, realGroups, fixtures, lastReal]);
+  // Groups as new tables (Greece, Ecuador): the regular season, then each
+  // group with its own games and rounds. Scotland's table carries on instead.
+  const phased = Boolean(splitConfig && league.groups && (realGroups || canGenerate || splitConfig.afterRound !== undefined));
   const standingsOptions = useMemo(
     () =>
-      splitConfig && (splitConfig.afterRound !== undefined || projecting)
-        ? { ...baseOptions, split: { afterRound: splitRound, groups: splitConfig.groups } }
+      splitConfig && (splitConfig.afterRound !== undefined || canGenerate || phased)
+        ? { ...baseOptions, split: { afterRound: splitRound, groups: splitConfig.groups, ...(phased ? { separate: true } : {}) } }
         : baseOptions,
-    [baseOptions, splitConfig, projecting, splitRound],
+    [baseOptions, splitConfig, canGenerate, phased, splitRound],
   );
-  const firstPhaseResults = useMemo(() => effectiveResults(fixtures, season.predictions), [fixtures, season.predictions]);
-  const projected = useMemo(() => {
-    if (!projecting || !splitConfig || !lastReal || !fixtures.every((f) => firstPhaseResults[f.id])) return null;
-    const groupTeams = splitGroupsFrom(computeStandings(teams, fixtures, firstPhaseResults, { ...baseOptions, includeForm: false }), splitConfig.groups);
-    return { groupTeams, fixtures: splitFixtures(groupTeams, splitConfig.groups, splitRound, lastReal.utcDate) };
-  }, [projecting, splitConfig, lastReal, fixtures, firstPhaseResults, teams, baseOptions, splitRound]);
-  const allFixtures = useMemo(() => (projected ? [...fixtures, ...projected.fixtures] : fixtures), [fixtures, projected]);
+  const phase = useMemo(
+    () =>
+      phased && splitConfig
+        ? buildSplitPhase({
+            teams,
+            fixtures,
+            results: { ...realResults(fixtures), ...season.predictions },
+            groups: splitConfig.groups,
+            afterRound: splitRound,
+            ...(realGroups ? { realGroups: (league.groups ?? []).map((g) => realGroups.find((m) => m.id === g.id)?.teamIds ?? []) } : {}),
+            ...(firstPhaseIds ? { firstPhaseIds } : {}),
+            options: baseOptions,
+          })
+        : null,
+    [phased, splitConfig, teams, fixtures, season.predictions, splitRound, realGroups, league.groups, baseOptions, firstPhaseIds],
+  );
+  // Scotland: the split's rounds, generated once the first phase is complete.
+  const extraRounds = useMemo(() => {
+    if (phased || !canGenerate || !splitConfig || !lastReal) return null;
+    const results = effectiveResults(fixtures, season.predictions);
+    if (!fixtures.every((f) => results[f.id])) return null;
+    const groupTeams = splitGroupsFrom(computeStandings(teams, fixtures, results, { ...baseOptions, includeForm: false }), splitConfig.groups);
+    return splitFixtures(groupTeams, splitConfig.groups, splitRound, lastReal.utcDate);
+  }, [phased, canGenerate, splitConfig, lastReal, fixtures, season.predictions, teams, baseOptions, splitRound]);
+  const allFixtures = useMemo(
+    () =>
+      phase ? (phase.members ? [...phase.firstPhase, ...phase.groupFixtures.flat()] : phase.firstPhase) : extraRounds ? [...fixtures, ...extraRounds] : fixtures,
+    [phase, extraRounds, fixtures],
+  );
   const ordered = useMemo(() => sortFixtures(allFixtures), [allFixtures]);
+  /** Stand-in games between places ("1st v 2nd") until the groups' clubs are known. */
+  const slotFixtures = useMemo(() => (phase && !phase.members ? sortFixtures(phase.groupFixtures.flat()) : []), [phase]);
+  /** Stand-in clubs for those places. */
+  const slotTeams = useMemo(
+    () =>
+      phase && !phase.members
+        ? teams.map((_, i) => ({ id: slotTeamId(i + 1), name: t("slotName", { place: i + 1 }), shortName: t("slotShort", { place: i + 1 }), tla: String(i + 1) }))
+        : [],
+    [phase, teams, t],
+  );
+  const displayTeams = useMemo(() => (slotTeams.length ? new Map([...teamMap, ...slotTeams.map((s) => [s.id, s] as const)]) : teamMap), [teamMap, slotTeams]);
 
   // Leagues split into separate tables (MLS conferences) show one at a time;
-  // a split's groups (Greece) once ESPN has them, or once generated.
-  const groupTabs = useMemo(
-    () => (league.groups ?? []).flatMap((g, i) => {
-      const teamIds = groups?.find((m) => m.id === g.id)?.teamIds ?? projected?.groupTeams[i];
-      return teamIds ? [{ id: g.id, name: g.name[lang], teamIds, ...(g.zones ? { zones: g.zones } : {}) }] : [];
-    }),
-    [league.groups, groups, projected, lang],
-  );
-  const [groupId, setGroupId] = useState(groupTabs[0]?.id);
-  // After a split, its first phase keeps its own final table (Greece's regular
-  // season), listed before the groups; in the chances, the groups only.
-  const regularTab = splitConfig && league.groups && groupTabs.length ? { id: REGULAR_TAB, name: splitConfig.firstPhaseName?.[lang] ?? t("regularSeason") } : null;
-  const showRegular = Boolean(regularTab) && groupId === REGULAR_TAB && tab === "table";
-  const group = groupTabs.find((g) => g.id === groupId) ?? groupTabs[0];
+  // a split's groups from the start, with places standing in for the clubs
+  // until the first phase is complete.
+  const groupTabs = useMemo(() => {
+    let place = 0;
+    return (league.groups ?? []).flatMap((g, i) => {
+      const size = splitConfig?.groups[i]?.size ?? 0;
+      const slots = Array.from({ length: i === (league.groups ?? []).length - 1 ? teams.length - place : size }, () => slotTeamId(++place));
+      const teamIds = phase ? (phase.members?.[i] ?? slots) : groups?.find((m) => m.id === g.id)?.teamIds;
+      return teamIds ? [{ id: g.id, index: i, name: g.name[lang], teamIds, ...(g.zones ? { zones: g.zones } : {}) }] : [];
+    });
+  }, [league.groups, groups, phase, splitConfig, teams.length, lang]);
+  const [groupId, setGroupId] = useState<string | null>(null);
+  const known = Boolean(phase?.members);
+  // The first phase's own table comes first; shown until the groups are known.
+  const regularTab = phase ? { id: REGULAR_TAB, name: splitConfig?.firstPhaseName?.[lang] ?? t("regularSeason") } : null;
+  const selectedId = groupId ?? (phase && !known ? REGULAR_TAB : groupTabs[0]?.id);
+  const showRegular = Boolean(regularTab) && selectedId === REGULAR_TAB && tab === "table";
+  // In the chances: before the groups are known, the whole season; after, each group.
+  const overallChances = Boolean(phase && !known && tab === "chances");
+  const group = showRegular || overallChances ? undefined : (groupTabs.find((g) => g.id === selectedId) ?? groupTabs[0]);
+  const slotGroup = Boolean(phase && !known && group);
   // A group with its own zones (Ecuador's final stage) shows and simulates
   // those; the first phase, where each place leads.
   const tableLeague = useMemo(
-    () => (showRegular ? { ...league, groups: undefined } : group?.zones ? { ...league, zones: group.zones } : league),
+    () => (showRegular || !group ? { ...league, groups: undefined } : group.zones ? { ...league, zones: group.zones } : league),
     [league, group, showRegular],
   );
-  /** A group's own table: a split's group with its carried-over share of the first phase's points. */
-  const groupOptions = (id: string) => {
-    const carry = splitConfig?.groups[(league.groups ?? []).findIndex((g) => g.id === id)]?.carryOver;
-    return carry === undefined ? baseOptions : { ...baseOptions, carryOver: { afterRound: splitRound, factor: carry } };
-  };
-  // Before the split, the chances are for the whole season's places.
   const chancesLeague = useMemo(
-    () => (projecting && !projected && splitConfig?.finalZones ? { ...league, zones: splitConfig.finalZones, groups: undefined } : tableLeague),
-    [projecting, projected, splitConfig, league, tableLeague],
+    () => (overallChances && splitConfig?.finalZones ? { ...league, zones: splitConfig.finalZones, groups: undefined } : tableLeague),
+    [overallChances, splitConfig, league, tableLeague],
   );
+  const groupTableOptions = useMemo(() => ({ tiebreakers: league.tiebreakers }), [league.tiebreakers]);
 
   const effective = useMemo(() => effectiveResults(allFixtures, season.predictions), [allFixtures, season.predictions]);
   const tableTeams = useMemo(
-    () => (group ? group.teamIds.flatMap((id) => teamMap.get(id) ?? []) : teams),
-    [group, teamMap, teams],
+    () => (group ? group.teamIds.flatMap((id) => displayTeams.get(id) ?? []) : teams),
+    [group, displayTeams, teams],
   );
-  const regularFixtures = useMemo(() => ordered.filter((f) => f.matchday <= splitRound), [ordered, splitRound]);
-  const rows = useMemo(
-    () =>
-      showRegular
-        ? computeStandings(teams, regularFixtures, effective, baseOptions)
-        : computeStandings(tableTeams, ordered, effective, group ? groupOptions(group.id) : standingsOptions),
-    [showRegular, teams, regularFixtures, baseOptions, tableTeams, ordered, effective, standingsOptions, group], // eslint-disable-line react-hooks/exhaustive-deps
-  );
+  const rows = useMemo(() => {
+    if (phase && showRegular) return computeStandings(teams, phase.firstPhase, effective, baseOptions);
+    if (phase && group) {
+      if (slotGroup) return computeStandings(tableTeams, [], {}, { tiebreakers: league.tiebreakers, fallbackOrder: group.teamIds });
+      return splitGroupTable(phase, group.index, teams, effective, groupTableOptions);
+    }
+    return computeStandings(tableTeams, ordered, effective, standingsOptions);
+  }, [phase, showRegular, group, slotGroup, teams, tableTeams, ordered, effective, baseOptions, standingsOptions, groupTableOptions, league.tiebreakers]);
+  /**
+   * The first phase's table once the groups are known: each club in the zone
+   * of the group it went into (ESPN's groups can differ from the table when
+   * postponed games were played after the cut).
+   */
+  const zoneByTeam = useMemo(() => {
+    if (!phase?.members || !showRegular) return undefined;
+    return new Map(phase.members.flatMap((ids, g) => (league.zones[g] ? ids.map((id) => [id, league.zones[g]!] as const) : [])));
+  }, [phase, showRegular, league.zones]);
+  /** A group's points carried over from the first phase, shown beside the total. */
+  const carried = phase && group && known ? phase.startPoints[group.index] : undefined;
 
   // Reserve sides (Eerste Divisie's "Jong" teams) can't go up: promotion places
   // and play-off seeds count first teams only, renumbered 1, 2, 3…
@@ -234,9 +294,9 @@ export function LeagueSimulator({
   const shareFixtures = useMemo<Fixture[]>(
     () => [
       ...fixtures,
-      ...[...legIds, ...(projecting ? allSplitFixtureIds(teams.map((tm) => tm.id)) : [])].map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null })),
+      ...[...legIds, ...(canGenerate ? allSplitFixtureIds(teams.map((tm) => tm.id)) : [])].map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null })),
     ],
-    [fixtures, legIds, projecting, teams],
+    [fixtures, legIds, canGenerate, teams],
   );
   const seasonComplete = useMemo(() => allFixtures.every((f) => effective[f.id]), [allFixtures, effective]);
   // Serie B: no play-off when 3rd finishes far enough clear of 4th.
@@ -292,15 +352,38 @@ export function LeagueSimulator({
 
   // The play-off is listed as one more entry after the last matchday.
   const matchdays = useMemo(
-    () => [...new Set(ordered.map((f) => f.matchday)), ...(playoff ? [PLAYOFF_MATCHDAY] : [])],
-    [ordered, playoff],
+    () => [...new Set([...ordered, ...slotFixtures].map((f) => f.matchday))].sort((a, b) => a - b).concat(playoff ? [PLAYOFF_MATCHDAY] : []),
+    [ordered, slotFixtures, playoff],
   );
   const [matchday, setMatchday] = useState(() => {
     const next = ordered.find((f) => !f.result);
     return next?.matchday ?? matchdays.at(-1) ?? 1;
   });
   const onPlayoff = matchday === PLAYOFF_MATCHDAY;
-  const matchdayFixtures = useMemo(() => ordered.filter((f) => f.matchday === matchday), [ordered, matchday]);
+  const matchdayFixtures = useMemo(() => [...ordered, ...slotFixtures].filter((f) => f.matchday === matchday), [ordered, slotFixtures, matchday]);
+  /** Rounds of a split's groups: "Championship play-offs 3". */
+  const roundLabels = useMemo(
+    () =>
+      phase
+        ? Object.fromEntries(
+            matchdays.flatMap((md) => {
+              const g = groupOfRound(md);
+              return g === null ? [] : [[md, t("groupRound", { group: league.groups?.[g]?.name[lang] ?? "", number: md % 1000 })]];
+            }),
+          )
+        : undefined,
+    [phase, matchdays, league.groups, lang, t],
+  );
+  const slotRound = matchdayFixtures.length > 0 && matchdayFixtures.every((f) => isSlotTeamId(f.homeId));
+  /** Picking a table shows its fixtures: its next round with a game to play, else its last. */
+  const pickTable = (id: string) => {
+    setGroupId(id);
+    if (!phase) return;
+    const g = id === REGULAR_TAB ? null : groupTabs.find((x) => x.id === id)?.index ?? null;
+    const own = [...ordered, ...slotFixtures].filter((f) => groupOfRound(f.matchday) === g);
+    const next = own.find((f) => !effective[f.id]) ?? own.at(-1);
+    if (next) setMatchday(next.matchday);
+  };
 
   // Load saved predictions, then apply a shared link (?r=...) if present.
   useEffect(() => {
@@ -336,7 +419,7 @@ export function LeagueSimulator({
     const rng = createRng(randomSeed());
     const leagueResults = simulateFixtures(ordered, effective, model, rng);
     // Then the split's games, from the table the first phase ends with.
-    if (projecting && !projected && splitConfig && lastReal) {
+    if (canGenerate && splitConfig && lastReal && (phase ? !phase.members : !extraRounds)) {
       const all = { ...effective, ...leagueResults };
       const groupTeams = splitGroupsFrom(computeStandings(teams, fixtures, all, { ...baseOptions, includeForm: false }), splitConfig.groups);
       Object.assign(leagueResults, simulateFixtures(splitFixtures(groupTeams, splitConfig.groups, splitRound, lastReal.utcDate), season.predictions, model, rng));
@@ -413,9 +496,22 @@ export function LeagueSimulator({
             // The knockout phase makes each continental run several times slower, so half as many (as for cups).
             iterations: league.continental || playoff?.seedFromGroups || (playoff?.title && !league.groups) ? ITERATIONS / 2 : ITERATIONS,
             seed: 2026,
-            ...(groupTabs.length ? { groups: groupTabs.map((g) => g.teamIds) } : {}),
-            ...(groupTabs.length && splitConfig ? { groupStandings: groupTabs.map((g) => groupOptions(g.id)) } : {}),
-            ...(projecting && !projected && splitConfig && lastReal
+            // A split's groups once known: each its own games, from its carried points.
+            ...(phase?.members
+              ? {
+                  groups: phase.members,
+                  groupFixtures: phase.groupFixtures,
+                  groupStandings: phase.members.map((_, g) => ({
+                    ...groupTableOptions,
+                    startPoints: phase.startPoints[g] ?? {},
+                    fallbackOrder: phase.firstTable.map((r) => r.teamId),
+                  })),
+                }
+              : !phase && groupTabs.length
+                ? { groups: groupTabs.map((g) => g.teamIds) }
+                : {}),
+            // Not yet: each run generates them from its own table.
+            ...(canGenerate && splitConfig && lastReal && (phase ? !phase.members : !extraRounds)
               ? { project: { afterRound: splitRound, afterDate: lastReal.utcDate, groups: splitConfig.groups } }
               : {}),
             ...(qualifiedElsewhere?.length ? { passDown: qualifiedElsewhere } : {}),
@@ -427,7 +523,7 @@ export function LeagueSimulator({
               : {}),
           }
         : null,
-    [tab, hydrated, teams, allFixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere, projecting, projected, splitConfig, lastReal, splitRound], // eslint-disable-line react-hooks/exhaustive-deps
+    [tab, hydrated, teams, allFixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere, canGenerate, phase, extraRounds, splitConfig, lastReal, splitRound, groupTableOptions], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const actionButton =
@@ -459,7 +555,7 @@ export function LeagueSimulator({
               {t("chances")}
             </button>
           </div>
-          {(groupTabs.length > 1 || regularTab) && (
+          {(groupTabs.length > 1 || regularTab) && !overallChances && (
             <div
               className="flex max-w-full overflow-x-auto rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800"
               role="group"
@@ -467,7 +563,7 @@ export function LeagueSimulator({
               data-testid="group-switch"
             >
               {[...(regularTab && tab === "table" ? [regularTab] : []), ...groupTabs].map((g) => {
-                const selected = g.id === REGULAR_TAB ? showRegular : !showRegular && g.id === group?.id;
+                const selected = g.id === REGULAR_TAB ? showRegular : g.id === group?.id;
                 // Many groups (Libertadores A–H): the selected one by name, the others by letter.
                 const label = groupTabs.length > 4 && !selected ? g.id : g.name;
                 return (
@@ -478,7 +574,7 @@ export function LeagueSimulator({
                     aria-label={g.name}
                     title={g.name}
                     className={`whitespace-nowrap ${tabButton(selected)}`}
-                    onClick={() => setGroupId(g.id)}
+                    onClick={() => pickTable(g.id)}
                   >
                     {label}
                   </button>
@@ -494,11 +590,14 @@ export function LeagueSimulator({
               <StandingsTable
                 league={tableLeague}
                 rows={rows}
-                teams={teamMap}
+                teams={displayTeams}
+                {...(carried ? { carried } : {})}
+                {...(zoneByTeam ? { zoneByTeam } : {})}
+                {...(slotGroup ? { note: t("slotNote", { phase: (regularTab?.name ?? "").toLowerCase() }) } : {})}
                 {...(zonePositions ? { zonePositions } : {})}
                 {...(qualified.size ? { qualified } : {})}
                 {...(qualifiedNote ? { qualifiedNote } : {})}
-                {...(deductions ? { deductions } : {})}
+                {...(deductions && !group ? { deductions } : {})}
               />
               {playoff?.title && bracket.length > 0 && (
                 <PlayoffChampion
@@ -537,7 +636,7 @@ export function LeagueSimulator({
             type="button"
             className={`${primaryButton} grow disabled:opacity-40 lg:grow-0`}
             onClick={() => (onPlayoff ? simulateWholePlayoff() : simulate(matchdayFixtures))}
-            disabled={onPlayoff && !seasonComplete}
+            disabled={(onPlayoff && !seasonComplete) || slotRound}
           >
             {t("simulateMatchday")}
           </button>
@@ -561,11 +660,16 @@ export function LeagueSimulator({
             matchdays={matchdays}
             onMatchdayChange={setMatchday}
             fixtures={matchdayFixtures}
-            teams={teamMap}
+            teams={displayTeams}
+            {...(roundLabels ? { roundLabels } : {})}
             predictions={season.predictions}
             onScore={onScore}
             onSimulate={simulateOne}
-            {...(projected && matchday > splitRound && matchday !== PLAYOFF_MATCHDAY ? { note: t("projectedSplitNote", { round: splitRound }) } : {})}
+            {...(slotRound
+              ? { note: t("slotNote", { phase: (regularTab?.name ?? "").toLowerCase() }) }
+              : (phase?.generated || extraRounds) && matchday > splitRound && matchday !== PLAYOFF_MATCHDAY
+                ? { note: t("projectedSplitNote", { round: splitRound }) }
+                : {})}
             {...(playoff
               ? {
                   playoff: {

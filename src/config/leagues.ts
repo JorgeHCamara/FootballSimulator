@@ -139,6 +139,8 @@ export interface LeagueConfig {
     groups: readonly SplitGroupConfig[];
     /** Places over the whole season, for the chances before the split (each group's own zones after it). */
     finalZones?: Zone[];
+    /** ESPN's stage tag of the first phase's games (postponed ones can be played during the split). */
+    espnStage?: string;
     /** The first phase's tab once split ("Regular season" by default). */
     firstPhaseName?: Record<SiteLocale, string>;
   };
@@ -726,6 +728,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     // from all of them.
     split: {
       afterRound: 26,
+      espnStage: "regular-season",
       groups: [
         { size: 4, legs: 2 },
         { size: 4, legs: 2, carryOver: 0.5 },
@@ -1162,6 +1165,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     // The first stage ends with the last round published until ESPN shows the groups.
     split: {
       firstPhaseName: { en: "First stage", pt: "Primeira fase", es: "Primera etapa" },
+      espnStage: "first-stage",
       groups: [
         { size: 6, legs: 2 },
         { size: 4, legs: 2 },

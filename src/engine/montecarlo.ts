@@ -20,7 +20,9 @@ export interface MonteCarloInput {
    * group on its own, and positions are within the team's group.
    */
   groups?: readonly (readonly TeamId[])[];
-  /** With `groups`: each group's own table options (Greece's halved points), in place of `standings`. */
+  /** With `groups`: each group's own games (a split's groups: their games only), in place of `fixtures`. */
+  groupFixtures?: readonly (readonly Fixture[])[];
+  /** With `groups`: each group's own table options (a split's carried points), in place of `standings`. */
   groupStandings?: readonly StandingsOptions[];
   /**
    * A split not yet published (Greece before its play-offs): each run plays
@@ -101,7 +103,7 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
     const groupRows: ReturnType<typeof computeStandings>[] = [];
     for (const [g, group] of tables.entries()) {
       const options = input.groupStandings?.[g] ? { ...input.groupStandings[g], includeForm: false } : tableOptions;
-      const rows = computeStandings(group, played, results, options);
+      const rows = computeStandings(group, input.groupFixtures?.[g] ?? played, results, options);
       let zonePosition = 0;
       for (const row of rows) {
         positionCounts[row.teamId]![row.position - 1]!++;

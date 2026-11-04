@@ -41,6 +41,12 @@
     "tagline": "Simulate the season before it happens"
   },
   "Simulator": {
+    "slotName": "{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place",
+    "slotShort": "{place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}",
+    "slotNote": "The clubs are filled in once every {phase} game has a score.",
+    "groupRound": "{group} {number}",
+    "carried": "Carried",
+    "carriedTitle": "Points carried over from the first phase (included in the points)",
     "regularSeason": "Regular season",
     "projectedSplitNote": "Generated from your table after matchday {round}. The real fixtures replace these once they're published.",
     "table": "Table",

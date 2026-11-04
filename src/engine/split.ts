@@ -1,5 +1,6 @@
 import { doubleRoundRobin } from "./schedule.ts";
-import type { Fixture, FixtureId, StandingRow, TeamId } from "./types.ts";
+import { computeStandings, type StandingsOptions } from "./standings.ts";
+import type { Fixture, FixtureId, ResultMap, StandingRow, Team, TeamId } from "./types.ts";
 
 /**
  * A league that splits after a first phase (Greece's play-offs, Ecuador's final
@@ -69,4 +70,114 @@ export function splitFixtures(
         result: null,
       }));
   });
+}
+
+/** Fixture-list rounds of a split's groups: group g's round r is (g + 1) × 1000 + r. */
+export const GROUP_ROUND_BASE = 1000;
+export const groupRoundKey = (group: number, round: number) => (group + 1) * GROUP_ROUND_BASE + round;
+/** The group of a round key, or null for a first-phase matchday. */
+export const groupOfRound = (key: number): number | null => (key >= GROUP_ROUND_BASE ? Math.floor(key / GROUP_ROUND_BASE) - 1 : null);
+
+/** A place at the split before the clubs are known ("1st"), as a stand-in club id. */
+export const slotTeamId = (place: number) => -place;
+export const isSlotTeamId = (id: TeamId) => id < 0;
+const SLOT_FIXTURE_BASE = 3_000_000_000;
+
+export interface SplitPhaseInput {
+  teams: readonly Team[];
+  /** Real fixtures, first phase and (once published) the split's. */
+  fixtures: readonly Fixture[];
+  /** Real results with the user's predictions (any fixture id). */
+  results: ResultMap;
+  groups: readonly SplitGroupConfig[];
+  /** Last round of the first phase. */
+  afterRound: number;
+  /** The groups' clubs once ESPN publishes them. */
+  realGroups?: readonly (readonly TeamId[])[];
+  /** The first phase's games by the feed's stage tag (a postponed one can be played during the split); else by round. */
+  firstPhaseIds?: readonly FixtureId[];
+  /** Options of the first phase's table (tiebreakers, deductions). */
+  options: StandingsOptions;
+}
+
+export interface SplitPhase {
+  /** The first phase's real fixtures. */
+  firstPhase: Fixture[];
+  /** Every first-phase game has a score. */
+  complete: boolean;
+  /** The first phase's table (its clubs' starting points and places for the groups). */
+  firstTable: StandingRow[];
+  /** Each group's clubs, once known (real groups, or the first phase complete). */
+  members: TeamId[][] | null;
+  /** Each group's games, real or generated, with round keys for matchdays; slot games while the clubs aren't known. */
+  groupFixtures: Fixture[][];
+  /** The groups' games are generated (no real ones yet). */
+  generated: boolean;
+  /** Each group's starting points, by club. */
+  startPoints: Record<TeamId, number>[];
+}
+
+/**
+ * A split league's second phase as separate tables (Greece's play-offs,
+ * Ecuador's final stage): who is in each group, and each group's games
+ * numbered as its own rounds. Real games once ESPN has them; otherwise
+ * generated from the first phase's table once it is complete, and before
+ * that games between places ("1st v 2nd") as stand-ins.
+ */
+export function buildSplitPhase(input: SplitPhaseInput): SplitPhase {
+  const { teams, fixtures, results, groups, afterRound, options } = input;
+  const tagged = input.firstPhaseIds?.length ? new Set(input.firstPhaseIds) : null;
+  const isFirst = (f: Fixture) => (tagged ? tagged.has(f.id) : f.matchday <= afterRound);
+  const firstPhase = fixtures.filter(isFirst);
+  const later = fixtures.filter((f) => !isFirst(f));
+  const complete = firstPhase.length > 0 && firstPhase.every((f) => results[f.id]);
+  const firstTable = computeStandings(teams, firstPhase, results, { ...options, split: undefined, includeForm: false });
+  const members = input.realGroups?.length
+    ? input.realGroups.map((ids) => [...ids])
+    : complete
+      ? splitGroupsFrom(firstTable, groups)
+      : null;
+  const lastDate = firstPhase.reduce((max, f) => (f.utcDate > max ? f.utcDate : max), "");
+  const numbered = (group: number, games: readonly Fixture[]) => {
+    const rounds = [...new Set(games.map((f) => f.matchday))].sort((a, b) => a - b);
+    return games.map((f) => ({ ...f, matchday: groupRoundKey(group, rounds.indexOf(f.matchday) + 1) }));
+  };
+  let groupFixtures: Fixture[][];
+  let generated = false;
+  if (members && later.length) {
+    groupFixtures = members.map((ids, g) => numbered(g, later.filter((f) => ids.includes(f.homeId) && ids.includes(f.awayId))));
+  } else if (members) {
+    generated = true;
+    groupFixtures = members.map((ids, g) => numbered(g, splitFixtures([ids], [groups[g]!], afterRound, lastDate)));
+  } else {
+    // Places at the split stand in for the clubs.
+    let place = 0;
+    const slots = groups.map((group, g) =>
+      Array.from({ length: g === groups.length - 1 ? teams.length - place : group.size }, () => slotTeamId(++place)),
+    );
+    groupFixtures = slots.map((ids, g) =>
+      numbered(
+        g,
+        splitFixtures([ids], [groups[g]!], afterRound, lastDate).map((f) => ({ ...f, id: SLOT_FIXTURE_BASE - f.homeId * 1000 - f.awayId })),
+      ),
+    );
+  }
+  const points = new Map(firstTable.map((r) => [r.teamId, r.points]));
+  const startPoints = (members ?? []).map((ids, g) =>
+    Object.fromEntries(ids.map((id) => [id, Math.ceil((points.get(id) ?? 0) * (groups[g]?.carryOver ?? 1))])),
+  );
+  return { firstPhase, complete, firstTable, members, groupFixtures, generated, startPoints };
+}
+
+/** A group's table: its own games only, from its starting points; level clubs by their place in the first phase. */
+export function splitGroupTable(phase: SplitPhase, group: number, teams: readonly Team[], results: ResultMap, options: StandingsOptions): StandingRow[] {
+  const ids = phase.members?.[group];
+  if (!ids) return [];
+  const members = new Set(ids);
+  return computeStandings(
+    teams.filter((t) => members.has(t.id)),
+    phase.groupFixtures[group] ?? [],
+    results,
+    { ...options, split: undefined, deductions: undefined, startPoints: phase.startPoints[group] ?? {}, fallbackOrder: phase.firstTable.map((r) => r.teamId) },
+  );
 }

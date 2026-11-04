@@ -10,7 +10,7 @@ export function TeamBadge({ team, size = 20 }: { team: Team; size?: number }) {
       <img src={team.crest} alt="" width={size} height={size} loading="lazy" className="shrink-0 object-contain" style={{ width: size, height: size }} />
     );
   }
-  const hue = HUES[team.id % HUES.length];
+  const hue = HUES[Math.abs(team.id) % HUES.length];
   return (
     <span
       aria-hidden

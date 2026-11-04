@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { zoneForPosition, type LeagueConfig } from "../config/leagues.ts";
+import { zoneForPosition, type LeagueConfig, type Zone } from "../config/leagues.ts";
 import type { FormResult, StandingRow, Team, TeamId } from "../engine/types.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { ZONE_STYLES } from "./zones.ts";
@@ -29,9 +29,15 @@ interface Props {
   qualifiedNote?: string;
   /** Points deducted by the league, by club (already taken off the points). */
   deductions?: Readonly<Record<TeamId, number>>;
+  /** A split's group: the points each club carried over (already in the points), shown in their own column. */
+  carried?: Readonly<Record<TeamId, number>>;
+  /** A line under the table. */
+  note?: string;
+  /** Each club's zone, in place of its position's (a split's first phase: the group each club went into). */
+  zoneByTeam?: ReadonlyMap<TeamId, Zone>;
 }
 
-export function StandingsTable({ league, rows, teams, zonePositions, qualified, qualifiedNote, deductions }: Props) {
+export function StandingsTable({ league, rows, teams, zonePositions, qualified, qualifiedNote, deductions, carried, note, zoneByTeam }: Props) {
   const t = useTranslations("Simulator");
   const tz = useTranslations("Zones");
   const cell = "px-1.5 py-2 text-center tabular-nums";
@@ -52,6 +58,11 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
               <th className={`${optional} md:table-cell`}>{t("goalsFor")}</th>
               <th className={`${optional} md:table-cell`}>{t("goalsAgainst")}</th>
               <th className={cell}>{t("goalDifference")}</th>
+              {carried && (
+                <th className={optional} title={t("carriedTitle")}>
+                  {t("carried")}
+                </th>
+              )}
               <th className={`${cell} pr-2 font-semibold`}>{t("points")}</th>
               <th className="hidden py-2 pr-3 text-left lg:table-cell">{t("form")}</th>
             </tr>
@@ -65,8 +76,9 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
               const zonePosition = zonePositions ? zonePositions.get(row.teamId) : row.position;
               const isQualified = qualified?.has(row.teamId) ?? false;
               const reserve = zonePositions !== undefined && zonePosition === null && !isQualified;
-              const zone =
-                real && RELEGATION.has(real.kind)
+              const zone = zoneByTeam
+                ? zoneByTeam.get(row.teamId)
+                : real && RELEGATION.has(real.kind)
                   ? real
                   : isQualified
                     ? league.zones[0]
@@ -106,6 +118,11 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
                   <td className={`${optional} md:table-cell`}>{row.goalsFor}</td>
                   <td className={`${optional} md:table-cell`}>{row.goalsAgainst}</td>
                   <td className={cell}>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
+                  {carried && (
+                    <td className={`${optional} text-zinc-500`} data-testid="carried">
+                      {carried[row.teamId] ?? 0}
+                    </td>
+                  )}
                   <td className={`${cell} pr-2 font-bold`} data-testid="points">
                     {row.points}
                     {deductions?.[row.teamId] ? (
@@ -135,6 +152,11 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
           </li>
         ))}
       </ul>
+      {note && (
+        <p className="mt-1 text-xs text-zinc-500" data-testid="table-note">
+          {note}
+        </p>
+      )}
       {qualifiedNote ? (
         <p className="mt-1 text-xs text-zinc-500" data-testid="qualified-note">
           {qualifiedNote}

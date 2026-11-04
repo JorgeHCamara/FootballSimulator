@@ -41,6 +41,12 @@
     "tagline": "Simule a temporada antes que ela aconteça"
   },
   "Simulator": {
+    "slotName": "{place}º colocado",
+    "slotShort": "{place}º",
+    "slotNote": "Os clubes aparecem assim que todos os jogos da {phase} tiverem placar.",
+    "groupRound": "{group} {number}",
+    "carried": "Herdados",
+    "carriedTitle": "Pontos herdados da primeira fase (já incluídos nos pontos)",
     "regularSeason": "Fase regular",
     "projectedSplitNote": "Gerados a partir da sua tabela após a rodada {round}. Os jogos reais substituem estes assim que forem divulgados.",
     "table": "Tabela",

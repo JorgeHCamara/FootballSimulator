@@ -41,6 +41,12 @@
     "tagline": "Simula la temporada antes de que ocurra"
   },
   "Simulator": {
+    "slotName": "{place}º puesto",
+    "slotShort": "{place}º",
+    "slotNote": "Los clubes aparecen en cuanto todos los partidos de la {phase} tengan resultado.",
+    "groupRound": "{group} {number}",
+    "carried": "Arrastre",
+    "carriedTitle": "Puntos arrastrados de la primera fase (incluidos en los puntos)",
     "regularSeason": "Fase regular",
     "projectedSplitNote": "Generados a partir de tu tabla tras la jornada {round}. Los partidos reales los sustituyen en cuanto se publiquen.",
     "table": "Clasificación",

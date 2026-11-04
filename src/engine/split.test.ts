@@ -3,7 +3,18 @@ import { describe, it } from "node:test";
 import { runMonteCarlo } from "./montecarlo.ts";
 import { buildLeagueModel } from "./ratings.ts";
 import { doubleRoundRobin } from "./schedule.ts";
-import { allSplitFixtureIds, isSplitFixtureId, splitFixtureId, splitFixtures, splitGroupsFrom, type SplitGroupConfig } from "./split.ts";
+import {
+  allSplitFixtureIds,
+  buildSplitPhase,
+  groupOfRound,
+  isSlotTeamId,
+  isSplitFixtureId,
+  splitFixtureId,
+  splitFixtures,
+  splitGroupTable,
+  splitGroupsFrom,
+  type SplitGroupConfig,
+} from "./split.ts";
 import { computeStandings } from "./standings.ts";
 import type { ResultMap, Team } from "./types.ts";
 
@@ -45,12 +56,12 @@ describe("a split generated from the table", () => {
     assert.equal(single.length, 12);
   });
 
-  it("keeps the groups apart and halves the points of a group with carry-over 0.5, rounded up", () => {
+  it("makes each group a new table of its own games, from its carried points (halved and rounded up with carry-over 0.5)", () => {
     // In the split, 8 wins everything in the second group.
     const results: ResultMap = { ...firstResults };
     for (const f of extra) results[f.id] = f.homeId === 8 ? { home: 2, away: 0 } : f.awayId === 8 ? { home: 0, away: 2 } : { home: 0, away: 0 };
     const all = [...firstPhase, ...extra];
-    const table = computeStandings(teams, all, results, { tiebreakers: [...options.tiebreakers], split: { afterRound: 14, groups } });
+    const table = computeStandings(teams, all, results, { tiebreakers: [...options.tiebreakers], split: { afterRound: 14, groups, separate: true } });
     assert.deepEqual(table.slice(0, 4).map((r) => r.teamId), [1, 2, 3, 4], "the top four stay on top");
     const row = (id: number) => table.find((r) => r.teamId === id)!;
     // 5 won 6 of its 14 first-phase games (18 points): 9 carried, plus four draws and two defeats by 8 → 13.
@@ -60,6 +71,10 @@ describe("a split generated from the table", () => {
     assert.equal(row(8).position, 5, "8 tops the second group");
     // The top group isn't halved: 1 won all 14 (42 points) plus its split games (all draws: 6).
     assert.equal(row(1).points, 42 + 6);
+    // Played, wins, goals: the split's games only.
+    assert.equal(row(1).played, 6);
+    assert.equal(row(8).won, 6);
+    assert.equal(row(8).goalsFor, 12);
   });
 
   it("generates each run's split in the chances, keeping the user's predictions for those games", () => {
@@ -72,7 +87,7 @@ describe("a split generated from the table", () => {
       fixtures: open,
       fixed,
       model,
-      standings: { tiebreakers: [...options.tiebreakers], split: { afterRound: 14, groups } },
+      standings: { tiebreakers: [...options.tiebreakers], split: { afterRound: 14, groups, separate: true } },
       iterations: 200,
       seed: 1,
       project: { afterRound: 14, afterDate: open.at(-1)!.utcDate, groups },
@@ -81,5 +96,45 @@ describe("a split generated from the table", () => {
     for (const t of teams) assert.equal(result.positionCounts[t.id]!.reduce((a, b) => a + b, 0), 200);
     // Each club plays 14 + 6 games a run: average points well above a first phase alone could give the weakest.
     assert.ok(result.averagePoints[8]! > 0);
+  });
+});
+
+describe("a split's second phase as separate tables", () => {
+  const base = { teams, groups, afterRound: 14, options: { tiebreakers: [...options.tiebreakers] } };
+
+  it("stands places in for the clubs until the first phase is complete, in each group's own rounds", () => {
+    const open = { ...firstResults };
+    delete open[firstPhase.at(-1)!.id];
+    const phase = buildSplitPhase({ ...base, fixtures: firstPhase, results: open });
+    assert.equal(phase.complete, false);
+    assert.equal(phase.members, null);
+    assert.equal(phase.groupFixtures.length, 2);
+    for (const [g, games] of phase.groupFixtures.entries()) {
+      assert.equal(games.length, 12);
+      assert.ok(games.every((f) => isSlotTeamId(f.homeId) && isSlotTeamId(f.awayId) && groupOfRound(f.matchday) === g));
+      assert.deepEqual([...new Set(games.map((f) => f.matchday % 1000))].sort((a, b) => a - b), [1, 2, 3, 4, 5, 6]);
+    }
+    // The second group's slots are the places 5th–8th.
+    assert.deepEqual([...new Set(phase.groupFixtures[1]!.flatMap((f) => [f.homeId, f.awayId]))].sort((a, b) => b - a), [-5, -6, -7, -8]);
+  });
+
+  it("generates the groups' games once it is complete, and their tables count only those, from the carried points", () => {
+    const phase = buildSplitPhase({ ...base, fixtures: firstPhase, results: firstResults });
+    assert.deepEqual(phase.members, [[1, 2, 3, 4], [5, 6, 7, 8]]);
+    assert.equal(phase.generated, true);
+    assert.ok(phase.groupFixtures[1]!.every((f) => isSplitFixtureId(f.id)));
+    // 5 had 18 points: 9 carried; 1 had 42: all of them.
+    assert.equal(phase.startPoints[1]![5], 9);
+    assert.equal(phase.startPoints[0]![1], 42);
+    const table = splitGroupTable(phase, 1, teams, firstResults, { tiebreakers: ["points"] });
+    assert.deepEqual(table.map((r) => [r.teamId, r.played, r.points]), [[5, 0, 9], [6, 0, 6], [7, 0, 3], [8, 0, 0]]);
+  });
+
+  it("uses the real games once published, numbered as each group's rounds", () => {
+    const later = splitFixtures([[1, 2, 3, 4], [5, 6, 7, 8]], groups, 14, firstPhase.at(-1)!.utcDate).map((f, i) => ({ ...f, id: 9000 + i }));
+    const phase = buildSplitPhase({ ...base, fixtures: [...firstPhase, ...later], results: firstResults, realGroups: [[1, 2, 3, 4], [5, 6, 7, 8]] });
+    assert.equal(phase.generated, false);
+    assert.ok(phase.groupFixtures.flat().every((f) => f.id >= 9000));
+    assert.deepEqual([...new Set(phase.groupFixtures[0]!.map((f) => f.matchday))], [1001, 1002, 1003, 1004, 1005, 1006]);
   });
 });
