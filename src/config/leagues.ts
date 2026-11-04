@@ -139,6 +139,8 @@ export interface LeagueConfig {
     groups: readonly SplitGroupConfig[];
     /** Places over the whole season, for the chances before the split (each group's own zones after it). */
     finalZones?: Zone[];
+    /** The first phase's tab once split ("Regular season" by default). */
+    firstPhaseName?: Record<SiteLocale, string>;
   };
   /**
    * Real data comes from ESPN and falls back to football-data.org (with `code`
@@ -1159,6 +1161,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints"],
     // The first stage ends with the last round published until ESPN shows the groups.
     split: {
+      firstPhaseName: { en: "First stage", pt: "Primeira fase", es: "Primera etapa" },
       groups: [
         { size: 6, legs: 2 },
         { size: 4, legs: 2 },

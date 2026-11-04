@@ -61,6 +61,9 @@ interface Props {
 
 type Tab = "table" | "chances";
 
+/** The group switch's entry for a split's first phase (not a group id). */
+const REGULAR_TAB = "regular";
+
 /** "2026" → "2027", "2026/27" → "2027/28". */
 function nextSeasonLabel(season: string): string {
   const single = /^(\d{4})$/.exec(season);
@@ -120,7 +123,17 @@ export function LeagueSimulator({
     for (const f of fixtures) for (const id of [f.homeId, f.awayId]) games.set(id, (games.get(id) ?? 0) + 1);
     return teams.every((tm) => (games.get(tm.id) ?? 0) >= 2 * (teams.length - 1));
   }, [splitConfig, lastReal, league.groups, groups, fixtures, teams]);
-  const splitRound = splitConfig?.afterRound ?? lastReal?.matchday ?? 0;
+  // The last round of the first phase: set, or the last round published, or
+  // (once ESPN has the groups) the last round with a game between two groups.
+  const splitRound = useMemo(() => {
+    if (!splitConfig) return 0;
+    if (splitConfig.afterRound !== undefined) return splitConfig.afterRound;
+    if (league.groups && groups?.length) {
+      const groupOf = new Map(groups.flatMap((g) => g.teamIds.map((id) => [id, g.id] as const)));
+      return Math.max(0, ...fixtures.filter((f) => groupOf.get(f.homeId) !== groupOf.get(f.awayId)).map((f) => f.matchday));
+    }
+    return lastReal?.matchday ?? 0;
+  }, [splitConfig, league.groups, groups, fixtures, lastReal]);
   const standingsOptions = useMemo(
     () =>
       splitConfig && (splitConfig.afterRound !== undefined || projecting)
@@ -147,9 +160,17 @@ export function LeagueSimulator({
     [league.groups, groups, projected, lang],
   );
   const [groupId, setGroupId] = useState(groupTabs[0]?.id);
+  // After a split, its first phase keeps its own final table (Greece's regular
+  // season), listed before the groups; in the chances, the groups only.
+  const regularTab = splitConfig && league.groups && groupTabs.length ? { id: REGULAR_TAB, name: splitConfig.firstPhaseName?.[lang] ?? t("regularSeason") } : null;
+  const showRegular = Boolean(regularTab) && groupId === REGULAR_TAB && tab === "table";
   const group = groupTabs.find((g) => g.id === groupId) ?? groupTabs[0];
-  // A group with its own zones (Ecuador's final stage) shows and simulates those.
-  const tableLeague = useMemo(() => (group?.zones ? { ...league, zones: group.zones } : league), [league, group]);
+  // A group with its own zones (Ecuador's final stage) shows and simulates
+  // those; the first phase, where each place leads.
+  const tableLeague = useMemo(
+    () => (showRegular ? { ...league, groups: undefined } : group?.zones ? { ...league, zones: group.zones } : league),
+    [league, group, showRegular],
+  );
   /** A group's own table: a split's group with its carried-over share of the first phase's points. */
   const groupOptions = (id: string) => {
     const carry = splitConfig?.groups[(league.groups ?? []).findIndex((g) => g.id === id)]?.carryOver;
@@ -166,9 +187,13 @@ export function LeagueSimulator({
     () => (group ? group.teamIds.flatMap((id) => teamMap.get(id) ?? []) : teams),
     [group, teamMap, teams],
   );
+  const regularFixtures = useMemo(() => ordered.filter((f) => f.matchday <= splitRound), [ordered, splitRound]);
   const rows = useMemo(
-    () => computeStandings(tableTeams, ordered, effective, group ? groupOptions(group.id) : standingsOptions),
-    [tableTeams, ordered, effective, standingsOptions, group], // eslint-disable-line react-hooks/exhaustive-deps
+    () =>
+      showRegular
+        ? computeStandings(teams, regularFixtures, effective, baseOptions)
+        : computeStandings(tableTeams, ordered, effective, group ? groupOptions(group.id) : standingsOptions),
+    [showRegular, teams, regularFixtures, baseOptions, tableTeams, ordered, effective, standingsOptions, group], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   // Reserve sides (Eerste Divisie's "Jong" teams) can't go up: promotion places
@@ -434,15 +459,15 @@ export function LeagueSimulator({
               {t("chances")}
             </button>
           </div>
-          {groupTabs.length > 1 && (
+          {(groupTabs.length > 1 || regularTab) && (
             <div
               className="flex max-w-full overflow-x-auto rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800"
               role="group"
               aria-label={t(groupTabs.length > 4 ? "group" : "conference")}
               data-testid="group-switch"
             >
-              {groupTabs.map((g) => {
-                const selected = g.id === group?.id;
+              {[...(regularTab && tab === "table" ? [regularTab] : []), ...groupTabs].map((g) => {
+                const selected = g.id === REGULAR_TAB ? showRegular : !showRegular && g.id === group?.id;
                 // Many groups (Libertadores A–H): the selected one by name, the others by letter.
                 const label = groupTabs.length > 4 && !selected ? g.id : g.name;
                 return (

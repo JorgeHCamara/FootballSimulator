@@ -41,6 +41,7 @@
     "tagline": "Simule a temporada antes que ela aconteça"
   },
   "Simulator": {
+    "regularSeason": "Fase regular",
     "projectedSplitNote": "Gerados a partir da sua tabela após a rodada {round}. Os jogos reais substituem estes assim que forem divulgados.",
     "table": "Tabela",
     "chances": "Chances",
