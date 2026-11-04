@@ -41,7 +41,8 @@ export interface LeagueFacts {
   continentalPlaces: boolean;
 }
 
-const CONTINENTAL: ReadonlySet<string> = new Set([
+/** Places that lead to a continental competition. */
+export const CONTINENTAL: ReadonlySet<string> = new Set([
   "championsLeague",
   "championsLeagueQualifying",
   "europaLeague",

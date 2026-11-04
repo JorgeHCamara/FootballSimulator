@@ -95,8 +95,25 @@ describe("AdSense settings", () => {
 });
 
 describe("the sitemap", () => {
-  it("lists About, Privacy and Contact in every language", () => {
-    const urls = sitemap().map((e) => e.url);
+  // The club pages come from each league's data: the generated sample leagues here (no network).
+  process.env.FOOTSIMU_SAMPLE_DATA = "1";
+  it("lists About, Privacy and Contact in every language", async () => {
+    const urls = (await sitemap()).map((e) => e.url);
     for (const locale of ["en", "pt", "es"]) for (const page of ["about", "privacy", "contact"]) assert.ok(urls.some((u) => u.endsWith(`/${locale}/${page}`)), `${locale}/${page}`);
+  });
+
+  it("lists every club page of every domestic league, in every language, with its alternates", async () => {
+    const entries = await sitemap();
+    const clubs = entries.filter((e) => e.url.includes("/team/"));
+    for (const code of ["PL", "BSA", "MLS", "ARG", "GSL"]) {
+      const l = league(code);
+      const own = clubs.filter((e) => e.url.includes(`/en/${l.slug}/team/`));
+      assert.equal(own.length, l.teams, code);
+    }
+    assert.ok(!clubs.some((e) => e.url.includes("/champions-league/")), "no club pages for continental competitions");
+    for (const locale of ["pt", "es"]) assert.equal(clubs.filter((e) => e.url.includes(`/${locale}/`)).length, clubs.length / 3);
+    const first = clubs[0]!;
+    assert.deepEqual(Object.keys(first.alternates!.languages!).sort(), ["en", "es", "pt-BR"]);
+    assert.equal(new Set(clubs.map((e) => e.url)).size, clubs.length, "no duplicates");
   });
 });

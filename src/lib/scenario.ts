@@ -1,6 +1,6 @@
 import { zoneForPosition, type LeagueConfig, type Zone, type ZoneKind } from "../config/leagues.ts";
 import { runMonteCarlo, type MonteCarloInput } from "../engine/montecarlo.ts";
-import { buildLeagueModel } from "../engine/ratings.ts";
+import { buildLeagueModel, type LeagueModel } from "../engine/ratings.ts";
 import { effectiveResults, realResults } from "../engine/results.ts";
 import { buildSplitPhase, splitFixtures, splitGroupTable, splitGroupsFrom } from "../engine/split.ts";
 import { computeStandings, type StandingsOptions } from "../engine/standings.ts";
@@ -14,7 +14,7 @@ export { shareCardSupported };
 /** Seasons simulated for a scenario's chances: the same as the Chances tab. */
 export const SCENARIO_ITERATIONS = 10_000;
 /** The Chances tab's seed (useMonteCarlo), so the card and the page agree. */
-const SEED = 2026;
+export const SCENARIO_SEED = 2026;
 
 export interface ScenarioData {
   teams: readonly Team[];
@@ -43,12 +43,24 @@ export interface ScenarioOutcome {
   places: readonly Zone[];
 }
 
+/** What a scenario's Monte Carlo runs on, with the table as it stands. */
+export interface ScenarioSimulation {
+  facts: NonNullable<ReturnType<typeof leagueFacts>>;
+  model: LeagueModel;
+  /** The table now (a split's groups placed after each other). */
+  rows: StandingRow[];
+  /** Every game the table counts (a split's generated games too). */
+  played: Fixture[];
+  input: Omit<MonteCarloInput, "iterations" | "seed">;
+  /** Each club's offset from its group's places to the whole table's. */
+  offset: Map<TeamId, number>;
+}
+
 /**
- * The final table a shared scenario leads to, with the chances behind it:
- * the user's predictions on top of the real results, everything else
- * simulated. Mirrors the league page (LeagueSimulator) for one table per league.
+ * The Monte Carlo behind a scenario, as the league page sets it up for one
+ * table per league: real results and the predictions fixed, the rest simulated.
  */
-export function scenarioOutcome(league: LeagueConfig, data: ScenarioData, predictions: ResultMap, iterations = SCENARIO_ITERATIONS): ScenarioOutcome | null {
+export function scenarioSimulation(league: LeagueConfig, data: ScenarioData, predictions: ResultMap): ScenarioSimulation | null {
   if (!shareCardSupported(league)) return null;
   const facts = leagueFacts(league);
   if (!facts) return null;
@@ -139,7 +151,20 @@ export function scenarioOutcome(league: LeagueConfig, data: ScenarioData, predic
     input = { teams, fixtures: played, fixed: effective, model, standings: base };
   }
 
-  const result = runMonteCarlo({ ...input, iterations, seed: SEED });
+  return { facts, model, rows, played, input, offset };
+}
+
+/**
+ * The final table a shared scenario leads to, with the chances behind it:
+ * the user's predictions on top of the real results, everything else
+ * simulated. Mirrors the league page (LeagueSimulator) for one table per league.
+ */
+export function scenarioOutcome(league: LeagueConfig, data: ScenarioData, predictions: ResultMap, iterations = SCENARIO_ITERATIONS): ScenarioOutcome | null {
+  const simulation = scenarioSimulation(league, data, predictions);
+  if (!simulation) return null;
+  const { facts, rows, played, input, offset } = simulation;
+  const { teams } = data;
+  const result = runMonteCarlo({ ...input, iterations, seed: SCENARIO_SEED });
   /** Runs a club ends at each place of the whole table. */
   const counts = (id: TeamId) => {
     const own = result.positionCounts[id] ?? [];

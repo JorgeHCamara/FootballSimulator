@@ -2,14 +2,14 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import type { EspnStages, LeagueConfig, SiteLocale } from "../config/leagues.ts";
-import { realChampion } from "../engine/playoffs.ts";
+import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import type { MatchParams, TeamStrength } from "../engine/ratings.ts";
-import { realResults } from "../engine/results.ts";
-import { computeStandings } from "../engine/standings.ts";
-import type { Fixture, Team, TeamId } from "../engine/types.ts";
+import type { Team, TeamId } from "../engine/types.ts";
 import type { Tournament } from "../lib/leagueData.ts";
 import { LeagueSimulator } from "./LeagueSimulator.tsx";
+import { annualFixtures, tournamentChampion, tournamentConfig } from "../lib/tournaments.ts";
+
+export { tournamentChampion, tournamentConfig };
 
 interface Props {
   league: LeagueConfig & { annual: NonNullable<LeagueConfig["annual"]> };
@@ -25,36 +25,6 @@ interface Props {
   matchParams?: MatchParams;
   /** Points deducted in the current tournament's table (ESPN), also applied to the annual table. */
   deductions?: Record<number, number>;
-}
-
-/** A tournament's own format: the league's, with what its stage config changes. */
-export function tournamentConfig(league: LeagueConfig, stage: EspnStages | undefined): LeagueConfig {
-  if (!stage) return league;
-  const playoff = stage.playoff === null ? undefined : (stage.playoff ?? league.playoff);
-  return {
-    ...league,
-    ...(stage.gamesPerTeam ? { gamesPerTeam: stage.gamesPerTeam } : {}),
-    ...(stage.zones ? { zones: stage.zones } : {}),
-    ...(stage.groups ? { groups: stage.groups } : {}),
-    playoff,
-  };
-}
-
-/**
- * A tournament's champion from real results: its play-off final when it has a
- * play-off, else the leader once every game is played.
- */
-export function tournamentChampion(config: LeagueConfig, teams: readonly Team[], tournament: Tournament): TeamId | null {
-  if (config.playoff) return realChampion(tournament.postseason);
-  if (tournament.fixtures.some((f) => !f.result)) return null;
-  const clubs = new Set(tournament.fixtures.flatMap((f) => [f.homeId, f.awayId]));
-  const table = computeStandings(
-    teams.filter((t) => clubs.has(t.id)),
-    tournament.fixtures,
-    realResults(tournament.fixtures),
-    { tiebreakers: config.tiebreakers, includeForm: false },
-  );
-  return table[0]?.teamId ?? null;
 }
 
 /**
@@ -82,16 +52,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
   // its real play-off games) in one table of all clubs, later tournaments'
   // rounds numbered after the earlier ones'.
   const annual = useMemo(() => {
-    let offset = 0;
-    const fixtures: Fixture[] = [];
-    for (const tournament of ordered) {
-      const rounds = Math.max(0, ...tournament.fixtures.map((f) => f.matchday));
-      fixtures.push(...tournament.fixtures.map((f) => ({ ...f, matchday: f.matchday + offset })));
-      if (league.annual.includePostseason) {
-        fixtures.push(...(tournament.postseason ?? []).filter((f) => f.result).map((f) => ({ ...f, matchday: rounds + 1 + offset })));
-      }
-      offset += rounds + (league.annual.includePostseason && tournament.postseason?.length ? 1 : 0);
-    }
+    const fixtures = annualFixtures(league, ordered);
     const config: LeagueConfig = {
       ...league,
       zones: league.annual.zones,

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { zoneForPosition, type LeagueConfig, type Zone } from "../config/leagues.ts";
 import type { FormResult, StandingRow, Team, TeamId } from "../engine/types.ts";
+import { Link } from "../i18n/navigation.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { ZONE_STYLES } from "./zones.ts";
 import { Icon } from "./Icon.tsx";
@@ -98,8 +99,18 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
                   <td className="py-2">
                     <span className="flex min-w-0 items-center gap-2">
                       <TeamBadge team={team} />
-                      <span className="truncate font-medium sm:hidden">{team.shortName}</span>
-                      <span className="hidden truncate font-medium sm:inline">{team.name}</span>
+                      {team.page ? (
+                        // The club's own page (chances, fixtures and odds).
+                        <Link href={team.page} className="min-w-0 truncate font-medium hover:underline" data-testid="club-link">
+                          <span className="sm:hidden">{team.shortName}</span>
+                          <span className="hidden sm:inline">{team.name}</span>
+                        </Link>
+                      ) : (
+                        <>
+                          <span className="truncate font-medium sm:hidden">{team.shortName}</span>
+                          <span className="hidden truncate font-medium sm:inline">{team.name}</span>
+                        </>
+                      )}
                       {reserve && (
                         <span className="shrink-0 rounded bg-zinc-200 px-1 text-[10px] font-semibold uppercase text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300" title={t("reserveTeam")} data-testid="reserve-tag">
                           {t("reserveTag")}

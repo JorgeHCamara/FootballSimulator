@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   // The share card reads Inter from src/assets/fonts (next/og needs the files).
   outputFileTracingIncludes: {
     "/*/*/share/**": ["./src/assets/fonts/**/*"],
+    "/*/*/team/**": ["./src/assets/fonts/**/*"],
   },
   experimental: {
     // Generate all pages in one worker so each league is fetched once per build

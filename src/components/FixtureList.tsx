@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { needsShootout, seriesGames, tieOutcome, type PlayoffSide, type PlayoffTie } from "../engine/playoffs.ts";
 import { isSlotTeamId } from "../engine/split.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
+import { Link } from "../i18n/navigation.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { Icon } from "./Icon.tsx";
 
@@ -376,6 +377,17 @@ function parseGoals(text: string): number | null {
   return Number(text);
 }
 
+/** A club's short name, linking to its own page when it has one. */
+function TeamName({ team }: { team: Team }) {
+  return team.page ? (
+    <Link href={team.page} className="truncate hover:underline" data-testid="club-link">
+      {team.shortName}
+    </Link>
+  ) : (
+    <span className="truncate">{team.shortName}</span>
+  );
+}
+
 export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false }: RowProps) {
   const side = (id: TeamId) => (winner == null ? "" : winner === id ? "font-bold" : "opacity-60");
   const t = useTranslations("Simulator");
@@ -434,7 +446,7 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <span className={`flex min-w-0 items-center justify-end gap-2 text-right text-sm font-medium ${side(home.id)}`}>
-          <span className="truncate">{home.shortName}</span>
+          <TeamName team={home} />
           {tags?.home && <Tag label={tags.home} />}
           <TeamBadge team={home} size={22} />
         </span>
@@ -478,7 +490,7 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
         </span>
         <span className={`flex min-w-0 items-center gap-2 text-sm font-medium ${side(away.id)}`}>
           <TeamBadge team={away} size={22} />
-          <span className="truncate">{away.shortName}</span>
+          <TeamName team={away} />
           {tags?.away && <Tag label={tags.away} />}
         </span>
       </div>

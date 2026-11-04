@@ -163,3 +163,68 @@ export async function renderGenericShareCard({ title, subtitle, cta }: { title: 
     { ...OG_SIZE, fonts: await interFonts(), headers: CARD_HEADERS },
   );
 }
+
+/** A club page's card: the club, where it stands and its headline chances. */
+export interface ClubCardText {
+  pill: string;
+  club: string;
+  /** e.g. "3rd · 24 pts". */
+  standing: string;
+  likeliest: string;
+  /** The headline chances: name, chance and its zone's colour. */
+  chances: { label: string; value: string; share: number; color: string }[];
+  basedOn: string;
+  cta: string;
+}
+
+/** Club pages change with every result: the CDN keeps a card for an hour (the page's own refresh). */
+const CLUB_CARD_HEADERS = { "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400" };
+
+export async function renderClubCard(text: ClubCardText) {
+  return new ImageResponse(
+    (
+      <div style={{ width: "100%", height: "100%", display: "flex", background: PITCH_700, fontFamily: "Inter", color: "#ffffff" }}>
+        <div style={{ width: 560, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "48px 40px 48px 56px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <BrandMark size={52} />
+            <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ display: "flex" }}>
+              <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: 1.5, padding: "8px 16px", borderRadius: 999, background: "rgba(255,255,255,0.16)", color: "#dcfce7" }}>
+                {text.pill}
+              </span>
+            </div>
+            <span style={{ fontSize: headlineSize(text.club), fontWeight: 800, lineHeight: 1.05, letterSpacing: -1.5, maxWidth: 470 }}>{truncate(text.club, 40)}</span>
+            <span style={{ fontSize: 28, fontWeight: 600, color: "#bbf7d0" }}>{text.standing}</span>
+            <div style={{ display: "flex" }}>
+              <span style={{ fontSize: 24, fontWeight: 700, padding: "8px 18px", borderRadius: 12, background: "#facc15", color: PITCH_900 }}>{text.likeliest}</span>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <span style={{ fontSize: 20, color: "#bbf7d0" }}>{text.basedOn}</span>
+            <div style={{ display: "flex" }}>
+              <span style={{ fontSize: 24, fontWeight: 700, padding: "14px 24px", borderRadius: 14, background: "#ffffff", color: PITCH_700 }}>{text.cta}</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "36px 48px 36px 8px" }}>
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 26, background: "#ffffff", borderRadius: 24, padding: "34px 34px", color: "#18181b", boxShadow: "0 20px 40px rgba(0,0,0,0.25)" }}>
+            {text.chances.map((c) => (
+              <div key={c.label} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 26, fontWeight: 700, color: "#3f3f46" }}>{truncate(c.label, 26)}</span>
+                  <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>{c.value}</span>
+                </div>
+                <div style={{ display: "flex", height: 14, borderRadius: 7, background: "#e4e4e7" }}>
+                  <div style={{ display: "flex", width: `${Math.max(c.share > 0 ? 2 : 0, c.share * 100)}%`, height: 14, borderRadius: 7, background: c.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
+  );
+}

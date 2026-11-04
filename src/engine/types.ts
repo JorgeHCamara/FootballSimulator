@@ -11,6 +11,10 @@ export interface Team {
   shortName: string;
   tla: string;
   crest?: string;
+  /** URL slug of the club's own page, unique within its league ("sao-paulo"). */
+  slug?: string;
+  /** The club's page, without the locale ("/brasileirao/team/sao-paulo"); set for clubs of domestic leagues. */
+  page?: string;
 }
 
 export interface Score {

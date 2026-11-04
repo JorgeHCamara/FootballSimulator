@@ -794,5 +794,81 @@
     "note": "This is a shared prediction: the scores come from the link, and you can't change them here.",
     "makeOwn": "Make your own prediction",
     "startFrom": "Start from this prediction"
+  },
+  "Club": {
+    "h1": "{club} {season}: {topics} chances",
+    "h1Plain": "{club} {season}: season chances",
+    "topic": {
+      "title": "title",
+      "promotion": "promotion",
+      "playoffs": "play-off",
+      "relegation": "relegation"
+    },
+    "metaDescription": "{club} in the {league} {season}: {stats} in {count} simulated seasons. Form, league position and win, draw and loss odds for every remaining game.",
+    "metaDescriptionPlain": "{club} in the {league} {season}: league position, form and win, draw and loss odds for every remaining game, from {count} simulated seasons.",
+    "breadcrumbClubs": "Clubs",
+    "position": "Position",
+    "points": "Points",
+    "played": "Played",
+    "form": "Form",
+    "formEmpty": "No games yet",
+    "formResult": {
+      "W": "Win",
+      "D": "Draw",
+      "L": "Loss"
+    },
+    "tableLeague": "in the {league} table",
+    "tableGroup": "in the {group}",
+    "tableAnnual": "in the {league} annual table",
+    "summaryPosition": "{club} are {position} {table} with {points, plural, one {# point} other {# points}} from {played, plural, one {# game} other {# games}}.",
+    "summaryStart": "{club} haven't played a game yet this season.",
+    "summaryFinal": "{club} finished {position} {table} with {points, plural, one {# point} other {# points}}.",
+    "summaryChances": "{club} {clauses} of {count} simulated seasons.",
+    "clause": {
+      "title": "win the title in {pct}",
+      "continental": "finish in the {zone} places in {pct}",
+      "promotion": "win promotion in {pct}",
+      "playoffs": "reach the play-offs in {pct}",
+      "relegation": "go down in {pct}"
+    },
+    "summaryLikeliest": "Their most likely finish is {position} ({pct} of seasons), averaging {avgPoints} points.",
+    "chancesTitle": "Season chances",
+    "chancesNote": "From {count} simulations of the rest of the season, starting from the real results so far. Updated every few hours.",
+    "likeliest": "Most likely finish",
+    "averagePoints": "Average points",
+    "distributionTitle": "Finishing position",
+    "distributionNote": "Share of the simulated seasons {club} finish in each place.",
+    "fixturesTitle": "Remaining fixtures",
+    "fixturesEmpty": "No games left to play.",
+    "home": "Home",
+    "away": "Away",
+    "homeShort": "H",
+    "awayShort": "A",
+    "win": "Win",
+    "draw": "Draw",
+    "loss": "Loss",
+    "oddsLabel": "Win {win}, draw {draw}, loss {loss}",
+    "toughestTitle": "Toughest remaining games",
+    "toughestNote": "The games {club} are least likely to win.",
+    "mustWinTitle": "Must-win games",
+    "mustWinNote": "Against the clubs closest to {club} in the table: a win also costs a direct rival points.",
+    "mustWinEmpty": "No games left against clubs within three places.",
+    "winChance": "{pct} to win",
+    "opponentPosition": "{position} in the table",
+    "simulate": "Simulate the rest of {club}'s season",
+    "shareTitle": "{club} {season}: season chances",
+    "shareText": "{club}'s chances in the {league} {season} on Foot Simu",
+    "otherClubs": "Other {league} clubs",
+    "card": {
+      "likeliest": "Most likely finish: {position}",
+      "basedOn": "Based on {count} simulated seasons",
+      "cta": "Every club at footsimu.com",
+      "chance": {
+        "title": "Title",
+        "promotion": "Promotion",
+        "playoffs": "Play-offs",
+        "relegation": "Relegation"
+      }
+    }
   }
 }

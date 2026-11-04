@@ -1602,6 +1602,65 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("club pages: linked from the table and fixtures, chances, fixtures, SEO tags, card, sitemap, 404s", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      const link = p.locator('[data-testid="standings"] [data-testid="club-link"]').first();
+      const href = await link.getAttribute("href");
+      assert.match(href, /^\/en\/premier-league\/team\/[a-z0-9-]+$/);
+      assert.ok((await p.locator('[data-testid="match-row"] [data-testid="club-link"]').count()) > 0, "fixture names link too");
+      await link.click();
+      await p.waitForURL(`${BASE_URL}${href}`);
+      await p.goto(`${BASE_URL}${href}`);
+      const h1 = await p.locator("h1").innerText();
+      assert.match(h1, /: title, Champions League and relegation chances$/);
+      assert.equal(await p.title(), `${h1} | Foot Simu`);
+      assert.match(await p.locator('meta[name="description"]').getAttribute("content"), /title \S+%, Champions League \S+%, relegation \S+% in 10,000 simulated seasons/);
+      assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${href}`);
+      for (const [lang, path] of [["en", "en"], ["pt-BR", "pt"], ["es", "es"]]) {
+        assert.equal(await p.locator(`link[rel="alternate"][hreflang="${lang}"]`).getAttribute("href"), `https://footsimu.com${href.replace(/^\/en/, `/${path}`)}`);
+      }
+      assert.match(await p.locator('meta[property="og:image"]').getAttribute("content"), /\/team\/[a-z0-9-]+\/opengraph-image/);
+      const ld = JSON.parse(await p.locator('script[type="application/ld+json"]').first().textContent());
+      assert.equal(ld["@graph"][0]["@type"], "SportsTeam");
+      assert.equal(ld["@graph"][0].memberOf.name, "Premier League");
+      assert.match(await p.getByTestId("club-summary").innerText(), /simulated seasons\. Their most likely finish is/);
+      assert.equal(await p.locator('[data-testid="club-chances"] [data-zone]').count(), 5);
+      assert.ok((await p.locator('[data-testid="club-form"] [data-result] svg').count()) > 0, "form badges are Lucide icons");
+      const fixtures = await p.getByTestId("club-fixture").count();
+      assert.ok(fixtures > 0);
+      assert.equal(await p.locator('[data-testid="club-toughest"] li').count(), Math.min(3, fixtures));
+      assert.equal(await p.locator('[data-testid="club-others"] li').count(), 19);
+      assert.equal(await p.getByTestId("club-simulate").getAttribute("href"), "/en/premier-league");
+      // The card.
+      const card = await p.request.get(`${BASE_URL}${href}/opengraph-image`);
+      assert.equal(card.status(), 200);
+      assert.equal(card.headers()["content-type"], "image/png");
+      // In Portuguese and Spanish too.
+      await p.goto(`${BASE_URL}${href.replace(/^\/en/, "/pt")}`);
+      assert.match(await p.locator("h1").innerText(), /: chances de título, Champions League e rebaixamento$/);
+      await p.goto(`${BASE_URL}${href.replace(/^\/en/, "/es")}`);
+      assert.match(await p.locator("h1").innerText(), /: probabilidades de título, Champions League y descenso$/);
+      // Conferences (MLS) and annual tables (Argentina) have pages too; continental competitions don't.
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      for (const slug of ["mls", "argentina-primera-division", "greek-super-league", "brasileirao"]) {
+        const url = sitemap.match(new RegExp(`https://footsimu.com/en/${slug}/team/[a-z0-9-]+`))?.[0];
+        assert.ok(url, slug);
+        const res = await p.goto(url.replace("https://footsimu.com", BASE_URL));
+        assert.equal(res.status(), 200, url);
+        assert.ok((await p.locator('[data-testid="club-chances"] [data-zone]').count()) > 0, url);
+      }
+      assert.doesNotMatch(sitemap, /champions-league\/team\//);
+      assert.equal((await p.goto(`${BASE_URL}/en/premier-league/team/not-a-club`)).status(), 404);
+      assert.equal((await p.goto(`${BASE_URL}/en/champions-league/team/arsenal`)).status(), 404);
+      await p.close();
+      // Phones: nothing wider than the screen.
+      const m = await browser.newPage({ viewport: { width: 360, height: 780 } });
+      await m.goto(`${BASE_URL}${href}`);
+      assert.equal(await m.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), 0);
+      await m.close();
+    });
+
     await step("unknown league returns 404", async () => {
       const res = await page.goto(`${BASE_URL}/en/not-a-league`);
       assert.equal(res.status(), 404);

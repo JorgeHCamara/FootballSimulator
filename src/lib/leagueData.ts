@@ -5,6 +5,7 @@ import type { Fixture, Team } from "../engine/types.ts";
 import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnDeductions, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
+import { withClubPages } from "./clubs.ts";
 
 export interface LeagueData {
   teams: Team[];
@@ -296,7 +297,7 @@ export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
   // runtime only while the request is in flight, so hourly refreshes still fetch.
   const pending = inflight.get(league.code);
   if (pending) return pending;
-  const promise = loadLeagueData(league);
+  const promise = loadLeagueData(league).then((data) => ({ ...data, teams: withClubPages(league, data.teams) }));
   inflight.set(league.code, promise);
   const forget = () => {
     if (!isBuildPhase()) inflight.delete(league.code);

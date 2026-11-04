@@ -794,5 +794,81 @@
     "note": "Este es un pronóstico compartido: los resultados vienen del enlace y no se pueden cambiar aquí.",
     "makeOwn": "Haz tu propio pronóstico",
     "startFrom": "Empezar desde este pronóstico"
+  },
+  "Club": {
+    "h1": "{club} {season}: probabilidades de {topics}",
+    "h1Plain": "{club} {season}: probabilidades de la temporada",
+    "topic": {
+      "title": "título",
+      "promotion": "ascenso",
+      "playoffs": "playoffs",
+      "relegation": "descenso"
+    },
+    "metaDescription": "{club} – {league} {season}: {stats} en {count} temporadas simuladas. Forma, posición en la tabla y probabilidades de victoria, empate y derrota en cada partido restante.",
+    "metaDescriptionPlain": "{club} – {league} {season}: posición en la tabla, forma y probabilidades de victoria, empate y derrota en cada partido restante, en {count} temporadas simuladas.",
+    "breadcrumbClubs": "Clubes",
+    "position": "Posición",
+    "points": "Puntos",
+    "played": "Partidos",
+    "form": "Racha",
+    "formEmpty": "Sin partidos aún",
+    "formResult": {
+      "W": "Victoria",
+      "D": "Empate",
+      "L": "Derrota"
+    },
+    "tableLeague": "en la clasificación",
+    "tableGroup": "en la {group}",
+    "tableAnnual": "en la tabla anual",
+    "summaryPosition": "{club} ocupa el {position} puesto {table}, con {points, plural, one {# punto} other {# puntos}} en {played, plural, one {# partido} other {# partidos}}.",
+    "summaryStart": "{club} todavía no ha jugado esta temporada.",
+    "summaryFinal": "{club} terminó en el {position} puesto {table}, con {points, plural, one {# punto} other {# puntos}}.",
+    "summaryChances": "En {count} temporadas simuladas, {club} {clauses}.",
+    "clause": {
+      "title": "es campeón en el {pct}",
+      "continental": "termina en puestos de {zone} en el {pct}",
+      "promotion": "asciende en el {pct}",
+      "playoffs": "llega a los playoffs en el {pct}",
+      "relegation": "desciende en el {pct}"
+    },
+    "summaryLikeliest": "Su puesto final más probable es el {position} ({pct} de las temporadas), con {avgPoints} puntos de media.",
+    "chancesTitle": "Probabilidades de la temporada",
+    "chancesNote": "En {count} simulaciones del resto de la temporada, a partir de los resultados reales hasta ahora. Se actualiza cada pocas horas.",
+    "likeliest": "Puesto final más probable",
+    "averagePoints": "Puntos de media",
+    "distributionTitle": "Puesto final",
+    "distributionNote": "En qué parte de las temporadas simuladas {club} termina en cada puesto.",
+    "fixturesTitle": "Próximos partidos",
+    "fixturesEmpty": "No quedan partidos por jugar.",
+    "home": "Local",
+    "away": "Visitante",
+    "homeShort": "L",
+    "awayShort": "V",
+    "win": "Victoria",
+    "draw": "Empate",
+    "loss": "Derrota",
+    "oddsLabel": "Victoria {win}, empate {draw}, derrota {loss}",
+    "toughestTitle": "Partidos más difíciles",
+    "toughestNote": "Los partidos en los que {club} tiene menos probabilidades de ganar.",
+    "mustWinTitle": "Partidos que hay que ganar",
+    "mustWinNote": "Contra los clubes más cercanos a {club} en la tabla: ganar también le quita puntos a un rival directo.",
+    "mustWinEmpty": "No quedan partidos contra clubes a tres puestos o menos.",
+    "winChance": "{pct} de victoria",
+    "opponentPosition": "{position} en la tabla",
+    "simulate": "Simula el resto de la temporada de {club}",
+    "shareTitle": "{club} {season}: probabilidades de la temporada",
+    "shareText": "Las probabilidades de {club} en {league} {season} en Foot Simu",
+    "otherClubs": "Otros clubes – {league}",
+    "card": {
+      "likeliest": "Puesto más probable: {position}",
+      "basedOn": "En {count} temporadas simuladas",
+      "cta": "Todos los clubes en footsimu.com",
+      "chance": {
+        "title": "Título",
+        "promotion": "Ascenso",
+        "playoffs": "Playoffs",
+        "relegation": "Descenso"
+      }
+    }
   }
 }
