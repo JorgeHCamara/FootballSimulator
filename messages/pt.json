@@ -174,9 +174,7 @@
     "downloadImage": "Baixar imagem",
     "shareTitle": "Meu palpite para {league} {season}",
     "shareText": "Meu palpite para {league} {season} no Foot Simu. Simule o seu:",
-    "shareFailed": "Não deu para abrir o compartilhamento. Escolha uma opção abaixo.",
-    "oddsTitle": "Chances de vitória do mandante (1), empate (X) e vitória do visitante (2), e os placares mais prováveis: o mesmo modelo das simulações",
-    "likelyScores": "Prováveis {scores}"
+    "shareFailed": "Não deu para abrir o compartilhamento. Escolha uma opção abaixo."
   },
   "Zones": {
     "championsLeague": "Champions League",

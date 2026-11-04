@@ -155,19 +155,13 @@ async function step(name, fn) {
       await fresh.close();
     });
 
-    await step("unplayed games show the model's 1X2 chances and likeliest scores", async () => {
+    await step("unplayed games show only the dice, no odds or likely scores", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/premier-league`);
-      const odds = p.locator('[data-testid="match-odds"]');
-      await odds.first().waitFor();
-      for (const text of await odds.allInnerTexts()) {
-        const m = text.replace(/\s+/g, " ").match(/1 (\d+)% · X (\d+)% · 2 (\d+)% Likely (\d+–\d+), (\d+–\d+), (\d+–\d+)/);
-        assert.ok(m, text);
-        const total = Number(m[1]) + Number(m[2]) + Number(m[3]);
-        assert.ok(total >= 98 && total <= 102, `${text}: ${total}%`);
-      }
-      // As many lines as games still to play on the matchday.
-      assert.equal(await odds.count(), await p.locator('[data-testid="fixtures"] [data-testid="match-row"] input').count() / 2);
+      const fixtures = p.locator('[data-testid="fixtures"]');
+      await fixtures.locator('svg[data-icon="dices"]').first().waitFor();
+      assert.equal(await p.locator('[data-testid="match-odds"]').count(), 0);
+      assert.doesNotMatch(await fixtures.innerText(), /Likely/);
       await p.close();
     });
 

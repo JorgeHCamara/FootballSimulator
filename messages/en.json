@@ -174,9 +174,7 @@
     "downloadImage": "Download image",
     "shareTitle": "My {league} {season} prediction",
     "shareText": "My {league} {season} prediction on Foot Simu. Simulate yours:",
-    "shareFailed": "Couldn't open the share sheet. Pick an option below.",
-    "oddsTitle": "Chances of a home win (1), a draw (X) and an away win (2), and the likeliest scores: the same model the simulations use",
-    "likelyScores": "Likely {scores}"
+    "shareFailed": "Couldn't open the share sheet. Pick an option below."
   },
   "Zones": {
     "championsLeague": "Champions League",

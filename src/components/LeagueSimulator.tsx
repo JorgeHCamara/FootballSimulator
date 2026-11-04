@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
-import { expectedGoals, expectedGoalsNeutral, likelyScores, outcomeProbabilities, simulateFixtures, simulateScore } from "../engine/match.ts";
+import { expectedGoals, expectedGoalsNeutral, simulateFixtures, simulateScore } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel, DOMESTIC_PRIOR_GAMES, matchParamOptions, NO_DATA_PRIOR, ratingHalfLife, type MatchParams, type TeamStrength } from "../engine/ratings.ts";
 import {
@@ -461,14 +461,6 @@ export function LeagueSimulator({
     setScore(seasonKey, fixture, score);
   };
 
-  /** "Simulate this match": the 1X2 chances and likeliest scores it draws from. */
-  const oddsOf = (fixture: Fixture) => {
-    if (fixture.result || isShootoutId(fixture.id)) return undefined;
-    const xg = fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId);
-    const rho = model.rho ?? 0;
-    return { ...outcomeProbabilities(xg, rho), likely: likelyScores(xg, rho, 3) };
-  };
-
   const onScore = (fixture: Fixture, score: Score | null) => {
     // Typing the real score back in is the same as not overriding it.
     if (score && fixture.result && score.home === fixture.result.home && score.away === fixture.result.away) {
@@ -699,7 +691,6 @@ export function LeagueSimulator({
             predictions={season.predictions}
             onScore={onScore}
             onSimulate={simulateOne}
-            odds={oddsOf}
             {...(slotRound
               ? { note: t("slotNote", { phase: (regularTab?.name ?? "").toLowerCase() }) }
               : (phase?.generated || extraRounds) && matchday > splitRound && matchday !== PLAYOFF_MATCHDAY

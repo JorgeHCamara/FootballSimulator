@@ -48,20 +48,10 @@ interface Props {
   note?: string;
   /** Names of rounds that aren't plain matchdays (a split's groups: "Championship play-offs 3"). */
   roundLabels?: Record<number, string>;
-  /** A game's 1X2 chances and likeliest scores, from the match model. */
-  odds?: (fixture: Fixture) => MatchOdds | undefined;
-}
-
-/** What the model expects of a game: home win, draw and away win chances, and the likeliest scores. */
-export interface MatchOdds {
-  home: number;
-  draw: number;
-  away: number;
-  likely: Score[];
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels, odds } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -122,7 +112,6 @@ export function FixtureList(props: Props) {
               onSimulate={() => onSimulate(f)}
               // Places standing in for clubs not known yet: nothing to predict.
               disabled={isSlotTeamId(f.homeId)}
-              {...(odds && !isSlotTeamId(f.homeId) ? { odds: odds(f) } : {})}
             />
           ))}
         </ul>
@@ -371,8 +360,6 @@ interface RowProps {
   winner?: TeamId | null;
   /** The dice sits in the date line instead of its own line below (cup cards). */
   inlineDice?: boolean;
-  /** The model's 1X2 chances and likeliest scores, shown by the dice. */
-  odds?: MatchOdds | undefined;
   fixture: Fixture;
   home: Team;
   away: Team;
@@ -389,7 +376,7 @@ function parseGoals(text: string): number | null {
   return Number(text);
 }
 
-export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false, odds }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false }: RowProps) {
   const side = (id: TeamId) => (winner == null ? "" : winner === id ? "font-bold" : "opacity-60");
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
@@ -497,8 +484,7 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
         </span>
       </div>
       {showInputs && !disabled && !inlineDice && (
-        <div className="mt-1 flex items-center justify-end gap-2">
-          {odds && <OddsLine odds={odds} />}
+        <div className="mt-1 flex justify-end">
           <button
             type="button"
             onClick={onSimulate}
@@ -511,27 +497,6 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
         </div>
       )}
     </li>
-  );
-}
-
-/**
- * The model's view of a game: 1 (home win), X (draw) and 2 (away win)
- * chances and the likeliest scores, from the same score distribution the
- * simulations draw from.
- */
-function OddsLine({ odds }: { odds: MatchOdds }) {
-  const t = useTranslations("Simulator");
-  const format = useFormatter();
-  const pct = (p: number) => format.number(p, { style: "percent", maximumFractionDigits: 0 });
-  const scores = odds.likely.map((s) => `${s.home}–${s.away}`).join(", ");
-  return (
-    <span className="mr-auto flex min-w-0 flex-wrap items-center gap-x-2 text-[11px] tabular-nums text-zinc-500 dark:text-zinc-400" title={t("oddsTitle")} data-testid="match-odds">
-      <span>
-        <b className="font-semibold text-zinc-700 dark:text-zinc-300">1</b> {pct(odds.home)} · <b className="font-semibold text-zinc-700 dark:text-zinc-300">X</b> {pct(odds.draw)} ·{" "}
-        <b className="font-semibold text-zinc-700 dark:text-zinc-300">2</b> {pct(odds.away)}
-      </span>
-      <span className="truncate">{t("likelyScores", { scores })}</span>
-    </span>
   );
 }
 
