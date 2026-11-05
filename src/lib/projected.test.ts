@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildProjectedHistory, type ProjectedClub } from "./projected.ts";
+import { SIM_VERSION } from "./simVersion.ts";
 import type { OddsSnapshot, TeamSnapshot } from "./snapshots.ts";
 
 const team = (position: number, projected?: number): TeamSnapshot => ({
@@ -39,6 +40,17 @@ describe("the projected table's history", () => {
     assert.deepEqual(h.entries.map((e) => e.teams["2"]!.place), [1, 2, 3]);
     assert.deepEqual(h.tables, [{ id: "table", teamIds: [1, 2, 3] }]);
     assert.equal(h.entries[0]!.teams["1"]!.chance, 0.4);
+  });
+
+  it("an entry worked out with another model than the one before is marked: a round, or the latest after older rounds", () => {
+    const marks = (h: ReturnType<typeof buildProjectedHistory>) => h!.entries.map((e) => Boolean(e.modelChange));
+    // Round 2 taken with today's model, round 1 before snapshots carried one.
+    assert.deepEqual(marks(buildProjectedHistory([rounds[0]!, { ...rounds[1]!, modelVersion: SIM_VERSION }], now(5, { 1: 1, 2: 3, 3: 2 }), undefined, zones)), [false, true, false]);
+    // Both rounds older: the latest (today's model) is the change.
+    assert.deepEqual(marks(buildProjectedHistory(rounds, now(5, { 1: 1, 2: 3, 3: 2 }), undefined, zones)), [false, false, true]);
+    // One model throughout: nothing marked.
+    const today = rounds.map((r) => ({ ...r, modelVersion: SIM_VERSION }));
+    assert.deepEqual(marks(buildProjectedHistory(today, now(5, { 1: 1, 2: 3, 3: 2 }), undefined, zones)), [false, false, false]);
   });
 
   it("no latest entry when nothing was played since the last round; rounds without projected places are left out", () => {

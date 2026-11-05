@@ -21,8 +21,8 @@ Item 0 (setting up this file and the workflow) came first, on `roadmap/0-setup`.
 |---|---|---|---|
 | 1 | Match impact cache key and skeleton | done | `roadmap/1-impact-cache` |
 | 2 | Club page Likely finish range | done | `roadmap/2-likely-finish-range` |
-| 3 | Rating noise: offline tune | in-pr | `roadmap/3-rating-noise-tune` |
-| 4 | Rating noise: live (gated on item 3) | todo | `roadmap/4-rating-noise-live` |
+| 3 | Rating noise: offline tune | done | `roadmap/3-rating-noise-tune` |
+| 4 | Rating noise: live (gated on item 3) | in-pr | `roadmap/4-rating-noise-live` |
 | 5 | Snapshot integrity | todo | `roadmap/5-snapshot-integrity` |
 | 6 | Play-offs and MLS Cup on club pages | todo | `roadmap/6-club-playoffs` |
 | 7 | Neutral venues | todo | `roadmap/7-neutral-venues` |
@@ -144,6 +144,12 @@ the live engine still reproduces every league's latest stored snapshot.
   check means.
 - No dice, match page, ads or AdSense changes.
 - PR: "[Roadmap 5] Snapshot integrity".
+
+Since item 4: the Championship's snapshots were rebuilt with the rating-noise
+model (`npm run snapshots -- ELC --rebuild`), and every snapshot carries the
+model it was taken with (`modelVersion`; none: model "1"). The drift check can
+only reproduce a snapshot of today's model (`SIM_VERSION`); a league whose
+latest snapshot is older is checked once its next round is taken (or rebuilt).
 
 ## 6. Play-offs and MLS Cup on club pages
 

@@ -28,8 +28,9 @@ export async function reportText(loaded: LoadedReport, lang: SiteLocale) {
   const leader = [...report.rows].sort((a, b) => (b.values[report.lead.kind]?.now ?? 0) - (a.values[report.lead.kind]?.now ?? 0))[0];
   const name = (id: TeamId) => teams.get(id)?.shortName ?? "";
   const count = new Intl.NumberFormat(lang).format(report.snapshot.iterations);
-  // The season's first report has nothing to compare with: the chances after the round, no "who rose and who fell".
-  const description = t(report.previous ? "description" : "descriptionFirst", {
+  // The season's first report has nothing to compare with (nor has the first after a model change): the chances
+  // after the round, no "who rose and who fell".
+  const description = t(report.previous && !report.modelChange ? "description" : "descriptionFirst", {
     league: league.name,
     season,
     round,

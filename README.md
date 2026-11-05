@@ -64,13 +64,13 @@ Every league game also has a preview page, `/{locale}/{league}/match/{home}-vs-{
 
 ### Odds reports ("what changed")
 
-Each domestic league has a report per completed round, `/{locale}/{league}/odds/matchday-{n}`, and `/{locale}/{league}/odds` shows the latest with links to the earlier ones; `/{locale}/odds` ("Latest odds" in the menu) lists every league's latest. A report compares the round's snapshot with the previous one (`src/lib/oddsReports.ts`): the three biggest risers and fallers for the title, the top continental competition (its qualifying round included), promotion or the play-offs, and relegation; every club's chances with the change in points; the game whose two clubs' chances moved the most; the top five's chances across the season (`RaceChart`, with a table view); and short sentences from the `Odds` messages, with each club's result. Each has its own title, description, `hreflang`, an `Article` JSON-LD block dated to the round and a share card. They're built from the snapshot files, so a new round's report appears as soon as the snapshot job's commit is deployed. With sample data they come from the sample leagues' own rounds.
+Each domestic league has a report per completed round, `/{locale}/{league}/odds/matchday-{n}`, and `/{locale}/{league}/odds` shows the latest with links to the earlier ones; `/{locale}/odds` ("Latest odds" in the menu) lists every league's latest. A report compares the round's snapshot with the previous one (`src/lib/oddsReports.ts`): the three biggest risers and fallers for the title, the top continental competition (its qualifying round included), promotion or the play-offs, and relegation; every club's chances with the change in points; the game whose two clubs' chances moved the most; the top five's chances across the season (`RaceChart`, with a table view); and short sentences from the `Odds` messages, with each club's result. When the previous report was taken with another model (see Odds snapshots), the report says so and shows no changes, movers or result of the round that week. Each has its own title, description, `hreflang`, an `Article` JSON-LD block dated to the round and a share card. They're built from the snapshot files, so a new round's report appears as soon as the snapshot job's commit is deployed. With sample data they come from the sample leagues' own rounds.
 
 ### Odds snapshots
 
 After each completed round of each domestic league, every club's season chances (title, each place, relegation, expected position and points) are stored in `src/data/snapshots/<CODE>.json`, one line per round, by season. `.github/workflows/odds-snapshots.yml` runs `npm run snapshots` (`scripts/snapshot-odds.ts`) every six hours and commits any new snapshots to `main`; run it by hand from the Actions tab (Run workflow) or locally with `npm run snapshots` (`-- PL BSA` for some leagues, `-- --dry-run` to only print).
 
-A round counts once it and every round before it are played (a game postponed far from its round's dates isn't waited for), and its snapshot is taken as of just after its last kick-off: later results are left out, so a late run records the same numbers. Rounds are taken in the order they were played and numbered by how many are complete (rounds are rebuilt from dates, and a few hold games scattered over months). A season's first run stores only the latest round; after that, every newly completed round. `npm run snapshots -- --backfill` also adds every earlier completed round not stored (split leagues whose groups are already known start at the split, so a snapshot never knows who went where); the current season was backfilled that way. Committed JSON was chosen over Vercel Blob or a KV store: no service, token or quota to set up on Vercel Hobby, the history is versioned and reviewable in git, and pages read it from the deployment itself. Each commit redeploys the site (a few per week).
+A round counts once it and every round before it are played (a game postponed far from its round's dates isn't waited for), and its snapshot is taken as of just after its last kick-off: later results are left out, so a late run records the same numbers. Rounds are taken in the order they were played and numbered by how many are complete (rounds are rebuilt from dates, and a few hold games scattered over months). A season's first run stores only the latest round; after that, every newly completed round. `npm run snapshots -- --backfill` also adds every earlier completed round not stored (split leagues whose groups are already known start at the split, so a snapshot never knows who went where); the current season was backfilled that way. `npm run snapshots -- ELC --rebuild` takes a league's stored rounds of the season again with today's engine, each as of its own moment (the Championship was rebuilt so with the rating-noise model). Each snapshot carries the model it was taken with (`modelVersion`, the `SIM_VERSION` then; none before the field: model "1"): the first report after a model change, the race chart and the projected table's round-by-round history label that step as a model update instead of showing it as movement. Committed JSON was chosen over Vercel Blob or a KV store: no service, token or quota to set up on Vercel Hobby, the history is versioned and reviewable in git, and pages read it from the deployment itself. Each commit redeploys the site (a few per week).
 
 After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` to your Google Search Console code, then submit `/sitemap.xml` in Search Console.
 
@@ -221,8 +221,12 @@ come from today's league config.
 simulated season starts with each club's attack and defence multiplied by
 exp(N(0, s)), s = sd × √(k / (k + games played)), `--noise-k` k (default 18,
 the prior's weight). It's an engine option (`ratingNoise` in
-`runMonteCarlo`), off unless given: the site, its snapshots and the dice don't
-use it.
+`runMonteCarlo`); each backtest run sets its own (`0`: none), whatever the
+site uses. The site's season outlook has sd 0.15, k 5 (`SEASON_RATING_NOISE`
+in `src/lib/seasonNoise.ts`, chosen by the grid below): the Chances tab, club
+pages, match impact, share cards and odds snapshots of every domestic league
+(continental competitions have none). A game's own odds (match pages) and the
+dice come from the plain ratings and don't use it.
 
 To tune it, run a grid of spreads and fade constants for each season (several
 values for both flags: every spread with every k, plus no noise, keyed
@@ -267,7 +271,8 @@ results for 11–15 February 2023):
 - Only sd 0.15, k 5 meets the selection rule (title Brier +0.8%): pooled RPS
   0.0926, calibration error 0.010, better than no noise in each of the four
   seasons. It sits at the grid's corner (the smallest spread, the fastest
-  fade: s = 0.15 at the start of the season, 0.067 after 20 games).
+  fade: s = 0.15 at the start of the season, 0.067 after 20 games). It is
+  the site's season outlook since roadmap item 4 (`SIM_VERSION` "2").
 
 ![League page](docs/screenshots/league.png)
 
@@ -296,7 +301,7 @@ results for 11–15 February 2023):
 | `ratings.ts` | Attack/defence strengths from played matches, adjusted for the opponents' strength and shrunk toward a prior (last season's ratings, see "Yearly: rebuild priors") early in the season |
 | `match.ts` | Expected goals per fixture, Poisson score sampling, and exact home/draw/away probabilities |
 | `standings.ts` | League table with per-league tiebreakers (including head-to-head mini-leagues) and points deductions |
-| `montecarlo.ts` | Simulates the rest of the season N times to get the probability of each final position |
+| `montecarlo.ts` | Simulates the rest of the season N times to get the probability of each final position (with rating noise for the season outlook: each simulated season redraws every club's strength around its rating, see `src/lib/seasonNoise.ts`) |
 | `schedule.ts` | Double round-robin fixture generator (sample leagues, tests, phase 2) |
 
 Data provided by football-data.org.

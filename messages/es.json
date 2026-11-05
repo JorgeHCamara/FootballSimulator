@@ -1013,7 +1013,11 @@
     "short": {
       "aclElite": "ACL Élite"
     },
-    "descriptionFirst": "{league} {season}: las probabilidades de {topics} de cada club tras la {round}, en {count} temporadas simuladas. {leader} lidera la {race} con el {leaderPct}."
+    "descriptionFirst": "{league} {season}: las probabilidades de {topics} de cada club tras la {round}, en {count} temporadas simuladas. {leader} lidera la {race} con el {leaderPct}.",
+    "modelChangeTitle": "El modelo cambió desde el último informe",
+    "modelChange": "La simulación ahora tiene en cuenta que la fuerza de cada club es una estimación, más aún al principio de la temporada, así que las probabilidades son algo menos seguras. Los cambios desde la {previous} mezclarían eso con los resultados, por eso este informe no los muestra; vuelven en la próxima jornada.",
+    "chartModelChange": "Modelo actualizado",
+    "chartModelNote": "La línea antes de la {round} marca una actualización del modelo: el salto ahí viene del modelo, no de los resultados."
   },
   "Projected": {
     "title": "Clasificación final proyectada",
@@ -1038,6 +1042,8 @@
     "down": "Baja {n}",
     "same": "Sin cambios",
     "historyTitle": "Jornada a jornada",
-    "historyNote": "El puesto de cada club en la clasificación final proyectada tras cada jornada. Toca una jornada para ver su tabla."
+    "historyNote": "El puesto de cada club en la clasificación final proyectada tras cada jornada. Toca una jornada para ver su tabla.",
+    "modelChange": "El modelo cambió antes de esta jornada (ahora tiene en cuenta que la fuerza de cada club es una estimación): los puestos cambiaron con él y con los resultados, por eso no se muestra ningún cambio.",
+    "modelChangeNote": "Una línea antes de una jornada marca una actualización del modelo."
   }
 }

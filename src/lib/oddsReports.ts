@@ -4,7 +4,7 @@ import type { LeagueConfig, ZoneKind } from "../config/leagues.ts";
 import type { Fixture, TeamId } from "../engine/types.ts";
 import { CONTINENTAL, leagueFacts } from "./leagueFacts.ts";
 import type { LeagueData } from "./leagueData.ts";
-import type { LeagueSnapshots, OddsSnapshot, TeamSnapshot } from "./snapshots.ts";
+import { snapshotModel, type LeagueSnapshots, type OddsSnapshot, type TeamSnapshot } from "./snapshots.ts";
 
 /*
  * "What changed" reports: one per league and completed round, from the odds
@@ -151,6 +151,12 @@ export interface OddsReport {
   snapshot: OddsSnapshot;
   /** The report before (undefined for the season's first). */
   previous?: OddsSnapshot;
+  /**
+   * The previous report was taken with another model (snapshotModel): the
+   * chances moved with the model as well as the results, so no change is
+   * worked out (no deltas, movers or result of the round).
+   */
+  modelChange: boolean;
   /** Every report of the season, oldest first (the archive). */
   all: OddsSnapshot[];
   categories: Category[];
@@ -159,8 +165,11 @@ export interface OddsReport {
   movers: Movers[];
   /** The category the race chart follows: the title, or the first one there is. */
   lead: Category;
-  /** The lead category's top five now, and their chance after each report up to this one. */
-  race: { rounds: number[]; series: { teamId: TeamId; values: number[] }[] };
+  /**
+   * The lead category's top five now, and their chance after each report up to
+   * this one; `modelChanges`: the rounds whose snapshot was the first of a new model.
+   */
+  race: { rounds: number[]; series: { teamId: TeamId; values: number[] }[]; modelChanges: number[] };
 }
 
 /** The report for a round (the season's latest when `round` is undefined), or undefined for no such round. */
@@ -169,6 +178,7 @@ export function buildReport(league: LeagueConfig, season: SeasonReports, round?:
   const snapshot = season.snapshots[index];
   if (!snapshot) return undefined;
   const previous = index > 0 ? season.snapshots[index - 1] : undefined;
+  const modelChange = Boolean(previous && snapshotModel(previous) !== snapshotModel(snapshot));
   const categories = reportCategories(league, snapshot);
   const value = (s: OddsSnapshot | undefined, id: string, c: Category) => (s?.teams[id] ? categoryValue(league, s.teams[id]!, c) : undefined);
   const rows: ReportRow[] = Object.entries(snapshot.teams)
@@ -182,7 +192,7 @@ export function buildReport(league: LeagueConfig, season: SeasonReports, round?:
         categories.map((c) => {
           const now = value(snapshot, id, c)!;
           const before = value(previous, id, c);
-          return [c.kind, { teamId: Number(id), now, ...(before !== undefined ? { before, delta: points(now) - points(before) } : {}) }];
+          return [c.kind, { teamId: Number(id), now, ...(before !== undefined ? { before, ...(modelChange ? {} : { delta: points(now) - points(before) }) } : {}) }];
         }),
       ),
     }))
@@ -202,8 +212,9 @@ export function buildReport(league: LeagueConfig, season: SeasonReports, round?:
   const race = {
     rounds: history.map((s) => s.round),
     series: top.map((r) => ({ teamId: r.teamId, values: history.map((s) => value(s, String(r.teamId), lead) ?? 0) })),
+    modelChanges: history.flatMap((s, i) => (i > 0 && snapshotModel(s) !== snapshotModel(history[i - 1]!) ? [s.round] : [])),
   };
-  return { league, seasonKey: season.seasonKey, season: season.season, snapshot, ...(previous ? { previous } : {}), all: season.snapshots, categories, rows, movers, lead, race };
+  return { league, seasonKey: season.seasonKey, season: season.season, snapshot, ...(previous ? { previous } : {}), modelChange, all: season.snapshots, categories, rows, movers, lead, race };
 }
 
 /** A club's game between two reports, from its side. */

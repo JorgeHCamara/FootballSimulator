@@ -3,7 +3,8 @@ import type { TeamId } from "../engine/types.ts";
 import { cachedLeagueOutlook, type LeagueOutlook } from "./clubOutlook.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { readSnapshots, seasonReports } from "./oddsReports.ts";
-import type { OddsSnapshot } from "./snapshots.ts";
+import { SIM_VERSION } from "./simVersion.ts";
+import { snapshotModel, type OddsSnapshot } from "./snapshots.ts";
 
 /*
  * The projected final table: the most likely final table (each club its own
@@ -31,6 +32,8 @@ export interface ProjectedEntry {
   date?: string;
   played: number;
   teams: Record<string, ProjectedClub>;
+  /** Worked out with another model than the entry before: places moved with the model as well as the results. */
+  modelChange?: true;
 }
 
 export interface ProjectedHistory {
@@ -56,8 +59,10 @@ export function buildProjectedHistory(
   groups: ProjectedHistory["tables"] | undefined,
   zones: ProjectedHistory["zones"],
 ): ProjectedHistory | undefined {
-  const entries: ProjectedEntry[] = snapshots
-    .filter((s) => Object.values(s.teams).every((t) => t.projected !== undefined))
+  const kept = snapshots.filter((s) => Object.values(s.teams).every((t) => t.projected !== undefined));
+  // Each entry's model: its snapshot's, and today's for the outlook now.
+  const models = kept.map(snapshotModel);
+  const entries: ProjectedEntry[] = kept
     .map((s) => ({
       round: s.round,
       date: s.date,
@@ -69,8 +74,14 @@ export function buildProjectedHistory(
         ]),
       ),
     }));
-  if (now && (!entries.length || now.played > entries.at(-1)!.played)) entries.push({ played: now.played, teams: now.teams });
+  if (now && (!entries.length || now.played > entries.at(-1)!.played)) {
+    entries.push({ played: now.played, teams: now.teams });
+    models.push(SIM_VERSION);
+  }
   if (!entries.length) return undefined;
+  entries.forEach((e, i) => {
+    if (i > 0 && models[i] !== models[i - 1]) e.modelChange = true;
+  });
   const ids = [...new Set(entries.flatMap((e) => Object.keys(e.teams)))].map(Number);
   const tables = groups?.length
     ? groups.map((g) => ({ ...g, teamIds: g.teamIds.filter((id) => ids.includes(id)) })).filter((g) => g.teamIds.length)

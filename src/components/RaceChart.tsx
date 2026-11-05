@@ -14,7 +14,9 @@ interface Props {
   /** At most five, in the order of the categorical slots (the leader first). */
   series: RaceSeries[];
   locale: string;
-  labels: { round: string; table: string; caption: string };
+  /** Rounds whose chances were the first of a new model: the step into each is the model's, not the results'. */
+  modelChanges?: readonly number[];
+  labels: { round: string; table: string; caption: string; modelChange?: string };
 }
 
 /*
@@ -38,7 +40,7 @@ const PAD = { top: 12, bottom: 28, left: 38 };
  * A line per club across the season's rounds: hover (or touch) shows every
  * club's chance at that round; a table view below has the same numbers.
  */
-export function RaceChart({ rounds, series, locale, labels }: Props) {
+export function RaceChart({ rounds, series, locale, modelChanges = [], labels }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(640);
   const [hover, setHover] = useState<number | null>(null);
@@ -77,6 +79,9 @@ export function RaceChart({ rounds, series, locale, labels }: Props) {
     setHover(rounds.length === 1 ? 0 : Math.max(0, Math.min(last, Math.round((px / plotW) * last))));
   };
   const tipLeft = hover === null ? 0 : x(hover);
+  // Each model change: between its round and the one before.
+  const changes = modelChanges.map((r) => rounds.indexOf(r)).filter((i) => i > 0);
+  const changed = new Set(changes);
 
   return (
     <div className="race-chart" data-testid="race-chart">
@@ -108,6 +113,19 @@ export function RaceChart({ rounds, series, locale, labels }: Props) {
               </text>
             ) : null,
           )}
+          {changes.map((i) => {
+            const at = (x(i - 1) + x(i)) / 2;
+            return (
+              <g key={`model-${i}`} data-testid="race-model-change">
+                <line x1={at} x2={at} y1={PAD.top} y2={PAD.top + plotH} stroke="var(--axis)" strokeWidth={1} strokeDasharray="3 3" />
+                {labels.modelChange && (
+                  <text x={at + 4} y={PAD.top + 10} fontSize={10} fill="var(--axis)">
+                    {labels.modelChange}
+                  </text>
+                )}
+              </g>
+            );
+          })}
           {hover !== null && <line x1={x(hover)} x2={x(hover)} y1={PAD.top} y2={PAD.top + plotH} stroke="var(--axis)" strokeWidth={1} />}
           {series.map((s, i) => (
             <g key={s.name}>
@@ -158,6 +176,7 @@ export function RaceChart({ rounds, series, locale, labels }: Props) {
             <p className="mb-1 font-semibold">
               {labels.round} {rounds[hover]}
             </p>
+            {changed.has(hover) && labels.modelChange && <p className="mb-1 text-zinc-500">{labels.modelChange}</p>}
             <ul className="space-y-0.5">
               {series
                 .map((s, i) => ({ s, i }))
@@ -192,7 +211,10 @@ export function RaceChart({ rounds, series, locale, labels }: Props) {
             <tbody>
               {rounds.map((r, j) => (
                 <tr key={r} className="border-t border-zinc-200/70 dark:border-zinc-800">
-                  <td className="py-1 pr-2">{r}</td>
+                  <td className="py-1 pr-2">
+                    {r}
+                    {changed.has(j) && labels.modelChange ? <span className="block text-[10px] leading-tight text-zinc-500">{labels.modelChange}</span> : null}
+                  </td>
                   {series.map((s) => (
                     <td key={s.name} className="py-1 pr-2">
                       {show(s.values[j] ?? 0)}
