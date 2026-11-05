@@ -177,6 +177,77 @@ Brier score), so they rate on `ratingXgWeight: 0.5`. The European leagues have
 ten rounds or so each, within noise, and three of them lean worse; they stay on
 goals until there's more of the season to test.
 
+#### Season-outcome backtest (is the Monte Carlo calibrated?)
+
+`npm run backtest` scores single games. `npm run backtest:season` checks the
+season chances: when the site says 30% for the title, does that happen about
+30% of the time? It runs offline and changes nothing on the site.
+
+```bash
+npm run backtest:season -- 2025 PL ELC PD BL1 SA FL1 BSA MLS ARG MX
+npm run backtest:season -- 2025 PL --rating-noise 0,0.05,0.1,0.15 --noise-k 18
+```
+
+For each league's finished season (`scripts/backtest-season.ts`), at checkpoints
+after rounds 0 (starting ratings only), 5, 10, 15, 20, 25 and 30 of a 38-round
+season (the same shares of the season's games for other lengths), it rebuilds
+the model from the results played by then: starting ratings from the season
+before (as `npm run priors`, without the season itself), xG only of games
+already played at the league's live weight, no later results, play-off games
+or deductions. Then it runs the site's own setup (tiebreakers, splits,
+conferences, annual tables) for 10,000 seasons with seed 2026, and scores each
+club's chances against the real final table:
+
+- Brier score for the title, the top places (the league's main continental
+  places, or promotion in a second tier), relegation and the play-off places;
+- ranked probability score (RPS) of the whole finishing-position distribution;
+- the mean absolute error of each club's expected finishing place;
+- a calibration table: every chance in buckets (0–5%, 5–15%, 15–30%, 30–50%,
+  50–70%, 70–90%, 90–100%), the average predicted chance against how often it
+  happened and the count (fewer than 30: too few to trust), and the
+  calibration error (the buckets' gaps, weighted by their counts);
+- the same for a baseline: the table at the checkpoint is the final table (at
+  round 0, last season's, promoted clubs below the others).
+
+Lower is better for every score. The summary prints per league and checkpoint
+and pooled; everything (with each club's distribution) goes to
+`backtest-results/season-<season>.json` (not committed; `--out` for another
+file). Leagues run side by side (`--jobs`, default the CPUs); the ten above take
+about a minute and a half. A league whose season isn't finished, or whose format
+ESPN didn't have then (Argentina 2024), is skipped with the reason. The places
+come from today's league config.
+
+`--rating-noise <sd,…>` reruns each checkpoint with rating uncertainty: every
+simulated season starts with each club's attack and defence multiplied by
+exp(N(0, s)), s = sd × √(k / (k + games played)), `--noise-k` k (default 18,
+the prior's weight). It's an engine option (`ratingNoise` in
+`runMonteCarlo`), off unless given: the site, its snapshots and the dice don't
+use it.
+
+What it found (2025 seasons, 10 leagues, 218 clubs per checkpoint; the 2024
+seasons, 9 leagues, agree):
+
+| Round | RPS, no noise | sd 0.15 | sd 0.25 | baseline | expected-place error (model / baseline) |
+|---|---|---|---|---|---|
+| 0 | 0.157 | 0.150 | 0.148 | 0.249 | 4.30 / 4.95 |
+| 10 | 0.108 | 0.105 | 0.104 | 0.163 | 3.10 / 3.28 |
+| 20 | 0.082 | 0.081 | 0.080 | 0.129 | 2.34 / 2.58 |
+| 30 | 0.055 | 0.054 | 0.054 | 0.079 | 1.55 / 1.54 |
+
+- The model beats "the table as it stands" at every checkpoint on RPS, and on
+  the Brier scores at every checkpoint but one tie (relegation at round 25); on
+  the expected place it ties it from round 25.
+- Without noise it is somewhat overconfident: chances it puts at 50–70% came
+  true 49% of the time (60% predicted, 171 chances), 70–90% ones 71% (80%
+  predicted), and small chances happen a little more than predicted (5–15%:
+  13.5% for 9.5%), most of all early in the season.
+- Rating noise fixes most of that: the calibration error drops from 0.019
+  (no noise) to 0.008 at sd 0.15 and 0.004–0.007 at 0.2–0.3, and RPS improves
+  at every checkpoint, best around sd 0.25 (it levels off by 0.3). The gain is
+  small in RPS (about 3%), mostly from the top places and relegation (in 2025
+  the title's Brier got slightly worse with noise; in 2024 it improved). Two
+  seasons are a small sample: worth rerunning with more before turning it on.
+
 ![League page](docs/screenshots/league.png)
 
 ## Project layout

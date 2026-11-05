@@ -10,11 +10,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test \"src/**/*.test.ts\"",
+    "test": "node --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
     "test:e2e": "node e2e/smoke.cjs",
     "typecheck": "tsc --noEmit",
     "priors": "NODE_USE_ENV_PROXY=1 node scripts/build-priors.ts",
     "backtest": "NODE_USE_ENV_PROXY=1 node scripts/backtest.ts",
+    "backtest:season": "NODE_USE_ENV_PROXY=1 node scripts/backtest-season.ts",
     "snapshots": "NODE_USE_ENV_PROXY=1 node scripts/snapshot-odds.ts",
     "xg": "NODE_USE_ENV_PROXY=1 node scripts/fetch-xg.ts"
   },

@@ -123,6 +123,29 @@ export function sampleScore(sampler: ScoreSampler, rng: Rng): Score {
   return { home: Math.floor(lo / sampler.size), away: lo % sampler.size };
 }
 
+/**
+ * One score from the Dixon–Coles distribution without building its matrix:
+ * independent Poisson draws, kept with probability tau / max tau, up to `max`
+ * goals a side (the distribution sampleScore(scoreSampler(xg, rho)) draws
+ * from, by other draws). For rates that change from one simulated season to
+ * the next (the season backtest's rating noise), where a matrix per game and
+ * season would cost too much.
+ */
+export function sampleDixonColes(xg: ExpectedGoals, rho: number, rng: Rng, max = MAX_SCORE): Score {
+  const tauMax = Math.max(1, dixonColesTau(0, 0, xg, rho), dixonColesTau(0, 1, xg, rho), dixonColesTau(1, 0, xg, rho), dixonColesTau(1, 1, xg, rho));
+  for (;;) {
+    const home = samplePoisson(xg.home, rng);
+    const away = samplePoisson(xg.away, rng);
+    if (home > max || away > max) continue;
+    if (rng() * tauMax < Math.max(0, dixonColesTau(home, away, xg, rho))) return { home, away };
+  }
+}
+
+/** A standard normal draw (Box–Muller). */
+export function sampleNormal(rng: Rng): number {
+  return Math.sqrt(-2 * Math.log(1 - rng())) * Math.cos(2 * Math.PI * rng());
+}
+
 /** One score drawn from the (Dixon–Coles adjusted) score distribution. */
 export function simulateScore(xg: ExpectedGoals, rng: Rng, rho = 0): Score {
   return sampleScore(scoreSampler(xg, rho), rng);

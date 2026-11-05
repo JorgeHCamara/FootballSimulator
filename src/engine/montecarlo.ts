@@ -1,4 +1,4 @@
-import { expectedGoals, sampleScore, scoreSampler, type ScoreSampler } from "./match.ts";
+import { expectedGoals, sampleDixonColes, sampleNormal, sampleScore, scoreSampler, type ScoreSampler } from "./match.ts";
 import { seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
@@ -48,6 +48,14 @@ export interface MonteCarloInput {
    * then use positions among the other clubs (see `zonePositionCounts`).
    */
   passDown?: readonly TeamId[];
+  /**
+   * Rating uncertainty, off unless given (the season backtest tries it; the
+   * site doesn't use it): at the start of each simulated season every club's
+   * attack and defence are multiplied by exp(N(0, s)), s = sd × √(k / (k +
+   * its games played so far)), so a club's rating is less sure early on. The
+   * season's games are then drawn from those ratings.
+   */
+  ratingNoise?: { sd: number; k: number };
   playoff?: {
     config: PlayoffConfig;
     options: Omit<BracketOptions, "seasonComplete">;
@@ -68,6 +76,9 @@ export interface MonteCarloResult {
   /** With `playoff`: runs the club won the knockout phase. */
   playoffWins?: Record<TeamId, number>;
 }
+
+/** Rating noise's spread for a club with `gamesPlayed` games so far: sd × √(k / (k + games)), shrinking as games come in. */
+export const ratingNoiseSd = (sd: number, k: number, gamesPlayed: number) => sd * Math.sqrt(k / (k + gamesPlayed));
 
 /** A run keeps the split's generated games for this many different groupings at most. */
 const SPLIT_GAMES_KEPT = 20_000;
@@ -98,7 +109,15 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
   const rho = model.rho ?? 0;
   const remaining = fixtures
     .filter((f) => !fixed[f.id])
-    .map((f) => ({ id: f.id, sampler: scoreSampler(expectedGoals(model, f.homeId, f.awayId), rho) }));
+    .map((f) => ({ id: f.id, homeId: f.homeId, awayId: f.awayId, sampler: scoreSampler(expectedGoals(model, f.homeId, f.awayId), rho) }));
+  // Rating noise: each club's spread, from its games played so far.
+  const noise = input.ratingNoise && input.ratingNoise.sd > 0 ? input.ratingNoise : undefined;
+  const noiseSd = new Map<TeamId, number>();
+  if (noise) {
+    const played = new Map<TeamId, number>();
+    for (const f of fixtures) if (fixed[f.id]) for (const id of [f.homeId, f.awayId]) played.set(id, (played.get(id) ?? 0) + 1);
+    for (const t of teams) noiseSd.set(t.id, ratingNoiseSd(noise.sd, noise.k, played.get(t.id) ?? 0));
+  }
   /** Generated split games: one distribution per pairing. */
   const pairSamplers = new Map<string, ScoreSampler>();
   const pairSampler = (homeId: TeamId, awayId: TeamId) => {
@@ -145,7 +164,18 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
       fixtures.every((f) => f.matchday <= input.project!.afterRound),
   );
   for (let i = 0; i < iterations; i++) {
-    for (const r of remaining) results[r.id] = sampleScore(r.sampler, rng);
+    // This season's ratings: the model's, or with rating noise each club's drawn around them.
+    let season = model;
+    if (noise) {
+      const strengths = new Map(model.strengths);
+      for (const t of teams) {
+        const s = model.strengths.get(t.id) ?? { attack: 1, defence: 1 };
+        const sd = noiseSd.get(t.id)!;
+        strengths.set(t.id, { attack: s.attack * Math.exp(sd * sampleNormal(rng)), defence: s.defence * Math.exp(sd * sampleNormal(rng)) });
+      }
+      season = { ...model, strengths };
+      for (const r of remaining) results[r.id] = sampleDixonColes(expectedGoals(season, r.homeId, r.awayId), rho, rng);
+    } else for (const r of remaining) results[r.id] = sampleScore(r.sampler, rng);
     const drawn = overridden.map((id) => results[id]);
     const at = rng.state;
     // Where the first variant's season left the draws: the next season goes on from there, so the first variant
@@ -178,7 +208,8 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
           }
           return games;
         });
-        for (const f of extra) results[f.id] = fixed[f.id] ?? sampleScore(pairSampler(f.homeId, f.awayId), rng);
+        for (const f of extra)
+          results[f.id] = fixed[f.id] ?? (noise ? sampleDixonColes(expectedGoals(season, f.homeId, f.awayId), rho, rng) : sampleScore(pairSampler(f.homeId, f.awayId), rng));
         played = [...fixtures, ...extra];
         // The table after the split, from the table at it (computeStandings would work that out again).
         if (splitDirect && extra.length) splitRows = splitStandings(teams, played, results, tableOptions, atSplit);
@@ -201,7 +232,7 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
         // The bracket only needs the table and knockout results (real ones come with the options).
         const roundCount = playoff.config.rounds.length;
         let final: PlayoffTie | undefined;
-        const played = simulatePlayoff(rows, playoff.config, {}, input.model, rng, playoff.options, (r, ties) => {
+        const played = simulatePlayoff(rows, playoff.config, {}, season, rng, playoff.options, (r, ties) => {
           for (const tie of ties) {
             for (const id of [tie.higher.teamId, tie.lower.teamId]) {
               if (id !== null) (count.playoffReached[id] ??= new Array<number>(roundCount).fill(0))[r]!++;
