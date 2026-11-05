@@ -19,6 +19,8 @@ import { getContinentalPriors, getExternalSeeds } from "../../../lib/continental
 import { getLeagueData, type LeagueData } from "../../../lib/leagueData.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd, fill, type FaqItem } from "../../../lib/site.ts";
 import { Icon } from "../../../components/Icon.tsx";
+import { hasClubPages } from "../../../lib/clubs.ts";
+import { latestReportPath, readSnapshots, seasonReports } from "../../../lib/oddsReports.ts";
 
 export const revalidate = 3600;
 
@@ -135,6 +137,10 @@ export default async function LeaguePage({ params }: { params: Params }) {
   const loaded = await load(slug);
   if (!loaded) notFound();
 
+  // The latest "what changed" report (domestic leagues with snapshots).
+  const latestOdds =
+    loaded.kind === "league" && hasClubPages(loaded.config) ? seasonReports(await readSnapshots(loaded.config.code), loaded.data.seasonKey)?.snapshots.at(-1)?.round : undefined;
+  const oddsT = await getTranslations("Odds");
   const [t, seo, faqT, meta] = await Promise.all([
     getTranslations("Simulator"),
     getTranslations("Seo"),
@@ -266,6 +272,16 @@ export default async function LeaguePage({ params }: { params: Params }) {
         </h1>
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{seo(intro, values)}</p>
         {data.source === "live" && <p className="text-xs text-zinc-500">{t("liveSource")}</p>}
+        {latestOdds && (
+          <Link
+            href={latestReportPath(config)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-pitch-600/40 bg-pitch-50 px-3 py-1.5 text-sm font-semibold text-pitch-800 hover:bg-pitch-100 dark:bg-pitch-900/30 dark:text-pitch-100 dark:hover:bg-pitch-900/50"
+            data-testid="league-latest-odds"
+          >
+            <Icon name="trending-up" size={16} className="shrink-0" />
+            {oddsT("leagueLink", { round: oddsT("round", { n: latestOdds }) })}
+          </Link>
+        )}
       </header>
 
       {loaded.kind === "cup" ? (

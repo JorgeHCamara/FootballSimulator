@@ -323,3 +323,83 @@ export async function renderMatchCard(text: MatchCardText) {
     { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
   );
 }
+
+export interface OddsCardText {
+  pill: string;
+  /** "Title race after Matchday 11". */
+  title: string;
+  /** "After the games up to 2 November 2026". */
+  date: string;
+  rows: { name: string; tla: string; crest?: string; value: string; delta?: { text: string; good: boolean; up: boolean } }[];
+  basedOn: string;
+  cta: string;
+}
+
+/** A Lucide trend arrow, drawn inline (next/og renders SVG elements). */
+const trend = (up: boolean, color: string) => (
+  <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+    {up ? (
+      <>
+        <path d="M16 7h6v6" />
+        <path d="m22 7-8.5 8.5-5-5L2 17" />
+      </>
+    ) : (
+      <>
+        <path d="M16 17h6v-6" />
+        <path d="m22 17-8.5-8.5-5 5L2 7" />
+      </>
+    )}
+  </svg>
+);
+
+/** A "what changed" report's card: the race after the round, its top five with their changes. */
+export async function renderOddsCard(text: OddsCardText) {
+  return new ImageResponse(
+    (
+      <div style={{ width: "100%", height: "100%", display: "flex", background: PITCH_700, fontFamily: "Inter", color: "#ffffff" }}>
+        <div style={{ width: 520, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "48px 32px 48px 56px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <BrandMark size={48} />
+            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ display: "flex" }}>
+              <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: 1.5, padding: "8px 16px", borderRadius: 999, background: "rgba(255,255,255,0.16)", color: "#dcfce7" }}>
+                {text.pill}
+              </span>
+            </div>
+            <span style={{ fontSize: headlineSize(text.title), fontWeight: 800, lineHeight: 1.05, letterSpacing: -1.5, maxWidth: 440 }}>{text.title}</span>
+            <span style={{ fontSize: 22, color: "#bbf7d0" }}>{text.date}</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <span style={{ fontSize: 19, color: "#bbf7d0" }}>{text.basedOn}</span>
+            <div style={{ display: "flex" }}>
+              <span style={{ fontSize: 22, fontWeight: 700, padding: "12px 22px", borderRadius: 14, background: "#ffffff", color: PITCH_700 }}>{text.cta}</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "36px 48px 36px 8px" }}>
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", background: "#ffffff", borderRadius: 24, padding: "16px 28px", color: "#18181b", boxShadow: "0 20px 40px rgba(0,0,0,0.25)" }}>
+            {text.rows.map((r, i) => (
+              <div key={r.name} style={{ display: "flex", alignItems: "center", gap: 16, height: 92, borderBottom: i < text.rows.length - 1 ? "1px solid #f4f4f5" : "none" }}>
+                <span style={{ width: 22, fontSize: 22, fontWeight: 700, color: "#71717a" }}>{i + 1}</span>
+                {crest(r, 44)}
+                <span style={{ flex: 1, fontSize: 28, fontWeight: 700, overflow: "hidden", whiteSpace: "nowrap" }}>{truncate(r.name, 18)}</span>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                  <span style={{ fontSize: 34, fontWeight: 800, letterSpacing: -1 }}>{r.value}</span>
+                  {r.delta && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 20, fontWeight: 700, color: r.delta.good ? "#15803d" : "#dc2626" }}>
+                      {trend(r.delta.up, r.delta.good ? "#15803d" : "#dc2626")}
+                      {r.delta.text}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
+  );
+}

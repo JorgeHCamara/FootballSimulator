@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "../i18n/navigation.ts";
+import { Link, usePathname } from "../i18n/navigation.ts";
 import { Flag } from "./Flag.tsx";
 import { CountryColumn, useContinentGroups } from "./LeagueMenu.tsx";
 import { Icon } from "./Icon.tsx";
@@ -80,6 +80,16 @@ export function MobileMenu() {
           data-testid="mobile-menu"
         >
           <div className="mx-auto max-w-6xl px-4 py-2">
+            {/* Every league's latest "what changed" report. */}
+            <Link
+              href="/odds"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-lg border-b border-zinc-100 px-2 py-3 text-base font-extrabold text-zinc-800 hover:bg-pitch-50 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-pitch-900/40"
+              data-testid="mobile-latest-odds"
+            >
+              <Icon name="trending-up" size={18} className="shrink-0 text-pitch-600" />
+              {nav("latestOdds")}
+            </Link>
             {groups.map((group) => {
               const isOpen = expanded === group.continent;
               const id = `mobile-${group.continent.toLowerCase().replace(/\s+/g, "-")}`;

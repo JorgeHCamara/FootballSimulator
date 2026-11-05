@@ -141,7 +141,7 @@ describe("odds snapshots", () => {
   const game = (id: number, matchday: number, utcDate: string, played = true): Fixture => ({ id, matchday, utcDate, homeId: id * 2, awayId: id * 2 + 1, result: played ? { home: 1, away: 0 } : null });
   const now = Date.parse("2026-11-05T12:00:00Z");
 
-  it("a round counts once it and every round before it are played, as of its last kick-off", () => {
+  it("rounds count in the order they're played, once every earlier one is, numbered by how many are complete", () => {
     const fixtures = [
       game(1, 1, "2026-10-17T14:00Z"),
       game(2, 1, "2026-10-18T14:00Z"),
@@ -153,20 +153,30 @@ describe("odds snapshots", () => {
       game(6, 2, "2026-10-26T19:00Z"),
       game(7, 3, "2026-11-01T14:00Z"),
       game(8, 3, "2026-11-02T14:00Z", false),
-      // Round 4 is all played (a midweek round brought forward) but round 3 isn't: not yet.
+      // A midweek round played before round 3: it's the third round complete.
       game(9, 4, "2026-10-29T19:00Z"),
       game(10, 4, "2026-10-29T19:00Z"),
     ];
     assert.deepEqual(completedRounds(fixtures, Date.parse("2026-11-03T12:00:00Z")), [
       { round: 1, lastKickoff: "2026-10-18T14:00Z" },
       { round: 2, lastKickoff: "2026-10-26T19:00Z" },
+      { round: 3, lastKickoff: "2026-10-29T19:00Z" },
     ]);
-    // Two days on, round 3's last game is overdue (postponed): rounds 3 and 4 complete, at the same moment: one snapshot, the higher round.
-    assert.deepEqual(completedRounds(fixtures, now), [
-      { round: 1, lastKickoff: "2026-10-18T14:00Z" },
-      { round: 2, lastKickoff: "2026-10-26T19:00Z" },
-      { round: 4, lastKickoff: "2026-11-01T14:00Z" },
-    ]);
+    // Two days on, round 3's last game is overdue (postponed): four rounds complete.
+    assert.deepEqual(completedRounds(fixtures, now).at(-1), { round: 4, lastKickoff: "2026-11-01T14:00Z" });
+    // A round of games scattered over months (rebuilt rounds can be): placed by its median, it doesn't hold the others back.
+    const scattered = [
+      game(1, 1, "2026-08-15T14:00Z"),
+      game(2, 1, "2026-08-15T14:00Z"),
+      game(3, 2, "2026-09-26T14:00Z"),
+      game(4, 2, "2026-11-04T19:00Z"),
+      game(5, 2, "2027-01-12T14:00Z", false),
+      game(6, 3, "2026-08-22T14:00Z"),
+      game(7, 3, "2026-08-22T14:00Z"),
+    ];
+    assert.deepEqual(completedRounds(scattered, Date.parse("2026-11-05T12:00:00Z")).map((r) => r.round), [1, 2, 3]);
+    // Two rounds completing at the same moment: one snapshot, the higher.
+    assert.deepEqual(completedRounds([game(1, 1, "2026-10-29T19:00Z"), game(2, 2, "2026-10-29T19:00Z"), game(3, 2, "2026-10-25T14:00Z")], now), [{ round: 2, lastKickoff: "2026-10-29T19:00Z" }]);
     // A game kicked off an hour ago: its round waits for the result to be in.
     assert.deepEqual(completedRounds([game(1, 1, "2026-11-05T11:00Z")], now), []);
   });

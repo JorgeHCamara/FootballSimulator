@@ -1818,6 +1818,82 @@ async function step(name, fn) {
       await ctx.close();
     });
 
+    await step("odds reports: latest and per round, movers, table, key game, race chart, SEO, card, hub, nav, sitemap", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      // From the league page and the main menu.
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      assert.equal(await p.getByTestId("league-latest-odds").getAttribute("href"), "/en/premier-league/odds");
+      assert.match(await p.getByTestId("league-latest-odds").innerText(), /^Latest odds: what changed after Matchday \d+$/);
+      assert.equal(await p.getByTestId("nav-latest-odds").getAttribute("href"), "/en/odds");
+      await p.getByTestId("league-latest-odds").click();
+      await p.waitForURL(`${BASE_URL}/en/premier-league/odds`);
+      await p.goto(`${BASE_URL}/en/premier-league/odds`);
+      assert.equal(await p.locator("h1").count(), 1);
+      const h1 = await p.locator("h1").innerText();
+      const round = Number(h1.match(/^Premier League title odds after Matchday (\d+)$/)[1]);
+      assert.match(await p.title(), new RegExp(`^Latest Premier League odds: what changed after Matchday ${round} \\| Foot Simu$`));
+      assert.match(await p.locator('meta[name="description"]').getAttribute("content"), /who rose and who fell after Matchday \d+\. .+ lead the title race at \d+%/);
+      assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/premier-league/odds");
+      assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/premier-league/odds");
+      assert.match(await p.locator('meta[property="og:image"]').getAttribute("content"), /\/premier-league\/odds\/opengraph-image/);
+      const ld = JSON.parse(await p.locator('script[type="application/ld+json"]').first().textContent());
+      assert.equal(ld["@graph"][0]["@type"], "Article");
+      assert.equal(ld["@graph"][0].headline, h1);
+      assert.match(ld["@graph"][0].datePublished, /^\d{4}-\d{2}-\d{2}$/);
+      // Risers and fallers: title, Champions League, relegation; Lucide arrows, no emojis.
+      assert.deepEqual(await p.getByTestId("odds-category").evaluateAll((els) => els.map((e) => e.dataset.kind)), ["title", "continental", "relegation"]);
+      assert.ok((await p.getByTestId("odds-mover").count()) > 0);
+      assert.ok((await p.locator('[data-testid="odds-movers"] svg[data-icon="trending-up"]').count()) > 0);
+      assert.ok((await p.locator('[data-testid="odds-movers"] svg[data-icon="trending-down"]').count()) > 0);
+      assert.doesNotMatch(await p.locator("main").innerText(), /\p{Extended_Pictographic}/u, "no emojis");
+      assert.match(await p.locator('[data-testid="odds-sentences"]').first().innerText(), /chances (rose|fell) from \d+% to \d+%\./);
+      // Every club, the key game with its match page, the race.
+      assert.equal(await p.getByTestId("odds-row").count(), 20);
+      assert.match(await p.getByTestId("odds-result-link").getAttribute("href"), /^\/en\/premier-league\/match\/[a-z0-9-]+-vs-[a-z0-9-]+-\d{4}-\d{2}-\d{2}$/);
+      assert.match(await p.getByTestId("odds-result-score").innerText(), /^\d+–\d+$/);
+      assert.equal(await p.locator('[data-testid="race-legend"] li').count(), 5);
+      const archive = await p.locator('[data-testid="odds-archive"] a').evaluateAll((links) => links.map((a) => a.getAttribute("href")));
+      assert.ok(archive.length >= 2);
+      assert.equal(await p.locator('[data-testid="race-table"] tbody tr').count(), archive.length);
+      assert.equal(archive[0], `/en/premier-league/odds/matchday-${round}`);
+      // An earlier round's own page.
+      await p.goto(`${BASE_URL}${archive[1]}`);
+      const earlier = Number(archive[1].match(/matchday-(\d+)$/)[1]);
+      assert.equal(await p.locator("h1").innerText(), `Premier League title odds after Matchday ${earlier}`);
+      assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${archive[1]}`);
+      assert.match(await p.title(), new RegExp(`^Premier League title odds after Matchday ${earlier} \\(\\d{4}(/\\d{2})?\\) \\| Foot Simu$`));
+      assert.equal((await p.request.get(`${BASE_URL}${archive[1]}/opengraph-image`)).headers()["content-type"], "image/png");
+      // Portuguese and Spanish.
+      await p.goto(`${BASE_URL}/pt/premier-league/odds`);
+      assert.match(await p.locator("h1").innerText(), /^Premier League: chances de título após a Rodada \d+$/);
+      await p.goto(`${BASE_URL}/es/premier-league/odds`);
+      assert.match(await p.locator("h1").innerText(), /^Premier League: probabilidades de título tras la Jornada \d+$/);
+      // No such round, or no reports (a continental competition): 404.
+      assert.equal((await p.goto(`${BASE_URL}/en/premier-league/odds/matchday-999`)).status(), 404);
+      assert.equal((await p.goto(`${BASE_URL}/en/champions-league/odds`)).status(), 404);
+      // The hub: every domestic league's latest report.
+      await p.goto(`${BASE_URL}/en/odds`);
+      assert.equal(await p.locator("h1").count(), 1);
+      assert.ok((await p.getByTestId("odds-hub-item").count()) >= 30);
+      // Every report in the sitemap.
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      for (const path of ["/en/odds", "/pt/premier-league/odds", ...archive.map((a) => a.replace(/^\/en/, "/es"))]) assert.ok(sitemap.includes(`https://footsimu.com${path}<`), path);
+      await p.close();
+      // Phones: nothing past the screen's edge; the menu's link.
+      for (const width of [360, 390]) {
+        const ctx = await browser.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true });
+        const m = await ctx.newPage();
+        for (const path of ["/en/premier-league/odds", "/pt/odds"]) {
+          await m.goto(`${BASE_URL}${path}`);
+          const right = await m.evaluate(() => Math.max(...[...document.querySelectorAll("body *")].filter((e) => !e.closest(".sr-only, details:not([open])")).map((e) => e.getBoundingClientRect().right)));
+          assert.ok(right <= width + 0.5, `${path} at ${width}px reaches ${right}px`);
+        }
+        await m.getByTestId("mobile-menu-button").click();
+        assert.equal(await m.getByTestId("mobile-latest-odds").getAttribute("href"), "/pt/odds");
+        await ctx.close();
+      }
+    });
+
     await step("unknown league returns 404", async () => {
       const res = await page.goto(`${BASE_URL}/en/not-a-league`);
       assert.equal(res.status(), 404);

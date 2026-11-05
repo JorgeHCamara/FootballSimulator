@@ -25,7 +25,8 @@
     "language": "Idioma",
     "leagues": "Ligas",
     "openMenu": "Abrir menú",
-    "closeMenu": "Cerrar menú"
+    "closeMenu": "Cerrar menú",
+    "latestOdds": "Últimas probabilidades"
   },
   "Home": {
     "subheading": "Elige una liga, escribe tus pronósticos o deja que el simulador juegue los partidos restantes, y mira cómo cambia la clasificación en directo.",
@@ -932,5 +933,82 @@
     },
     "subtitle": "Pronóstico, probabilidades y marcadores simulados · {league} · {matchday}",
     "subtitlePlayed": "Resultado final y pronóstico previo · {league} · {matchday}"
+  },
+  "Odds": {
+    "round": "Jornada {n}",
+    "h1": {
+      "title": "{league}: probabilidades de título tras la {round}",
+      "playoffs": "{league}: probabilidades de playoffs tras la {round}",
+      "other": "{league}: probabilidades tras la {round}"
+    },
+    "metaTitle": "{h1} ({season})",
+    "metaTitleLatest": "Últimas probabilidades – {league}: qué cambió tras la {round}",
+    "description": "{league} {season}: quién subió y quién bajó tras la {round}. {leader} lidera la {race} con el {leaderPct}; las probabilidades de {topics} de cada club, con el cambio desde la jornada anterior, en {count} temporadas simuladas.",
+    "asOf": "Tras los partidos hasta el {date}",
+    "latest": "Más reciente",
+    "category": {
+      "title": "Título",
+      "promotion": "Ascenso",
+      "playoffs": "Playoffs",
+      "relegation": "Descenso"
+    },
+    "moversTitle": "Los que más subieron y bajaron",
+    "moversNote": "Cambios desde la {round}, en puntos porcentuales.",
+    "up": "Suben",
+    "down": "Bajan",
+    "noMoves": "Las probabilidades de ningún club cambiaron un punto o más.",
+    "firstReport": "Este es el primer informe de la temporada: los cambios empiezan con la próxima jornada.",
+    "rise": "{club} {result} y sus probabilidades de {topic} subieron del {from} al {to}.",
+    "fall": "{club} {result} y sus probabilidades de {topic} bajaron del {from} al {to}.",
+    "riseIdle": "{club} no jugó y sus probabilidades de {topic} subieron del {from} al {to}.",
+    "fallIdle": "{club} no jugó y sus probabilidades de {topic} bajaron del {from} al {to}.",
+    "riseOther": "Las probabilidades de {topic} de {club} subieron del {from} al {to}.",
+    "fallOther": "Las probabilidades de {topic} de {club} bajaron del {from} al {to}.",
+    "result": {
+      "winHome": "venció a {opponent} por {score} en casa",
+      "winAway": "venció a {opponent} por {score} a domicilio",
+      "drawHome": "empató {score} con {opponent} en casa",
+      "drawAway": "empató {score} con {opponent} a domicilio",
+      "lossHome": "perdió {score} ante {opponent} en casa",
+      "lossAway": "perdió {score} ante {opponent} a domicilio"
+    },
+    "leader": "{club} lidera la {race} con el {pct}.",
+    "tableTitle": "Las probabilidades de cada club",
+    "tableNote": "Probabilidades tras la {round}, en {count} temporadas simuladas; debajo de cada una, el cambio desde la {previous}.",
+    "tableNoteFirst": "Probabilidades tras la {round}, en {count} temporadas simuladas.",
+    "position": "#",
+    "club": "Club",
+    "points": "Pts",
+    "deltaPoints": "{sign}{n} p.p.",
+    "resultTitle": "El resultado de la jornada",
+    "resultLead": "{home} {score} {away} fue el partido que más movió las probabilidades.",
+    "resultNote": "El partido cuyos dos clubes más cambiaron sus probabilidades desde la jornada anterior.",
+    "resultNone": "Ningún partido de la jornada movió las probabilidades un punto o más.",
+    "matchPreview": "Previa del partido",
+    "chartTitle": "La {race}",
+    "chartNote": "Las probabilidades de {topic} de los cinco primeros clubes tras cada jornada.",
+    "chartTable": "Ver como tabla",
+    "chartRound": "Jornada",
+    "archiveTitle": "Todos los informes de la temporada",
+    "simulate": "Simula el resto de la temporada",
+    "shareTitle": "{h1}",
+    "shareText": "Quién subió y quién bajó tras la {round} en Foot Simu",
+    "card": {
+      "title": "{race} tras la {round}",
+      "basedOn": "En {count} temporadas simuladas",
+      "cta": "Informes en footsimu.com"
+    },
+    "hubTitle": "Últimas probabilidades: qué cambió tras cada jornada",
+    "hubDescription": "Tras cada jornada completa: quién subió y quién bajó en las carreras por el título, las plazas continentales y el descenso de cada liga de Foot Simu, en 10.000 temporadas simuladas.",
+    "hubIntro": "Tras cada jornada completa, el informe de cada liga muestra quién subió y quién bajó, las probabilidades de cada club, el partido que más las movió y la carrera hasta ahora.",
+    "hubLeader": "{club} {pct}",
+    "leagueLink": "Últimas probabilidades: qué cambió tras la {round}",
+    "race": {
+      "title": "carrera por el título",
+      "continental": "carrera por la {zone}",
+      "promotion": "carrera por el ascenso",
+      "playoffs": "carrera por los playoffs",
+      "relegation": "lucha por la permanencia"
+    }
   }
 }

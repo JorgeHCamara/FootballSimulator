@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
     "/*/*/share/**": ["./src/assets/fonts/**/*"],
     "/*/*/team/**": ["./src/assets/fonts/**/*"],
     "/*/*/match/**": ["./src/assets/fonts/**/*"],
+    // Odds reports read the snapshots at run time (src/lib/oddsReports.ts), as do the league pages' links to them and the sitemap.
+    "/*/*/odds": ["./src/assets/fonts/**/*", "./src/data/snapshots/**/*"],
+    "/*/*/odds/**": ["./src/assets/fonts/**/*", "./src/data/snapshots/**/*"],
+    "/*/odds": ["./src/data/snapshots/**/*"],
+    "/*/*": ["./src/data/snapshots/**/*"],
+    "/sitemap.xml": ["./src/data/snapshots/**/*"],
   },
   experimental: {
     // Generate all pages in one worker so each league is fetched once per build

@@ -49,6 +49,7 @@ import type { SVGProps } from "react";
 type IconNode = readonly (readonly [string, Readonly<Record<string, string>>])[];
 
 const ICONS = {
+  "arrow-right": [["path", {"d": "M5 12h14"}], ["path", {"d": "m12 5 7 7-7 7"}]],
   "calendar-days": [["path", {"d": "M8 2v3"}], ["path", {"d": "M16 2v3"}], ["rect", {"x": "3", "y": "3", "width": "18", "height": "18", "rx": "2"}], ["path", {"d": "M3 9h18"}], ["path", {"d": "M8 13h.01"}], ["path", {"d": "M12 13h.01"}], ["path", {"d": "M16 13h.01"}], ["path", {"d": "M8 17h.01"}], ["path", {"d": "M12 17h.01"}], ["path", {"d": "M16 17h.01"}]],
   "chart-column": [["path", {"d": "M3 3v16a2 2 0 0 0 2 2h16"}], ["path", {"d": "M18 17V9"}], ["path", {"d": "M13 17V5"}], ["path", {"d": "M8 17v-3"}]],
   "check": [["path", {"d": "M20 6 9 17l-5-5"}]],
@@ -74,6 +75,8 @@ const ICONS = {
   "share-2": [["circle", {"cx": "18", "cy": "5", "r": "3"}], ["circle", {"cx": "6", "cy": "12", "r": "3"}], ["circle", {"cx": "18", "cy": "19", "r": "3"}], ["line", {"x1": "8.59", "x2": "15.42", "y1": "13.51", "y2": "17.49"}], ["line", {"x1": "15.41", "x2": "8.59", "y1": "6.51", "y2": "10.49"}]],
   "target": [["circle", {"cx": "12", "cy": "12", "r": "10"}], ["circle", {"cx": "12", "cy": "12", "r": "6"}], ["circle", {"cx": "12", "cy": "12", "r": "2"}]],
   "thumbs-up": [["path", {"d": "M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"}], ["path", {"d": "M7 10v12"}]],
+  "trending-down": [["path", {"d": "M16 17h6v-6"}], ["path", {"d": "m22 17-8.5-8.5-5 5L2 7"}]],
+  "trending-up": [["path", {"d": "M16 7h6v6"}], ["path", {"d": "m22 7-8.5 8.5-5-5L2 17"}]],
   "trophy": [["path", {"d": "M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2"}], ["path", {"d": "M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2"}], ["path", {"d": "M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3"}], ["path", {"d": "M4 22h16"}], ["path", {"d": "M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"}], ["path", {"d": "M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3"}]],
   "x": [["path", {"d": "M18 6 6 18"}], ["path", {"d": "m6 6 12 12"}]],
 } as const satisfies Record<string, IconNode>;

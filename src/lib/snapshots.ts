@@ -59,30 +59,34 @@ const OVERDUE = 2 * DAY;
 const GAME_LENGTH = 3 * 3_600_000;
 
 /**
- * The rounds completed so far, in order, each with the moment it was: the
- * first rounds, up to the first one still to finish, with the last kick-off
- * among them (rounds are rebuilt from dates, so a round can hold a game
- * moved weeks earlier or later; a later round finishing first isn't counted
- * until the ones before it are). Rounds completed at the same moment count
- * as one, the highest.
+ * The rounds completed so far, in order, each numbered by how many rounds are
+ * complete then (the "Matchday 13" fans count) with the moment it was.
+ * Rounds are rebuilt from dates (ESPN has no round numbers), and a few hold
+ * games scattered over months, so they're taken in the order they were
+ * played (each by its median kick-off), not by their number: the first ones,
+ * up to the first still to finish, with the last kick-off among them. Rounds
+ * completed at the same moment count as one, the highest.
  */
 export function completedRounds(fixtures: readonly Fixture[], now = Date.now()): { round: number; lastKickoff: string }[] {
   const byRound = new Map<number, Fixture[]>();
   for (const f of fixtures) byRound.set(f.matchday, [...(byRound.get(f.matchday) ?? []), f]);
-  const out: { round: number; lastKickoff: string }[] = [];
-  let moment = "";
-  for (const [round, games] of [...byRound].sort((a, b) => a[0] - b[0])) {
+  const rounds = [...byRound.values()].map((games) => {
     const times = games.map((g) => Date.parse(g.utcDate)).sort((a, b) => a - b);
     const median = times[Math.floor(times.length / 2)]!;
     // Its own games: a game moved far from the others' dates isn't waited for.
-    const core = games.filter((g) => Math.abs(Date.parse(g.utcDate) - median) <= ROUND_WINDOW);
+    return { median, core: games.filter((g) => Math.abs(Date.parse(g.utcDate) - median) <= ROUND_WINDOW) };
+  });
+  rounds.sort((a, b) => a.median - b.median);
+  const out: { round: number; lastKickoff: string }[] = [];
+  let moment = "";
+  for (const [i, { core }] of rounds.entries()) {
     const played = core.filter((g) => g.result);
     const done = core.every((g) => g.result || Date.parse(g.utcDate) < now - OVERDUE);
     if (!played.length || !done) break;
     for (const g of played) if (g.utcDate > moment) moment = g.utcDate;
     if (Date.parse(moment) + GAME_LENGTH > now) break;
     if (out.at(-1)?.lastKickoff === moment) out.pop();
-    out.push({ round, lastKickoff: moment });
+    out.push({ round: i + 1, lastKickoff: moment });
   }
   return out;
 }
@@ -90,11 +94,11 @@ export function completedRounds(fixtures: readonly Fixture[], now = Date.now()):
 const round4 = (x: number) => Math.round(x * 10_000) / 10_000;
 
 /** Every club's chances just after a round: the league's Monte Carlo from the results up to its last game. */
-export function snapshotAfter(league: LeagueConfig, data: LeagueData, round: number, lastKickoff: string, takenAt = new Date()): OddsSnapshot | null {
+export function snapshotAfter(league: LeagueConfig, data: LeagueData, round: number, lastKickoff: string, takenAt = new Date(), iterations?: number): OddsSnapshot | null {
   // Just after the last kick-off: that game counts, any later one doesn't.
   const asOf = new Date(Date.parse(lastKickoff) + 60_000).toISOString();
   const then = dataAsOf(data, asOf);
-  const outlook = leagueOutlook(league, then);
+  const outlook = leagueOutlook(league, then, iterations);
   if (!outlook) return null;
   const teams: Record<string, TeamSnapshot> = {};
   for (const club of outlook.clubs.values()) {
@@ -129,6 +133,28 @@ export function pendingRounds(file: LeagueSnapshots | undefined, seasonKey: stri
   if (!stored.length) return completed.slice(-1);
   const last = Math.max(...stored.map((s) => s.round));
   return completed.filter((r) => r.round > last);
+}
+
+/**
+ * Every completed round not stored yet for the season, earlier ones included
+ * (a backfill: each is taken as of its own last kick-off, so it's what the
+ * snapshot would have been at the time).
+ */
+export function missingRounds(file: LeagueSnapshots | undefined, seasonKey: string, completed: readonly { round: number; lastKickoff: string }[]) {
+  const stored = new Set((file?.seasons[seasonKey]?.snapshots ?? []).map((s) => s.round));
+  return completed.filter((r) => !stored.has(r.round));
+}
+
+/**
+ * The first moment a backfilled snapshot can be taken as of, or undefined for
+ * any. A split league whose groups are already known (Ecuador): before its
+ * second phase, the season's simulation would already know who went where.
+ */
+export function backfillFrom(league: LeagueConfig, data: LeagueData): string | undefined {
+  if (!league.split || !data.groups?.length) return undefined;
+  const first = new Set(data.firstPhaseIds ?? []);
+  const later = data.fixtures.filter((f) => (first.size ? !first.has(f.id) : f.matchday > (league.split!.afterRound ?? Infinity)));
+  return later.reduce<string | undefined>((min, f) => (min === undefined || f.utcDate < min ? f.utcDate : min), undefined);
 }
 
 /** The file with the new snapshots added (a round already stored is replaced), in round order. */

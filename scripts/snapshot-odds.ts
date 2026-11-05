@@ -7,6 +7,7 @@
 //   npm run snapshots                 every domestic league
 //   npm run snapshots -- PL BSA       only these
 //   npm run snapshots -- --dry-run    print, write nothing
+//   npm run snapshots -- --backfill   also every earlier completed round of the season not stored yet
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -14,11 +15,12 @@ import { fileURLToPath } from "node:url";
 import { LEAGUES } from "../src/config/leagues.ts";
 import { hasClubPages } from "../src/lib/clubs.ts";
 import { getLeagueData } from "../src/lib/leagueData.ts";
-import { addSnapshots, completedRounds, pendingRounds, snapshotAfter, type LeagueSnapshots } from "../src/lib/snapshots.ts";
+import { addSnapshots, backfillFrom, completedRounds, missingRounds, pendingRounds, snapshotAfter, type LeagueSnapshots } from "../src/lib/snapshots.ts";
 
 const DIR = join(dirname(fileURLToPath(import.meta.url)), "../src/data/snapshots");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
+const backfill = args.includes("--backfill");
 const only = args.filter((a) => !a.startsWith("--"));
 
 // Real data only: never snapshot the generated sample leagues.
@@ -52,7 +54,9 @@ for (const league of LEAGUES.filter((l) => hasClubPages(l) && (!only.length || o
       continue;
     }
     const file = await read(league.code);
-    const pending = pendingRounds(file, data.seasonKey, completedRounds(data.fixtures));
+    const completed = completedRounds(data.fixtures);
+    const from = backfill ? backfillFrom(league, data) : undefined;
+    const pending = backfill ? missingRounds(file, data.seasonKey, completed).filter((r) => !from || r.lastKickoff >= from) : pendingRounds(file, data.seasonKey, completed);
     if (!pending.length) {
       console.log(`${league.code} ${data.season}: up to date`);
       continue;

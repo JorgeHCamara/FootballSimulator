@@ -25,7 +25,8 @@
     "language": "Language",
     "leagues": "Leagues",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "latestOdds": "Latest odds"
   },
   "Home": {
     "subheading": "Pick a league, enter your predictions or let the simulator play the remaining matches, and watch the table change live.",
@@ -932,5 +933,82 @@
     },
     "subtitle": "Prediction, odds and simulated scores · {league} · {matchday}",
     "subtitlePlayed": "Final score and pre-match prediction · {league} · {matchday}"
+  },
+  "Odds": {
+    "round": "Matchday {n}",
+    "h1": {
+      "title": "{league} title odds after {round}",
+      "playoffs": "{league} play-off odds after {round}",
+      "other": "{league} odds after {round}"
+    },
+    "metaTitle": "{h1} ({season})",
+    "metaTitleLatest": "Latest {league} odds: what changed after {round}",
+    "description": "{league} {season}: who rose and who fell after {round}. {leader} lead the {race} at {leaderPct}; every club's {topics} chances with the change since the last round, from {count} simulated seasons.",
+    "asOf": "After the games up to {date}",
+    "latest": "Latest",
+    "category": {
+      "title": "Title",
+      "promotion": "Promotion",
+      "playoffs": "Play-offs",
+      "relegation": "Relegation"
+    },
+    "moversTitle": "Biggest risers and fallers",
+    "moversNote": "Changes since {round}, in points of percentage.",
+    "up": "Up",
+    "down": "Down",
+    "noMoves": "No club's chances moved by a point or more.",
+    "firstReport": "This is the season's first report: the changes start with the next round.",
+    "rise": "{club} {result}, and their {topic} chances rose from {from} to {to}.",
+    "fall": "{club} {result}, and their {topic} chances fell from {from} to {to}.",
+    "riseIdle": "{club} didn't play, and their {topic} chances rose from {from} to {to}.",
+    "fallIdle": "{club} didn't play, and their {topic} chances fell from {from} to {to}.",
+    "riseOther": "{club}'s {topic} chances rose from {from} to {to}.",
+    "fallOther": "{club}'s {topic} chances fell from {from} to {to}.",
+    "result": {
+      "winHome": "beat {opponent} {score} at home",
+      "winAway": "won {score} at {opponent}",
+      "drawHome": "drew {score} with {opponent} at home",
+      "drawAway": "drew {score} at {opponent}",
+      "lossHome": "lost {score} to {opponent} at home",
+      "lossAway": "lost {score} at {opponent}"
+    },
+    "leader": "{club} lead the {race} at {pct}.",
+    "tableTitle": "Every club's chances",
+    "tableNote": "Chances after {round}, from {count} simulated seasons; the change since {previous} below each.",
+    "tableNoteFirst": "Chances after {round}, from {count} simulated seasons.",
+    "position": "#",
+    "club": "Club",
+    "points": "Pts",
+    "deltaPoints": "{sign}{n, plural, one {# pt} other {# pts}}",
+    "resultTitle": "Result of the round",
+    "resultLead": "{home} {score} {away} moved the odds the most.",
+    "resultNote": "The game whose two clubs' chances changed the most since the last round.",
+    "resultNone": "No game this round moved the odds by a point or more.",
+    "matchPreview": "Match preview",
+    "chartTitle": "The {race}",
+    "chartNote": "The top five clubs' {topic} chances after each round.",
+    "chartTable": "Show as a table",
+    "chartRound": "Round",
+    "archiveTitle": "All reports this season",
+    "simulate": "Simulate the rest of the season",
+    "shareTitle": "{h1}",
+    "shareText": "Who rose and who fell after {round} on Foot Simu",
+    "card": {
+      "title": "{race} after {round}",
+      "basedOn": "Based on {count} simulated seasons",
+      "cta": "Every report at footsimu.com"
+    },
+    "hubTitle": "Latest odds: what changed after each round",
+    "hubDescription": "After every completed round: who rose and who fell in the title, European and relegation races of every league on Foot Simu, from 10,000 simulated seasons.",
+    "hubIntro": "After every completed round, each league's report shows who rose and who fell, every club's chances, the game that moved them most and the race so far.",
+    "hubLeader": "{club} {pct}",
+    "leagueLink": "Latest odds: what changed after {round}",
+    "race": {
+      "title": "title race",
+      "continental": "{zone} race",
+      "promotion": "promotion race",
+      "playoffs": "play-off race",
+      "relegation": "relegation fight"
+    }
   }
 }

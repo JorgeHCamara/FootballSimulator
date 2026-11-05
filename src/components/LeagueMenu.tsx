@@ -161,6 +161,18 @@ export function LeagueMenu() {
             </li>
           );
         })}
+        {/* Every league's latest "what changed" report. */}
+        <li>
+          <Link
+            href="/odds"
+            aria-current={pathname === "/odds" ? "page" : undefined}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium text-pitch-50 hover:bg-white/10 ${pathname === "/odds" || pathname.endsWith("/odds") || pathname.includes("/odds/") ? "bg-white/10" : ""}`}
+            data-testid="nav-latest-odds"
+          >
+            <Icon name="trending-up" size={14} />
+            {nav("latestOdds")}
+          </Link>
+        </li>
       </ul>
     </nav>
   );
