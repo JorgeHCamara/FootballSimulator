@@ -1,6 +1,6 @@
-import { getLeagueBySlug, LEAGUES, type LeagueConfig, type SiteLocale } from "../config/leagues.ts";
+import { getLeagueBySlug, LEAGUES, type LeagueConfig, type SiteLocale, type ZoneKind } from "../config/leagues.ts";
 import type { Team } from "../engine/types.ts";
-import { cachedLeagueOutlook, type ClubOutlook, type HeadlineChance, type LeagueOutlook } from "./clubOutlook.ts";
+import { cachedLeagueOutlook, featuredChances, type ClubOutlook, type HeadlineChance, type LeagueOutlook } from "./clubOutlook.ts";
 import { hasClubPages } from "./clubs.ts";
 import { listOf, percent } from "./clubText.ts";
 import { getLeagueData, type LeagueData } from "./leagueData.ts";
@@ -54,9 +54,21 @@ export function clubSubtitle(loaded: LoadedClub, locale: SiteLocale, t: Translat
   return t("subtitle", { season: loaded.season, topics: locale === "en" ? list.charAt(0).toUpperCase() + list.slice(1) : list });
 }
 
-/** The meta description: the headline chances, then what's on the page. */
+/** The chances a club's card and link preview show (see featuredChances), named as the card names them. */
+export function clubCardChances(loaded: Pick<LoadedClub, "club">, locale: SiteLocale, t: Translate, tz: Translate): { label: string; value: string; chance: number; zone: ZoneKind }[] {
+  return featuredChances(loaded.club).map((c) => ({
+    label: c.kind === "continental" || c.kind === "zone" ? tz(c.zone) : t(`card.chance.${c.kind}`),
+    value: percent(c.chance, locale),
+    chance: c.chance,
+    zone: c.zone,
+  }));
+}
+
+/** The meta description: the card's chances, then what's on the page. */
 export function clubDescription(loaded: LoadedClub, locale: SiteLocale, t: Translate, tz: Translate): string {
-  const stats = loaded.club.headline.map((h) => `${topicName(h, t, tz)} ${percent(h.chance, locale)}`).join(", ");
+  const stats = clubCardChances(loaded, locale, t, tz)
+    .map((c) => `${c.label} ${c.value}`)
+    .join(", ");
   const values = { club: loaded.team.name, league: loaded.league.name, season: loaded.season, count: new Intl.NumberFormat(locale).format(loaded.outlook.iterations) };
   return stats ? t("metaDescription", { ...values, stats }) : t("metaDescriptionPlain", values);
 }

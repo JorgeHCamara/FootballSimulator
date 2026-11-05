@@ -1631,7 +1631,8 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("club-subtitle").innerText(), /^\d{4}(\/\d{2})? · Title, Champions League and relegation chances$/);
       const title = await p.title();
       assert.ok(title.startsWith(`${h1} `) && title.endsWith(": title, Champions League and relegation chances | Foot Simu"), title);
-      assert.match(await p.locator('meta[name="description"]').getAttribute("content"), /title \S+%, Champions League \S+%, relegation \S+% in 10,000 simulated seasons/);
+      // The card's three chances (a 0% one gives way to another place the club has a chance of).
+      assert.match(await p.locator('meta[name="description"]').getAttribute("content"), /: [A-Z][^:%]+ \S+%, [A-Z][^%]+ \S+%, [A-Z][^%]+ \S+% in 10,000 simulated seasons/);
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${href}`);
       for (const [lang, path] of [["en", "en"], ["pt-BR", "pt"], ["es", "es"]]) {
         assert.equal(await p.locator(`link[rel="alternate"][hreflang="${lang}"]`).getAttribute("href"), `https://footsimu.com${href.replace(/^\/en/, `/${path}`)}`);

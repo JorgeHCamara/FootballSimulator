@@ -111,6 +111,39 @@ export function headlineChances(zones: readonly ZoneChance[], share: (from: numb
   return out;
 }
 
+/** A chance a club's card shows: one of its headline chances, or another of its places ("zone"). */
+export interface FeaturedChance {
+  kind: HeadlineKind | "zone";
+  zone: ZoneKind;
+  chance: number;
+}
+
+/** Another of the club's places makes its card from this chance (shown as 1% or more). */
+const FEATURED_MIN = 0.005;
+
+/**
+ * The chances a club's card (and its link preview) show, at most `max`: its
+ * headline chances, except that a headline at 0% gives way to another of the
+ * club's places it has a real chance of (Série B: promotion 0%, but the
+ * promotion play-off 23%; a top-flight club's Europa League or Sudamericana
+ * place). Chances above 0% come first, the headline's in its order and then
+ * the other places in table order; 0% headline chances fill what's left, the
+ * title last (a club with no chance of promotion or of the places from the
+ * top has none of the title either). In table order.
+ */
+export function featuredChances(club: Pick<ClubOutlook, "headline" | "zones">, max = 3): FeaturedChance[] {
+  // The places the headline already speaks for (a continental place with its qualifying round).
+  const covered = new Set<ZoneKind>(club.headline.map((h) => h.zone));
+  for (const h of club.headline) if (h.kind === "continental") for (const z of club.zones) if (family(z.kind) === h.zone) covered.add(z.kind);
+  const others: FeaturedChance[] = club.zones.filter((z) => !covered.has(z.kind) && z.chance >= FEATURED_MIN).map((z) => ({ kind: "zone", zone: z.kind, chance: z.chance }));
+  const empty = club.headline.filter((h) => h.chance <= 0);
+  const picked = [...club.headline.filter((h) => h.chance > 0), ...others, ...empty.filter((h) => h.kind !== "title"), ...empty.filter((h) => h.kind === "title")].slice(0, max);
+  const order = [...club.headline, ...others];
+  const firstPlace = (c: FeaturedChance) =>
+    Math.min(Infinity, ...club.zones.filter((z) => z.kind === c.zone || (c.kind === "continental" && family(z.kind) === c.zone)).flatMap((z) => z.ranges.map(([from]) => from)));
+  return picked.sort((a, b) => firstPlace(a) - firstPlace(b) || order.indexOf(a) - order.indexOf(b));
+}
+
 /** Zones merged by kind, in table order, with each club's chance from its place counts. */
 function zoneChances(places: readonly Zone[], title: boolean, share: (from: number, to: number) => number): ZoneChance[] {
   const zones: ZoneChance[] = [];

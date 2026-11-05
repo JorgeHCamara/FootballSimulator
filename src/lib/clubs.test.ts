@@ -4,8 +4,8 @@ import { describe, it } from "node:test";
 import { createTranslator } from "next-intl";
 import { getLeagueByCode } from "../config/leagues.ts";
 import type { Fixture, Team } from "../engine/types.ts";
-import { cachedLeagueOutlook, headlineChances, leagueOutlook, mustWinGames, toughestGames } from "./clubOutlook.ts";
-import { clubDescription, clubHeading, type LoadedClub } from "./clubPage.ts";
+import { cachedLeagueOutlook, featuredChances, headlineChances, leagueOutlook, mustWinGames, toughestGames, type ClubOutlook, type ZoneChance } from "./clubOutlook.ts";
+import { clubCardChances, clubDescription, clubHeading, type LoadedClub } from "./clubPage.ts";
 import { slugify, withClubPages } from "./clubs.ts";
 import { ordinal, percent, placeRange } from "./clubText.ts";
 import type { LeagueData } from "./leagueData.ts";
@@ -111,6 +111,51 @@ describe("a club's outlook", () => {
     const headline = headlineChances(zones, (from, to) => (asked.push([from, to]), 0.7));
     assert.deepEqual(headline.map((h) => `${h.kind}:${h.zone}:${h.chance}`), ["title:title:0.5", "continental:championsLeague:0.7"]);
     assert.deepEqual(asked, [[1, 2]]);
+  });
+
+  describe("the chances a club's card shows", () => {
+    const zone = (kind: ZoneChance["kind"], from: number, to: number, chance: number): ZoneChance => ({ kind, ranges: [[from, to]], chance });
+    /** A club with these places, and its headline from them (its place ranges' chances as given). */
+    const clubWith = (zones: ZoneChance[]): Pick<ClubOutlook, "headline" | "zones"> => ({
+      zones,
+      headline: headlineChances(zones, (from, to) => zones.filter((z) => z.ranges.some(([a, b]) => a >= from && b <= to)).reduce((sum, z) => sum + z.chance, 0)),
+    });
+    const shown = (club: Pick<ClubOutlook, "headline" | "zones">) => featuredChances(club).map((c) => `${c.zone} ${Math.round(c.chance * 100)}`);
+    const serieB = (title: number, promotion: number, playoff: number, relegation: number) =>
+      clubWith([zone("title", 1, 1, title), zone("promotion", 1, 2, promotion), zone("promotionPlayoff", 3, 6, playoff), zone("relegation", 17, 20, relegation)]);
+
+    it("a 0% gives way to a place the club has a chance of (Série B: no promotion, but the play-off)", () => {
+      // Sport: title, promotion and relegation all 0%, the promotion play-off 23%: the title goes, the play-off shows.
+      assert.deepEqual(shown(serieB(0, 0, 0.23, 0)), ["promotion 0", "promotionPlayoff 23", "relegation 0"]);
+      // Two 0%s: both other places show, in table order.
+      assert.deepEqual(shown(serieB(0, 0.05, 0.4, 0)), ["promotion 5", "promotionPlayoff 40", "relegation 0"]);
+    });
+
+    it("headline chances above 0% keep their places; at most three, in table order", () => {
+      assert.deepEqual(shown(serieB(0.02, 0.1, 0.5, 0.01)), ["title 2", "promotion 10", "relegation 1"]);
+      assert.equal(featuredChances(serieB(0.1, 0.2, 0.3, 0.4), 3).length, 3);
+      // A top-flight leader: no chance of going down, a real one of the Europa League instead.
+      const leader = clubWith([zone("title", 1, 1, 0.3), zone("championsLeague", 1, 4, 0.6), zone("europaLeague", 5, 5, 0.2), zone("conferenceLeague", 6, 6, 0.1), zone("relegation", 18, 20, 0)]);
+      assert.deepEqual(shown(leader), ["title 30", "championsLeague 90", "europaLeague 20"]);
+    });
+
+    it("only a real chance (1% or more) replaces a 0%, and a continental place isn't shown twice", () => {
+      const safe = clubWith([zone("title", 1, 1, 0.5), zone("championsLeague", 1, 4, 0.45), zone("championsLeagueQualifying", 5, 5, 0.03), zone("europaLeague", 6, 6, 0.004), zone("relegation", 18, 20, 0)]);
+      assert.deepEqual(shown(safe), ["title 50", "championsLeague 98", "relegation 0"]);
+      // Every headline chance at 0% and nothing else: the 0%s, as before.
+      assert.deepEqual(shown(serieB(0, 0, 0, 0)), ["title 0", "promotion 0", "relegation 0"]);
+    });
+
+    it("named as on the card, in the link preview too", () => {
+      const messages = JSON.parse(readFileSync(new URL("../../messages/en.json", import.meta.url), "utf8"));
+      const t = createTranslator({ locale: "en", messages, namespace: "Club" }) as never;
+      const tz = createTranslator({ locale: "en", messages, namespace: "Zones" }) as never;
+      const club = serieB(0, 0, 0.23, 0) as ClubOutlook;
+      assert.deepEqual(
+        clubCardChances({ club }, "en", t, tz).map((c) => `${c.label} ${c.value}`),
+        ["Promotion 0%", "Promotion play-off 23%", "Relegation 0%"],
+      );
+    });
   });
 
   it("one Monte Carlo per league and data version", () => {

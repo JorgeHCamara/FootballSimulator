@@ -53,11 +53,14 @@ export async function renderShareCard({
   outcome,
   teams,
   text,
+  crests,
 }: {
   league: LeagueConfig;
   outcome: ScenarioOutcome;
   teams: ReadonlyMap<TeamId, Team>;
   text: ShareCardText;
+  /** Each row's crest (a data URI, see crestDataUri) beside its name; without, names only. */
+  crests?: ReadonlyMap<TeamId, string>;
 }) {
   const rows = cardRows(outcome.rows);
   const legend = legendKinds(outcome.places, !league.playoff?.title);
@@ -121,7 +124,15 @@ export async function renderShareCard({
                 >
                   <span style={{ width: 6, height: rowHeight - 10, borderRadius: 3, marginRight: 12, background: row.zone ? zoneHex(row.zone.kind) : "transparent" }} />
                   <span style={{ width: 34, color: "#52525b" }}>{row.position}</span>
-                  <span style={{ flex: 1, overflow: "hidden", whiteSpace: "nowrap" }}>{truncate(teams.get(row.teamId)?.shortName ?? "", 22)}</span>
+                  {crests && (
+                    <div style={{ width: 26, height: 26, marginRight: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {crests.get(row.teamId) && (
+                        // eslint-disable-next-line @next/next/no-img-element -- next/og renders plain img elements
+                        <img src={crests.get(row.teamId)} width={26} height={26} style={{ objectFit: "contain" }} alt="" />
+                      )}
+                    </div>
+                  )}
+                  <span style={{ flex: 1, overflow: "hidden", whiteSpace: "nowrap" }}>{truncate(teams.get(row.teamId)?.shortName ?? "", crests ? 20 : 22)}</span>
                   <span style={{ width: 72, justifyContent: "flex-end", fontWeight: 800 }}>{row.points}</span>
                 </div>
               ),
@@ -164,18 +175,28 @@ export async function renderGenericShareCard({ title, subtitle, cta }: { title: 
   );
 }
 
-/** A club page's card: the club, where it stands and its headline chances. */
+/** A club page's card: the club (crest and name), where it stands and its chances. */
 export interface ClubCardText {
   pill: string;
   club: string;
+  /** Shown in a circle when there's no crest. */
+  tla: string;
+  /** The club's crest as a data URI (crestDataUri), beside its name. */
+  crest?: string;
   /** e.g. "3rd · 24 pts". */
   standing: string;
   likeliest: string;
-  /** The headline chances: name, chance and its zone's colour. */
+  /** The chances it shows (featuredChances): name, chance and its zone's colour. */
   chances: { label: string; value: string; share: number; color: string }[];
   basedOn: string;
   cta: string;
 }
+
+/** A club's name beside its crest: smaller as it gets longer, so it stays on two lines. */
+const clubNameSize = (name: string) => (name.length <= 12 ? 60 : name.length <= 18 ? 50 : name.length <= 26 ? 42 : 36);
+
+/** A chance's name: smaller as it gets longer, so "Liga dos Campeões da AFC Elite" and "… Two" both fit whole. */
+const chanceLabelSize = (label: string) => (label.length <= 24 ? 26 : label.length <= 30 ? 22 : 20);
 
 /** Club pages change with every result: the CDN keeps a card for an hour (the page's own refresh). */
 const CLUB_CARD_HEADERS = { "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400" };
@@ -195,7 +216,10 @@ export async function renderClubCard(text: ClubCardText) {
                 {text.pill}
               </span>
             </div>
-            <span style={{ fontSize: headlineSize(text.club), fontWeight: 800, lineHeight: 1.05, letterSpacing: -1.5, maxWidth: 470 }}>{truncate(text.club, 40)}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+              {crest({ name: text.club, tla: text.tla, ...(text.crest ? { crest: text.crest } : {}) }, 80)}
+              <span style={{ fontSize: clubNameSize(text.club), fontWeight: 800, lineHeight: 1.05, letterSpacing: -1.5, maxWidth: 370 }}>{truncate(text.club, 40)}</span>
+            </div>
             <span style={{ fontSize: 28, fontWeight: 600, color: "#bbf7d0" }}>{text.standing}</span>
             <div style={{ display: "flex" }}>
               <span style={{ fontSize: 24, fontWeight: 700, padding: "8px 18px", borderRadius: 12, background: "#facc15", color: PITCH_900 }}>{text.likeliest}</span>
@@ -212,8 +236,8 @@ export async function renderClubCard(text: ClubCardText) {
           <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 26, background: "#ffffff", borderRadius: 24, padding: "34px 34px", color: "#18181b", boxShadow: "0 20px 40px rgba(0,0,0,0.25)" }}>
             {text.chances.map((c) => (
               <div key={c.label} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 26, fontWeight: 700, color: "#3f3f46" }}>{truncate(c.label, 26)}</span>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16 }}>
+                  <span style={{ fontSize: chanceLabelSize(c.label), fontWeight: 700, color: "#3f3f46" }}>{truncate(c.label, 34)}</span>
                   <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: -1 }}>{c.value}</span>
                 </div>
                 <div style={{ display: "flex", height: 14, borderRadius: 7, background: "#e4e4e7" }}>
