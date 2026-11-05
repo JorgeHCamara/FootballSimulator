@@ -72,12 +72,15 @@ function preMatchModel(league: LeagueConfig, data: LeagueData, fixture: Fixture,
   return model;
 }
 
+/** A game found by its address, and where it stands: the cheap part of loadMatch (no simulation). */
+export type FoundMatch = Pick<LoadedMatch, "league" | "data" | "current" | "match" | "state" | "result">;
+
 /**
- * A game's page data. `moved` when the address names a game since moved to
- * another day (a redirect), undefined for no such game (a 404). Shared by the
- * page and its metadata within a request.
+ * The game an address names, with its state (on match day, from ESPN):
+ * `moved` for a game since moved to another day (a redirect), undefined for
+ * no such game (a 404). Shared within a request.
  */
-export const loadMatch = cache(async (leagueSlug: string, slug: string): Promise<LoadedMatch | { moved: string } | undefined> => {
+export const locateMatch = cache(async (leagueSlug: string, slug: string): Promise<FoundMatch | { moved: string } | undefined> => {
   const league = getLeagueBySlug(leagueSlug);
   if (!league || !hasClubPages(league)) return undefined;
   const current = await getLeagueData(league);
@@ -114,7 +117,19 @@ export const loadMatch = cache(async (leagueSlug: string, slug: string): Promise
     } else if (live?.off) state = "off";
     else if (live?.state === "in") state = "live";
   }
+  return { league, data, current, match, state, result };
+});
 
+/**
+ * A game's page data. `moved` when the address names a game since moved to
+ * another day (a redirect), undefined for no such game (a 404). Shared by the
+ * page and its metadata within a request.
+ */
+export const loadMatch = cache(async (leagueSlug: string, slug: string): Promise<LoadedMatch | { moved: string } | undefined> => {
+  const found = await locateMatch(leagueSlug, slug);
+  if (!found || "moved" in found) return found;
+  const { league, data, current, match, state, result } = found;
+  const { fixture } = match;
   const outlook = cachedLeagueOutlook(league, data);
   const model = preMatchModel(league, data, fixture, outlook);
   if (!model) return undefined;

@@ -1726,8 +1726,14 @@ async function step(name, fn) {
       assert.equal(impact.status(), 200);
       assert.match(impact.headers()["content-type"], /application\/json/);
       assert.equal(impact.headers()["x-robots-tag"], "noindex");
-      assert.match(impact.headers()["cache-control"], /s-maxage=600/);
-      assert.ok((await impact.json()).rows.length >= 2);
+      assert.match(impact.headers()["cache-control"], /s-maxage=10800, stale-while-revalidate=86400/);
+      const numbers = await impact.json();
+      assert.ok(numbers.rows.length >= 2);
+      // The same numbers in every language, each in its own words.
+      const other = await (await p.request.get(`${BASE_URL}${new URL(p.url()).pathname.replace(/^\/en\//, "/pt/")}/impact`)).json();
+      assert.deepEqual(other.heads.map((h) => h.score), numbers.heads.map((h) => h.score));
+      assert.deepEqual(other.rows.map((r) => r.cells.map((c) => c.change.tone)), numbers.rows.map((r) => r.cells.map((c) => c.change.tone)));
+      assert.notEqual(other.note, numbers.note);
       assert.equal((await p.request.get(`${BASE_URL}/en/premier-league/match/nobody-vs-nobody-2026-01-01/impact`)).status(), 404);
       // The dice: one of the likeliest scores, another one each roll.
       const dice = p.getByTestId("match-dice");

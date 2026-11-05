@@ -55,6 +55,12 @@ const emptyTotals = (): Totals => ({
 function accumulate(matches: readonly PlayedMatch[], teamIds: Iterable<TeamId>): Map<TeamId, Totals> {
   const totals = new Map<TeamId, Totals>();
   for (const id of teamIds) totals.set(id, emptyTotals());
+  addMatches(totals, matches);
+  return totals;
+}
+
+/** Adds the matches to the clubs' totals (a club not in `totals` is skipped). */
+function addMatches(totals: Map<TeamId, Totals>, matches: readonly PlayedMatch[]): void {
   for (const m of matches) {
     // A table can hold only some of the league's clubs (an MLS conference): a
     // match against a club outside it still counts for the club inside.
@@ -89,7 +95,6 @@ function accumulate(matches: readonly PlayedMatch[], teamIds: Iterable<TeamId>):
       }
     }
   }
-  return totals;
 }
 
 function criterionValue(criterion: Tiebreaker, overall: Totals, h2h: Totals | undefined): number {
@@ -186,6 +191,36 @@ export function sortFixtures<T extends Fixture>(fixtures: readonly T[]): T[] {
   );
 }
 
+/**
+ * The table of a split league once its split is done (see `split` in
+ * StandingsOptions), from the table at the split: what computeStandings returns
+ * then, with `table` = computeStandings of the first phase's games (without the
+ * split, nor the form column). A Monte Carlo run that has that table already
+ * passes it here instead of having it worked out again.
+ */
+export function splitStandings(teams: readonly Team[], fixtures: readonly Fixture[], results: ResultMap, options: StandingsOptions, table: readonly StandingRow[]): StandingRow[] {
+  const { afterRound, groups, separate: apart } = options.split!;
+  const plain = { ...options, split: undefined };
+  const atSplit = table.map((r) => r.teamId);
+  const later = apart ? fixtures.filter((f) => f.matchday > afterRound) : fixtures;
+  const rows: StandingRow[] = [];
+  let start = 0;
+  groups.forEach((group, i) => {
+    const members = new Set(i === groups.length - 1 ? atSplit.slice(start) : atSplit.slice(start, start + group.size));
+    start += group.size;
+    const own = teams.filter((t) => members.has(t.id));
+    const separate = apart
+      ? {
+          deductions: undefined,
+          startPoints: Object.fromEntries(table.filter((r) => members.has(r.teamId)).map((r) => [r.teamId, Math.ceil(r.points * (group.carryOver ?? 1))])),
+          fallbackOrder: atSplit,
+        }
+      : {};
+    rows.push(...computeStandings(own, later, results, { ...plain, ...separate }));
+  });
+  return rows.map((r, i) => ({ ...r, position: i + 1 }));
+}
+
 export function computeStandings(
   teams: readonly Team[],
   fixtures: readonly Fixture[],
@@ -204,26 +239,8 @@ export function computeStandings(
     const firstPhase = fixtures.filter((f) => f.matchday <= afterRound);
     const splitDone = firstPhase.length > 0 && firstPhase.every((f) => results[f.id]) && fixtures.some((f) => f.matchday > afterRound);
     if (splitDone) {
-      const plain = { ...options, split: undefined };
-      const table = computeStandings(teams, firstPhase, results, { ...plain, includeForm: false });
-      const atSplit = table.map((r) => r.teamId);
-      const later = options.split.separate ? fixtures.filter((f) => f.matchday > afterRound) : fixtures;
-      const rows: StandingRow[] = [];
-      let start = 0;
-      groups.forEach((group, i) => {
-        const members = new Set(i === groups.length - 1 ? atSplit.slice(start) : atSplit.slice(start, start + group.size));
-        start += group.size;
-        const own = teams.filter((t) => members.has(t.id));
-        const separate = options.split!.separate
-          ? {
-              deductions: undefined,
-              startPoints: Object.fromEntries(table.filter((r) => members.has(r.teamId)).map((r) => [r.teamId, Math.ceil(r.points * (group.carryOver ?? 1))])),
-              fallbackOrder: atSplit,
-            }
-          : {};
-        rows.push(...computeStandings(own, later, results, { ...plain, ...separate }));
-      });
-      return rows.map((r, i) => ({ ...r, position: i + 1 }));
+      const table = computeStandings(teams, firstPhase, results, { ...options, split: undefined, includeForm: false });
+      return splitStandings(teams, fixtures, results, options, table);
     }
   }
 
@@ -263,4 +280,72 @@ export function computeStandings(
       form: includeForm ? buildForm(teamId, chronological, results) : [],
     };
   });
+}
+
+/**
+ * computeStandings for many result sets over the same games (a Monte Carlo
+ * run): the games whose result never changes (a result in `fixed`, not in
+ * `changing`) are added up once, and each call adds only the others. Each
+ * call returns exactly what computeStandings(teams, fixtures, results,
+ * options) would, for a table without a split and without the form column;
+ * undefined for any other table (use computeStandings).
+ */
+export function standingsBuilder(
+  teams: readonly Team[],
+  fixtures: readonly Fixture[],
+  fixed: ResultMap,
+  options: StandingsOptions,
+  changing: ReadonlySet<number>,
+): ((results: ResultMap) => StandingRow[]) | undefined {
+  if (options.split || (options.includeForm ?? true)) return undefined;
+  const ids = teams.map((t) => t.id);
+  const names = new Map(teams.map((t) => [t.id, t.name]));
+  const settled: PlayedMatch[] = [];
+  const open: Fixture[] = [];
+  for (const f of fixtures) {
+    const r = fixed[f.id];
+    if (r && !changing.has(f.id)) settled.push({ matchday: f.matchday, homeId: f.homeId, awayId: f.awayId, home: r.home, away: r.away });
+    else open.push(f);
+  }
+  // The settled games' totals, with the points a club starts with and its deductions (they only add up).
+  const base = accumulate(settled, ids);
+  for (const [teamId, points] of Object.entries(options.startPoints ?? {})) {
+    const t = base.get(Number(teamId));
+    if (t) t.points += points;
+  }
+  for (const [teamId, deduction] of Object.entries(options.deductions ?? {})) {
+    const t = base.get(Number(teamId));
+    if (t) t.points -= deduction;
+  }
+  const criteria: Tiebreaker[] = options.tiebreakers[0] === "points" ? [...options.tiebreakers] : ["points", ...options.tiebreakers];
+  const fallback = options.fallbackOrder ? new Map(options.fallbackOrder.map((id, i) => [id, i])) : undefined;
+  // Head-to-head criteria need every game; the others only the totals.
+  const headToHead = criteria.some(isHeadToHead);
+  return (results) => {
+    const overall = new Map<TeamId, Totals>();
+    for (const [id, t] of base) overall.set(id, { ...t });
+    const played: PlayedMatch[] = [];
+    for (const f of open) {
+      const r = results[f.id];
+      if (r) played.push({ matchday: f.matchday, homeId: f.homeId, awayId: f.awayId, home: r.home, away: r.away });
+    }
+    addMatches(overall, played);
+    const order = rankGroup(ids, criteria, overall, headToHead ? settled.concat(played) : settled, names, fallback);
+    return order.map((teamId, index) => {
+      const t = overall.get(teamId)!;
+      return {
+        position: index + 1,
+        teamId,
+        played: t.played,
+        won: t.won,
+        drawn: t.drawn,
+        lost: t.lost,
+        goalsFor: t.goalsFor,
+        goalsAgainst: t.goalsAgainst,
+        goalDifference: t.goalsFor - t.goalsAgainst,
+        points: t.points,
+        form: [],
+      };
+    });
+  };
 }

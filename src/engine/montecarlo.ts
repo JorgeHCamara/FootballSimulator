@@ -3,7 +3,7 @@ import { seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, typ
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
 import { splitFixtures, splitGroupsFrom, type SplitGroupConfig } from "./split.ts";
-import { computeStandings, type StandingsOptions } from "./standings.ts";
+import { computeStandings, splitStandings, standingsBuilder, type StandingsOptions } from "./standings.ts";
 import type { Fixture, ResultMap, StandingRow, Team, TeamId } from "./types.ts";
 
 export interface MonteCarloInput {
@@ -69,7 +69,25 @@ export interface MonteCarloResult {
   playoffWins?: Record<TeamId, number>;
 }
 
+/** A run keeps the split's generated games for this many different groupings at most. */
+const SPLIT_GAMES_KEPT = 20_000;
+
 export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
+  return runMonteCarloVariants(input, [input.override ?? {}])[0]!;
+}
+
+/**
+ * The same simulated seasons finished several ways ("what if this game ends
+ * 2–1, 1–1 or 1–2"): each season's remaining games are drawn once, then the
+ * season is finished once per variant, its results set on top of the draws
+ * (as `override` does), into that variant's own counts. Every variant gets the
+ * full `iterations` seasons, and the draws after the remaining games (split
+ * games, play-offs) start from the same point for each, so the variants differ
+ * by their results alone. One variant is exactly runMonteCarlo with that
+ * `override`; several cost one season's draws plus a table per variant,
+ * instead of a whole run each.
+ */
+export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, variants: readonly ResultMap[]): MonteCarloResult[] {
   const { teams, fixtures, fixed, model, standings, iterations } = input;
   const byId = new Map(teams.map((t) => [t.id, t]));
   const tables = input.groups?.length
@@ -90,74 +108,120 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
     return sampler;
   };
 
-  const positionCounts: Record<TeamId, number[]> = {};
-  const pointsTotal: Record<TeamId, number> = {};
-  for (const t of teams) {
-    const size = tables.find((table) => table.includes(t))?.length ?? teams.length;
-    positionCounts[t.id] = new Array<number>(size).fill(0);
-    pointsTotal[t.id] = 0;
-  }
-
-  const tableOptions: StandingsOptions = { ...standings, includeForm: false };
-  const results: ResultMap = { ...fixed };
   const grouped = Boolean(input.groups?.length);
   const playoff = !grouped || input.playoff?.config.seedFromGroups ? input.playoff : undefined;
   const passDown = new Set(input.passDown ?? []);
-  const zonePositionCounts: Record<TeamId, number[]> = {};
-  if (passDown.size) for (const t of teams) zonePositionCounts[t.id] = new Array<number>(teams.length).fill(0);
-  const playoffReached: Record<TeamId, number[]> = {};
-  const playoffWins: Record<TeamId, number> = {};
+  // Each variant's counts.
+  const counts = variants.map(() => {
+    const positionCounts: Record<TeamId, number[]> = {};
+    const pointsTotal: Record<TeamId, number> = {};
+    const zonePositionCounts: Record<TeamId, number[]> = {};
+    for (const t of teams) {
+      const size = tables.find((table) => table.includes(t))?.length ?? teams.length;
+      positionCounts[t.id] = new Array<number>(size).fill(0);
+      pointsTotal[t.id] = 0;
+      if (passDown.size) zonePositionCounts[t.id] = new Array<number>(teams.length).fill(0);
+    }
+    return { positionCounts, pointsTotal, zonePositionCounts, playoffReached: {} as Record<TeamId, number[]>, playoffWins: {} as Record<TeamId, number> };
+  });
+
+  const tableOptions: StandingsOptions = { ...standings, includeForm: false };
+  const results: ResultMap = { ...fixed };
+  // The games a variant sets: put back to their draw before the next variant sets its own.
+  const overridden = [...new Set(variants.flatMap((v) => Object.keys(v)))].map(Number);
+  // Each table's games already played, added up once: a season adds only the rest (a split's tables: computeStandings).
+  const changing = new Set<number>([...remaining.map((r) => r.id), ...overridden]);
+  const groupOptions = tables.map((_, g) => (input.groupStandings?.[g] ? { ...input.groupStandings[g], includeForm: false } : tableOptions));
+  const builders = tables.map((group, g) => (input.project ? undefined : standingsBuilder(group, input.groupFixtures?.[g] ?? fixtures, fixed, groupOptions[g]!, changing)));
+  const splitTable = input.project ? standingsBuilder(teams, fixtures, fixed, { ...tableOptions, split: undefined }, changing) : undefined;
+  const splitGames = new Map<string, Fixture[]>();
+  // A projected split ranked straight from the table at the split: when the table's own split is this one and every
+  // first-phase game is in `fixtures` (so computeStandings's first-phase table is that same table).
+  const splitDirect = Boolean(
+    input.project &&
+      !grouped &&
+      tableOptions.split &&
+      tableOptions.split.afterRound === input.project.afterRound &&
+      fixtures.every((f) => f.matchday <= input.project!.afterRound),
+  );
   for (let i = 0; i < iterations; i++) {
     for (const r of remaining) results[r.id] = sampleScore(r.sampler, rng);
-    if (input.override) Object.assign(results, input.override);
-    let played: readonly Fixture[] = fixtures;
-    if (input.project) {
-      const { afterRound, afterDate, groups } = input.project;
-      const atSplit = computeStandings(teams, fixtures, results, { ...tableOptions, split: undefined });
-      const extra = splitFixtures(splitGroupsFrom(atSplit, groups), groups, afterRound, afterDate);
-      for (const f of extra) results[f.id] = fixed[f.id] ?? sampleScore(pairSampler(f.homeId, f.awayId), rng);
-      played = [...fixtures, ...extra];
-    }
-    const groupRows: ReturnType<typeof computeStandings>[] = [];
-    for (const [g, group] of tables.entries()) {
-      const options = input.groupStandings?.[g] ? { ...input.groupStandings[g], includeForm: false } : tableOptions;
-      const rows = computeStandings(group, input.groupFixtures?.[g] ?? played, results, options);
-      let zonePosition = 0;
-      for (const row of rows) {
-        positionCounts[row.teamId]![row.position - 1]!++;
-        pointsTotal[row.teamId]! += row.points;
-        if (passDown.size && !passDown.has(row.teamId)) zonePositionCounts[row.teamId]![zonePosition++]!++;
+    const drawn = overridden.map((id) => results[id]);
+    const at = rng.state;
+    for (const [v, variant] of variants.entries()) {
+      const count = counts[v]!;
+      if (v > 0) {
+        rng.state = at;
+        overridden.forEach((id, j) => {
+          const score = drawn[j];
+          if (score) results[id] = score;
+          else delete results[id];
+        });
       }
-      groupRows.push(rows);
-    }
-    if (playoff) {
-      const seeding = playoff.config.seedFromGroups;
-      const rows = grouped ? seedByGroupPlace(groupRows, playoff.external, seeding?.places, seeding?.interleave) : groupRows[0]!;
-      // The bracket only needs the table and knockout results (real ones come with the options).
-      const roundCount = playoff.config.rounds.length;
-      let final: PlayoffTie | undefined;
-      const played = simulatePlayoff(rows, playoff.config, {}, input.model, rng, playoff.options, (r, ties) => {
-        for (const tie of ties) {
-          for (const id of [tie.higher.teamId, tie.lower.teamId]) {
-            if (id !== null) (playoffReached[id] ??= new Array<number>(roundCount).fill(0))[r]!++;
+      Object.assign(results, variant);
+      let played: readonly Fixture[] = fixtures;
+      let splitRows: StandingRow[] | undefined;
+      if (input.project) {
+        const { afterRound, afterDate, groups } = input.project;
+        const atSplit = splitTable ? splitTable(results) : computeStandings(teams, fixtures, results, { ...tableOptions, split: undefined });
+        // Each group's games depend only on its clubs, in order: the same ones come round again and again.
+        const extra = splitGroupsFrom(atSplit, groups).flatMap((members, g) => {
+          const key = `${g}:${members.join(",")}`;
+          let games = splitGames.get(key);
+          if (!games) {
+            games = splitFixtures([members], [groups[g]!], afterRound, afterDate);
+            if (splitGames.size < SPLIT_GAMES_KEPT) splitGames.set(key, games);
           }
+          return games;
+        });
+        for (const f of extra) results[f.id] = fixed[f.id] ?? sampleScore(pairSampler(f.homeId, f.awayId), rng);
+        played = [...fixtures, ...extra];
+        // The table after the split, from the table at it (computeStandings would work that out again).
+        if (splitDirect && extra.length) splitRows = splitStandings(teams, played, results, tableOptions, atSplit);
+      }
+      const groupRows: ReturnType<typeof computeStandings>[] = [];
+      for (const [g, group] of tables.entries()) {
+        const build = builders[g];
+        const rows = splitRows ?? (build ? build(results) : computeStandings(group, input.groupFixtures?.[g] ?? played, results, groupOptions[g]!));
+        let zonePosition = 0;
+        for (const row of rows) {
+          count.positionCounts[row.teamId]![row.position - 1]!++;
+          count.pointsTotal[row.teamId]! += row.points;
+          if (passDown.size && !passDown.has(row.teamId)) count.zonePositionCounts[row.teamId]![zonePosition++]!++;
         }
-        if (r === roundCount - 1) final = ties[0];
-      });
-      const winner = final ? tieOutcome(final, played)?.winner : undefined;
-      if (winner !== undefined) playoffWins[winner] = (playoffWins[winner] ?? 0) + 1;
+        groupRows.push(rows);
+      }
+      if (playoff) {
+        const seeding = playoff.config.seedFromGroups;
+        const rows = grouped ? seedByGroupPlace(groupRows, playoff.external, seeding?.places, seeding?.interleave) : groupRows[0]!;
+        // The bracket only needs the table and knockout results (real ones come with the options).
+        const roundCount = playoff.config.rounds.length;
+        let final: PlayoffTie | undefined;
+        const played = simulatePlayoff(rows, playoff.config, {}, input.model, rng, playoff.options, (r, ties) => {
+          for (const tie of ties) {
+            for (const id of [tie.higher.teamId, tie.lower.teamId]) {
+              if (id !== null) (count.playoffReached[id] ??= new Array<number>(roundCount).fill(0))[r]!++;
+            }
+          }
+          if (r === roundCount - 1) final = ties[0];
+        });
+        const winner = final ? tieOutcome(final, played)?.winner : undefined;
+        if (winner !== undefined) count.playoffWins[winner] = (count.playoffWins[winner] ?? 0) + 1;
+      }
     }
   }
 
-  const averagePoints: Record<TeamId, number> = {};
-  for (const t of teams) averagePoints[t.id] = iterations > 0 ? pointsTotal[t.id]! / iterations : 0;
-  return {
-    iterations,
-    positionCounts,
-    averagePoints,
-    ...(passDown.size ? { zonePositionCounts } : {}),
-    ...(playoff ? { playoffReached, playoffWins } : {}),
-  };
+  return counts.map(({ positionCounts, pointsTotal, zonePositionCounts, playoffReached, playoffWins }) => {
+    const averagePoints: Record<TeamId, number> = {};
+    for (const t of teams) averagePoints[t.id] = iterations > 0 ? pointsTotal[t.id]! / iterations : 0;
+    return {
+      iterations,
+      positionCounts,
+      averagePoints,
+      ...(passDown.size ? { zonePositionCounts } : {}),
+      ...(playoff ? { playoffReached, playoffWins } : {}),
+    };
+  });
 }
 
 /**

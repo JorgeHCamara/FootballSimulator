@@ -1,7 +1,7 @@
 import type { LeagueConfig, SiteLocale, Zone, ZoneKind } from "../config/leagues.ts";
 import { mostLikelyPlaces } from "../engine/finishes.ts";
 import { expectedGoals, expectedGoalsNeutral, outcomeProbabilities } from "../engine/match.ts";
-import { runMonteCarlo, type MonteCarloInput, type MonteCarloResult } from "../engine/montecarlo.ts";
+import { runMonteCarlo, runMonteCarloVariants, type MonteCarloInput, type MonteCarloResult } from "../engine/montecarlo.ts";
 import { buildLeagueModel, type LeagueModel } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
 import { computeStandings, type StandingsOptions } from "../engine/standings.ts";
@@ -439,10 +439,12 @@ const scenarioCache = new Map<string, ResultScenarios>();
 const SCENARIO_CACHE_SIZE = 500;
 
 /**
- * Reruns the league's Monte Carlo three times with the game's result set to
- * each score: the same draws for every other game (common random numbers), so
- * the change from today's chances is the result's alone. Cached per game and
- * data version.
+ * The league's Monte Carlo with the game's result set to each score, in one
+ * simulation loop (runMonteCarloVariants): every simulated season's other
+ * games drawn once and finished three times, so each result has the full
+ * SCENARIO_ITERATIONS seasons and the same draws for every other game (common
+ * random numbers): the change from today's chances is the result's alone.
+ * Cached per game and data version.
  */
 export function resultScenarios(league: LeagueConfig, data: LeagueData, fixture: Fixture, scores: ResultScenarios["scores"]): ResultScenarios | null {
   const { version, setup } = cached(league, data);
@@ -450,8 +452,14 @@ export function resultScenarios(league: LeagueConfig, data: LeagueData, fixture:
   const key = `${league.code}:${version}:${fixture.id}:${JSON.stringify(scores)}`;
   const hit = scenarioCache.get(key);
   if (hit) return hit;
-  const pick = (score: Score) => {
-    const outlook = leagueOutlook(league, data, SCENARIO_ITERATIONS, { [fixture.id]: score }, setup)!;
+  // One simulation loop: each season's other games drawn once, then finished with each result (full iterations each).
+  const [home, draw, away] = runMonteCarloVariants({ ...setup.input, iterations: SCENARIO_ITERATIONS, seed: SCENARIO_SEED }, [
+    { [fixture.id]: scores.home },
+    { [fixture.id]: scores.draw },
+    { [fixture.id]: scores.away },
+  ]);
+  const pick = (result: MonteCarloResult) => {
+    const outlook = outlookFromRun(league, data, setup, result);
     const clubs = new Map<TeamId, ClubChances>();
     for (const id of [fixture.homeId, fixture.awayId]) {
       const club = outlook.clubs.get(id);
@@ -459,7 +467,7 @@ export function resultScenarios(league: LeagueConfig, data: LeagueData, fixture:
     }
     return clubs;
   };
-  const scenarios: ResultScenarios = { scores, after: { home: pick(scores.home), draw: pick(scores.draw), away: pick(scores.away) } };
+  const scenarios: ResultScenarios = { scores, after: { home: pick(home!), draw: pick(draw!), away: pick(away!) } };
   if (scenarioCache.size >= SCENARIO_CACHE_SIZE) scenarioCache.delete(scenarioCache.keys().next().value!);
   scenarioCache.set(key, scenarios);
   return scenarios;
