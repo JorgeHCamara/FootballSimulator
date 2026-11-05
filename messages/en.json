@@ -174,7 +174,8 @@
     "downloadImage": "Download image",
     "shareTitle": "My {league} {season} prediction",
     "shareText": "My {league} {season} prediction on Foot Simu. Simulate yours:",
-    "shareFailed": "Couldn't open the share sheet. Pick an option below."
+    "shareFailed": "Couldn't open the share sheet. Pick an option below.",
+    "matchPreview": "Match preview"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -255,7 +256,8 @@
     "step3Tournaments": "Open the Chances tab to see every club's chance of winning the tournament and, in the annual table, of the Copa Libertadores and the Sudamericana.",
     "introLiguilla": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the remaining matches: the table updates instantly with the official tiebreakers. The top 8 go to the Liguilla, played over two legs down to the final.",
     "step3Liguilla": "Open the Chances tab to see every club's chance of finishing first, of reaching the Liguilla and of winning the title.",
-    "step3Asia": "Open the Chances tab to see every team's chances of the title, the AFC Champions League Elite and relegation."
+    "step3Asia": "Open the Chances tab to see every team's chances of the title, the AFC Champions League Elite and relegation.",
+    "breadcrumb": "Breadcrumb"
   },
   "Faq": {
     "league": [

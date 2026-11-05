@@ -41,6 +41,7 @@ import { ITERATIONS, ProbabilityGrid } from "./ProbabilityGrid.tsx";
 import { PlayoffChampion } from "./PlayoffChampion.tsx";
 import { PromotedClubs } from "./PromotedClubs.tsx";
 import { StandingsTable } from "./StandingsTable.tsx";
+import { matchPath, matchSlug } from "../lib/matchSlug.ts";
 
 interface Props {
   league: LeagueConfig;
@@ -123,6 +124,15 @@ export function LeagueSimulator({
   const { setScore, applyResults, replace, reset, undo, reconcile, drop } = useSimStore.getState();
 
   const teamMap = useMemo(() => new Map(teams.map((tm) => [tm.id, tm])), [teams]);
+  // Each real league game's preview page (not a generated split game or a play-off leg: they have none).
+  const matchPage = useMemo(() => {
+    const real = new Set(fixtures.map((f) => f.id));
+    return (f: Fixture) => {
+      if (!real.has(f.id)) return undefined;
+      const slug = matchSlug(league, f, teamMap.get(f.homeId), teamMap.get(f.awayId));
+      return slug ? matchPath(league, slug) : undefined;
+    };
+  }, [fixtures, league, teamMap]);
   const real = useMemo(() => realResults(fixtures), [fixtures]);
   // Ratings come from real results only: predictions shouldn't change how good a team is.
   const model = useMemo(
@@ -693,6 +703,7 @@ export function LeagueSimulator({
             onMatchdayChange={setMatchday}
             fixtures={matchdayFixtures}
             teams={displayTeams}
+            matchPage={matchPage}
             {...(roundLabels ? { roundLabels } : {})}
             predictions={season.predictions}
             onScore={onScore}

@@ -174,7 +174,8 @@
     "downloadImage": "Baixar imagem",
     "shareTitle": "Meu palpite para {league} {season}",
     "shareText": "Meu palpite para {league} {season} no Foot Simu. Simule o seu:",
-    "shareFailed": "Não deu para abrir o compartilhamento. Escolha uma opção abaixo."
+    "shareFailed": "Não deu para abrir o compartilhamento. Escolha uma opção abaixo.",
+    "matchPreview": "Prévia"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -255,7 +256,8 @@
     "step3Tournaments": "Abra a aba Chances para ver as chances de cada clube de ganhar o torneio e, na tabela anual, de ir à Libertadores e à Sul-Americana.",
     "introLiguilla": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: a tabela é atualizada na hora com os critérios oficiais. Os 8 primeiros vão à Liguilla, disputada em ida e volta até a final.",
     "step3Liguilla": "Abra a aba Chances para ver as chances de cada clube de terminar em primeiro, de chegar à Liguilla e de ser campeão.",
-    "step3Asia": "Abra a aba Chances para ver as chances de cada time de título, Liga dos Campeões da AFC Elite e rebaixamento."
+    "step3Asia": "Abra a aba Chances para ver as chances de cada time de título, Liga dos Campeões da AFC Elite e rebaixamento.",
+    "breadcrumb": "Trilha de navegação"
   },
   "Faq": {
     "league": [

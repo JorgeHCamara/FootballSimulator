@@ -159,7 +159,7 @@ async function step(name, fn) {
       await fresh.close();
     });
 
-    await step("a game's row: only the dice and the score; the dice rolls likely scores", async () => {
+    await step("a game's row: the score, the dice and the preview link; the dice rolls likely scores", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/premier-league`);
       const fixtures = p.locator('[data-testid="fixtures"]');
@@ -171,6 +171,13 @@ async function step(name, fn) {
       assert.equal(await row.locator("[title]").count(), 0, "no tooltips in the row");
       const dice = row.getByRole("button", { name: "Simulate this match" });
       assert.equal(await row.getByRole("button").count(), 1, "the dice is the only button");
+      // Next to it, the game's preview page (a chart icon), both a full fingertip on phones.
+      const preview = row.getByRole("link", { name: "Match preview" });
+      assert.match(await preview.getAttribute("href"), /^\/en\/premier-league\/match\/[a-z0-9-]+-vs-[a-z0-9-]+-\d{4}-\d{2}-\d{2}$/);
+      assert.equal(await preview.locator('svg[data-icon="chart-column"]').count(), 1);
+      // Every game of the matchday has one (played ones too), and the dice where a score can still be entered.
+      const rows = fixtures.locator('[data-testid="match-row"]');
+      assert.equal(await fixtures.getByRole("link", { name: "Match preview" }).count(), await rows.count());
       // Rolling fills in a realistic score, a different one each time.
       const scores = [];
       const read = () => row.locator("input").evaluateAll((inputs) => inputs.map((x) => x.value).join("-"));
@@ -1731,26 +1738,72 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="match-prediction"] h2').innerText(), /^Pre-match prediction$/);
       assert.match(await p.locator("h1").innerText(), /^.+ \d+–\d+ .+: result and pre-match prediction$/);
       assert.equal(await p.getByTestId("match-impact").count(), 0);
+      // Played: no dice (it has its real score).
+      assert.equal(await p.getByTestId("match-dice").count(), 0);
+      assert.equal(await p.locator('nav[aria-label="Breadcrumb"]').count(), 1);
+      // Inside the index window: indexable.
+      assert.equal(await p.locator('meta[name="robots"][content*="noindex"]').count(), 0);
       // A game moved to another day: its old address redirects; an unknown one is a 404.
       const moved = await p.request.get(`${BASE_URL}${upcoming.replace(/\d{2}$/, (d) => String(Number(d) === 1 ? 2 : Number(d) - 1).padStart(2, "0"))}`, { maxRedirects: 0 });
       assert.equal(moved.status(), 308);
       // (`next start` sends an ISR page's redirect with the same Location twice; Playwright joins them.)
       assert.equal(new URL(moved.headers().location.split(", ")[0], BASE_URL).pathname, upcoming);
       assert.equal((await p.goto(`${BASE_URL}/en/premier-league/match/nobody-vs-noone-2026-11-08`)).status(), 404);
-      // From a club page's fixture list.
+      // The clubs' other meeting is months away: no redirect to it, a 404.
+      assert.equal((await p.goto(`${BASE_URL}${upcoming.replace(/\d{4}-\d{2}-\d{2}$/, "2027-05-20")}`)).status(), 404);
+      // Far from today (over 14 days ahead): the page loads, asking not to be indexed.
+      const leaguePage = await p.goto(`${BASE_URL}/en/premier-league`);
+      assert.equal(leaguePage.status(), 200);
+      // The last matchday: far ahead.
+      const matchdays = p.getByTestId("matchday-select");
+      if (await matchdays.count()) {
+        const last = await matchdays.locator("option").last().getAttribute("value");
+        await matchdays.selectOption(last);
+      }
+      const farHref = await p.locator('[data-testid="fixtures"]').getByRole("link", { name: "Match preview" }).last().getAttribute("href");
+      const far = await p.goto(`${BASE_URL}${farHref}`);
+      assert.equal(far.status(), 200);
+      assert.match(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex,\s*follow/);
+      assert.ok(!sitemap.includes(`https://footsimu.com${farHref}<`), "not in the sitemap");
+      // Breadcrumb label in Portuguese and Spanish.
+      await p.goto(`${BASE_URL}${upcoming.replace(/^\/en/, "/pt")}`);
+      assert.equal(await p.locator('nav[aria-label="Trilha de navegação"]').count(), 1);
+      await p.goto(`${BASE_URL}${upcoming.replace(/^\/en/, "/es")}`);
+      assert.equal(await p.locator('nav[aria-label="Ruta de navegación"]').count(), 1);
+      // From a club page's fixture list: only games inside the window are links; the rest are plain text.
       const club = sitemap.match(/https:\/\/footsimu\.com(\/en\/premier-league\/team\/[a-z0-9-]+)/)[1];
       await p.goto(`${BASE_URL}${club}`);
-      assert.match(await p.locator('[data-testid="club-fixture"] [data-testid="club-match-link"]').first().getAttribute("href"), /^\/en\/premier-league\/match\/[a-z0-9-]+-vs-[a-z0-9-]+-\d{4}-\d{2}-\d{2}$/);
+      const clubLinks = await p.locator('[data-testid="club-fixture"] [data-testid="club-match-link"]').evaluateAll((links) => links.map((a) => a.getAttribute("href")));
+      assert.ok(clubLinks.length > 0);
+      for (const href of clubLinks) {
+        assert.match(href, /^\/en\/premier-league\/match\/[a-z0-9-]+-vs-[a-z0-9-]+-\d{4}-\d{2}-\d{2}$/);
+        assert.ok(sitemap.includes(`https://footsimu.com${href}<`), `${href} is in the window (the sitemap's)`);
+      }
+      assert.ok((await p.getByTestId("club-fixture").count()) > clubLinks.length, "later games are plain text");
       await p.close();
-      // Phones: nothing past the screen's edge (element edges: a phone viewport widens to fit its content).
-      for (const width of [320, 390]) {
+      // Phones: nothing past the screen's edge (element edges: a phone viewport widens to fit its content);
+      // each result's column headed by one line (the winner's crest and the score).
+      for (const width of [320, 360, 390]) {
         const ctx = await browser.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true });
         const m = await ctx.newPage();
         await m.goto(`${BASE_URL}${upcoming}`);
         const right = await m.evaluate(() => Math.max(...[...document.querySelectorAll("body *")].map((e) => e.getBoundingClientRect().right)));
         assert.ok(right <= width + 0.5, `${width}px: content reaches ${right}px`);
+        const heads = await m.getByTestId("match-impact-head").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
+        assert.equal(heads.length, 3);
+        for (const h of heads) assert.ok(h <= 20, `${width}px: a result's header is one line (${h}px)`);
         await ctx.close();
       }
+      // The league page's fixture rows on a phone: the preview link and the dice, 44px each, apart.
+      const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+      const m = await ctx.newPage();
+      await m.goto(`${BASE_URL}/en/premier-league`);
+      const row = m.locator('[data-testid="match-row"]').filter({ has: m.locator('svg[data-icon="dices"]') }).first();
+      await row.waitFor();
+      const boxes = await Promise.all([row.getByRole("link", { name: "Match preview" }).boundingBox(), row.getByRole("button", { name: "Simulate this match" }).boundingBox()]);
+      for (const box of boxes) assert.ok(box.width >= 44 && box.height >= 44, `tap target ${box.width}×${box.height}`);
+      assert.ok(boxes[0].x + boxes[0].width <= boxes[1].x, "side by side, not overlapping");
+      await ctx.close();
     });
 
     await step("unknown league returns 404", async () => {

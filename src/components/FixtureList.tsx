@@ -49,10 +49,12 @@ interface Props {
   note?: string;
   /** Names of rounds that aren't plain matchdays (a split's groups: "Championship play-offs 3"). */
   roundLabels?: Record<number, string>;
+  /** Each game's preview page (odds, likely scores, what each result means), when it has one. */
+  matchPage?: (fixture: Fixture) => string | undefined;
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels, matchPage } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -113,6 +115,7 @@ export function FixtureList(props: Props) {
               onSimulate={() => onSimulate(f)}
               // Places standing in for clubs not known yet: nothing to predict.
               disabled={isSlotTeamId(f.homeId)}
+              {...(matchPage?.(f) ? { preview: matchPage(f)! } : {})}
             />
           ))}
         </ul>
@@ -361,6 +364,8 @@ interface RowProps {
   winner?: TeamId | null;
   /** The dice sits in the date line instead of its own line below (cup cards). */
   inlineDice?: boolean;
+  /** The game's preview page: a chart button next to the dice. */
+  preview?: string;
   fixture: Fixture;
   home: Team;
   away: Team;
@@ -377,6 +382,10 @@ function parseGoals(text: string): number | null {
   return Number(text);
 }
 
+/** A row's icon buttons (preview, dice): 44px on phones, 32px from tablets up. */
+const actionButton =
+  "flex h-11 w-11 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 sm:h-8 sm:w-8 dark:hover:bg-zinc-800 dark:hover:text-zinc-100";
+
 /** A club's short name, linking to its own page when it has one. */
 function TeamName({ team }: { team: Team }) {
   return team.page ? (
@@ -388,7 +397,7 @@ function TeamName({ team }: { team: Team }) {
   );
 }
 
-export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false, preview }: RowProps) {
   const side = (id: TeamId) => (winner == null ? "" : winner === id ? "font-bold" : "opacity-60");
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
@@ -494,16 +503,24 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
           {tags?.away && <Tag label={tags.away} />}
         </span>
       </div>
-      {showInputs && !disabled && !inlineDice && (
-        <div className="mt-1 flex justify-end">
-          <button
-            type="button"
-            onClick={onSimulate}
-            aria-label={t("simulateMatch")}
-            className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-          >
-            <Icon name="dices" size={18} />
-          </button>
+      {/* The game's actions: its preview page, then the dice. A full fingertip each on phones, smaller from tablets up. */}
+      {(preview || (showInputs && !disabled && !inlineDice)) && (
+        <div className="mt-1 flex justify-end gap-2" data-testid="match-actions">
+          {preview && (
+            <Link
+              href={preview}
+              aria-label={t("matchPreview")}
+              className={actionButton}
+              data-testid="match-preview-link"
+            >
+              <Icon name="chart-column" size={18} />
+            </Link>
+          )}
+          {showInputs && !disabled && !inlineDice && (
+            <button type="button" onClick={onSimulate} aria-label={t("simulateMatch")} className={actionButton} data-testid="match-dice-button">
+              <Icon name="dices" size={18} />
+            </button>
+          )}
         </div>
       )}
     </li>

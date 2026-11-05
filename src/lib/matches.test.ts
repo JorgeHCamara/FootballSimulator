@@ -7,7 +7,7 @@ import type { Fixture, Team } from "../engine/types.ts";
 import { cachedLeagueOutlook, dataAsOf, dataVersion, leagueOutlook, outlookSetup, resultScenarios } from "./clubOutlook.ts";
 import { withClubPages } from "./clubs.ts";
 import type { LeagueData } from "./leagueData.ts";
-import { findMatch, leagueMatches, localDate, matchesBetween, matchSlug, slugDate } from "./matches.ts";
+import { findMatch, inIndexWindow, leagueMatches, localDate, matchesBetween, matchSlug, MOVED_WITHIN_DAYS, slugDate } from "./matches.ts";
 import { impactRows, isMatchDay, resultScores } from "./matchPreview.ts";
 import { addSnapshots, completedRounds, pendingRounds, snapshotAfter, type OddsSnapshot } from "./snapshots.ts";
 
@@ -42,9 +42,24 @@ describe("match page addresses", () => {
     // The same game, three days off (it was moved): the nearest game of the same clubs.
     const old = m.slug.replace(/\d{4}-\d{2}-\d{2}$/, localDate(new Date(Date.parse(next.utcDate) - 3 * 86_400_000).toISOString(), "Europe/London"));
     assert.equal((findMatch(pl, data, old) as { moved: typeof m }).moved, m);
+    // Only a game within three weeks of the address's date: any other date is no game, not the clubs' other meeting.
+    const shifted = (days: number) => m.slug.replace(/\d{4}-\d{2}-\d{2}$/, localDate(new Date(Date.parse(next.utcDate) + days * 86_400_000).toISOString(), "Europe/London"));
+    assert.equal(MOVED_WITHIN_DAYS, 21);
+    assert.equal((findMatch(pl, data, shifted(21)) as { moved: typeof m }).moved, m);
+    assert.equal((findMatch(pl, data, shifted(-21)) as { moved: typeof m }).moved, m);
+    assert.equal(findMatch(pl, data, shifted(22)), undefined);
+    assert.equal(findMatch(pl, data, `${m.slug.slice(0, -10)}2027-05-20`), undefined);
     assert.equal(findMatch(pl, data, "arsenal-vs-nobody-2026-11-08"), undefined);
     assert.equal(findMatch(pl, data, "arsenal-vs-chelsea"), undefined);
     assert.equal(slugDate(m.slug), Date.parse(`${m.slug.slice(-10)}T12:00:00Z`));
+  });
+
+  it("the index window: 30 days back, 14 ahead", () => {
+    const now = Date.parse("2026-11-05T12:00:00Z");
+    assert.equal(inIndexWindow("2026-10-06T12:00:00Z", now), true);
+    assert.equal(inIndexWindow("2026-10-06T11:59:00Z", now), false);
+    assert.equal(inIndexWindow("2026-11-19T12:00:00Z", now), true);
+    assert.equal(inIndexWindow("2026-11-19T12:01:00Z", now), false);
   });
 
   it("the sitemap's window: games between two times", () => {

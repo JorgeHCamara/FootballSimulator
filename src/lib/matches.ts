@@ -1,7 +1,7 @@
-import { leagueTimeZone } from "../config/timezones.ts";
 import type { LeagueConfig } from "../config/leagues.ts";
 import type { Fixture, Team } from "../engine/types.ts";
 import { dataVersion } from "./clubOutlook.ts";
+import { localDate, matchPath, matchSlug } from "./matchSlug.ts";
 import type { LeagueData } from "./leagueData.ts";
 
 /** A league game with a page: both clubs have one. */
@@ -15,19 +15,27 @@ export interface MatchRef {
   path: string;
 }
 
-/** A day as "2026-11-08" in a time zone. */
-export const localDate = (iso: string, timeZone: string) =>
-  new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(iso));
-
-/** A game's page address, or undefined when a club has no page (a play-off slot). */
-export function matchSlug(league: Pick<LeagueConfig, "code">, fixture: Fixture, home: Team | undefined, away: Team | undefined): string | undefined {
-  if (!home?.slug || !away?.slug) return undefined;
-  return `${home.slug}-vs-${away.slug}-${localDate(fixture.utcDate, leagueTimeZone(league.code))}`;
-}
-
-export const matchPath = (league: Pick<LeagueConfig, "slug">, slug: string) => `/${league.slug}/match/${slug}`;
+export { localDate, matchPath, matchSlug };
 
 const DATE_SUFFIX = /^(.+)-(\d{4}-\d{2}-\d{2})$/;
+
+const DAY = 86_400_000;
+/**
+ * The games search engines are pointed at: kicking off from this many days
+ * ago to this many ahead. They're in the sitemap, indexable, and linked from
+ * the club and league pages; other games' pages load but ask not to be indexed.
+ */
+export const INDEX_PAST_DAYS = 30;
+export const INDEX_NEXT_DAYS = 14;
+
+/** Is a game (by its kick-off) inside the window search engines are pointed at? */
+export const inIndexWindow = (utcDate: string, now = Date.now()) => {
+  const time = Date.parse(utcDate);
+  return time >= now - INDEX_PAST_DAYS * DAY && time <= now + INDEX_NEXT_DAYS * DAY;
+};
+
+/** An old address redirects to the same clubs' game only when that game is at most this many days from the address's date. */
+export const MOVED_WITHIN_DAYS = 21;
 
 const indexes = new Map<string, { version: string; matches: MatchRef[]; bySlug: Map<string, MatchRef> }>();
 
@@ -63,8 +71,9 @@ function index(league: LeagueConfig, data: LeagueData) {
 
 /**
  * The game a page address names. A game moved to another day keeps its old
- * address working: the same clubs' game nearest that day is returned as
- * `moved`, for a permanent redirect.
+ * address working: the same clubs' game nearest that day, if it's within
+ * MOVED_WITHIN_DAYS, is returned as `moved`, for a permanent redirect. Any
+ * other date is no game (a 404), not the clubs' other meeting months away.
  */
 export function findMatch(league: LeagueConfig, data: LeagueData, slug: string): { match: MatchRef } | { moved: MatchRef } | undefined {
   const { matches, bySlug } = index(league, data);
@@ -76,8 +85,11 @@ export function findMatch(league: LeagueConfig, data: LeagueData, slug: string):
   const day = Date.parse(`${date}T12:00:00Z`);
   const candidates = matches.filter((m) => m.slug.startsWith(`${pairing}-`) && DATE_SUFFIX.exec(m.slug)?.[1] === pairing);
   if (!candidates.length || !Number.isFinite(day)) return undefined;
-  const nearest = candidates.sort((a, b) => Math.abs(Date.parse(a.fixture.utcDate) - day) - Math.abs(Date.parse(b.fixture.utcDate) - day))[0]!;
-  return { moved: nearest };
+  const distance = (m: MatchRef) => Math.abs(Date.parse(m.fixture.utcDate) - day);
+  const nearest = candidates.sort((a, b) => distance(a) - distance(b))[0]!;
+  // Within the limit by calendar day: the address's date against the game's own (local) one.
+  const days = Math.abs(Date.parse(`${DATE_SUFFIX.exec(nearest.slug)![2]}T12:00:00Z`) - day) / DAY;
+  return days <= MOVED_WITHIN_DAYS ? { moved: nearest } : undefined;
 }
 
 /** The date an address names, at noon UTC ("…-2026-11-08"), or NaN. */
@@ -86,10 +98,11 @@ export const slugDate = (slug: string) => {
   return parts ? Date.parse(`${parts[2]}T12:00:00Z`) : NaN;
 };
 
-/** Games kicking off between two times (the sitemap's window: the past 30 days and the next 14). */
+/** Games kicking off between two times (the sitemap's: see inIndexWindow). */
 export function matchesBetween(league: LeagueConfig, data: LeagueData, from: number, to: number): MatchRef[] {
   return leagueMatches(league, data).filter((m) => {
     const time = Date.parse(m.fixture.utcDate);
     return time >= from && time <= to;
   });
 }
+

@@ -14,6 +14,7 @@ import { Link } from "../../../../../i18n/navigation.ts";
 import type { ClubOutlook } from "../../../../../lib/clubOutlook.ts";
 import { ordinal, percent } from "../../../../../lib/clubText.ts";
 import { impactRows, loadMatch, matchScenarios, type ImpactRow, type LoadedMatch } from "../../../../../lib/matchPreview.ts";
+import { inIndexWindow } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
 
 /**
@@ -70,6 +71,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title,
     description,
     alternates: alternates(locale, path),
+    // Games far from today (over 30 days ago, over 14 ahead): the page loads, search engines are pointed at the current ones.
+    ...(inIndexWindow(loaded.match.fixture.utcDate) ? {} : { robots: { index: false, follow: true } }),
     // The card comes from the opengraph-image and twitter-image files next to this page.
     openGraph: { type: "website", siteName: SITE_NAME, title, description, url: `/${locale}${path}`, locale: OG_LOCALE[locale] },
     twitter: { card: "summary_large_image", title, description },
@@ -191,8 +194,9 @@ export default async function MatchPage({ params }: { params: Params }) {
 
   // A change in a chance, in points, coloured by whether it's good for that club.
   const delta = (row: ImpactRow, value: number) => {
-    const diff = row.kind === "position" ? value - row.now : (value - row.now) * 100;
-    const size = row.kind === "position" ? Math.round(Math.abs(diff) * 10) / 10 : Math.round(Math.abs(diff));
+    // From the figures shown (whole points, places to one decimal), so "1% → 2%" reads "+1".
+    const diff = row.kind === "position" ? (Math.round(value * 10) - Math.round(row.now * 10)) / 10 : Math.round(value * 100) - Math.round(row.now * 100);
+    const size = Math.abs(diff);
     if (size === 0) return <span className="text-[11px] text-zinc-400">±0</span>;
     const better = row.kind === "relegation" || row.kind === "position" ? diff < 0 : diff > 0;
     const sign = diff > 0 ? "+" : "−";
@@ -218,6 +222,9 @@ export default async function MatchPage({ params }: { params: Params }) {
             name: `${home.name} vs ${away.name}`,
             sport: "Soccer",
             startDate: fixture.utcDate,
+            // schema.org's statuses are about scheduling: a game played as planned stays
+            // EventScheduled ("taking place or has taken place on the startDate as
+            // scheduled"); there is no completed status.
             eventStatus: state === "off" ? "https://schema.org/EventPostponed" : "https://schema.org/EventScheduled",
             url: pageUrl,
             inLanguage: HREFLANG[locale],
@@ -243,7 +250,7 @@ export default async function MatchPage({ params }: { params: Params }) {
         ]}
       />
 
-      <nav aria-label="Breadcrumb" className="flex min-w-0 items-center text-xs text-zinc-500">
+      <nav aria-label={seo("breadcrumb")} className="flex min-w-0 items-center text-xs text-zinc-500">
         <Link href="/" className="shrink-0 hover:underline">
           {seo("breadcrumbHome")}
         </Link>
@@ -330,7 +337,7 @@ export default async function MatchPage({ params }: { params: Params }) {
             </div>
           ))}
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className={`grid gap-3 ${played ? "" : "md:grid-cols-2"}`}>
           <div className={card}>
             <h3 className="text-sm font-semibold">{t("xgTitle")}</h3>
             <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3" data-testid="match-xg">
@@ -353,17 +360,20 @@ export default async function MatchPage({ params }: { params: Params }) {
               ))}
             </ol>
           </div>
-          <div className={`${card} flex flex-col gap-3`}>
-            <h3 className="text-sm font-semibold">{t("diceTitle")}</h3>
-            <MatchDice
-              xg={xg}
-              rho={loaded.model.rho ?? 0}
-              home={home.shortName}
-              away={away.shortName}
-              labels={{ button: t("diceButton"), again: t("diceAgain"), result: t("diceResult", { score: "{score}" }) }}
-            />
-            <p className="text-xs text-zinc-500">{t("diceNote")}</p>
-          </div>
+          {/* The dice: for a game still to play (a played one has its real score). */}
+          {!played && (
+            <div className={`${card} flex flex-col gap-3`}>
+              <h3 className="text-sm font-semibold">{t("diceTitle")}</h3>
+              <MatchDice
+                xg={xg}
+                rho={loaded.model.rho ?? 0}
+                home={home.shortName}
+                away={away.shortName}
+                labels={{ button: t("diceButton"), again: t("diceAgain"), result: t("diceResult", { score: "{score}" }) }}
+              />
+              <p className="text-xs text-zinc-500">{t("diceNote")}</p>
+            </div>
+          )}
         </div>
         <p className="text-xs text-zinc-500">{t(played ? "preMatchNote" : "predictionNote")}</p>
       </section>
@@ -374,15 +384,28 @@ export default async function MatchPage({ params }: { params: Params }) {
           <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
             <div className="grid grid-cols-4 gap-1 border-b border-zinc-200 bg-zinc-100 px-3 py-2 text-[11px] font-semibold leading-tight text-zinc-600 sm:text-xs dark:border-zinc-800 dark:bg-zinc-800/60 dark:text-zinc-300">
               <span>{t("impactNow")}</span>
-              <span>
-                {t("impactHome", { team: home.shortName })} <span className="font-normal tabular-nums">{scoreText(scenarios.scores.home)}</span>
-              </span>
-              <span>
-                {t("impactDraw")} <span className="font-normal tabular-nums">{scoreText(scenarios.scores.draw)}</span>
-              </span>
-              <span>
-                {t("impactAway", { team: away.shortName })} <span className="font-normal tabular-nums">{scoreText(scenarios.scores.away)}</span>
-              </span>
+              {/* Phones: each result as the winner's crest and its score; the full label from tablets up (and for screen readers). */}
+              {(
+                [
+                  ["home", t("impactHome", { team: home.shortName }), home],
+                  ["draw", t("impactDraw"), null],
+                  ["away", t("impactAway", { team: away.shortName }), away],
+                ] as const
+              ).map(([k, label, team]) => (
+                <span key={k} className="flex min-w-0 flex-wrap items-center gap-x-1" data-testid="match-impact-head">
+                  {team ? (
+                    <>
+                      <span className="sm:hidden" aria-hidden>
+                        <TeamBadge team={team} size={16} />
+                      </span>
+                      <span className="sr-only sm:not-sr-only">{label}</span>
+                    </>
+                  ) : (
+                    <span>{label}</span>
+                  )}
+                  <span className="font-normal tabular-nums">{scoreText(scenarios.scores[k])}</span>
+                </span>
+              ))}
             </div>
             <ul className="divide-y divide-zinc-200/70 dark:divide-zinc-800">
               {impacts.map((row) => (

@@ -174,7 +174,8 @@
     "downloadImage": "Descargar imagen",
     "shareTitle": "Mi pronóstico de {league} {season}",
     "shareText": "Mi pronóstico de {league} {season} en Foot Simu. Simula el tuyo:",
-    "shareFailed": "No se pudo abrir el menú para compartir. Elige una opción abajo."
+    "shareFailed": "No se pudo abrir el menú para compartir. Elige una opción abajo.",
+    "matchPreview": "Previa"
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -255,7 +256,8 @@
     "step3Tournaments": "Abre la pestaña Probabilidades para ver las opciones de cada club de ganar el torneo y, en la tabla anual, de ir a la Copa Libertadores y a la Sudamericana.",
     "introLiguilla": "Usa el {simulator} para predecir el resto de la {league} {season} ({aka}). Escribe tus marcadores o simula los partidos restantes: la tabla se actualiza al instante con los criterios oficiales. Los 8 primeros van a la Liguilla, a ida y vuelta hasta la final.",
     "step3Liguilla": "Abre la pestaña Probabilidades para ver las opciones de cada club de terminar primero, de llegar a la Liguilla y de ser campeón.",
-    "step3Asia": "Abre la pestaña Probabilidades para ver las opciones de cada equipo de título, Liga de Campeones de la AFC Élite y descenso."
+    "step3Asia": "Abre la pestaña Probabilidades para ver las opciones de cada equipo de título, Liga de Campeones de la AFC Élite y descenso.",
+    "breadcrumb": "Ruta de navegación"
   },
   "Faq": {
     "league": [

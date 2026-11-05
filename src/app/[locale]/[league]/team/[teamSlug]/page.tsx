@@ -13,7 +13,7 @@ import { Link } from "../../../../../i18n/navigation.ts";
 import { mustWinGames, toughestGames, type ClubFixture } from "../../../../../lib/clubOutlook.ts";
 import { clubDescription, clubHeading, loadClub } from "../../../../../lib/clubPage.ts";
 import { listOf, ordinal, percent, placeRange } from "../../../../../lib/clubText.ts";
-import { matchPath, matchSlug } from "../../../../../lib/matches.ts";
+import { inIndexWindow, matchPath, matchSlug } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
 
 /** Regenerated in the background at most every hour, like the league pages (the league data is refreshed hourly). */
@@ -160,8 +160,10 @@ export default async function ClubPage({ params }: { params: Params }) {
       </div>
     </div>
   );
-  // Each game's own preview page (odds, likely scores, what each result means).
+  // Each game's own preview page (odds, likely scores, what each result means),
+  // linked only inside the window search engines are pointed at (the rest are plain text).
   const preview = (f: ClubFixture) => {
+    if (!inIndexWindow(f.fixture.utcDate)) return undefined;
     const slug = matchSlug(league, f.fixture, teams.get(f.fixture.homeId), teams.get(f.fixture.awayId));
     return slug ? matchPath(league, slug) : undefined;
   };
@@ -214,7 +216,7 @@ export default async function ClubPage({ params }: { params: Params }) {
         ]}
       />
 
-      <nav aria-label="Breadcrumb" className="flex min-w-0 items-center text-xs text-zinc-500">
+      <nav aria-label={seo("breadcrumb")} className="flex min-w-0 items-center text-xs text-zinc-500">
         <Link href="/" className="shrink-0 hover:underline">
           {seo("breadcrumbHome")}
         </Link>

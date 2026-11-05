@@ -249,7 +249,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
         ]}
       />
 
-      <nav aria-label="Breadcrumb" className="text-xs text-zinc-500">
+      <nav aria-label={seo("breadcrumb")} className="text-xs text-zinc-500">
         <Link href="/" className="hover:underline">
           {seo("breadcrumbHome")}
         </Link>
