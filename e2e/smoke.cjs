@@ -1203,6 +1203,8 @@ async function step(name, fn) {
       // Kept after a reload.
       await p.reload();
       await gsl.first().waitFor();
+      // The saved choice is restored once the page has hydrated.
+      await p.waitForFunction(() => document.querySelectorAll('[data-testid="group-switch"] button')[1]?.getAttribute("aria-pressed") === "true", null, { timeout: 15_000 }).catch(() => {});
       assert.equal(await gsl.nth(1).getAttribute("aria-pressed"), "true", "the play-offs show first once known");
       assert.ok((await rowTexts()).every((r) => playedOf(r) === 6));
       await p.close();
@@ -1818,6 +1820,42 @@ async function step(name, fn) {
       const boxes = await Promise.all([row.getByRole("link", { name: "Match preview" }).boundingBox(), row.getByRole("button", { name: "Simulate this match" }).boundingBox()]);
       for (const box of boxes) assert.ok(box.width >= 44 && box.height >= 44, `tap target ${box.width}×${box.height}`);
       assert.ok(boxes[0].x + boxes[0].width <= boxes[1].x, "side by side, not overlapping");
+      await ctx.close();
+    });
+
+    await step("projected final table: one club per place, round by round, the round picker, fits a phone", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      const section = p.getByTestId("projected");
+      assert.equal(await section.locator("h2").innerText(), "Projected final table");
+      const places = async () => (await section.locator('[data-testid="projected-table"] tbody tr td:first-child').allInnerTexts()).map(Number);
+      assert.deepEqual(await places(), Array.from({ length: 20 }, (_, i) => i + 1));
+      // Every club links to its page.
+      assert.equal(await section.locator('[data-testid="projected-row"] a[href^="/en/premier-league/team/"]').count(), 20);
+      // Round by round: a column per round, a row per club, every round's places 1–20 once each.
+      const grid = section.getByTestId("projected-grid");
+      const columns = await grid.locator("thead th button").count();
+      assert.ok(columns > 1, `${columns} rounds`);
+      assert.equal(await grid.locator("tbody tr").count(), 20);
+      const first = (await grid.locator("tbody tr").evaluateAll((rows) => rows.map((r) => r.querySelectorAll("td")[0].textContent))).map(Number).sort((a, b) => a - b);
+      assert.deepEqual(first, Array.from({ length: 20 }, (_, i) => i + 1));
+      // The picker: the latest first; back a round, and a round from the grid.
+      const select = section.getByTestId("projected-round");
+      assert.equal(await select.inputValue(), String(columns - 1));
+      assert.ok(await section.getByTestId("projected-next").isDisabled());
+      await section.getByTestId("projected-previous").click();
+      assert.equal(await select.inputValue(), String(columns - 2));
+      await grid.locator("thead th button").first().click();
+      assert.equal(await select.inputValue(), "0");
+      assert.ok(await section.getByTestId("projected-previous").isDisabled());
+      assert.deepEqual((await places()).sort((a, b) => a - b), Array.from({ length: 20 }, (_, i) => i + 1));
+      await p.close();
+      // Phones: the page doesn't scroll sideways (the grid scrolls inside its box).
+      const ctx = await browser.newContext({ viewport: { width: 360, height: 760 }, isMobile: true, hasTouch: true });
+      const phone = await ctx.newPage();
+      await phone.goto(`${BASE_URL}/pt/premier-league`);
+      assert.equal(await phone.getByTestId("projected").locator("h2").innerText(), "Classificação final projetada");
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 360, "no sideways scroll at 360px");
       await ctx.close();
     });
 

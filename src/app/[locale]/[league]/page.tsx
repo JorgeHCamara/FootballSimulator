@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { CupSimulator } from "../../../components/CupSimulator.tsx";
 import { LeagueFactsSection } from "../../../components/LeagueFactsSection.tsx";
+import { ProjectedSection } from "../../../components/ProjectedSection.tsx";
 import { Faq } from "../../../components/Faq.tsx";
 import { Flag } from "../../../components/Flag.tsx";
 import { JsonLd } from "../../../components/JsonLd.tsx";
@@ -314,6 +315,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(loaded.data.firstPhaseIds ? { firstPhaseIds: loaded.data.firstPhaseIds } : {})}
         />
       )}
+
+      {loaded.kind === "league" && hasClubPages(loaded.config) && <ProjectedSection league={loaded.config} data={loaded.data} locale={locale as SiteLocale} />}
 
       {loaded.kind === "league" && <LeagueFactsSection league={loaded.config} locale={locale as SiteLocale} />}
 

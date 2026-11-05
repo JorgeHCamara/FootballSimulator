@@ -1015,5 +1015,30 @@
       "aclElite": "ACL Elite"
     },
     "descriptionFirst": "{league} {season}: as chances de {topics} de cada clube após a {round}, em {count} temporadas simuladas. {leader} lidera a {race} com {leaderPct}."
+  },
+  "Projected": {
+    "title": "Classificação final projetada",
+    "titleAnnual": "Tabela anual projetada",
+    "intro": "A classificação final mais provável em {count} temporadas simuladas a partir dos resultados reais até agora, com cada clube numa posição só sua. Atualizada após cada rodada: escolha uma para ver como estava.",
+    "latestPlayed": "Atual · {n} jogos disputados",
+    "latestShort": "Agora",
+    "previous": "Rodada anterior",
+    "next": "Próxima rodada",
+    "pick": "Projeção após",
+    "place": "#",
+    "club": "Clube",
+    "table": "Tabela",
+    "tableTitle": "Posição na tabela naquele momento",
+    "points": "Pts",
+    "pointsTitle": "Média de pontos finais nas temporadas simuladas",
+    "chance": "Chance",
+    "chanceTitle": "Chance de terminar exatamente nessa posição",
+    "change": "+/−",
+    "changeTitle": "Posições ganhas ou perdidas desde a rodada anterior",
+    "up": "Subiu {n}",
+    "down": "Caiu {n}",
+    "same": "Sem mudança",
+    "historyTitle": "Rodada a rodada",
+    "historyNote": "A posição de cada clube na classificação final projetada após cada rodada. Toque numa rodada para ver a tabela dela."
   }
 }

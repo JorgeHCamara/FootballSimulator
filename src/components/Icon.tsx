@@ -49,7 +49,9 @@ import type { SVGProps } from "react";
 type IconNode = readonly (readonly [string, Readonly<Record<string, string>>])[];
 
 const ICONS = {
+  "arrow-down": [["path", {"d": "M12 5v14"}], ["path", {"d": "m19 12-7 7-7-7"}]],
   "arrow-right": [["path", {"d": "M5 12h14"}], ["path", {"d": "m12 5 7 7-7 7"}]],
+  "arrow-up": [["path", {"d": "m5 12 7-7 7 7"}], ["path", {"d": "M12 19V5"}]],
   "calendar-days": [["path", {"d": "M8 2v3"}], ["path", {"d": "M16 2v3"}], ["rect", {"x": "3", "y": "3", "width": "18", "height": "18", "rx": "2"}], ["path", {"d": "M3 9h18"}], ["path", {"d": "M8 13h.01"}], ["path", {"d": "M12 13h.01"}], ["path", {"d": "M16 13h.01"}], ["path", {"d": "M8 17h.01"}], ["path", {"d": "M12 17h.01"}], ["path", {"d": "M16 17h.01"}]],
   "chart-column": [["path", {"d": "M3 3v16a2 2 0 0 0 2 2h16"}], ["path", {"d": "M18 17V9"}], ["path", {"d": "M13 17V5"}], ["path", {"d": "M8 17v-3"}]],
   "check": [["path", {"d": "M20 6 9 17l-5-5"}]],

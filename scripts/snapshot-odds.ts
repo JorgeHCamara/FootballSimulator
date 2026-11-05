@@ -8,6 +8,7 @@
 //   npm run snapshots -- PL BSA       only these
 //   npm run snapshots -- --dry-run    print, write nothing
 //   npm run snapshots -- --backfill   also every earlier completed round of the season not stored yet
+//   npm run snapshots -- --projected  add each club's projected place to the season's stored rounds that lack it
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -21,6 +22,7 @@ const DIR = join(dirname(fileURLToPath(import.meta.url)), "../src/data/snapshots
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const backfill = args.includes("--backfill");
+const projectedOnly = args.includes("--projected");
 const only = args.filter((a) => !a.startsWith("--"));
 
 // Real data only: never snapshot the generated sample leagues.
@@ -54,6 +56,27 @@ for (const league of LEAGUES.filter((l) => hasClubPages(l) && (!only.length || o
       continue;
     }
     const file = await read(league.code);
+    if (projectedOnly) {
+      const season = file?.seasons[data.seasonKey];
+      const todo = season?.snapshots.filter((x) => Object.values(x.teams).some((t) => t.projected === undefined)) ?? [];
+      let differ = 0;
+      for (const stored of todo) {
+        // The same run again (same data up to the same moment, same seed): only the projected places are taken from it.
+        const again = snapshotAfter(league, data, stored.round, new Date(Date.parse(stored.asOf) - 60_000).toISOString(), new Date(stored.takenAt), stored.iterations);
+        if (!again) continue;
+        for (const [id, team] of Object.entries(stored.teams)) {
+          const fresh = again.teams[id];
+          if (!fresh) continue;
+          if (JSON.stringify(fresh.chances) !== JSON.stringify(team.chances)) differ++;
+          team.projected = fresh.projected!;
+          team.projectedChance = fresh.projectedChance!;
+        }
+      }
+      console.log(`${league.code} ${data.season}: projected places added to ${todo.length} round(s)${differ ? ` (${differ} club rows' chances differ from the stored ones)` : ""}`);
+      added += todo.length;
+      if (!dryRun && todo.length && file) await writeFile(join(DIR, `${league.code}.json`), format(file));
+      continue;
+    }
     const completed = completedRounds(data.fixtures);
     const from = backfill ? backfillFrom(league, data) : undefined;
     const pending = backfill ? missingRounds(file, data.seasonKey, completed).filter((r) => !from || r.lastKickoff >= from) : pendingRounds(file, data.seasonKey, completed);

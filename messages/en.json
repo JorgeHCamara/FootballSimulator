@@ -1014,5 +1014,30 @@
       "aclElite": "ACL Elite"
     },
     "descriptionFirst": "{league} {season}: every club's {topics} chances after {round}, from {count} simulated seasons. {leader} lead the {race} at {leaderPct}."
+  },
+  "Projected": {
+    "title": "Projected final table",
+    "titleAnnual": "Projected annual table",
+    "intro": "The most likely final table from {count} simulated seasons of the real results so far, with every club in a place of its own. It's updated after every round: pick one to see how it looked then.",
+    "latestPlayed": "Latest · {n} games played",
+    "latestShort": "Now",
+    "previous": "Previous round",
+    "next": "Next round",
+    "pick": "Projection after",
+    "place": "#",
+    "club": "Club",
+    "table": "Table",
+    "tableTitle": "Its place in the table at the time",
+    "points": "Pts",
+    "pointsTitle": "Average final points in the simulated seasons",
+    "chance": "Chance",
+    "chanceTitle": "Chance of finishing in exactly that place",
+    "change": "+/−",
+    "changeTitle": "Places gained or lost since the round before",
+    "up": "Up {n}",
+    "down": "Down {n}",
+    "same": "No change",
+    "historyTitle": "Round by round",
+    "historyNote": "Each club's place in the projected final table after every round. Tap a round to see its table."
   }
 }

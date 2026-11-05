@@ -24,6 +24,9 @@ export interface TeamSnapshot {
   averagePoints: number;
   /** Chance of each place the league's config lists, by zone kind ("title" when the table decides it). */
   chances: Partial<Record<ZoneKind, number>>;
+  /** Its place in the most likely final table (one club per place, see mostLikelyPlaces), and its chance of that place. */
+  projected?: number;
+  projectedChance?: number;
 }
 
 export interface OddsSnapshot {
@@ -109,6 +112,8 @@ export function snapshotAfter(league: LeagueConfig, data: LeagueData, round: num
       expectedPosition: round4(club.expectedPosition),
       averagePoints: round4(club.averagePoints),
       chances: Object.fromEntries(club.zones.map((z) => [z.kind, round4(z.chance)])),
+      projected: club.likeliest.position,
+      projectedChance: round4(club.likeliest.chance),
     };
   }
   return {
