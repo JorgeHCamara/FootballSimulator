@@ -1681,6 +1681,17 @@ async function step(name, fn) {
       await m.close();
     });
 
+    await step("MLS club pages: every club's page answers 200 in every language, all requested at once", async () => {
+      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const paths = [...new Set([...sitemap.matchAll(/<loc>https:\/\/footsimu\.com\/en(\/mls\/team\/[a-z0-9-]+)<\/loc>/g)].map((m) => m[1]))];
+      assert.equal(paths.length, 30, "every MLS club");
+      // A crawl: every club page in every language at the same moment.
+      const statuses = await Promise.all(
+        paths.flatMap((path) => ["en", "pt", "es"].map(async (locale) => [`/${locale}${path}`, (await page.request.get(`${BASE_URL}/${locale}${path}`)).status()])),
+      );
+      for (const [path, status] of statuses) assert.equal(status, 200, path);
+    });
+
     await step("match pages: odds, scores, dice, what each result means, played games, SEO, card, redirects, sitemap", async () => {
       const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
       const urls = [...sitemap.matchAll(/<loc>https:\/\/footsimu\.com(\/en\/premier-league\/match\/[a-z0-9-]+)<\/loc>/g)].map((m) => m[1]);

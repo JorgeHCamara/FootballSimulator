@@ -18,6 +18,12 @@ import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../.
 
 /** Regenerated in the background at most every hour, like the league pages (the league data is refreshed hourly). */
 export const revalidate = 3600;
+/**
+ * Room for a cold render (the league's data from ESPN, its conferences retried,
+ * the shared outlook worked out) when many club pages are visited at once,
+ * as the match pages have.
+ */
+export const maxDuration = 60;
 
 type Params = Promise<{ locale: string; league: string; teamSlug: string }>;
 

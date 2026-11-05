@@ -13,22 +13,31 @@ Every item also has to meet these:
 - The dice simulator keeps its dice-roll feel: likely rolls only, no percentages.
 - The share card has no Chance column.
 - The privacy, about and contact pages, `ads.txt` and the AdSense code are not
-  touched (the site is under AdSense review); no new ad slots.
+  touched (the site is under AdSense review); no new ad slots (except item 12's
+  placeholders, behind a flag that is off by default).
 
 Item 0 (setting up this file and the workflow) came first, on `roadmap/0-setup`.
+
+Since the growth reorder of 5 November 2026, odds and model tuning is paused:
+reliability (item 5) comes next, then growth, engagement and monetisation
+(items 6–12). Items 13–14 are backlog (accuracy polish), only after items 5–12.
 
 | # | Item | Status | Branch |
 |---|---|---|---|
 | 1 | Match impact cache key and skeleton | done | `roadmap/1-impact-cache` |
 | 2 | Club page Likely finish range | done | `roadmap/2-likely-finish-range` |
 | 3 | Rating noise: offline tune | done | `roadmap/3-rating-noise-tune` |
-| 4 | Rating noise: live (gated on item 3) | in-pr | `roadmap/4-rating-noise-live` |
-| 5 | Snapshot integrity | todo | `roadmap/5-snapshot-integrity` |
-| 6 | Play-offs and MLS Cup on club pages | todo | `roadmap/6-club-playoffs` |
-| 7 | Neutral venues | todo | `roadmap/7-neutral-venues` |
-| 8 | PL and EFL tiebreakers | todo | `roadmap/8-pl-efl-tiebreakers` |
-| 9 | Quiz with historical data | todo | `roadmap/9-quiz-historical` |
-| 10 | Prediction league | todo | `roadmap/10-prediction-league` |
+| 4 | Rating noise: live (gated on item 3) | done | `roadmap/4-rating-noise-live` |
+| 5 | Club page reliability: MLS 500s and consistent odds | in-pr | `roadmap/5-club-page-reliability` |
+| 6 | Snapshot integrity | todo | `roadmap/6-snapshot-integrity` |
+| 7 | Play-offs and MLS Cup on club pages | todo | `roadmap/7-club-playoffs` |
+| 8 | Quiz with historical data | todo | `roadmap/8-quiz-historical` |
+| 9 | Prediction league | todo | `roadmap/9-prediction-league` |
+| 10 | Shareable content: club outlook and biggest movers cards | todo | `roadmap/10-shareable-content` |
+| 11 | SEO: programmatic chance landing pages | todo | `roadmap/11-seo-chance-pages` |
+| 12 | Ad-slot readiness (placeholders behind a flag) | todo | `roadmap/12-ad-slot-readiness` |
+| 13 | Neutral venues (backlog) | todo | `roadmap/13-neutral-venues` |
+| 14 | PL and EFL tiebreakers (backlog) | todo | `roadmap/14-pl-efl-tiebreakers` |
 
 ## 1. Match impact cache key and skeleton
 
@@ -103,7 +112,7 @@ offline only; the live default stays off.
 **Goal:** turn the chosen sd and k on for the season outlook, only if item 3
 confirmed the selection rule (the chosen pair beats no-noise pooled RPS and
 holds in at least 3 seasons). Otherwise this item is **cancelled**: no code PR,
-this file is marked so, and work goes on with item 5.
+this file is marked so, and work goes on with item 5 (club page reliability).
 
 **Acceptance:**
 
@@ -123,11 +132,46 @@ this file is marked so, and work goes on with item 5.
   dice and match probabilities.
 - The PR body reports before/after title, top-4 (or league equivalent) and
   relegation odds for the Premier League, Brasileirão and MLS on today's data.
-- The Championship (ELC) snapshot rebuilt if item 5 hasn't landed, or
-  coordinated so item 5 isn't blocked.
+- The Championship (ELC) snapshot rebuilt if item 6 (snapshot integrity)
+  hasn't landed, or coordinated so item 6 isn't blocked.
 - PR: "[Roadmap 4] Rating noise live".
 
-## 5. Snapshot integrity
+## 5. Club page reliability: MLS 500s and consistent odds
+
+**Goal:** no more intermittent HTTP 500s on MLS club pages, and every club page
+of a league shows odds from the same shared outlook as the league page (each
+outcome's chances add up across the clubs to its number of places).
+
+Found live on 5 November 2026: under a concurrent crawl 11 of the 30 MLS club
+pages returned 500 (fine when warm), and the chances summed across
+independently cached club pages came to 102.07% for the Championship title,
+205.12% for its automatic promotion and 213.58% for Bundesliga relegation.
+
+**Acceptance:**
+
+- The league page and every club page (and their opengraph/twitter images)
+  read one shared, durable outlook per league + data version + `SIM_VERSION`
+  (`unstable_cache` or equivalent, with a tag such as `league:<CODE>-outlook`),
+  not only the in-process Map.
+- When a league's data / outlook is rebuilt, its league page and every club
+  page are revalidated together (`revalidateTag` / `revalidatePath`), so no
+  two pages show different simulations for the same matchday.
+- MLS club pages hardened: `maxDuration = 60` on the club page (and its image
+  routes); ESPN's conference groups retried, or degraded cleanly, instead of a
+  bare 500; real odds once the groups load. All 30 MLS club slugs answer 200 in
+  EN (and not 500 in PT/ES).
+- A regression test that each outcome's chances summed across a league's clubs
+  match its places within ±0.5 points (title ~100, ELC automatic promotion
+  ~200, BL1 direct relegation ~200…), and an e2e check that every MLS club page
+  answers 200.
+- This file follows the growth reorder of 5 November 2026: items 0–4 done;
+  5 this item; 6 snapshot integrity; 7 play-offs and MLS Cup on club pages;
+  8 quiz; 9 prediction league; 10 shareable content; 11 SEO chance pages;
+  12 ad-slot readiness; 13–14 backlog (neutral venues, PL/EFL tiebreakers),
+  with their branches and cross-references; items 0–4's scope unchanged.
+- PR: "[Roadmap 5] Club page reliability: MLS 500s and consistent odds".
+
+## 6. Snapshot integrity
 
 **Goal:** the Championship's stale snapshot is rebuilt, and a check makes sure
 the live engine still reproduces every league's latest stored snapshot.
@@ -135,7 +179,8 @@ the live engine still reproduces every league's latest stored snapshot.
 **Acceptance:**
 
 - `src/data/snapshots/ELC.json` rebuilt with the current engine (the odds
-  snapshot script's path) and committed.
+  snapshot script's path) and committed; skipped if it already matches within
+  the epsilon after item 4 (which rebuilt it). The drift check is added either way.
 - A unit or CI check that, for every league file in `src/data/snapshots`, the
   live engine reproduces the latest stored snapshot's headline chances (title /
   top places / relegation / projected place as applicable), failing on drift
@@ -143,7 +188,7 @@ the live engine still reproduces every league's latest stored snapshot.
 - A short README note on refreshing one league's snapshot and what the drift
   check means.
 - No dice, match page, ads or AdSense changes.
-- PR: "[Roadmap 5] Snapshot integrity".
+- PR: "[Roadmap 6] Snapshot integrity".
 
 Since item 4: the Championship's snapshots were rebuilt with the rating-noise
 model (`npm run snapshots -- ELC --rebuild`), and every snapshot carries the
@@ -151,7 +196,7 @@ model it was taken with (`modelVersion`; none: model "1"). The drift check can
 only reproduce a snapshot of today's model (`SIM_VERSION`); a league whose
 latest snapshot is older is checked once its next round is taken (or rebuilt).
 
-## 6. Play-offs and MLS Cup on club pages
+## 7. Play-offs and MLS Cup on club pages
 
 **Goal:** club pages show the chance of promotion through the play-offs and of
 winning the MLS Cup (or a title play-off), from the Monte Carlo's play-off
@@ -166,48 +211,9 @@ winners, not only of finishing in the play-off places.
 - The brackets already in `src/config/leagues.ts` reused (EFL play-offs, MLS
   Cup, Série B…); no new bracket formats.
 - Unit tests for the Championship, Série B and MLS club outlooks.
-- PR: "[Roadmap 6] Play-offs and MLS Cup on club pages".
+- PR: "[Roadmap 7] Play-offs and MLS Cup on club pages".
 
-## 7. Neutral venues
-
-**Goal:** the season Monte Carlo honours neutral venues (no home advantage),
-from ESPN's `neutralSite` or the venue itself.
-
-**Acceptance:**
-
-- `runMonteCarlo` uses `expectedGoalsNeutral` for `fixture.neutral` games in the
-  precomputed samplers, the rating-noise path and the split's pair samplers.
-- ESPN events set `neutral` from `competitions[0].neutralSite` when present; if
-  not, the venue is compared with the home club's usual ground (its most common
-  home venue this season) and a clear difference marks it neutral. Config /
-  `cups.ts` / play-off round venue or neutral flags stay the source of truth
-  when set.
-- Unit tests: a neutral fixture in the Monte Carlo matches `expectedGoalsNeutral`
-  rates; the ESPN and venue-heuristic cases.
-- PR: "[Roadmap 7] Neutral venues".
-
-## 8. PL and EFL tiebreakers
-
-**Goal:** the Premier League keeps its 2025/26 statistical order and adds the
-deciding play-off for meaningful ties; the EFL follows Regulation 9.
-
-**Acceptance:**
-
-- Premier League 2025/26: points, goal difference, goals scored, head-to-head
-  points, head-to-head away goals; if still level where the place decides the
-  title, a European place or relegation, a one-off play-off at a neutral venue
-  (sources cited in code comments: premierleague.com/en/news/58905 and NBC
-  Sports' 2026 tiebreaker explainer).
-- EFL 2025/26 Regulation 9: points, goal difference, goals scored, head-to-head
-  (points, goal difference, goals), wins, away goals, penalty points, then a
-  deciding match where the place decides the championship, promotion,
-  relegation or play-off entry (source: the EFL regulations PDF). If penalty
-  points aren't available from ESPN, the order stops before that step (with a
-  comment why) and the deciding match follows where the place matters.
-- Tests covering the head-to-head and deciding-match paths; the dice unchanged.
-- PR: "[Roadmap 8] PL and EFL tiebreakers".
-
-## 9. Quiz with historical data
+## 8. Quiz with historical data
 
 **Goal:** a first `/quiz` page (EN/PT/ES) mixing past-winner trivia with
 live-model "who is likelier" questions, for traffic and return visits.
@@ -227,12 +233,12 @@ live-model "who is likelier" questions, for traffic and return visits.
 - No dice changes, no new ad slots, no privacy/about/contact, `ads.txt` or
   AdSense changes.
 - Unit tests for picking the questions and scoring.
-- PR: "[Roadmap 9] Quiz with historical data".
+- PR: "[Roadmap 8] Quiz with historical data".
 
-## 10. Prediction league
+## 9. Prediction league
 
 **Goal:** a light weekly 1X2 prediction league with leaderboards, for
-retention, next to the match previews and the quiz; no payments.
+retention, next to the match previews and the quiz (item 8); no payments.
 
 **Acceptance:**
 
@@ -248,4 +254,118 @@ retention, next to the match previews and the quiz; no payments.
 - Optional: whether the model agreed with the pick after the game, with no
   percentages on the dice and no Chance column on share cards.
 - No privacy/about/contact, `ads.txt` or AdSense changes.
-- PR: "[Roadmap 10] Prediction league".
+- PR: "[Roadmap 9] Prediction league".
+
+## 10. Shareable content: club outlook and biggest movers cards
+
+**Goal:** a dedicated "biggest movers" share card for each odds report, and an
+obvious one-tap share of the club outlook on club pages (EN/PT/ES), for social
+growth. No Chance column.
+
+**Acceptance:**
+
+- A 1200×630 biggest-movers image per league odds report (beside the existing
+  report card): the top risers and fallers for title / promotion / relegation
+  from the report's movers, in EN/PT/ES, reusing the share-card fonts, brand
+  mark and crests; cached by the report's round.
+- Every club page exposes the share menu with the club's opengraph image,
+  working on touch and desktop; optionally a slimmer highlight card (likely
+  finish range and one or two headline chances), still with no Chance column.
+- Entry points from the report's "Biggest risers and fallers" section and the
+  club page's header/actions; Lucide icons only in the UI.
+- New routes in the sitemap only if they are indexable pages; image files stay
+  as today.
+- Unit tests for the movers-card selection (top N by size of change, stable
+  ties).
+- PR: "[Roadmap 10] Shareable content: club outlook and biggest movers cards".
+
+## 11. SEO: programmatic chance landing pages
+
+**Goal:** EN/PT/ES landing pages that answer single search intents (a league's
+title or relegation odds, a club's title / relegation / promotion / play-off
+chances), with an FAQ and links to the live league and club pages. Reads the
+shared outlook (item 5); no new model maths.
+
+**Acceptance:**
+
+- A maintainable pattern, e.g. `/[locale]/[league]/chances/title` and
+  `/relegation`, and per club `/[locale]/[league]/team/[teamSlug]/chances/…`
+  only for the outcomes the league has. Each: an H1 for the query, a short
+  explainer, the live chance table or the club's headline chances, an FAQ with
+  `faqJsonLd`, and links to the simulator and the club page.
+- EN/PT/ES messages; Lucide only; mobile and desktop.
+- The URLs in the sitemap, with canonical and `hreflang` from the existing
+  helpers.
+- No AdSense slots in this PR.
+- Tests for the route helpers and FAQ text; a smoke check that a sample PL
+  title page and a club relegation page render.
+- PR: "[Roadmap 11] SEO chance landing pages".
+
+## 12. Ad-slot readiness (placeholders behind a flag)
+
+**Goal:** reserve responsive ad placements on the busiest templates so turning
+display ads on later doesn't shift the layout (CLS), as disabled placeholders
+behind a feature flag. `ads.txt` and the existing AdSense script are not
+touched (the site is under AdSense review).
+
+**Acceptance:**
+
+- A presentational `AdSlot` with fixed reservations for common sizes
+  (responsive in-content ~300×250 / fluid, a mobile anchor or desktop rail);
+  an "Ad" label only with a debug flag.
+- Real ads only behind an explicit flag (e.g. `NEXT_PUBLIC_ADS_SLOTS=1`), off by
+  default; when off, the reserved empty box or nothing (the choice documented);
+  when on, only the placeholder's own `<ins>`, with the client id helper from
+  `src/lib/site.ts` unchanged.
+- One or two reserved slots on high-traffic templates (below the fold on the
+  league and club pages, or after the standings / outlook), with no layout
+  jump on mobile or desktop when the flag flips on.
+- Unit tests: flag off, no `adsbygoogle` push or new script tags; flag on, the
+  slot with its reserved height. No privacy/about/contact changes.
+- PR: "[Roadmap 12] Ad-slot readiness".
+
+This item is the one exception to "no new ad slots" below: placeholders only,
+behind a flag that is off by default.
+
+## 13. Neutral venues (backlog)
+
+**Backlog** (accuracy polish: only after items 5–12).
+
+**Goal:** the season Monte Carlo honours neutral venues (no home advantage),
+from ESPN's `neutralSite` or the venue itself.
+
+**Acceptance:**
+
+- `runMonteCarlo` uses `expectedGoalsNeutral` for `fixture.neutral` games in the
+  precomputed samplers, the rating-noise path and the split's pair samplers.
+- ESPN events set `neutral` from `competitions[0].neutralSite` when present; if
+  not, the venue is compared with the home club's usual ground (its most common
+  home venue this season) and a clear difference marks it neutral. Config /
+  `cups.ts` / play-off round venue or neutral flags stay the source of truth
+  when set.
+- Unit tests: a neutral fixture in the Monte Carlo matches `expectedGoalsNeutral`
+  rates; the ESPN and venue-heuristic cases.
+- PR: "[Roadmap 13] Neutral venues".
+
+## 14. PL and EFL tiebreakers (backlog)
+
+**Backlog** (accuracy polish: only after items 5–13).
+
+**Goal:** the Premier League keeps its 2025/26 statistical order and adds the
+deciding play-off for meaningful ties; the EFL follows Regulation 9.
+
+**Acceptance:**
+
+- Premier League 2025/26: points, goal difference, goals scored, head-to-head
+  points, head-to-head away goals; if still level where the place decides the
+  title, a European place or relegation, a one-off play-off at a neutral venue
+  (sources cited in code comments: premierleague.com/en/news/58905 and NBC
+  Sports' 2026 tiebreaker explainer).
+- EFL 2025/26 Regulation 9: points, goal difference, goals scored, head-to-head
+  (points, goal difference, goals), wins, away goals, penalty points, then a
+  deciding match where the place decides the championship, promotion,
+  relegation or play-off entry (source: the EFL regulations PDF). If penalty
+  points aren't available from ESPN, the order stops before that step (with a
+  comment why) and the deciding match follows where the place matters.
+- Tests covering the head-to-head and deciding-match paths; the dice unchanged.
+- PR: "[Roadmap 14] PL and EFL tiebreakers".

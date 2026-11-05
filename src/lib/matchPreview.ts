@@ -4,7 +4,8 @@ import { leagueTimeZone } from "../config/timezones.ts";
 import { expectedGoals, expectedGoalsNeutral, likelyScores, outcomeProbabilities, scoreMatrix, MAX_SCORE, type ExpectedGoals, type OutcomeProbabilities } from "../engine/match.ts";
 import type { LeagueModel } from "../engine/ratings.ts";
 import type { Fixture, Score, TeamId } from "../engine/types.ts";
-import { cachedLeagueOutlook, dataAsOf, outlookSetup, type ClubChances, type ClubOutlook, type HeadlineKind, type LeagueOutlook, type ResultScenarios } from "./clubOutlook.ts";
+import { dataAsOf, outlookSetup, type ClubChances, type ClubOutlook, type HeadlineKind, type LeagueOutlook, type ResultScenarios } from "./clubOutlook.ts";
+import { sharedLeagueOutlook } from "./sharedOutlook.ts";
 import { hasClubPages } from "./clubs.ts";
 import { fetchEspnGameState } from "./espn.ts";
 import { getLeagueData, getPastSeasonData, type LeagueData } from "./leagueData.ts";
@@ -134,7 +135,7 @@ export const loadMatch = cache(async (leagueSlug: string, slug: string): Promise
   if (!found || "moved" in found) return found;
   const { league, data, current, match, state, result } = found;
   const { fixture } = match;
-  const outlook = cachedLeagueOutlook(league, data);
+  const outlook = await sharedLeagueOutlook(league, data);
   const model = preMatchModel(league, data, fixture, outlook?.model ?? null);
   if (!model) return undefined;
   const xg = gameXg(model, fixture);

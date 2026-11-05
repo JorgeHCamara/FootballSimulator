@@ -1,10 +1,11 @@
 import { getLeagueBySlug, LEAGUES, type LeagueConfig, type SiteLocale, type ZoneKind } from "../config/leagues.ts";
 import type { Team } from "../engine/types.ts";
-import { cachedLeagueOutlook, featuredChances, type ClubOutlook, type HeadlineChance, type LeagueOutlook } from "./clubOutlook.ts";
+import { featuredChances, type ClubOutlook, type HeadlineChance, type LeagueOutlook } from "./clubOutlook.ts";
 import { hasClubPages } from "./clubs.ts";
 import { listOf, percent } from "./clubText.ts";
 import { getLeagueData, type LeagueData } from "./leagueData.ts";
 import { INDEX_NEXT_DAYS, INDEX_PAST_DAYS, matchesBetween } from "./matches.ts";
+import { sharedLeagueOutlook } from "./sharedOutlook.ts";
 
 export interface LoadedClub {
   league: LeagueConfig;
@@ -17,8 +18,9 @@ export interface LoadedClub {
 }
 
 /**
- * A club's page data: its league, the league's outlook and its own. Undefined
- * for an unknown league or club (a 404).
+ * A club's page data: its league, the league's outlook (the shared one: every
+ * club page of the league, and the league page, read the same simulated
+ * seasons) and its own. Undefined for an unknown league or club (a 404).
  */
 export async function loadClub(leagueSlug: string, teamSlug: string): Promise<LoadedClub | undefined> {
   const league = getLeagueBySlug(leagueSlug);
@@ -26,7 +28,7 @@ export async function loadClub(leagueSlug: string, teamSlug: string): Promise<Lo
   const data = await getLeagueData(league);
   const team = data.teams.find((t) => t.slug === teamSlug);
   if (!team) return undefined;
-  const outlook = cachedLeagueOutlook(league, data);
+  const outlook = await sharedLeagueOutlook(league, data);
   const club = outlook?.clubs.get(team.id);
   if (!outlook || !club) return undefined;
   const season = data.tournaments ? (data.season.split(" ").at(-1) ?? data.season) : data.season;

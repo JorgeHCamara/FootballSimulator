@@ -431,6 +431,21 @@ export function cachedLeagueOutlook(league: LeagueConfig, data: LeagueData): Lea
   return cached(league, data).outlook;
 }
 
+/** This server's outlook for the league's data as it stands, if it has worked it out (or been given it) already. */
+export function peekLeagueOutlook(league: LeagueConfig, data: LeagueData): { outlook: LeagueOutlook | null } | undefined {
+  const hit = cache.get(league.code);
+  return hit && hit.version === dataVersion(data) ? { outlook: hit.outlook } : undefined;
+}
+
+/**
+ * Keep an outlook worked out elsewhere (the shared one, src/lib/sharedOutlook.ts)
+ * as this server's for the league's data, so cachedLeagueOutlook and the match
+ * pages' results read the same numbers.
+ */
+export function primeLeagueOutlook(league: LeagueConfig, data: LeagueData, setup: OutlookSetup | null, outlook: LeagueOutlook | null) {
+  cache.set(league.code, { version: dataVersion(data), setup, outlook });
+}
+
 /** What a club's page would say after a result: its chances and average place. */
 export type ClubChances = Pick<ClubOutlook, "zones" | "headline" | "expectedPosition">;
 

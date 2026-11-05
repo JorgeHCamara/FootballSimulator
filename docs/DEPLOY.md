@@ -33,6 +33,7 @@ In **Settings → Environment Variables**, add these for *Production* and *Previ
 | `FOOTBALL_DATA_API_KEY` | Your free key from https://www.football-data.org/client/register. Optional: the fallback source when ESPN's public feed (the main source) fails. |
 | `NEXT_PUBLIC_SITE_URL` | `https://footsimu.com` |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Added in step 7 |
+| `REVALIDATE_TOKEN` | Optional: a long random string (e.g. `openssl rand -hex 32`). With it, and the same value as the GitHub repository secret `REVALIDATE_TOKEN`, a scheduled job refreshes a league's page and all its club pages together when new results come in (see "Shared outlook" in the README). Production only. |
 
 Redeploy after changing variables: **Deployments → … → Redeploy**.
 

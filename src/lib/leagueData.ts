@@ -1,3 +1,5 @@
+// The file itself (".js"): these modules also run outside Next (scripts, tests), whose Node needs the extension.
+import { unstable_cache } from "next/cache.js";
 import { gamesPerTeam, isStage, type EspnStages, type LeagueConfig } from "../config/leagues.ts";
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
@@ -142,16 +144,17 @@ export function currentSeasonYear(league: LeagueConfig, now = new Date()): numbe
  * Until at least half of a new season's fixtures are published, the previous
  * season is shown.
  */
-async function loadEspn(league: LeagueConfig, years?: readonly number[]): Promise<LeagueData> {
+async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh = false): Promise<LeagueData> {
   const { slug, seasons, weeklyRounds } = league.espn;
-  const init = { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
+  // `fresh`: straight from ESPN, past the data cache (see freshLeagueData).
+  const init: RequestInit = fresh ? { cache: "no-store" } : { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
   const perTeam = gamesPerTeam(league);
   const current = currentSeasonYear(league);
   for (const year of years ?? [current, current - 1]) {
     let all = await fetchEspnSeason(slug, year, seasons, init);
     // Optional groups (a split later in the season): one table until they exist.
     const groups = league.groups
-      ? await loadEspnGroups(league, year, init).catch((error) => {
+      ? await keptEspnGroups(league, year, init, fresh).catch((error) => {
           if (league.groupsOptional) return undefined;
           throw error;
         })
@@ -241,6 +244,38 @@ async function loadEspn(league: LeagueConfig, years?: readonly number[]): Promis
     };
   }
   throw new Error(`No ${league.code} fixtures on ESPN for ${(years ?? [current, current - 1]).join(" or ")}`);
+}
+
+/** A flaky ESPN call, tried up to three times (0.4s, then 1.2s apart). */
+export async function withRetry<T>(load: () => Promise<T>, delays: readonly number[] = [400, 1200]): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await load();
+    } catch (error) {
+      if (attempt >= delays.length) throw error;
+      await new Promise((resolve) => setTimeout(resolve, delays[attempt]));
+    }
+  }
+}
+
+/** Outside a Next.js server or build (scripts, tests) there is no data cache. */
+const noDataCache = (error: unknown) => error instanceof Error && error.message.includes("incrementalCache missing");
+
+/**
+ * The league's groups (MLS conferences: its pages need them), retried, and kept
+ * in the data cache an hour at a time: when ESPN's standings fail (busy, a
+ * rate limit), the last groups it gave stand instead of failing every page of
+ * the league. A fresh load (freshLeagueData) asks ESPN itself.
+ */
+async function keptEspnGroups(league: LeagueConfig, year: number, init: RequestInit, fresh: boolean) {
+  const load = () => withRetry(() => loadEspnGroups(league, year, init));
+  if (fresh) return load();
+  try {
+    return await unstable_cache(load, ["espn-groups", league.code, String(year)], { tags: [`league:${league.code}`], revalidate: REVALIDATE_SECONDS })();
+  } catch (error) {
+    if (noDataCache(error)) return load();
+    throw error;
+  }
 }
 
 /** The league's groups (conferences) with their clubs, matched to the config by ESPN's group names. */
@@ -333,6 +368,23 @@ async function withXg(league: LeagueConfig, data: LeagueData): Promise<LeagueDat
   const xg: Record<number, readonly [number, number]> = {};
   for (const f of games) if (f.result && stored[f.id]) xg[f.id] = stored[f.id]!;
   return Object.keys(xg).length ? { ...data, xg } : data;
+}
+
+/**
+ * The league's current data straight from ESPN, past the data cache (and
+ * this server's in-flight requests): what the revalidation route
+ * (src/app/api/revalidate/leagues) compares the cached copy with. Undefined
+ * when ESPN fails; the cached copy itself with sample data.
+ */
+export async function freshLeagueData(league: LeagueConfig): Promise<LeagueData | undefined> {
+  if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return getLeagueData(league);
+  try {
+    const data = await loadEspn(league, undefined, true);
+    return await withXg(league, { ...data, teams: withClubPages(league, data.teams) });
+  } catch (error) {
+    console.warn(`${league.code}: no fresh ESPN data:`, error);
+    return undefined;
+  }
 }
 
 const pastInflight = new Map<string, Promise<LeagueData | undefined>>();
