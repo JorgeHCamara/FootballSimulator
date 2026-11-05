@@ -212,8 +212,8 @@ export function CupRounds(props: RoundsProps) {
         <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} teams={props.teams} />
       ) : (
         <div className="space-y-3">
-          {/* Equal rows: every card in the round is as tall as the tallest (e.g. one with penalties). */}
-          <div className="grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-3" data-testid="round-grid">
+          {/* Equal rows: every card in the round is as tall as the tallest (e.g. one with penalties). Two per row at most, so the clubs' names fit. */}
+          <div className="grid auto-rows-fr gap-3 lg:grid-cols-2" data-testid="round-grid">
             {round.ties.map((tie) => (
               <TieCard key={tie.game.id} tie={tie} {...props} />
             ))}
