@@ -137,3 +137,81 @@ export function metrics(rows: readonly Scored[]): Metrics {
   return { clubs: rows.length, brier, rps, mae: mean(rows.map((r) => Math.abs(r.expected - r.final))), calibration, calibrationError };
 }
 
+/** A rating-noise run: its key in the results, its spread and its fade constant. */
+export interface NoiseConfig {
+  key: string;
+  sd: number;
+  k: number;
+}
+
+/**
+ * The runs for these spreads and fade constants: no noise once ("0"), and
+ * every spread above 0 with every k, keyed "sd" with a single k (as before)
+ * or "sd/k" for a grid of several.
+ */
+export function noiseConfigs(sds: readonly number[], ks: readonly number[]): NoiseConfig[] {
+  const out: NoiseConfig[] = [];
+  for (const sd of sds) {
+    if (sd === 0) {
+      if (!out.some((c) => c.key === "0")) out.push({ key: "0", sd: 0, k: ks[0] ?? 18 });
+      continue;
+    }
+    for (const k of ks) out.push({ key: ks.length > 1 ? `${sd}/${k}` : String(sd), sd, k });
+  }
+  return out;
+}
+
+/** A run's scores over the seasons pooled: overall and per checkpoint. */
+export interface PooledScores {
+  all: Metrics;
+  byCheckpoint: Record<string, Metrics>;
+}
+
+/** How a run fares against no noise under the selection rule. */
+export interface Candidate {
+  key: string;
+  rps: number;
+  /** Its worst calibration error minus no noise's, over the checkpoints. */
+  worstCalibrationGap: number;
+  /** Its title Brier against no noise's, as a share (0.01 = 1% worse). */
+  titleBrierChange: number;
+  /** Lower RPS than no noise, no checkpoint's calibration error worse by more than the margin, the title Brier within its margin. */
+  eligible: boolean;
+}
+
+/** The selection rule's margins: calibration error per checkpoint (absolute), title Brier (a share). */
+export const NOISE_RULE = { calibrationMargin: 0.002, titleMargin: 0.01 } as const;
+
+/**
+ * The selection rule for rating noise: the run with the best (lowest) pooled
+ * RPS, as long as its calibration error is no worse than no noise's at any
+ * checkpoint by more than `calibrationMargin` and its title Brier is no
+ * worse by more than `titleMargin` (a share) pooled, and its RPS beats no
+ * noise's. `chosen` is undefined when no run meets it (keep noise off).
+ */
+export function chooseNoise(
+  runs: Record<string, PooledScores>,
+  base = "0",
+  { calibrationMargin = NOISE_RULE.calibrationMargin, titleMargin = NOISE_RULE.titleMargin }: { calibrationMargin?: number; titleMargin?: number } = {},
+): { chosen?: string; runnerUp?: string; candidates: Candidate[] } {
+  const none = runs[base];
+  if (!none) throw new Error(`no "${base}" run to compare with`);
+  const candidates = Object.entries(runs)
+    .filter(([key]) => key !== base)
+    .map(([key, r]): Candidate => {
+      const worstCalibrationGap = Math.max(...Object.entries(none.byCheckpoint).map(([cp, m]) => (r.byCheckpoint[cp]?.calibrationError ?? Infinity) - m.calibrationError));
+      const baseTitle = none.all.brier.title;
+      const title = r.all.brier.title;
+      const titleBrierChange = baseTitle !== undefined && title !== undefined && baseTitle > 0 ? title / baseTitle - 1 : 0;
+      return {
+        key,
+        rps: r.all.rps,
+        worstCalibrationGap,
+        titleBrierChange,
+        eligible: r.all.rps < none.all.rps && worstCalibrationGap <= calibrationMargin + 1e-12 && titleBrierChange <= titleMargin + 1e-12,
+      };
+    })
+    .sort((a, b) => a.rps - b.rps);
+  const eligible = candidates.filter((c) => c.eligible);
+  return { ...(eligible[0] ? { chosen: eligible[0].key } : {}), ...(eligible[1] ? { runnerUp: eligible[1].key } : {}), candidates };
+}

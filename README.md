@@ -224,29 +224,50 @@ the prior's weight). It's an engine option (`ratingNoise` in
 `runMonteCarlo`), off unless given: the site, its snapshots and the dice don't
 use it.
 
-What it found (2025 seasons, 10 leagues, 218 clubs per checkpoint; the 2024
-seasons, 9 leagues, agree):
+To tune it, run a grid of spreads and fade constants for each season (several
+values for both flags: every spread with every k, plus no noise, keyed
+`sd/k`), then pool the seasons:
 
-| Round | RPS, no noise | sd 0.15 | sd 0.25 | baseline | expected-place error (model / baseline) |
-|---|---|---|---|---|---|
-| 0 | 0.157 | 0.150 | 0.148 | 0.249 | 4.30 / 4.95 |
-| 10 | 0.108 | 0.105 | 0.104 | 0.163 | 3.10 / 3.28 |
-| 20 | 0.082 | 0.081 | 0.080 | 0.129 | 2.34 / 2.58 |
-| 30 | 0.055 | 0.054 | 0.054 | 0.079 | 1.55 / 1.54 |
+```bash
+npm run backtest:season -- 2025 PL ELC PD BL1 SA FL1 BSA MLS ARG MX --rating-noise 0,0.15,0.2,0.25,0.3 --noise-k 5,10,20,40
+npm run backtest:season:tune -- 2022 2023 2024 2025
+```
 
-- The model beats "the table as it stands" at every checkpoint on RPS, and on
-  the Brier scores at every checkpoint but one tie (relegation at round 25); on
-  the expected place it ties it from round 25.
-- Without noise it is somewhat overconfident: chances it puts at 50–70% came
-  true 49% of the time (60% predicted, 171 chances), 70–90% ones 71% (80%
-  predicted), and small chances happen a little more than predicted (5–15%:
-  13.5% for 9.5%), most of all early in the season.
-- Rating noise fixes most of that: the calibration error drops from 0.019
-  (no noise) to 0.008 at sd 0.15 and 0.004–0.007 at 0.2–0.3, and RPS improves
-  at every checkpoint, best around sd 0.25 (it levels off by 0.3). The gain is
-  small in RPS (about 3%), mostly from the top places and relegation (in 2025
-  the title's Brier got slightly worse with noise; in 2024 it improved). Two
-  seasons are a small sample: worth rerunning with more before turning it on.
+The second reads `backtest-results/season-<season>.json` for each season,
+scores every run on all of them together and applies the selection rule: the
+lowest pooled RPS, as long as its calibration error is no worse than no
+noise's at any checkpoint by more than 0.002, its title Brier is no more than
+1% worse, and it beats no noise. It prints Markdown tables (each checkpoint for
+no noise, the chosen run and the runner-up; each season apart; the whole grid)
+and writes them to `backtest-results/rating-noise-tune.md` (numbers in
+`rating-noise-tune.json`). A grid of 17 runs takes a few minutes per season.
+
+What it found (four seasons, 2022–2025: 35 league seasons, 736 clubs per
+checkpoint; not loaded: Argentina 2022–2024, whose ESPN tables then had
+another format, and the Championship and La Liga 2022, where ESPN has no
+results for 11–15 February 2023):
+
+| Round | RPS, no noise | sd 0.15, k 5 | sd 0.25, k 20 | calibration error, no noise / sd 0.15, k 5 |
+|---|---|---|---|---|
+| 0 | 0.147 | 0.141 | 0.140 | 0.043 / 0.025 |
+| 10 | 0.105 | 0.104 | 0.103 | 0.018 / 0.011 |
+| 20 | 0.077 | 0.076 | 0.076 | 0.010 / 0.008 |
+| 30 | 0.051 | 0.051 | 0.051 | 0.006 / 0.006 |
+
+- The model beats "the table as it stands" on RPS at every checkpoint of every
+  season.
+- Without noise it is overconfident, most of all early in the season (the
+  calibration error is 0.043 at round 0, 0.017 over all checkpoints).
+- Every pair of the grid improves RPS and calibration over no noise in all
+  four seasons, most with a wider spread (best: sd 0.25, k 20, RPS 0.0917
+  against 0.0940, calibration error 0.004). But they all make the title
+  chances worse (title Brier +1.3% to +12.6% pooled): noise takes chances away
+  from the favourites, and the favourites mostly won, most of all in Ligue 1,
+  the Premier League and the Championship.
+- Only sd 0.15, k 5 meets the selection rule (title Brier +0.8%): pooled RPS
+  0.0926, calibration error 0.010, better than no noise in each of the four
+  seasons. It sits at the grid's corner (the smallest spread, the fastest
+  fade: s = 0.15 at the start of the season, 0.067 after 20 games).
 
 ![League page](docs/screenshots/league.png)
 

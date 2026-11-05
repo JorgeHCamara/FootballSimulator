@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { getLeagueByCode } from "../src/config/leagues.ts";
-import { baselinePredictions, categoriesOf, metrics, scoreClubs } from "./seasonScoring.ts";
+import { baselinePredictions, categoriesOf, chooseNoise, metrics, noiseConfigs, scoreClubs, type Metrics, type PooledScores } from "./seasonScoring.ts";
 
 describe("the season backtest's scores", () => {
   it("the chances scored come from the league's places", () => {
@@ -50,7 +50,7 @@ describe("the season backtest's scores", () => {
       preds[i] = { dist: [p, 1 - p], expected: 2 - p };
       final[i] = (i <= 40 ? i <= 8 : i <= 49) ? 1 : 2;
     }
-    const m = metrics(scoreClubs({ final, tableSize: {}, categories: [{ key: "title", ranges: [[1, 1]] }] }, preds));
+    const m = metrics(scoreClubs({ final, categories: [{ key: "title", ranges: [[1, 1]] }] }, preds));
     const b20 = m.calibration.find((b) => b.bucket === "15–30%")!;
     assert.equal(b20.n, 40);
     assert.ok(Math.abs(b20.predicted - 0.2) < 1e-12 && Math.abs(b20.actual - 0.2) < 1e-12);
@@ -62,3 +62,40 @@ describe("the season backtest's scores", () => {
     assert.ok(Math.abs(m.calibrationError - (10 * 0.05) / 50) < 1e-12);
   });
 });
+
+describe("rating-noise runs and the selection rule", () => {
+  it("no noise once, then every spread with every fade constant", () => {
+    assert.deepEqual(noiseConfigs([0, 0.1], [5, 20]).map((c) => c.key), ["0", "0.1/5", "0.1/20"]);
+    // A single k keeps the plain keys of earlier runs.
+    assert.deepEqual(noiseConfigs([0, 0.05, 0.1], [18]).map((c) => [c.key, c.sd, c.k]), [["0", 0, 18], ["0.05", 0.05, 18], ["0.1", 0.1, 18]]);
+  });
+
+  const scores = (rps: number, calibration: number[], title: number): PooledScores => {
+    const m = (rpsValue: number, ce: number): Metrics => ({ clubs: 100, brier: { title }, rps: rpsValue, mae: 2, calibration: [], calibrationError: ce });
+    return { all: m(rps, Math.max(...calibration)), byCheckpoint: Object.fromEntries(calibration.map((ce, i) => [String(i * 10), m(rps, ce)])) };
+  };
+
+  it("the lowest RPS that keeps calibration and the title Brier within their margins", () => {
+    const runs = {
+      0: scores(0.1, [0.02, 0.01], 0.03),
+      // Best RPS, but one checkpoint's calibration error 0.003 worse: out.
+      "0.3/5": scores(0.09, [0.02, 0.013], 0.03),
+      // Title Brier 2% worse: out.
+      "0.25/10": scores(0.091, [0.01, 0.01], 0.0306),
+      "0.2/20": scores(0.093, [0.015, 0.0115], 0.0302),
+      "0.15/40": scores(0.095, [0.01, 0.01], 0.03),
+    };
+    const { chosen, runnerUp, candidates } = chooseNoise(runs);
+    assert.equal(chosen, "0.2/20");
+    assert.equal(runnerUp, "0.15/40");
+    assert.deepEqual(candidates.map((c) => [c.key, c.eligible]), [["0.3/5", false], ["0.25/10", false], ["0.2/20", true], ["0.15/40", true]]);
+    assert.ok(Math.abs(candidates[1]!.titleBrierChange - 0.02) < 1e-9);
+  });
+
+  it("nothing better than no noise: none chosen (keep it off)", () => {
+    const { chosen, candidates } = chooseNoise({ 0: scores(0.1, [0.01], 0.03), "0.2/10": scores(0.101, [0.01], 0.03) });
+    assert.equal(chosen, undefined);
+    assert.equal(candidates[0]!.eligible, false);
+  });
+});
+
