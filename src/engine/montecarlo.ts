@@ -83,9 +83,9 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
  * (as `override` does), into that variant's own counts. Every variant gets the
  * full `iterations` seasons, and the draws after the remaining games (split
  * games, play-offs) start from the same point for each, so the variants differ
- * by their results alone. One variant is exactly runMonteCarlo with that
- * `override`; several cost one season's draws plus a table per variant,
- * instead of a whole run each.
+ * by their results alone. The first variant is exactly runMonteCarlo with its
+ * `override` (with `{}`, the plain run); several cost one season's draws plus
+ * a table per variant, instead of a whole run each.
  */
 export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, variants: readonly ResultMap[]): MonteCarloResult[] {
   const { teams, fixtures, fixed, model, standings, iterations } = input;
@@ -148,9 +148,13 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
     for (const r of remaining) results[r.id] = sampleScore(r.sampler, rng);
     const drawn = overridden.map((id) => results[id]);
     const at = rng.state;
+    // Where the first variant's season left the draws: the next season goes on from there, so the first variant
+    // is exactly a run of its own (runMonteCarlo with its override), whatever the others draw.
+    let after = at;
     for (const [v, variant] of variants.entries()) {
       const count = counts[v]!;
       if (v > 0) {
+        after = v === 1 ? rng.state : after;
         rng.state = at;
         overridden.forEach((id, j) => {
           const score = drawn[j];
@@ -209,6 +213,7 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
         if (winner !== undefined) count.playoffWins[winner] = (count.playoffWins[winner] ?? 0) + 1;
       }
     }
+    if (variants.length > 1) rng.state = after;
   }
 
   return counts.map(({ positionCounts, pointsTotal, zonePositionCounts, playoffReached, playoffWins }) => {

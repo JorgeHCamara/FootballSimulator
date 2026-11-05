@@ -131,7 +131,8 @@ function rankGroup(
   group: TeamId[],
   criteria: readonly Tiebreaker[],
   overall: Map<TeamId, Totals>,
-  matches: readonly PlayedMatch[],
+  /** The games, for head-to-head criteria: asked for only when a tie gets that far. */
+  matches: () => readonly PlayedMatch[],
   names: Map<TeamId, string>,
   fallback?: ReadonlyMap<TeamId, number>,
 ): TeamId[] {
@@ -147,7 +148,7 @@ function rankGroup(
   if (isHeadToHead(criterion)) {
     const members = new Set(group);
     h2h = accumulate(
-      matches.filter((m) => members.has(m.homeId) && members.has(m.awayId)),
+      matches().filter((m) => members.has(m.homeId) && members.has(m.awayId)),
       group,
     );
   }
@@ -260,7 +261,7 @@ export function computeStandings(
     ? [...options.tiebreakers]
     : ["points", ...options.tiebreakers];
   const fallback = options.fallbackOrder ? new Map(options.fallbackOrder.map((id, i) => [id, i])) : undefined;
-  const order = rankGroup(ids, criteria, overall, matches, names, fallback);
+  const order = rankGroup(ids, criteria, overall, () => matches, names, fallback);
   const includeForm = options.includeForm ?? true;
   const chronological = includeForm ? sortFixtures(fixtures) : [];
 
@@ -319,22 +320,55 @@ export function standingsBuilder(
   }
   const criteria: Tiebreaker[] = options.tiebreakers[0] === "points" ? [...options.tiebreakers] : ["points", ...options.tiebreakers];
   const fallback = options.fallbackOrder ? new Map(options.fallbackOrder.map((id, i) => [id, i])) : undefined;
-  // Head-to-head criteria need every game; the others only the totals.
-  const headToHead = criteria.some(isHeadToHead);
+  // Totals by club index, eight numbers each, the settled games' added in once; the open games by club index (-1: not in the table).
+  const n = ids.length;
+  const index = new Map(ids.map((id, i) => [id, i]));
+  const baseTotals = new Int32Array(n * FIELDS);
+  for (const [i, id] of ids.entries()) {
+    const t = base.get(id)!;
+    baseTotals.set([t.played, t.won, t.drawn, t.lost, t.goalsFor, t.goalsAgainst, t.awayGoalsFor, t.points], i * FIELDS);
+  }
+  const homeOf = Int32Array.from(open, (f) => index.get(f.homeId) ?? -1);
+  const awayOf = Int32Array.from(open, (f) => index.get(f.awayId) ?? -1);
+  const totals = new Int32Array(n * FIELDS);
   return (results) => {
-    const overall = new Map<TeamId, Totals>();
-    for (const [id, t] of base) overall.set(id, { ...t });
-    const played: PlayedMatch[] = [];
-    for (const f of open) {
-      const r = results[f.id];
-      if (r) played.push({ matchday: f.matchday, homeId: f.homeId, awayId: f.awayId, home: r.home, away: r.away });
+    totals.set(baseTotals);
+    for (let k = 0; k < open.length; k++) {
+      const r = results[open[k]!.id];
+      if (!r) continue;
+      const h = homeOf[k]!;
+      const a = awayOf[k]!;
+      if (h >= 0) tally(totals, h * FIELDS, r.home, r.away, false);
+      if (a >= 0) tally(totals, a * FIELDS, r.away, r.home, true);
     }
-    addMatches(overall, played);
-    const order = rankGroup(ids, criteria, overall, headToHead ? settled.concat(played) : settled, names, fallback);
-    return order.map((teamId, index) => {
+    const overall = new Map<TeamId, Totals>();
+    for (const [i, id] of ids.entries()) {
+      const o = i * FIELDS;
+      overall.set(id, {
+        played: totals[o]!,
+        won: totals[o + 1]!,
+        drawn: totals[o + 2]!,
+        lost: totals[o + 3]!,
+        goalsFor: totals[o + 4]!,
+        goalsAgainst: totals[o + 5]!,
+        awayGoalsFor: totals[o + 6]!,
+        points: totals[o + 7]!,
+      });
+    }
+    // Every game, only if a tie gets as far as a head-to-head criterion.
+    let all: PlayedMatch[] | undefined;
+    const matches = () =>
+      (all ??= settled.concat(
+        open.flatMap((f) => {
+          const r = results[f.id];
+          return r ? [{ matchday: f.matchday, homeId: f.homeId, awayId: f.awayId, home: r.home, away: r.away }] : [];
+        }),
+      ));
+    const order = rankGroup(ids, criteria, overall, matches, names, fallback);
+    return order.map((teamId, position) => {
       const t = overall.get(teamId)!;
       return {
-        position: index + 1,
+        position: position + 1,
         teamId,
         played: t.played,
         won: t.won,
@@ -348,4 +382,23 @@ export function standingsBuilder(
       };
     });
   };
+}
+
+/** Numbers per club in standingsBuilder's totals: played, won, drawn, lost, for, against, away goals, points. */
+const FIELDS = 8;
+
+/** One game into a club's totals (at offset `o`), from its side: its goals, the other side's, and whether it played away. */
+function tally(t: Int32Array, o: number, own: number, other: number, away: boolean): void {
+  t[o]!++;
+  t[o + 4]! += own;
+  t[o + 5]! += other;
+  if (away) t[o + 6]! += own;
+  if (own > other) {
+    t[o + 1]!++;
+    t[o + 7]! += 3;
+  } else if (own < other) t[o + 3]!++;
+  else {
+    t[o + 2]!++;
+    t[o + 7]!++;
+  }
 }

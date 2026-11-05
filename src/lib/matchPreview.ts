@@ -4,7 +4,7 @@ import { leagueTimeZone } from "../config/timezones.ts";
 import { expectedGoals, expectedGoalsNeutral, likelyScores, outcomeProbabilities, scoreMatrix, MAX_SCORE, type ExpectedGoals, type OutcomeProbabilities } from "../engine/match.ts";
 import type { LeagueModel } from "../engine/ratings.ts";
 import type { Fixture, Score, TeamId } from "../engine/types.ts";
-import { cachedLeagueOutlook, dataAsOf, outlookSetup, resultScenarios, type ClubChances, type ClubOutlook, type HeadlineKind, type LeagueOutlook, type ResultScenarios } from "./clubOutlook.ts";
+import { cachedLeagueOutlook, dataAsOf, outlookSetup, type ClubChances, type ClubOutlook, type HeadlineKind, type LeagueOutlook, type ResultScenarios } from "./clubOutlook.ts";
 import { hasClubPages } from "./clubs.ts";
 import { fetchEspnGameState } from "./espn.ts";
 import { getLeagueData, getPastSeasonData, type LeagueData } from "./leagueData.ts";
@@ -57,10 +57,14 @@ const seasonLabel = (data: LeagueData) => (data.tournaments ? (data.season.split
 
 const preMatchModels = new Map<string, LeagueModel>();
 
-/** The model at kick-off: built only from games played before it, so a played game keeps the prediction it had. */
-function preMatchModel(league: LeagueConfig, data: LeagueData, fixture: Fixture, outlook: LeagueOutlook | null): LeagueModel | null {
+/**
+ * The model at kick-off: built only from games played before it, so a played
+ * game keeps the prediction it had. `current`: the league's model now (the
+ * outlook's), which it is when no game has been played since.
+ */
+export function preMatchModel(league: LeagueConfig, data: LeagueData, fixture: Fixture, current: LeagueModel | null): LeagueModel | null {
   const later = [...data.fixtures, ...(data.tournaments ?? []).flatMap((t) => t.fixtures)].some((f) => f.result && f.utcDate >= fixture.utcDate);
-  if (!later && outlook) return outlook.model;
+  if (!later && current) return current;
   const key = `${league.code}:${data.seasonKey}:${fixture.id}:${fixture.utcDate}`;
   const hit = preMatchModels.get(key);
   if (hit) return hit;
@@ -131,9 +135,9 @@ export const loadMatch = cache(async (leagueSlug: string, slug: string): Promise
   const { league, data, current, match, state, result } = found;
   const { fixture } = match;
   const outlook = cachedLeagueOutlook(league, data);
-  const model = preMatchModel(league, data, fixture, outlook);
+  const model = preMatchModel(league, data, fixture, outlook?.model ?? null);
   if (!model) return undefined;
-  const xg = fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId);
+  const xg = gameXg(model, fixture);
   const rho = model.rho ?? 0;
   const homeClub = outlook?.clubs.get(fixture.homeId);
   const awayClub = outlook?.clubs.get(fixture.awayId);
@@ -158,6 +162,10 @@ export const loadMatch = cache(async (leagueSlug: string, slug: string): Promise
   };
 });
 
+/** A game's expected goals from a model (a neutral ground has no home advantage). */
+export const gameXg = (model: LeagueModel, fixture: Fixture): ExpectedGoals =>
+  fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId);
+
 /** The likeliest score of each result: what "if the home side wins" is played out with. */
 export function resultScores(xg: ExpectedGoals, rho: number): ResultScenarios["scores"] {
   const matrix = scoreMatrix(xg, rho);
@@ -175,11 +183,6 @@ export function resultScores(xg: ExpectedGoals, rho: number): ResultScenarios["s
   return { home: best((h, a) => h > a), draw: best((h, a) => h === a), away: best((h, a) => h < a) };
 }
 
-/** "What this result means": the season's chances after each result, for a game still to play. */
-export function matchScenarios(loaded: LoadedMatch): ResultScenarios | null {
-  if (loaded.state === "played" || loaded.state === "off" || loaded.data !== loaded.current) return null;
-  return resultScenarios(loaded.league, loaded.data, loaded.match.fixture, resultScores(loaded.xg, loaded.model.rho ?? 0));
-}
 
 /** One line of "What this result means": a club's chance (or average place) now and after each result. */
 export interface ImpactRow {

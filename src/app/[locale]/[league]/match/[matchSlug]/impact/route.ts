@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { SiteLocale } from "../../../../../../config/leagues.ts";
 import { dataVersion } from "../../../../../../lib/clubOutlook.ts";
 import { impactNumbers, impactPossible, impactView } from "../../../../../../lib/matchImpact.ts";
-import { loadMatch, locateMatch } from "../../../../../../lib/matchPreview.ts";
+import { locateMatch } from "../../../../../../lib/matchPreview.ts";
 
 /** Three season simulations on a first request. */
 export const maxDuration = 60;
@@ -20,8 +20,8 @@ const HEADERS = { "Cache-Control": `public, max-age=0, s-maxage=${KEEP}, stale-w
  */
 const cachedNumbers = unstable_cache(
   async (leagueSlug: string, matchSlug: string, _version: string, _deployment: string) => {
-    const loaded = await loadMatch(leagueSlug, matchSlug);
-    return loaded && !("moved" in loaded) ? impactNumbers(loaded) : null;
+    const found = await locateMatch(leagueSlug, matchSlug);
+    return found && !("moved" in found) ? impactNumbers(found) : null;
   },
   ["match-impact"],
   { revalidate: KEEP },

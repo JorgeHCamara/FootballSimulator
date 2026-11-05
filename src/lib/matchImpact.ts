@@ -1,11 +1,12 @@
 import type { SiteLocale, ZoneKind } from "../config/leagues.ts";
 import type { Score, Team } from "../engine/types.ts";
 import { percent } from "./clubText.ts";
-import { impactRows, matchScenarios, type FoundMatch, type ImpactRow, type LoadedMatch } from "./matchPreview.ts";
+import { outlookWithResults } from "./clubOutlook.ts";
+import { gameXg, impactRows, preMatchModel, resultScores, type FoundMatch, type ImpactRow, type LoadedMatch } from "./matchPreview.ts";
 
 /*
  * "What this result means" on a match page: three more season simulations
- * (one simulation loop, see resultScenarios), so the page loads without them
+ * (one simulation loop, see outlookWithResults), so the page loads without them
  * and fetches this from its own address (…/impact). The numbers are worked
  * out once per game (impactNumbers, cached by the route), the words per
  * language (impactView).
@@ -41,11 +42,23 @@ export const impactPossible = (found: FoundMatch) => found.state !== "played" &&
 /** Does the page show the section's placeholder? */
 export const hasImpact = (loaded: LoadedMatch) => impactPossible(loaded) && Boolean(loaded.homeClub && loaded.awayClub);
 
-/** The section's numbers (null for a game without it): the expensive part, the same in every language. */
-export function impactNumbers(loaded: LoadedMatch): ImpactNumbers | null {
-  const { homeClub, awayClub } = loaded;
-  const scenarios = homeClub && awayClub ? matchScenarios(loaded) : null;
-  if (!scenarios || !homeClub || !awayClub) return null;
+/**
+ * The section's numbers (null for a game without it): the expensive part, the
+ * same in every language. The league's outlook (the "Now" column) and the
+ * three results come from one simulation loop (outlookWithResults), each
+ * result played out with its likeliest score under the model at kick-off.
+ */
+export function impactNumbers(found: FoundMatch): ImpactNumbers | null {
+  const { league, data } = found;
+  const { fixture } = found.match;
+  const both = outlookWithResults(league, data, fixture, (current) => {
+    const model = preMatchModel(league, data, fixture, current) ?? current;
+    return resultScores(gameXg(model, fixture), model.rho ?? 0);
+  });
+  const homeClub = both?.outlook.clubs.get(fixture.homeId);
+  const awayClub = both?.outlook.clubs.get(fixture.awayId);
+  if (!both || !homeClub || !awayClub) return null;
+  const { scenarios } = both;
   const rows = [homeClub, awayClub].flatMap((club) =>
     impactRows(club.team.id, club, {
       home: scenarios.after.home.get(club.team.id),
@@ -53,7 +66,7 @@ export function impactNumbers(loaded: LoadedMatch): ImpactNumbers | null {
       away: scenarios.after.away.get(club.team.id),
     }),
   );
-  return rows.length ? { scores: scenarios.scores, rows, iterations: loaded.outlook?.iterations ?? 10_000 } : null;
+  return rows.length ? { scores: scenarios.scores, rows, iterations: both.outlook.iterations } : null;
 }
 
 /** The section in one language. */

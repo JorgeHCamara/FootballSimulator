@@ -453,22 +453,61 @@ export function resultScenarios(league: LeagueConfig, data: LeagueData, fixture:
   const hit = scenarioCache.get(key);
   if (hit) return hit;
   // One simulation loop: each season's other games drawn once, then finished with each result (full iterations each).
-  const [home, draw, away] = runMonteCarloVariants({ ...setup.input, iterations: SCENARIO_ITERATIONS, seed: SCENARIO_SEED }, [
-    { [fixture.id]: scores.home },
-    { [fixture.id]: scores.draw },
-    { [fixture.id]: scores.away },
-  ]);
-  const pick = (result: MonteCarloResult) => {
-    const outlook = outlookFromRun(league, data, setup, result);
-    const clubs = new Map<TeamId, ClubChances>();
-    for (const id of [fixture.homeId, fixture.awayId]) {
-      const club = outlook.clubs.get(id);
-      if (club) clubs.set(id, { zones: club.zones, headline: club.headline, expectedPosition: club.expectedPosition });
-    }
-    return clubs;
-  };
-  const scenarios: ResultScenarios = { scores, after: { home: pick(home!), draw: pick(draw!), away: pick(away!) } };
+  const [home, draw, away] = runMonteCarloVariants({ ...setup.input, iterations: SCENARIO_ITERATIONS, seed: SCENARIO_SEED }, resultVariants(fixture, scores));
+  return keepScenarios(key, { scores, after: { home: chancesAfter(league, data, setup, fixture, home!), draw: chancesAfter(league, data, setup, fixture, draw!), away: chancesAfter(league, data, setup, fixture, away!) } });
+}
+
+const resultVariants = (fixture: Fixture, scores: ResultScenarios["scores"]): ResultMap[] => [{ [fixture.id]: scores.home }, { [fixture.id]: scores.draw }, { [fixture.id]: scores.away }];
+
+/** The game's two clubs' chances in a run. */
+function chancesAfter(league: LeagueConfig, data: LeagueData, setup: OutlookSetup, fixture: Fixture, result: MonteCarloResult): Map<TeamId, ClubChances> {
+  const outlook = outlookFromRun(league, data, setup, result);
+  const clubs = new Map<TeamId, ClubChances>();
+  for (const id of [fixture.homeId, fixture.awayId]) {
+    const club = outlook.clubs.get(id);
+    if (club) clubs.set(id, { zones: club.zones, headline: club.headline, expectedPosition: club.expectedPosition });
+  }
+  return clubs;
+}
+
+function keepScenarios(key: string, scenarios: ResultScenarios): ResultScenarios {
   if (scenarioCache.size >= SCENARIO_CACHE_SIZE) scenarioCache.delete(scenarioCache.keys().next().value!);
   scenarioCache.set(key, scenarios);
   return scenarios;
+}
+
+/**
+ * The league's outlook (exactly cachedLeagueOutlook's) and a game's results
+ * (resultScenarios's), together: when the outlook isn't worked out on this
+ * server yet, from one simulation loop, the season as it stands first and
+ * then each result, instead of a run for the outlook and another for the
+ * results. `scoresOf` gives each result's score from the league's model.
+ */
+export function outlookWithResults(
+  league: LeagueConfig,
+  data: LeagueData,
+  fixture: Fixture,
+  scoresOf: (model: LeagueModel) => ResultScenarios["scores"],
+): { outlook: LeagueOutlook; scenarios: ResultScenarios } | null {
+  const version = dataVersion(data);
+  const hit = cache.get(league.code);
+  if (hit && hit.version === version) {
+    if (!hit.outlook || !hit.setup) return null;
+    const scenarios = resultScenarios(league, data, fixture, scoresOf(hit.setup.model));
+    return scenarios ? { outlook: hit.outlook, scenarios } : null;
+  }
+  const setup = outlookSetup(league, data);
+  if (!setup) {
+    cache.set(league.code, { version, setup, outlook: null });
+    return null;
+  }
+  const scores = scoresOf(setup.model);
+  const [now, home, draw, away] = runMonteCarloVariants({ ...setup.input, iterations: SCENARIO_ITERATIONS, seed: SCENARIO_SEED }, [{}, ...resultVariants(fixture, scores)]);
+  const outlook = outlookFromRun(league, data, setup, now!);
+  cache.set(league.code, { version, setup, outlook });
+  const scenarios = keepScenarios(`${league.code}:${version}:${fixture.id}:${JSON.stringify(scores)}`, {
+    scores,
+    after: { home: chancesAfter(league, data, setup, fixture, home!), draw: chancesAfter(league, data, setup, fixture, draw!), away: chancesAfter(league, data, setup, fixture, away!) },
+  });
+  return { outlook, scenarios };
 }

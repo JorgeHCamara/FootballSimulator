@@ -9,7 +9,7 @@ import { realResults } from "../engine/results.ts";
 import { createRng } from "../engine/rng.ts";
 import { computeStandings, standingsBuilder, type StandingsOptions } from "../engine/standings.ts";
 import type { Fixture, ResultMap, Team } from "../engine/types.ts";
-import { outlookSetup, resultScenarios } from "./clubOutlook.ts";
+import { cachedLeagueOutlook, leagueOutlook, outlookSetup, outlookWithResults, resultScenarios } from "./clubOutlook.ts";
 import { withClubPages } from "./clubs.ts";
 import { getLeagueData, type LeagueData } from "./leagueData.ts";
 import { impactView, type ImpactNumbers } from "./matchImpact.ts";
@@ -109,6 +109,37 @@ describe("each result of a game in one simulation loop", () => {
     const expected = (run: MonteCarloResult) => run.positionCounts[game.homeId]!.reduce((sum, n, p) => sum + (n / run.iterations) * (p + 1), 0);
     assert.ok(Math.abs(scenarios.after.home.get(game.homeId)!.expectedPosition - expected(loop[0]!)) < 1e-9);
     assert.ok(Math.abs(scenarios.after.away.get(game.homeId)!.expectedPosition - expected(loop[2]!)) < 1e-9);
+  });
+});
+
+describe("the match endpoint's numbers: the outlook and the results from one loop", () => {
+  it("the outlook is exactly the page's, the results exactly resultScenarios's (Premier League)", () => {
+    // Another data version than the tests above, so nothing is kept from them.
+    const data = { ...plData, seasonKey: "PL:espn:2026:endpoint" };
+    const game = nextGame(data);
+    const scores = { home: { home: 2, away: 0 }, draw: { home: 0, away: 0 }, away: { home: 0, away: 1 } };
+    const both = outlookWithResults(pl, data, game, () => scores)!;
+    const plain = leagueOutlook(pl, data)!;
+    assert.deepEqual([...both.outlook.clubs.values()].map((c) => [c.team.id, c.distribution, c.likeliest, c.averagePoints]), [...plain.clubs.values()].map((c) => [c.team.id, c.distribution, c.likeliest, c.averagePoints]));
+    // Kept: the page's outlook on this server is that one, and the results come back from the cache.
+    assert.equal(cachedLeagueOutlook(pl, data), both.outlook);
+    assert.equal(resultScenarios(pl, data, game, scores), both.scenarios);
+    const fresh = { ...data, seasonKey: "PL:espn:2026:endpoint-2" };
+    const separately = resultScenarios(pl, fresh, game, scores)!;
+    for (const k of ["home", "draw", "away"] as const) {
+      for (const id of [game.homeId, game.awayId]) assert.deepEqual(both.scenarios.after[k].get(id), separately.after[k].get(id));
+    }
+  });
+
+  it("a split still to come: the outlook still exactly the plain run's", async () => {
+    process.env.FOOTSIMU_SAMPLE_DATA = "1";
+    const gsl = getLeagueByCode("GSL")!;
+    const data = await getLeagueData(gsl);
+    const game = data.fixtures.find((f) => !f.result)!;
+    const scores = { home: { home: 1, away: 0 }, draw: { home: 1, away: 1 }, away: { home: 0, away: 1 } };
+    const both = outlookWithResults(gsl, { ...data, seasonKey: `${data.seasonKey}:endpoint` }, game, () => scores)!;
+    const plain = leagueOutlook(gsl, data)!;
+    assert.deepEqual([...both.outlook.clubs.values()].map((c) => c.distribution), [...plain.clubs.values()].map((c) => c.distribution));
   });
 });
 
