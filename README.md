@@ -60,6 +60,14 @@ Each league × language page is pre-rendered with:
 
 Every club of every domestic league also has its own page, `/{locale}/{league}/team/{slug}` (slugs from `src/lib/clubs.ts`: lowercase, accent-free, unique within the league). It shows the club's position, points and form, its chances from the same Monte Carlo as the league page (10,000 seasons, real results only, see `src/lib/clubOutlook.ts`), its finishing-position spread, every remaining game with win/draw/loss odds, the toughest and must-win games and a templated summary (`Club` messages). Each page has its own title, description, canonical and `hreflang` links, a `SportsTeam` JSON-LD block and a card image (`team/[teamSlug]/opengraph-image.tsx`). Pages render on first visit and refresh hourly (ISR), and all of them are in the sitemap. Club names in the tables and fixtures link to them.
 
+Every league game also has a preview page, `/{locale}/{league}/match/{home}-vs-{away}-{yyyy-mm-dd}` (club slugs, and the date in the league's own time zone from `src/config/timezones.ts`; a game moved to another day redirects to its new address). It shows the date, kick-off (in the visitor's time zone once loaded) and ground, the match model's win/draw/loss chances, expected goals and five likeliest scores, a dice roll (`sampleLikelyScore`), both clubs' form and places, and "What this result means": the season's Monte Carlo rerun with each result fixed (the likeliest home win, draw and away win scores), with the same draws for every other game, so the change in each club's chances is the result's alone (`resultScenarios` in `src/lib/clubOutlook.ts`, cached per game). Once the game is played the page stays: the final score on top and the odds the model gave at kick-off, labelled "Pre-match prediction" (the model rebuilt from the results before it). Pages refresh hourly, and every 10 minutes on match day (the game's own state is fetched from ESPN). The sitemap lists games from the past 30 days to the next 14. Each page has its own title, description, `hreflang`, a `SportsEvent` JSON-LD block and a card image.
+
+### Odds snapshots
+
+After each completed round of each domestic league, every club's season chances (title, each place, relegation, expected position and points) are stored in `src/data/snapshots/<CODE>.json`, one line per round, by season. `.github/workflows/odds-snapshots.yml` runs `npm run snapshots` (`scripts/snapshot-odds.ts`) every six hours and commits any new snapshots to `main`; run it by hand from the Actions tab (Run workflow) or locally with `npm run snapshots` (`-- PL BSA` for some leagues, `-- --dry-run` to only print).
+
+A round counts once it and every round before it are played (a game postponed far from its round's dates isn't waited for), and its snapshot is taken as of just after its last kick-off: later results are left out, so a late run records the same numbers. A season's first run stores only the latest round; after that, every newly completed round. Committed JSON was chosen over Vercel Blob or a KV store: no service, token or quota to set up on Vercel Hobby, the history is versioned and reviewable in git, and pages read it from the deployment itself. Each commit redeploys the site (a few per week).
+
 After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` to your Google Search Console code, then submit `/sitemap.xml` in Search Console.
 
 ### Other commands
@@ -69,6 +77,7 @@ After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_
 | `npm run build && npm start` | Production build and server |
 | `npm test` | Engine and library unit tests |
 | `npm run typecheck` | TypeScript check |
+| `npm run snapshots` | Add odds snapshots for newly completed rounds (real data; see Odds snapshots) |
 | `npm run test:e2e` | Browser test against a running server built and started with `FOOTSIMU_SAMPLE_DATA=1` (`FOOTSIMU_SAMPLE_DATA=1 npm run build && FOOTSIMU_SAMPLE_DATA=1 npm start`: share pages and cards render on request, so the server needs it too; needs Playwright: `npx playwright install chromium`) |
 
 ### Yearly: rebuild priors

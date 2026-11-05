@@ -1661,6 +1661,93 @@ async function step(name, fn) {
       await m.close();
     });
 
+    await step("match pages: odds, scores, dice, what each result means, played games, SEO, card, redirects, sitemap", async () => {
+      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const urls = [...sitemap.matchAll(/<loc>https:\/\/footsimu\.com(\/en\/premier-league\/match\/[a-z0-9-]+)<\/loc>/g)].map((m) => m[1]);
+      assert.ok(urls.length > 0, "games in the sitemap");
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      // An upcoming game.
+      let upcoming;
+      for (const url of urls.reverse()) {
+        await p.goto(`${BASE_URL}${url}`);
+        if ((await p.getByTestId("match-page").getAttribute("data-state")) === "upcoming") {
+          upcoming = url;
+          break;
+        }
+      }
+      assert.ok(upcoming, "an upcoming game");
+      const h1 = await p.locator("h1").innerText();
+      assert.match(h1, /^.+ vs .+ prediction: odds and simulated scores$/);
+      assert.match(await p.title(), /^.+ vs .+ prediction \(\d{1,2} [A-Z][a-z]{2} \d{4}\): odds and simulated scores \| Foot Simu$/);
+      assert.match(await p.locator('meta[name="description"]').getAttribute("content"), / win \d+%, draw \d+%, .+ win \d+%\. Expected goals \d\.\d–\d\.\d/);
+      assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${upcoming}`);
+      for (const [lang, path] of [["en", "en"], ["pt-BR", "pt"], ["es", "es"]]) {
+        assert.equal(await p.locator(`link[rel="alternate"][hreflang="${lang}"]`).getAttribute("href"), `https://footsimu.com${upcoming.replace(/^\/en/, `/${path}`)}`);
+      }
+      assert.match(await p.locator('meta[property="og:image"]').getAttribute("content"), /\/match\/[a-z0-9-]+\/opengraph-image/);
+      const ld = JSON.parse(await p.locator('script[type="application/ld+json"]').first().textContent());
+      assert.equal(ld["@graph"][0]["@type"], "SportsEvent");
+      assert.ok(ld["@graph"][0].homeTeam.name && ld["@graph"][0].awayTeam.name && ld["@graph"][0].startDate);
+      // Odds adding up to about 100%, five scores, expected goals.
+      const odds = await p.locator('[data-testid="match-prediction"] [data-outcome]').allInnerTexts();
+      const total = odds.map((x) => Number(x.match(/(\d+)%/)[1])).reduce((a, b) => a + b, 0);
+      assert.ok(total >= 98 && total <= 102, String(total));
+      assert.equal(await p.locator('[data-testid="match-scores"] li').count(), 5);
+      assert.match(await p.getByTestId("match-xg").innerText(), /\d\.\d\d\s*–\s*\d\.\d\d/);
+      // What each result means: rows for both clubs.
+      assert.ok((await p.getByTestId("match-impact-row").count()) >= 2);
+      // The dice: one of the likeliest scores, another one each roll.
+      const dice = p.getByTestId("match-dice");
+      await dice.click();
+      const first = await p.getByTestId("match-dice-result").innerText();
+      assert.match(first, /\d+–\d+/);
+      await dice.click();
+      await p.waitForFunction(() => document.querySelector('[data-testid="match-dice-result"]').dataset.rolls === "2");
+      assert.notEqual(await p.getByTestId("match-dice-result").innerText(), first, "a re-roll gives another score");
+      // Links: both club pages and the league.
+      assert.equal(await p.locator('[data-testid="match-scoreboard"] [data-testid="match-club-link"]').count(), 2);
+      assert.equal(await p.getByTestId("match-simulate").getAttribute("href"), "/en/premier-league");
+      assert.equal((await p.request.get(`${BASE_URL}${upcoming}/opengraph-image`)).headers()["content-type"], "image/png");
+      // Portuguese and Spanish.
+      await p.goto(`${BASE_URL}${upcoming.replace(/^\/en/, "/pt")}`);
+      assert.match(await p.locator("h1").innerText(), /^Palpite .+ x .+: probabilidades e placares simulados$/);
+      await p.goto(`${BASE_URL}${upcoming.replace(/^\/en/, "/es")}`);
+      assert.match(await p.locator("h1").innerText(), /^Pronóstico .+ vs .+: probabilidades y resultados simulados$/);
+      // A played game: the final score on top, the pre-match odds kept, no "what it means".
+      let playedUrl;
+      for (const url of [...urls].reverse()) {
+        await p.goto(`${BASE_URL}${url}`);
+        if ((await p.getByTestId("match-page").getAttribute("data-state")) === "played") {
+          playedUrl = url;
+          break;
+        }
+      }
+      assert.ok(playedUrl, "a played game");
+      assert.match(await p.getByTestId("match-final-score").innerText(), /^\d+–\d+$/);
+      assert.match(await p.locator('[data-testid="match-prediction"] h2').innerText(), /^Pre-match prediction$/);
+      assert.match(await p.locator("h1").innerText(), /^.+ \d+–\d+ .+: result and pre-match prediction$/);
+      assert.equal(await p.getByTestId("match-impact").count(), 0);
+      // A game moved to another day: its old address redirects; an unknown one is a 404.
+      const moved = await p.request.get(`${BASE_URL}${upcoming.replace(/\d{2}$/, (d) => String(Number(d) === 1 ? 2 : Number(d) - 1).padStart(2, "0"))}`, { maxRedirects: 0 });
+      assert.equal(moved.status(), 308);
+      assert.equal(new URL(moved.headers().location, BASE_URL).pathname, upcoming);
+      assert.equal((await p.goto(`${BASE_URL}/en/premier-league/match/nobody-vs-noone-2026-11-08`)).status(), 404);
+      // From a club page's fixture list.
+      const club = sitemap.match(/https:\/\/footsimu\.com(\/en\/premier-league\/team\/[a-z0-9-]+)/)[1];
+      await p.goto(`${BASE_URL}${club}`);
+      assert.match(await p.locator('[data-testid="club-fixture"] [data-testid="club-match-link"]').first().getAttribute("href"), /^\/en\/premier-league\/match\/[a-z0-9-]+-vs-[a-z0-9-]+-\d{4}-\d{2}-\d{2}$/);
+      await p.close();
+      // Phones: nothing past the screen's edge (element edges: a phone viewport widens to fit its content).
+      for (const width of [320, 390]) {
+        const ctx = await browser.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true });
+        const m = await ctx.newPage();
+        await m.goto(`${BASE_URL}${upcoming}`);
+        const right = await m.evaluate(() => Math.max(...[...document.querySelectorAll("body *")].map((e) => e.getBoundingClientRect().right)));
+        assert.ok(right <= width + 0.5, `${width}px: content reaches ${right}px`);
+        await ctx.close();
+      }
+    });
+
     await step("unknown league returns 404", async () => {
       const res = await page.goto(`${BASE_URL}/en/not-a-league`);
       assert.equal(res.status(), 404);

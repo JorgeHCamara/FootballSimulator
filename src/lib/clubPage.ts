@@ -4,6 +4,7 @@ import { cachedLeagueOutlook, type ClubOutlook, type HeadlineChance, type League
 import { hasClubPages } from "./clubs.ts";
 import { listOf, percent } from "./clubText.ts";
 import { getLeagueData, type LeagueData } from "./leagueData.ts";
+import { matchesBetween } from "./matches.ts";
 
 export interface LoadedClub {
   league: LeagueConfig;
@@ -51,20 +52,32 @@ export function clubDescription(loaded: LoadedClub, locale: SiteLocale, t: Trans
   return stats ? t("metaDescription", { ...values, stats }) : t("metaDescriptionPlain", values);
 }
 
-/** Every club page's path (without the locale), league by league; a league whose data can't load is left out. */
-export async function clubPaths(): Promise<string[]> {
+/** Days of games the sitemap lists: the past 30 and the next 14. */
+export const SITEMAP_PAST_DAYS = 30;
+export const SITEMAP_NEXT_DAYS = 14;
+
+/**
+ * Every club page's path (without the locale), and every match page's for
+ * games from SITEMAP_PAST_DAYS ago to SITEMAP_NEXT_DAYS ahead, league by
+ * league; a league whose data can't load is left out.
+ */
+export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: string[]; matches: string[] }> {
   const leagues = LEAGUES.filter(hasClubPages);
+  const day = 86_400_000;
   const pages = await Promise.all(
     leagues.map((league) =>
       getLeagueData(league).then(
-        (data) => data.teams.flatMap((team) => (team.page ? [team.page] : [])),
+        (data) => ({
+          clubs: data.teams.flatMap((team) => (team.page ? [team.page] : [])),
+          matches: matchesBetween(league, data, now - SITEMAP_PAST_DAYS * day, now + SITEMAP_NEXT_DAYS * day).map((m) => m.path),
+        }),
         (error: unknown) => {
-          console.warn(`sitemap: no club pages for ${league.code}:`, error);
-          return [];
+          console.warn(`sitemap: no club or match pages for ${league.code}:`, error);
+          return { clubs: [], matches: [] };
         },
       ),
     ),
   );
-  return pages.flat();
+  return { clubs: pages.flatMap((p) => p.clubs), matches: pages.flatMap((p) => p.matches) };
 }
 

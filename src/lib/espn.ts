@@ -27,7 +27,7 @@ export interface EspnEvent {
   /** The season the game belongs to, by its starting year (2026 = 2026/27). */
   season?: { year: number; slug?: string };
   status: { type: { name: string; state: string; completed: boolean } };
-  competitions: { competitors: EspnCompetitor[] }[];
+  competitions: { competitors: EspnCompetitor[]; venue?: { fullName?: string } }[];
 }
 
 export interface EspnCalendarEntry {
@@ -58,6 +58,53 @@ export async function fetchEspnYear(slug: string, year: number, init: RequestIni
   const res = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${year}&limit=1000`, init);
   if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} ${year}: HTTP ${res.status}`);
   return (await res.json()) as EspnScoreboard;
+}
+
+/** Each game's ground, by fixture id (ESPN ids), when the feed names it. */
+export function espnVenues(events: readonly EspnEvent[]): Record<number, string> {
+  const venues: Record<number, string> = {};
+  for (const e of events) {
+    const name = e.competitions[0]?.venue?.fullName?.trim();
+    if (name) venues[Number(e.id)] = name;
+  }
+  return venues;
+}
+
+/** Where one game stands right now: before, during or after it, with the final score. */
+export interface EspnGameState {
+  state: "pre" | "in" | "post";
+  /** Full time, with the score (a postponed or abandoned game has none). */
+  result: { home: number; away: number } | null;
+  /** Postponed, cancelled, abandoned or suspended. */
+  off: boolean;
+}
+
+const yyyymmdd = (time: number) => new Date(time).toISOString().slice(0, 10).replaceAll("-", "");
+
+/**
+ * One game's state from the league's scoreboard around its kick-off (a day
+ * either side: ESPN's days are US time). For match pages on match day, kept
+ * for `revalidate` seconds so the final score shows soon after the whistle.
+ */
+export async function fetchEspnGameState(slug: string, eventId: number, kickoff: string, revalidate: number): Promise<EspnGameState | null> {
+  const time = Date.parse(kickoff);
+  const range = `${yyyymmdd(time - 86_400_000)}-${yyyymmdd(time + 86_400_000)}`;
+  const res = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${range}&limit=200`, { next: { revalidate } });
+  if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} ${range}: HTTP ${res.status}`);
+  const board = (await res.json()) as EspnScoreboard;
+  const event = board.events?.find((e) => Number(e.id) === eventId);
+  if (!event) return null;
+  const type = event.status.type;
+  const competitors = event.competitions[0]?.competitors ?? [];
+  const goals = (side: "home" | "away") => Number(competitors.find((c) => c.homeAway === side)?.score);
+  const finished = type.completed && type.state === "post";
+  const home = goals("home");
+  const away = goals("away");
+  return {
+    state: type.state === "in" ? "in" : type.state === "post" ? "post" : "pre",
+    result: finished && Number.isFinite(home) && Number.isFinite(away) ? { home, away } : null,
+    off: REPLACEABLE_STATUSES.has(type.name),
+  };
 }
 
 interface EspnStandings {

@@ -14,7 +14,8 @@
     "test:e2e": "node e2e/smoke.cjs",
     "typecheck": "tsc --noEmit",
     "priors": "NODE_USE_ENV_PROXY=1 node scripts/build-priors.ts",
-    "backtest": "NODE_USE_ENV_PROXY=1 node scripts/backtest.ts"
+    "backtest": "NODE_USE_ENV_PROXY=1 node scripts/backtest.ts",
+    "snapshots": "NODE_USE_ENV_PROXY=1 node scripts/snapshot-odds.ts"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

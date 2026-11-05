@@ -13,6 +13,7 @@ import { Link } from "../../../../../i18n/navigation.ts";
 import { mustWinGames, toughestGames, type ClubFixture } from "../../../../../lib/clubOutlook.ts";
 import { clubDescription, clubHeading, loadClub } from "../../../../../lib/clubPage.ts";
 import { listOf, ordinal, percent, placeRange } from "../../../../../lib/clubText.ts";
+import { matchPath, matchSlug } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
 
 /** Regenerated in the background at most every hour, like the league pages (the league data is refreshed hourly). */
@@ -159,13 +160,28 @@ export default async function ClubPage({ params }: { params: Params }) {
       </div>
     </div>
   );
+  // Each game's own preview page (odds, likely scores, what each result means).
+  const preview = (f: ClubFixture) => {
+    const slug = matchSlug(league, f.fixture, teams.get(f.fixture.homeId), teams.get(f.fixture.awayId));
+    return slug ? matchPath(league, slug) : undefined;
+  };
+  const withPreview = (f: ClubFixture, content: React.ReactNode, className = "") => {
+    const href = preview(f);
+    return href ? (
+      <Link href={href} className={`hover:underline ${className}`} data-testid="club-match-link">
+        {content}
+      </Link>
+    ) : (
+      <span className={className}>{content}</span>
+    );
+  };
   const keyGame = (f: ClubFixture) => (
     <li key={f.fixture.id} className="flex items-center gap-3 py-2">
       {venue(f)}
       <div className="min-w-0 flex-1">
         {opponent(f)}
         <p className="mt-0.5 text-xs text-zinc-500">
-          {dateFormat.format(new Date(f.fixture.utcDate))} · {t("opponentPosition", { position: ordinal(f.opponentPosition, lang) })}
+          {withPreview(f, dateFormat.format(new Date(f.fixture.utcDate)))} · {t("opponentPosition", { position: ordinal(f.opponentPosition, lang) })}
         </p>
       </div>
       <span className="shrink-0 text-sm font-bold tabular-nums text-pitch-700 dark:text-pitch-300">{t("winChance", { pct: pct(f.win) })}</span>
@@ -381,10 +397,14 @@ export default async function ClubPage({ params }: { params: Params }) {
             <ul className="divide-y divide-zinc-200/70 dark:divide-zinc-800">
               {club.fixtures.map((f) => (
                 <li key={f.fixture.id} className="flex items-center gap-2 px-3 py-2 text-sm sm:gap-3" data-testid="club-fixture">
-                  <span className="w-9 shrink-0 text-xs tabular-nums text-zinc-500 sm:w-16">
-                    <span className="sm:hidden">{shortDate.format(new Date(f.fixture.utcDate))}</span>
-                    <span className="hidden sm:inline">{dateFormat.format(new Date(f.fixture.utcDate))}</span>
-                  </span>
+                  {withPreview(
+                    f,
+                    <>
+                      <span className="sm:hidden">{shortDate.format(new Date(f.fixture.utcDate))}</span>
+                      <span className="hidden sm:inline">{dateFormat.format(new Date(f.fixture.utcDate))}</span>
+                    </>,
+                    "w-9 shrink-0 text-xs tabular-nums text-zinc-500 sm:w-16",
+                  )}
                   {venue(f)}
                   <div className="min-w-0 flex-1">{opponent(f)}</div>
                   {odds(f)}

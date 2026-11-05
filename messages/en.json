@@ -870,5 +870,63 @@
         "relegation": "Relegation"
       }
     }
+  },
+  "Match": {
+    "h1": "{home} vs {away} prediction: odds and simulated scores",
+    "h1Played": "{home} {homeGoals}–{awayGoals} {away}: result and pre-match prediction",
+    "title": "{home} vs {away} prediction ({date}): odds and simulated scores",
+    "titlePlayed": "{home} {homeGoals}–{awayGoals} {away} ({date}): result and pre-match prediction",
+    "description": "{home} vs {away}, {league}, {date}: {home} win {homeWin}, draw {draw}, {away} win {awayWin}. Expected goals {homeXg}–{awayXg}, the five likeliest scores and what each result means for the season.",
+    "descriptionPlayed": "{home} {homeGoals}–{awayGoals} {away}, {league}, {date}. Before kick-off the model gave {home} {homeWin}, the draw {draw} and {away} {awayWin}, with expected goals of {homeXg}–{awayXg}.",
+    "matchday": "Matchday {n}",
+    "yourTime": "your time",
+    "fullTime": "Full time",
+    "live": "In progress",
+    "liveNote": "The game is under way: the final score will show here soon after the whistle.",
+    "postponed": "Postponed",
+    "postponedNote": "This game has been postponed; its new date will show here once it's set.",
+    "vs": "vs",
+    "predictionTitle": "Prediction",
+    "preMatchTitle": "Pre-match prediction",
+    "preMatchNote": "The model's odds at kick-off, from the results before this game.",
+    "predictionNote": "From the match model: each side's attack and defence, rated from this season's results (starting from last season's), and home advantage.",
+    "win": "{team} win",
+    "draw": "Draw",
+    "oddsLabel": "{home} win {homeWin}, draw {draw}, {away} win {awayWin}",
+    "xgTitle": "Expected goals",
+    "scoresTitle": "Most likely scores",
+    "diceTitle": "Roll a likely score",
+    "diceButton": "Roll the dice",
+    "diceAgain": "Roll again",
+    "diceNote": "One of the likeliest scores, picked the way the simulator's dice picks it.",
+    "diceResult": "Rolled: {score}",
+    "formTitle": "Form and table",
+    "position": "Position",
+    "points": "Points",
+    "played": "Played",
+    "form": "Form",
+    "formEmpty": "No games yet",
+    "impactTitle": "What this result means",
+    "impactNote": "Each result played out over {count} simulated seasons, with its likeliest score; every other game is simulated the same way each time, so the change is this result's alone.",
+    "impactNow": "Now",
+    "impactHome": "{team} win",
+    "impactDraw": "Draw",
+    "impactAway": "{team} win",
+    "impactKind": {
+      "title": "Title",
+      "promotion": "Promotion",
+      "playoffs": "Play-offs",
+      "relegation": "Relegation",
+      "position": "Average finish"
+    },
+    "impactDelta": "{sign}{n, plural, one {# pt} other {# pts}}",
+    "impactPositionNote": "Average finish: the club's mean final place over the simulated seasons (lower is better).",
+    "seasonChances": "{club}: season chances",
+    "simulate": "Simulate the rest of the {league} season",
+    "card": {
+      "fullTime": "Full time",
+      "preMatch": "Pre-match prediction",
+      "cta": "Match odds at footsimu.com"
+    }
   }
 }

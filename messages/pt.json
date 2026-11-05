@@ -870,5 +870,63 @@
         "relegation": "Rebaixamento"
       }
     }
+  },
+  "Match": {
+    "h1": "Palpite {home} x {away}: probabilidades e placares simulados",
+    "h1Played": "{home} {homeGoals}–{awayGoals} {away}: resultado e palpite pré-jogo",
+    "title": "Palpite {home} x {away} ({date}): probabilidades e placares simulados",
+    "titlePlayed": "{home} {homeGoals}–{awayGoals} {away} ({date}): resultado e palpite pré-jogo",
+    "description": "{home} x {away}, {league}, {date}: vitória de {home} {homeWin}, empate {draw}, vitória de {away} {awayWin}. Gols esperados {homeXg}–{awayXg}, os cinco placares mais prováveis e o que cada resultado significa na temporada.",
+    "descriptionPlayed": "{home} {homeGoals}–{awayGoals} {away}, {league}, {date}. Antes do jogo, o modelo dava vitória de {home} {homeWin}, empate {draw} e vitória de {away} {awayWin}, com gols esperados de {homeXg}–{awayXg}.",
+    "matchday": "Rodada {n}",
+    "yourTime": "seu horário",
+    "fullTime": "Fim de jogo",
+    "live": "Em andamento",
+    "liveNote": "O jogo está em andamento: o placar final aparece aqui logo após o apito.",
+    "postponed": "Adiado",
+    "postponedNote": "Este jogo foi adiado; a nova data aparece aqui assim que for definida.",
+    "vs": "x",
+    "predictionTitle": "Palpite",
+    "preMatchTitle": "Palpite pré-jogo",
+    "preMatchNote": "As probabilidades do modelo no início do jogo, a partir dos resultados anteriores a ele.",
+    "predictionNote": "Do modelo de jogo: ataque e defesa de cada time, calculados com os resultados desta temporada (partindo da anterior), e a vantagem de jogar em casa.",
+    "win": "Vitória de {team}",
+    "draw": "Empate",
+    "oddsLabel": "Vitória de {home} {homeWin}, empate {draw}, vitória de {away} {awayWin}",
+    "xgTitle": "Gols esperados",
+    "scoresTitle": "Placares mais prováveis",
+    "diceTitle": "Role um placar provável",
+    "diceButton": "Rolar o dado",
+    "diceAgain": "Rolar de novo",
+    "diceNote": "Um dos placares mais prováveis, escolhido como o dado do simulador escolhe.",
+    "diceResult": "Resultado: {score}",
+    "formTitle": "Forma e tabela",
+    "position": "Posição",
+    "points": "Pontos",
+    "played": "Jogos",
+    "form": "Forma",
+    "formEmpty": "Nenhum jogo ainda",
+    "impactTitle": "O que cada resultado significa",
+    "impactNote": "Cada resultado simulado em {count} temporadas, com o seu placar mais provável; os outros jogos são simulados da mesma forma em todas, então a diferença vem só deste resultado.",
+    "impactNow": "Agora",
+    "impactHome": "Vitória de {team}",
+    "impactDraw": "Empate",
+    "impactAway": "Vitória de {team}",
+    "impactKind": {
+      "title": "Título",
+      "promotion": "Acesso",
+      "playoffs": "Playoffs",
+      "relegation": "Rebaixamento",
+      "position": "Posição média"
+    },
+    "impactDelta": "{sign}{n} p.p.",
+    "impactPositionNote": "Posição média: a colocação final média do clube nas temporadas simuladas (quanto menor, melhor).",
+    "seasonChances": "{club}: chances na temporada",
+    "simulate": "Simule o resto da temporada – {league}",
+    "card": {
+      "fullTime": "Fim de jogo",
+      "preMatch": "Palpite pré-jogo",
+      "cta": "Palpites em footsimu.com"
+    }
   }
 }

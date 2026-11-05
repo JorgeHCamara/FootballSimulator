@@ -116,4 +116,19 @@ describe("the sitemap", () => {
     assert.deepEqual(Object.keys(first.alternates!.languages!).sort(), ["en", "es", "pt-BR"]);
     assert.equal(new Set(clubs.map((e) => e.url)).size, clubs.length, "no duplicates");
   });
+
+  it("lists every league game from the past 30 days to the next 14, in every language", async () => {
+    const entries = await sitemap();
+    const games = entries.filter((e) => e.url.includes("/match/"));
+    assert.ok(games.length > 0);
+    const day = 86_400_000;
+    for (const e of games) {
+      const date = Date.parse(`${e.url.slice(-10)}T12:00:00Z`);
+      // The address has the local day: up to a day either side of the window in UTC.
+      assert.ok(date >= Date.now() - 31 * day && date <= Date.now() + 15 * day, e.url);
+      assert.match(e.url, /\/(en|pt|es)\/[a-z0-9-]+\/match\/[a-z0-9-]+-vs-[a-z0-9-]+-\d{4}-\d{2}-\d{2}$/);
+    }
+    for (const locale of ["pt", "es"]) assert.equal(games.filter((e) => e.url.includes(`/${locale}/`)).length, games.length / 3);
+    assert.ok(!games.some((e) => e.url.includes("/champions-league/")));
+  });
 });

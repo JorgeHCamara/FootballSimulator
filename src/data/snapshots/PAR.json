@@ -1,0 +1,11 @@
+{
+  "league": "PAR",
+  "seasons": {
+    "PAR:2026:torneo-clausura": {
+      "season": "Clausura 2026",
+      "snapshots": [
+        {"round":17,"date":"2026-11-01","asOf":"2026-11-01T20:01:00.000Z","takenAt":"2026-11-05T02:59:58.426Z","played":102,"iterations":10000,"scope":"annual","teams":{"2670":{"position":5,"points":61,"played":39,"expectedPosition":4.1154,"averagePoints":69.0625,"chances":{"libertadores":0.3218,"sudamericana":0.6781}},"2671":{"position":4,"points":62,"played":39,"expectedPosition":4.1661,"averagePoints":69.4133,"chances":{"libertadores":0.3095,"sudamericana":0.6905}},"2675":{"position":1,"points":85,"played":39,"expectedPosition":1.0001,"averagePoints":94.8761,"chances":{"libertadores":1,"sudamericana":0}},"5583":{"position":11,"points":36,"played":39,"expectedPosition":10.7732,"averagePoints":41.0832,"chances":{"libertadores":0,"sudamericana":0}},"5584":{"position":2,"points":71,"played":39,"expectedPosition":2.0104,"averagePoints":80.1658,"chances":{"libertadores":0.9998,"sudamericana":0.0002}},"6097":{"position":8,"points":51,"played":39,"expectedPosition":7.7486,"averagePoints":56.9808,"chances":{"libertadores":0,"sudamericana":0.247}},"7385":{"position":6,"points":57,"played":39,"expectedPosition":5.8897,"averagePoints":63.7283,"chances":{"libertadores":0.0153,"sudamericana":0.971}},"7466":{"position":3,"points":62,"played":39,"expectedPosition":4.0017,"averagePoints":69.3921,"chances":{"libertadores":0.3535,"sudamericana":0.6465}},"10080":{"position":10,"points":39,"played":39,"expectedPosition":10.0769,"averagePoints":44.6041,"chances":{"libertadores":0,"sudamericana":0}},"17671":{"position":12,"points":22,"played":39,"expectedPosition":12,"averagePoints":25.6591,"chances":{"libertadores":0,"sudamericana":0}},"21313":{"position":7,"points":52,"played":39,"expectedPosition":7.0899,"averagePoints":59.1817,"chances":{"libertadores":0.0001,"sudamericana":0.7655}},"22517":{"position":9,"points":43,"played":39,"expectedPosition":9.128,"averagePoints":48.5253,"chances":{"libertadores":0,"sudamericana":0.0012}}}}
+      ]
+    }
+  }
+}

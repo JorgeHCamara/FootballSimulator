@@ -4,7 +4,7 @@ import { runMonteCarlo, type MonteCarloInput, type MonteCarloResult } from "../e
 import { buildLeagueModel, type LeagueModel } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
 import { computeStandings, type StandingsOptions } from "../engine/standings.ts";
-import type { Fixture, StandingRow, Team, TeamId } from "../engine/types.ts";
+import type { Fixture, ResultMap, Score, StandingRow, Team, TeamId } from "../engine/types.ts";
 import { CONTINENTAL, leagueFacts } from "./leagueFacts.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { domesticModelOptions } from "./priors.ts";
@@ -45,6 +45,8 @@ export interface ClubOutlook {
   headline: HeadlineChance[];
   /** The most likely final place, and its chance. */
   likeliest: { position: number; chance: number };
+  /** The average final place over the simulated seasons. */
+  expectedPosition: number;
   averagePoints: number;
   /** Its games still to play, soonest first. */
   fixtures: ClubFixture[];
@@ -63,6 +65,8 @@ export interface LeagueOutlook {
   clubs: Map<TeamId, ClubOutlook>;
   /** Clubs of the league, in table order (by conference, one after the other). */
   order: TeamId[];
+  /** The match model the chances (and every game's odds) come from. */
+  model: LeagueModel;
 }
 
 /** The kinds a club's headline chances are about, in this order: the title, the top continental place, promotion, play-offs, relegation. */
@@ -152,7 +156,8 @@ export function mustWinGames(fixtures: readonly ClubFixture[], position: number,
     .slice(0, count);
 }
 
-interface Setup {
+/** What a league's Monte Carlo runs on, and how its result reads as places. */
+export interface OutlookSetup {
   model: LeagueModel;
   /** The table(s) now, positions within each. */
   rows: StandingRow[];
@@ -171,7 +176,7 @@ interface Setup {
   complete: boolean;
 }
 
-function setup(league: LeagueConfig, data: LeagueData): Setup | null {
+export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSetup | null {
   const facts = leagueFacts(league);
   if (!facts) return null;
   const base: StandingsOptions = { tiebreakers: league.tiebreakers, ...(data.deductions ? { deductions: data.deductions } : {}) };
@@ -254,15 +259,8 @@ function setup(league: LeagueConfig, data: LeagueData): Setup | null {
   return null;
 }
 
-/**
- * Every club's outlook in a league: where it stands, its chances over the
- * rest of the season (the league page's Monte Carlo, from the real results
- * only) and the model's odds for its remaining games.
- */
-export function leagueOutlook(league: LeagueConfig, data: LeagueData, iterations = SCENARIO_ITERATIONS): LeagueOutlook | null {
-  const s = setup(league, data);
-  if (!s) return null;
-  const result: MonteCarloResult = runMonteCarlo({ ...s.input, iterations, seed: SCENARIO_SEED });
+/** Every club's outlook from one Monte Carlo run of the league's setup. */
+export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: OutlookSetup, result: MonteCarloResult): LeagueOutlook {
   // Rows' places are already over the whole table (a split's groups one after the other).
   const positions = new Map(s.rows.map((r) => [r.teamId, r.position]));
   const passedDown = new Set(s.input.passDown ?? []);
@@ -293,6 +291,7 @@ export function leagueOutlook(league: LeagueConfig, data: LeagueData, iterations
     distribution.forEach((chance, p) => {
       if (chance > likeliest.chance) likeliest = { position: p + 1, chance };
     });
+    const expectedPosition = distribution.reduce((sum, chance, p) => sum + chance * (p + 1), 0);
     const group = s.groupOf?.get(row.teamId);
     clubs.set(row.teamId, {
       team,
@@ -302,31 +301,110 @@ export function leagueOutlook(league: LeagueConfig, data: LeagueData, iterations
       zones,
       headline: headlineChances(zones, share, passedDown.has(row.teamId)),
       likeliest,
+      expectedPosition,
       averagePoints: result.averagePoints[row.teamId] ?? row.points,
       fixtures: clubFixtures(row.teamId, s.fixtures, s.model, positions),
       ...(group ? { group } : {}),
     });
   }
-  return { league, season: data.season, iterations: result.iterations, complete: s.complete, scope: s.scope, clubs, order: s.rows.map((r) => r.teamId) };
+  return { league, season: data.season, iterations: result.iterations, complete: s.complete, scope: s.scope, clubs, order: s.rows.map((r) => r.teamId), model: s.model };
+}
+
+/**
+ * Every club's outlook in a league: where it stands, its chances over the
+ * rest of the season (the league page's Monte Carlo, from the real results
+ * only) and the model's odds for its remaining games. With `override`, the
+ * same run with those results set ("what if this game ends 2–1").
+ */
+export function leagueOutlook(league: LeagueConfig, data: LeagueData, iterations = SCENARIO_ITERATIONS, override?: ResultMap, s = outlookSetup(league, data)): LeagueOutlook | null {
+  if (!s) return null;
+  const result = runMonteCarlo({ ...s.input, iterations, seed: SCENARIO_SEED, ...(override ? { override } : {}) });
+  return outlookFromRun(league, data, s, result);
+}
+
+/**
+ * The league as it stood at a moment: games kicking off at or after `cutoff`
+ * (an ISO time) have no result yet. For pre-match odds and past snapshots.
+ */
+export function dataAsOf(data: LeagueData, cutoff: string): LeagueData {
+  const strip = (fixtures: Fixture[]) => fixtures.map((f) => (f.result && f.utcDate >= cutoff ? { ...f, result: null } : f));
+  return {
+    ...data,
+    fixtures: strip(data.fixtures),
+    ...(data.tournaments ? { tournaments: data.tournaments.map((t) => ({ ...t, fixtures: strip(t.fixtures) })) } : {}),
+  };
 }
 
 /**
  * One outlook per league and data version, kept while the server runs: the
  * club pages of a league (and their images) share one Monte Carlo.
  */
-const cache = new Map<string, { version: string; outlook: LeagueOutlook | null }>();
+const cache = new Map<string, { version: string; outlook: LeagueOutlook | null; setup: OutlookSetup | null }>();
 
-const dataVersion = (data: LeagueData) => {
+/** A fingerprint of a league's data: every game's id, date and result, and the groups. */
+export function dataVersion(data: LeagueData): string {
   const fixtures = data.tournaments?.flatMap((t) => t.fixtures) ?? data.fixtures;
-  const played = fixtures.filter((f) => f.result);
-  return `${data.seasonKey}:${fixtures.length}:${played.length}:${played.reduce((sum, f) => sum + f.id * 7 + f.result!.home * 3 + f.result!.away, 0)}:${data.groups?.map((g) => g.teamIds.join(",")).join("|") ?? ""}`;
-};
+  // FNV-1a over each game, so a moved or newly played game changes it.
+  let hash = 0x811c9dc5;
+  const add = (text: string) => {
+    for (let i = 0; i < text.length; i++) hash = Math.imul(hash ^ text.charCodeAt(i), 0x01000193) >>> 0;
+  };
+  for (const f of fixtures) add(`${f.id}@${f.utcDate}=${f.result ? `${f.result.home}-${f.result.away}` : ""};`);
+  add(data.groups?.map((g) => g.teamIds.join(",")).join("|") ?? "");
+  return `${data.seasonKey}:${fixtures.length}:${hash.toString(36)}`;
+}
 
-export function cachedLeagueOutlook(league: LeagueConfig, data: LeagueData): LeagueOutlook | null {
+function cached(league: LeagueConfig, data: LeagueData) {
   const version = dataVersion(data);
   const hit = cache.get(league.code);
-  if (hit && hit.version === version) return hit.outlook;
-  const outlook = leagueOutlook(league, data);
-  cache.set(league.code, { version, outlook });
-  return outlook;
+  if (hit && hit.version === version) return hit;
+  const setup = outlookSetup(league, data);
+  const entry = { version, setup, outlook: leagueOutlook(league, data, SCENARIO_ITERATIONS, undefined, setup) };
+  cache.set(league.code, entry);
+  return entry;
+}
+
+export function cachedLeagueOutlook(league: LeagueConfig, data: LeagueData): LeagueOutlook | null {
+  return cached(league, data).outlook;
+}
+
+/** What a club's page would say after a result: its chances and average place. */
+export type ClubChances = Pick<ClubOutlook, "zones" | "headline" | "expectedPosition">;
+
+/** The season's chances of a game's two clubs after a home win, a draw and an away win (each with a given score). */
+export interface ResultScenarios {
+  scores: { home: Score; draw: Score; away: Score };
+  /** By result, then by club. */
+  after: Record<"home" | "draw" | "away", Map<TeamId, ClubChances>>;
+}
+
+const scenarioCache = new Map<string, ResultScenarios>();
+/** Kept while the server runs, a few hundred games at most (each holds two clubs' chances, three times). */
+const SCENARIO_CACHE_SIZE = 500;
+
+/**
+ * Reruns the league's Monte Carlo three times with the game's result set to
+ * each score: the same draws for every other game (common random numbers), so
+ * the change from today's chances is the result's alone. Cached per game and
+ * data version.
+ */
+export function resultScenarios(league: LeagueConfig, data: LeagueData, fixture: Fixture, scores: ResultScenarios["scores"]): ResultScenarios | null {
+  const { version, setup } = cached(league, data);
+  if (!setup) return null;
+  const key = `${league.code}:${version}:${fixture.id}:${JSON.stringify(scores)}`;
+  const hit = scenarioCache.get(key);
+  if (hit) return hit;
+  const pick = (score: Score) => {
+    const outlook = leagueOutlook(league, data, SCENARIO_ITERATIONS, { [fixture.id]: score }, setup)!;
+    const clubs = new Map<TeamId, ClubChances>();
+    for (const id of [fixture.homeId, fixture.awayId]) {
+      const club = outlook.clubs.get(id);
+      if (club) clubs.set(id, { zones: club.zones, headline: club.headline, expectedPosition: club.expectedPosition });
+    }
+    return clubs;
+  };
+  const scenarios: ResultScenarios = { scores, after: { home: pick(scores.home), draw: pick(scores.draw), away: pick(scores.away) } };
+  if (scenarioCache.size >= SCENARIO_CACHE_SIZE) scenarioCache.delete(scenarioCache.keys().next().value!);
+  scenarioCache.set(key, scenarios);
+  return scenarios;
 }

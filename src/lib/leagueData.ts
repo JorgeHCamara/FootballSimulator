@@ -2,7 +2,7 @@ import { gamesPerTeam, isStage, type EspnStages, type LeagueConfig } from "../co
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
-import { EspnError, espnFixtures, espnSplitSeason, espnTeams, fetchEspnDeductions, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
+import { EspnError, espnFixtures, espnSplitSeason, espnTeams, espnVenues, fetchEspnDeductions, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
 import { withClubPages } from "./clubs.ts";
@@ -31,6 +31,10 @@ export interface LeagueData {
   deductions?: Record<number, number>;
   /** A split league: the first phase's games by ESPN's stage tag (see `split.espnStage`). */
   firstPhaseIds?: number[];
+  /** Where the data came from (ESPN's game ids differ from football-data.org's). */
+  provider?: "espn" | "football-data";
+  /** Each game's ground, by fixture id, when the feed names it (match pages). */
+  venues?: Record<number, string>;
 }
 
 export interface Tournament {
@@ -112,6 +116,7 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
     seasonKey: `${league.code}:${season.id || season.startDate.slice(0, 4)}`,
     seasonYear: Number(season.startDate.slice(0, 4)),
     source: "live",
+    provider: "football-data",
     ...(postseason.length ? { postseason } : {}),
   };
 }
@@ -129,12 +134,12 @@ export function currentSeasonYear(league: LeagueConfig, now = new Date()): numbe
  * Until at least half of a new season's fixtures are published, the previous
  * season is shown.
  */
-async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
+async function loadEspn(league: LeagueConfig, years?: readonly number[]): Promise<LeagueData> {
   const { slug, seasons, weeklyRounds } = league.espn;
   const init = { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
   const perTeam = gamesPerTeam(league);
   const current = currentSeasonYear(league);
-  for (const year of [current, current - 1]) {
+  for (const year of years ?? [current, current - 1]) {
     let all = await fetchEspnSeason(slug, year, seasons, init);
     // Optional groups (a split later in the season): one table until they exist.
     const groups = league.groups
@@ -217,6 +222,8 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       seasonKey: `${baseKey}${stageSets.length > 1 && stages ? `:${stages.table}` : ""}`,
       seasonYear: year,
       source: "live",
+      provider: "espn",
+      venues: espnVenues([...events, ...tournamentEvents]),
       ...(league.playoff && postseason.length ? { postseason: realPostseason(postseason) } : {}),
       ...(groups ? { groups } : {}),
       ...(tournaments.length > 1 ? { tournaments } : {}),
@@ -225,7 +232,7 @@ async function loadEspn(league: LeagueConfig): Promise<LeagueData> {
       ...(firstPhaseIds.length && firstPhaseIds.length < fixtures.length ? { firstPhaseIds } : {}),
     };
   }
-  throw new Error(`No ${league.code} fixtures on ESPN for ${current} or ${current - 1}`);
+  throw new Error(`No ${league.code} fixtures on ESPN for ${(years ?? [current, current - 1]).join(" or ")}`);
 }
 
 /** The league's groups (conferences) with their clubs, matched to the config by ESPN's group names. */
@@ -303,6 +310,32 @@ export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
     if (!isBuildPhase()) inflight.delete(league.code);
   };
   promise.then(forget, () => inflight.delete(league.code));
+  return promise;
+}
+
+const pastInflight = new Map<string, Promise<LeagueData | undefined>>();
+
+/**
+ * An earlier season of a league from ESPN (match pages of last season's
+ * games, after the new season has taken over), or undefined when it can't be
+ * loaded (or with sample data). Cached like the current season's.
+ */
+export function getPastSeasonData(league: LeagueConfig, year: number): Promise<LeagueData | undefined> {
+  if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return Promise.resolve(undefined);
+  const key = `${league.code}:${year}`;
+  const pending = pastInflight.get(key);
+  if (pending) return pending;
+  const promise = loadEspn(league, [year]).then(
+    (data) => ({ ...data, teams: withClubPages(league, data.teams) }),
+    (error: unknown) => {
+      console.warn(`${league.code}: no ${year} season on ESPN:`, error);
+      return undefined;
+    },
+  );
+  pastInflight.set(key, promise);
+  promise.then(() => {
+    if (!isBuildPhase()) pastInflight.delete(key);
+  });
   return promise;
 }
 

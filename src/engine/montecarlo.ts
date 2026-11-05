@@ -11,6 +11,13 @@ export interface MonteCarloInput {
   fixtures: readonly Fixture[];
   /** Results treated as fixed (real results plus the user's own predictions). */
   fixed: ResultMap;
+  /**
+   * Results set after each run's games are drawn ("what if this game ends
+   * 2–1"): every other game gets the same draws as without them (common random
+   * numbers), so the difference from a run without `override` is the result's
+   * effect alone, not simulation noise.
+   */
+  override?: ResultMap;
   model: LeagueModel;
   standings: StandingsOptions;
   iterations: number;
@@ -102,6 +109,7 @@ export function runMonteCarlo(input: MonteCarloInput): MonteCarloResult {
   const playoffWins: Record<TeamId, number> = {};
   for (let i = 0; i < iterations; i++) {
     for (const r of remaining) results[r.id] = sampleScore(r.sampler, rng);
+    if (input.override) Object.assign(results, input.override);
     let played: readonly Fixture[] = fixtures;
     if (input.project) {
       const { afterRound, afterDate, groups } = input.project;

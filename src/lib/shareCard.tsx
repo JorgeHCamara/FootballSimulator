@@ -228,3 +228,98 @@ export async function renderClubCard(text: ClubCardText) {
     { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
   );
 }
+
+/**
+ * A crest as a data URI for a card (PNG or JPEG only), or undefined when it
+ * can't be fetched quickly: the card then shows the club's initials.
+ */
+export async function crestDataUri(url: string | undefined): Promise<string | undefined> {
+  if (!url) return undefined;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(2500), next: { revalidate: 604800 } });
+    const type = res.headers.get("content-type")?.split(";")[0]?.trim() ?? "";
+    if (!res.ok || !["image/png", "image/jpeg"].includes(type)) return undefined;
+    const bytes = Buffer.from(await res.arrayBuffer());
+    return bytes.length > 400_000 ? undefined : `data:${type};base64,${bytes.toString("base64")}`;
+  } catch {
+    return undefined;
+  }
+}
+
+export interface MatchCardText {
+  pill: string;
+  home: { name: string; tla: string; crest?: string };
+  away: { name: string; tla: string; crest?: string };
+  /** e.g. "Sat 8 Nov 2026 · 15:00 GMT". */
+  when: string;
+  /** Once played: the score and "Full time". */
+  result?: { score: string; label: string };
+  /** Above the odds once played ("Pre-match prediction"). */
+  oddsTitle?: string;
+  odds: { label: string; value: string; share: number; color: string }[];
+  cta: string;
+}
+
+const crest = (side: MatchCardText["home"], size: number) =>
+  side.crest ? (
+    // eslint-disable-next-line @next/next/no-img-element -- next/og renders plain img elements
+    <img src={side.crest} width={size} height={size} style={{ objectFit: "contain" }} alt="" />
+  ) : (
+    <div style={{ width: size, height: size, borderRadius: size / 2, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.32, fontWeight: 800 }}>
+      {side.tla.slice(0, 3)}
+    </div>
+  );
+
+/** A match page's card: the two clubs, when they meet, and the model's odds (or the final score). */
+export async function renderMatchCard(text: MatchCardText) {
+  const nameSize = (name: string) => (name.length <= 14 ? 46 : name.length <= 20 ? 38 : 32);
+  return new ImageResponse(
+    (
+      <div style={{ width: "100%", height: "100%", display: "flex", background: PITCH_700, fontFamily: "Inter", color: "#ffffff" }}>
+        <div style={{ width: 600, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "44px 36px 44px 56px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <BrandMark size={48} />
+            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ display: "flex" }}>
+              <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: 1.5, padding: "8px 16px", borderRadius: 999, background: "rgba(255,255,255,0.16)", color: "#dcfce7" }}>
+                {text.pill}
+              </span>
+            </div>
+            {[text.home, text.away].map((side, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 18 }}>
+                {crest(side, 64)}
+                <span style={{ fontSize: nameSize(side.name), fontWeight: 800, letterSpacing: -1, lineHeight: 1.05, maxWidth: 400 }}>{truncate(side.name, 26)}</span>
+                {text.result && (
+                  <span style={{ marginLeft: "auto", fontSize: 52, fontWeight: 800 }}>{text.result.score.split("–")[i]}</span>
+                )}
+              </div>
+            ))}
+            <span style={{ fontSize: 24, fontWeight: 600, color: "#bbf7d0" }}>{text.result ? `${text.result.label} · ${text.when}` : text.when}</span>
+          </div>
+          <div style={{ display: "flex" }}>
+            <span style={{ fontSize: 22, fontWeight: 700, padding: "12px 22px", borderRadius: 14, background: "#ffffff", color: PITCH_700 }}>{text.cta}</span>
+          </div>
+        </div>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "36px 48px 36px 4px" }}>
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 24, background: "#ffffff", borderRadius: 24, padding: "30px 32px", color: "#18181b", boxShadow: "0 20px 40px rgba(0,0,0,0.25)" }}>
+            {text.oddsTitle && <span style={{ fontSize: 20, fontWeight: 700, color: "#71717a", textTransform: "uppercase", letterSpacing: 1 }}>{text.oddsTitle}</span>}
+            {text.odds.map((o) => (
+              <div key={o.label} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 24, fontWeight: 700, color: "#3f3f46" }}>{truncate(o.label, 22)}</span>
+                  <span style={{ fontSize: 42, fontWeight: 800, letterSpacing: -1 }}>{o.value}</span>
+                </div>
+                <div style={{ display: "flex", height: 14, borderRadius: 7, background: "#e4e4e7" }}>
+                  <div style={{ display: "flex", width: `${Math.max(o.share > 0 ? 2 : 0, o.share * 100)}%`, height: 14, borderRadius: 7, background: o.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
+  );
+}
