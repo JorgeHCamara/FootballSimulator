@@ -19,8 +19,8 @@ Item 0 (setting up this file and the workflow) came first, on `roadmap/0-setup`.
 
 | # | Item | Status | Branch |
 |---|---|---|---|
-| 1 | Match impact cache key and skeleton | in-pr | `roadmap/1-impact-cache` |
-| 2 | Club page Likely finish range | todo | `roadmap/2-likely-finish-range` |
+| 1 | Match impact cache key and skeleton | done | `roadmap/1-impact-cache` |
+| 2 | Club page Likely finish range | in-pr | `roadmap/2-likely-finish-range` |
 | 3 | Rating noise: offline tune | todo | `roadmap/3-rating-noise-tune` |
 | 4 | Rating noise: live (gated on item 3) | todo | `roadmap/4-rating-noise-live` |
 | 5 | Snapshot integrity | todo | `roadmap/5-snapshot-integrity` |

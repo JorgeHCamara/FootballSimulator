@@ -3,7 +3,7 @@ import { zoneHex } from "../../../../../components/zones.ts";
 import { getLeagueBySlug, type SiteLocale } from "../../../../../config/leagues.ts";
 import { firstCardThatRenders } from "../../../../../lib/cardFallback.ts";
 import { clubCardChances, loadClub } from "../../../../../lib/clubPage.ts";
-import { ordinal } from "../../../../../lib/clubText.ts";
+import { ordinal, placeRange } from "../../../../../lib/clubText.ts";
 import { OG_SIZE } from "../../../../../lib/ogImage.tsx";
 import { crestDataUri, renderClubCard, renderGenericShareCard } from "../../../../../lib/shareCard.tsx";
 
@@ -34,7 +34,8 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
       tla: team.tla,
       ...(withCrest && crest ? { crest } : {}),
       standing: `${ordinal(club.row.position, lang)} · ${club.row.points} ${tc("points")}`,
-      likeliest: t("card.likeliest", { position: ordinal(club.likeliest.position, lang) }),
+      // The range only (no chance on the card).
+      likeliest: t("card.likeliest", { range: placeRange(club.likelyRange.from, club.likelyRange.to, lang) }),
       chances: clubCardChances(loaded, lang, t as never, tz as never).map((c) => ({ label: c.label, value: c.value, share: c.chance, color: zoneHex(c.zone) })),
       basedOn: t("card.basedOn", { count: new Intl.NumberFormat(lang).format(outlook.iterations) }),
       cta: t("card.cta"),

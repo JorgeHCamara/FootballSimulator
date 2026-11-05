@@ -1643,7 +1643,7 @@ async function step(name, fn) {
       const ld = JSON.parse(await p.locator('script[type="application/ld+json"]').first().textContent());
       assert.equal(ld["@graph"][0]["@type"], "SportsTeam");
       assert.equal(ld["@graph"][0].memberOf.name, "Premier League");
-      assert.match(await p.getByTestId("club-summary").innerText(), /simulated seasons\. In the most likely final table they finish/);
+      assert.match(await p.getByTestId("club-summary").innerText(), /simulated seasons\. Their likely finish is \d+(st|nd|rd|th)(–\d+(st|nd|rd|th))? \(\d+% of seasons\)/);
       assert.equal(await p.locator('[data-testid="club-chances"] [data-zone]').count(), 5);
       assert.ok((await p.locator('[data-testid="club-form"] [data-result] svg').count()) > 0, "form badges are Lucide icons");
       const fixtures = await p.getByTestId("club-fixture").count();

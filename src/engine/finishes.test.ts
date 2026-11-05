@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { assign, mostLikelyPlaces } from "./finishes.ts";
+import { assign, likelyFinishRange, mostLikelyPlaces } from "./finishes.ts";
 import { createRng } from "./rng.ts";
 
 /** Every way of giving each row a different column: the cheapest total, by brute force. */
@@ -55,3 +55,38 @@ describe("the most likely final table", () => {
     assert.deepEqual(mostLikelyPlaces([], []), []);
   });
 });
+
+describe("a club's likely finish range", () => {
+  const close = (a: number, b: number) => Math.abs(a - b) < 1e-12;
+
+  it("the shortest run of places covering at least 75% of the club's chances", () => {
+    // Peaks at 3rd: 3rd–4th has 80%, and no single place has 75%.
+    const r = likelyFinishRange([0, 0.1, 0.5, 0.3, 0.1]);
+    assert.deepEqual([r.from, r.to], [3, 4]);
+    assert.ok(close(r.chance, 0.8));
+    // One place can be enough.
+    assert.deepEqual(likelyFinishRange([0.9, 0.1]), { from: 1, to: 1, chance: 0.9 });
+    // Spread out: a longer run.
+    const wide = likelyFinishRange([0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1]);
+    assert.deepEqual([wide.from, wide.to], [2, 6]);
+    assert.ok(wide.chance >= 0.75);
+  });
+
+  it("runs of the same length: the likelier; then the one nearest the expected place", () => {
+    // 2nd–3rd 75%, 3rd–4th 76%: the likelier wins, though 2nd–3rd is nearer the expected place (2.83).
+    const r = likelyFinishRange([0.09, 0.15, 0.6, 0.16]);
+    assert.deepEqual([r.from, r.to], [3, 4]);
+    // 2nd–3rd and 3rd–4th both 75%; the expected place (3.15) is nearer 3rd–4th.
+    const tie = likelyFinishRange([0, 0.2, 0.55, 0.2, 0, 0.05]);
+    assert.deepEqual([tie.from, tie.to], [3, 4]);
+    assert.ok(close(tie.chance, 0.75));
+  });
+
+  it("no run reaching 75% (chances adding up to less): every place; nothing at all: 1st", () => {
+    assert.deepEqual(likelyFinishRange([0.1, 0.1, 0.1]), { from: 1, to: 3, chance: 0.1 + 0.1 + 0.1 });
+    assert.deepEqual(likelyFinishRange([]), { from: 1, to: 1, chance: 0 });
+    // Another coverage.
+    assert.deepEqual([likelyFinishRange([0, 0.1, 0.5, 0.3, 0.1], 0.5).from, likelyFinishRange([0, 0.1, 0.5, 0.3, 0.1], 0.5).to], [3, 3]);
+  });
+});
+

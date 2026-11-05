@@ -834,10 +834,10 @@
       "playoffs": "reach the play-offs in {pct}",
       "relegation": "go down in {pct}"
     },
-    "summaryLikeliest": "In the most likely final table they finish {position} ({pct} of seasons), averaging {avgPoints} points.",
+    "summaryLikeliest": "Their likely finish is {range} ({pct} of seasons), averaging {avgPoints} points.",
     "chancesTitle": "Season chances",
     "chancesNote": "From {count} simulations of the rest of the season, starting from the real results so far. Updated every few hours.",
-    "likeliest": "Most likely finish",
+    "likeliest": "Likely finish",
     "averagePoints": "Average points",
     "distributionTitle": "Finishing position",
     "distributionNote": "Share of the simulated seasons {club} finish in each place.",
@@ -863,7 +863,7 @@
     "shareText": "{club}'s chances in the {league} {season} on Foot Simu",
     "otherClubs": "Other {league} clubs",
     "card": {
-      "likeliest": "Most likely finish: {position}",
+      "likeliest": "Likely finish: {range}",
       "basedOn": "Based on {count} simulated seasons",
       "cta": "Every club at footsimu.com",
       "chance": {

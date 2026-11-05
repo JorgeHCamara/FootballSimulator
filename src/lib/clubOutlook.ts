@@ -1,5 +1,5 @@
 import type { LeagueConfig, SiteLocale, Zone, ZoneKind } from "../config/leagues.ts";
-import { mostLikelyPlaces } from "../engine/finishes.ts";
+import { likelyFinishRange, mostLikelyPlaces, type FinishRange } from "../engine/finishes.ts";
 import { expectedGoals, expectedGoalsNeutral, outcomeProbabilities } from "../engine/match.ts";
 import { runMonteCarlo, runMonteCarloVariants, type MonteCarloInput, type MonteCarloResult } from "../engine/montecarlo.ts";
 import { buildLeagueModel, type LeagueModel } from "../engine/ratings.ts";
@@ -44,8 +44,10 @@ export interface ClubOutlook {
   zones: ZoneChance[];
   /** What the page leads with (see headlineChances). */
   headline: HeadlineChance[];
-  /** The most likely final place, and its chance. */
+  /** Its place in the most likely final table (one club per place: the projected table, snapshots), and its chance of it. */
   likeliest: { position: number; chance: number };
+  /** Its likely finish on its own: the shortest run of places it ends in at least 75% of the time (likelyFinishRange). */
+  likelyRange: FinishRange;
   /** The average final place over the simulated seasons. */
   expectedPosition: number;
   averagePoints: number;
@@ -333,6 +335,7 @@ export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: Outloo
       zones,
       headline: headlineChances(zones, share, passedDown.has(row.teamId)),
       likeliest,
+      likelyRange: likelyFinishRange(distribution),
       expectedPosition,
       averagePoints: result.averagePoints[row.teamId] ?? row.points,
       fixtures: clubFixtures(row.teamId, s.fixtures, s.model, positions),
