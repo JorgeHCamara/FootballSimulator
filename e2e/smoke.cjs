@@ -1399,7 +1399,9 @@ async function step(name, fn) {
       // Europe's row: UEFA and the big five's flags, whatever the menu's order.
       assert.deepEqual(await rows.nth(0).locator("[data-flag]").evaluateAll((els) => els.map((e) => e.dataset.flag)), ["eu", "gb-eng", "es", "de", "it", "fr"]);
       assert.deepEqual(await rows.evaluateAll((els) => els.map((e) => e.firstElementChild.textContent.trim())), ["Europe", "South America", "North America", "Asia"]);
-      assert.equal(await mobile.locator("a").count(), 0, "continents start closed");
+      // Closed: no competition links, only the latest odds.
+      assert.equal(await mobile.locator('a:not([data-testid="mobile-latest-odds"])').count(), 0, "continents start closed");
+      assert.equal(await mobile.getByTestId("mobile-latest-odds").getAttribute("href"), "/en/odds");
       const countriesShown = async () => (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
       // Asia: only its countries.
       await rows.nth(3).tap();
