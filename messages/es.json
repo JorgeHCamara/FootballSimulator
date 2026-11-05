@@ -1009,6 +1009,9 @@
       "promotion": "carrera por el ascenso",
       "playoffs": "carrera por los playoffs",
       "relegation": "lucha por la permanencia"
+    },
+    "short": {
+      "aclElite": "ACL Élite"
     }
   }
 }

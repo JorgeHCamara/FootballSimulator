@@ -1009,6 +1009,9 @@
       "promotion": "promotion race",
       "playoffs": "play-off race",
       "relegation": "relegation fight"
+    },
+    "short": {
+      "aclElite": "ACL Elite"
     }
   }
 }

@@ -1885,10 +1885,13 @@ async function step(name, fn) {
       for (const width of [360, 390]) {
         const ctx = await browser.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true });
         const m = await ctx.newPage();
-        for (const path of ["/en/premier-league/odds", "/pt/odds"]) {
+        for (const path of ["/en/premier-league/odds", "/pt/premier-league/odds", "/es/j1-league/odds", "/pt/odds"]) {
           await m.goto(`${BASE_URL}${path}`);
           const right = await m.evaluate(() => Math.max(...[...document.querySelectorAll("body *")].filter((e) => !e.closest(".sr-only, details:not([open])")).map((e) => e.getBoundingClientRect().right)));
           assert.ok(right <= width + 0.5, `${path} at ${width}px reaches ${right}px`);
+          // The table's column names fit, in whole words ("Rebaix." on phones in Portuguese).
+          const cut = await m.getByTestId("odds-column").evaluateAll((cols) => cols.filter((c) => c.scrollWidth > c.clientWidth + 1).map((c) => c.textContent));
+          assert.deepEqual(cut, [], `${path} at ${width}px`);
         }
         await m.getByTestId("mobile-menu-button").click();
         assert.equal(await m.getByTestId("mobile-latest-odds").getAttribute("href"), "/pt/odds");

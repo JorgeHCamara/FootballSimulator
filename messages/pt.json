@@ -1009,6 +1009,10 @@
       "promotion": "disputa pelo acesso",
       "playoffs": "disputa pelos playoffs",
       "relegation": "luta contra o rebaixamento"
+    },
+    "short": {
+      "relegation": "Rebaix.",
+      "aclElite": "ACL Elite"
     }
   }
 }

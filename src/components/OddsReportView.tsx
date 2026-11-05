@@ -94,6 +94,8 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
     );
   };
   const categoryName = (c: Category) => (c.kind === "continental" ? topic(c) : t(`category.${c.kind}`));
+  const shortNames = (await getTranslations({ locale: lang, namespace: "Odds" })).raw("short") as Record<string, string>;
+  const phoneName = (c: Category) => shortNames[c.zone] ?? categoryName(c);
   const shareProps = {
     path: `/${locale}${path}`,
     imagePath: `/${locale}${path}/opengraph-image`,
@@ -303,8 +305,13 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
                 <th className="py-2 pl-1 text-left">{t("club")}</th>
                 <th className="hidden w-12 py-2 text-right sm:table-cell">{t("points")}</th>
                 {report.categories.map((c) => (
-                  <th key={c.kind} className="w-[4.75rem] py-2 pr-3 text-right align-bottom sm:w-28">
-                    <span className="block break-words leading-tight">{categoryName(c)}</span>
+                  <th key={c.kind} className="w-[4.75rem] py-2 pr-2 text-right align-bottom sm:w-28 sm:pr-3">
+                    {/* Whole words only (two lines at most on phones): "Champions / League". */}
+                    <span className="block text-[10px] leading-tight sm:text-xs" data-testid="odds-column" title={categoryName(c)}>
+                      {/* Phones: a short name where the full one doesn't fit ("Rebaix.", "ACL Elite"). */}
+                      <span className="sm:hidden">{phoneName(c)}</span>
+                      <span className="hidden sm:inline">{categoryName(c)}</span>
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -328,7 +335,7 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
                     {report.categories.map((c) => {
                       const v = row.values[c.kind]!;
                       return (
-                        <td key={c.kind} className="py-2 pr-3 text-right align-top">
+                        <td key={c.kind} className="py-2 pr-2 text-right align-top sm:pr-3">
                           <span className="block font-semibold tabular-nums">{pct(v.now)}</span>
                           {delta(v, c)}
                         </td>
