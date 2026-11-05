@@ -9,5 +9,12 @@
  * src/config/leagues.ts) or the starting ratings (a rebuilt src/data/priors).
  * New results and xG need no bump: the league's data version and its xG
  * file's fingerprint are in the keys too.
+ *
+ * It is also the odds snapshots' `modelVersion` (src/lib/snapshots.ts): the
+ * first report after a bump compares two models, and says so instead of
+ * listing movers.
+ *
+ * "1": the first versioned model (snapshots before this field have none).
+ * "2": rating noise in the season outlook (SEASON_RATING_NOISE, src/lib/seasonNoise.ts).
  */
-export const SIM_VERSION = "1";
+export const SIM_VERSION = "2";

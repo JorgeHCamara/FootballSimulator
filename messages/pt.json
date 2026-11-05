@@ -1014,7 +1014,11 @@
       "relegation": "Rebaix.",
       "aclElite": "ACL Elite"
     },
-    "descriptionFirst": "{league} {season}: as chances de {topics} de cada clube após a {round}, em {count} temporadas simuladas. {leader} lidera a {race} com {leaderPct}."
+    "descriptionFirst": "{league} {season}: as chances de {topics} de cada clube após a {round}, em {count} temporadas simuladas. {leader} lidera a {race} com {leaderPct}.",
+    "modelChangeTitle": "O modelo mudou desde o último relatório",
+    "modelChange": "A simulação agora leva em conta que a força de cada clube é uma estimativa, mais ainda no início da temporada, então as chances ficam um pouco menos certas. As mudanças desde a {previous} misturariam isso com os resultados, por isso este relatório não as mostra; elas voltam na próxima rodada.",
+    "chartModelChange": "Modelo atualizado",
+    "chartModelNote": "A linha antes da {round} marca uma atualização do modelo: o salto ali vem do modelo, não dos resultados."
   },
   "Projected": {
     "title": "Classificação final projetada",
@@ -1039,6 +1043,8 @@
     "down": "Caiu {n}",
     "same": "Sem mudança",
     "historyTitle": "Rodada a rodada",
-    "historyNote": "A posição de cada clube na classificação final projetada após cada rodada. Toque numa rodada para ver a tabela dela."
+    "historyNote": "A posição de cada clube na classificação final projetada após cada rodada. Toque numa rodada para ver a tabela dela.",
+    "modelChange": "O modelo mudou antes desta rodada (agora leva em conta que a força de cada clube é uma estimativa): as posições mudaram com ele e com os resultados, por isso nenhuma mudança é mostrada.",
+    "modelChangeNote": "Uma linha antes de uma rodada marca uma atualização do modelo."
   }
 }

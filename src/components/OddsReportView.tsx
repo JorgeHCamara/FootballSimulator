@@ -184,6 +184,15 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
         <h2 className="text-xl font-bold tracking-tight">{t("moversTitle")}</h2>
         {!report.previous ? (
           <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("firstReport")}</p>
+        ) : report.modelChange ? (
+          // The previous report is another model's: its chances aren't comparable with these.
+          <div className={`${card} flex gap-3`} data-testid="odds-model-change">
+            <Icon name="info" size={20} className="mt-0.5 shrink-0 text-pitch-700 dark:text-pitch-300" />
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">{t("modelChangeTitle")}</p>
+              <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{t("modelChange", { previous: previousRound ?? "" })}</p>
+            </div>
+          </div>
         ) : (
           <>
             <div className="grid gap-3 lg:grid-cols-3">
@@ -244,7 +253,7 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
         )}
       </section>
 
-      {report.previous && (
+      {report.previous && !report.modelChange && (
         <section className="space-y-3" data-testid="odds-result">
           <h2 className="text-xl font-bold tracking-tight">{t("resultTitle")}</h2>
           <div className={card}>
@@ -289,9 +298,13 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
             rounds={report.race.rounds}
             series={report.race.series.map((s) => ({ name: name(s.teamId), values: s.values }))}
             locale={lang}
-            labels={{ round: t("chartRound"), table: t("chartTable"), caption: t("chartNote", { topic: topic(report.lead) }) }}
+            modelChanges={report.race.modelChanges}
+            labels={{ round: t("chartRound"), table: t("chartTable"), caption: t("chartNote", { topic: topic(report.lead) }), modelChange: t("chartModelChange") }}
           />
-          <p className="mt-3 text-xs text-zinc-500">{t("chartNote", { topic: topic(report.lead) })}</p>
+          <p className="mt-3 text-xs text-zinc-500">
+            {t("chartNote", { topic: topic(report.lead) })}
+            {report.race.modelChanges.length ? ` ${t("chartModelNote", { round: t("round", { n: report.race.modelChanges.at(-1)! }) })}` : ""}
+          </p>
         </div>
       </section>
 
@@ -348,7 +361,7 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
           </table>
         </div>
         <p className="text-xs text-zinc-500">
-          {previousRound ? t("tableNote", { round, count, previous: previousRound }) : t("tableNoteFirst", { round, count })}
+          {previousRound && !report.modelChange ? t("tableNote", { round, count, previous: previousRound }) : t("tableNoteFirst", { round, count })}
         </p>
       </section>
 

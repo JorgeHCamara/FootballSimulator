@@ -1,4 +1,4 @@
-import { expectedGoals, sampleDixonColes, sampleNormal, sampleScore, scoreSampler, type ScoreSampler } from "./match.ts";
+import { clampRate, expectedGoals, sampleDixonColes, sampleNormal, sampleScore, scoreSampler, venueFactor, type ScoreSampler } from "./match.ts";
 import { seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
@@ -49,8 +49,9 @@ export interface MonteCarloInput {
    */
   passDown?: readonly TeamId[];
   /**
-   * Rating uncertainty, off unless given (the season backtest tries it; the
-   * site doesn't use it): at the start of each simulated season every club's
+   * Rating uncertainty, off unless given (the site's season outlook gives
+   * SEASON_RATING_NOISE, src/lib/seasonNoise.ts; the season backtest tries
+   * others): at the start of each simulated season every club's
    * attack and defence are multiplied by exp(N(0, s)), s = sd × √(k / (k +
    * its games played so far)), so a club's rating is less sure early on. The
    * season's games are then drawn from those ratings.
@@ -110,14 +111,39 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
   const remaining = fixtures
     .filter((f) => !fixed[f.id])
     .map((f) => ({ id: f.id, homeId: f.homeId, awayId: f.awayId, sampler: scoreSampler(expectedGoals(model, f.homeId, f.awayId), rho) }));
-  // Rating noise: each club's spread, from its games played so far.
+  // Rating noise: each club's spread, from its games played so far, and its strengths in slots (the clubs in
+  // `teams` first, in order) so a season's rates are a few multiplications per game, as expectedGoals works them out.
   const noise = input.ratingNoise && input.ratingNoise.sd > 0 ? input.ratingNoise : undefined;
-  const noiseSd = new Map<TeamId, number>();
+  const slot = new Map<TeamId, number>(teams.map((t, i) => [t.id, i]));
+  const noiseSd = new Float64Array(teams.length);
+  let baseAttack = new Float64Array(0);
+  let baseDefence = new Float64Array(0);
+  let attack = new Float64Array(0);
+  let defence = new Float64Array(0);
+  let noisyGames: { id: number; h: number; a: number; venue: number }[] = [];
   if (noise) {
     const played = new Map<TeamId, number>();
     for (const f of fixtures) if (fixed[f.id]) for (const id of [f.homeId, f.awayId]) played.set(id, (played.get(id) ?? 0) + 1);
-    for (const t of teams) noiseSd.set(t.id, ratingNoiseSd(noise.sd, noise.k, played.get(t.id) ?? 0));
+    teams.forEach((t, i) => (noiseSd[i] = ratingNoiseSd(noise.sd, noise.k, played.get(t.id) ?? 0)));
+    // A game's club outside `teams` keeps the model's strengths (no draw).
+    for (const r of remaining) for (const id of [r.homeId, r.awayId]) if (!slot.has(id)) slot.set(id, slot.size);
+    baseAttack = new Float64Array(slot.size);
+    baseDefence = new Float64Array(slot.size);
+    for (const [id, i] of slot) {
+      const s = model.strengths.get(id) ?? { attack: 1, defence: 1 };
+      baseAttack[i] = s.attack;
+      baseDefence[i] = s.defence;
+    }
+    attack = Float64Array.from(baseAttack);
+    defence = Float64Array.from(baseDefence);
+    noisyGames = remaining.map((r) => ({ id: r.id, h: slot.get(r.homeId)!, a: slot.get(r.awayId)!, venue: venueFactor(model, r.homeId) * venueFactor(model, r.awayId) }));
   }
+  /** This season's ratings with rating noise, as a model (for the split's games and the play-offs). */
+  const noisyModel = (): LeagueModel => {
+    const strengths = new Map(model.strengths);
+    teams.forEach((t, i) => strengths.set(t.id, { attack: attack[i]!, defence: defence[i]! }));
+    return { ...model, strengths };
+  };
   /** Generated split games: one distribution per pairing. */
   const pairSamplers = new Map<string, ScoreSampler>();
   const pairSampler = (homeId: TeamId, awayId: TeamId) => {
@@ -167,14 +193,17 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
     // This season's ratings: the model's, or with rating noise each club's drawn around them.
     let season = model;
     if (noise) {
-      const strengths = new Map(model.strengths);
-      for (const t of teams) {
-        const s = model.strengths.get(t.id) ?? { attack: 1, defence: 1 };
-        const sd = noiseSd.get(t.id)!;
-        strengths.set(t.id, { attack: s.attack * Math.exp(sd * sampleNormal(rng)), defence: s.defence * Math.exp(sd * sampleNormal(rng)) });
+      for (let t = 0; t < teams.length; t++) {
+        const sd = noiseSd[t]!;
+        attack[t] = baseAttack[t]! * Math.exp(sd * sampleNormal(rng));
+        defence[t] = baseDefence[t]! * Math.exp(sd * sampleNormal(rng));
       }
-      season = { ...model, strengths };
-      for (const r of remaining) results[r.id] = sampleDixonColes(expectedGoals(season, r.homeId, r.awayId), rho, rng);
+      if (input.project || playoff) season = noisyModel();
+      const { avgHomeGoals, avgAwayGoals } = model;
+      for (const g of noisyGames) {
+        const xg = { home: clampRate(avgHomeGoals * attack[g.h]! * defence[g.a]! * g.venue), away: clampRate((avgAwayGoals * attack[g.a]! * defence[g.h]!) / g.venue) };
+        results[g.id] = sampleDixonColes(xg, rho, rng);
+      }
     } else for (const r of remaining) results[r.id] = sampleScore(r.sampler, rng);
     const drawn = overridden.map((id) => results[id]);
     const at = rng.state;

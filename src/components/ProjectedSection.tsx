@@ -21,7 +21,7 @@ export async function ProjectedSection({ league, data, locale }: { league: Leagu
   );
   const zones = Object.fromEntries([...new Set(history.zones.map((z) => z.kind))].map((kind) => [kind, tz(kind)])) as Partial<Record<ZoneKind, string>>;
   const tableNames = Object.fromEntries(history.tables.flatMap((x) => (x.name ? [[x.id, x.name[locale]]] : [])));
-  const keys = ["previous", "next", "pick", "place", "club", "table", "tableTitle", "points", "pointsTitle", "chance", "chanceTitle", "change", "changeTitle", "up", "down", "same", "historyTitle", "historyNote"] as const;
+  const keys = ["previous", "next", "pick", "place", "club", "table", "tableTitle", "points", "pointsTitle", "chance", "chanceTitle", "change", "changeTitle", "up", "down", "same", "historyTitle", "historyNote", "modelChange", "modelChangeNote"] as const;
   // "{n}" stays for the component to fill in.
   const labels = { ...Object.fromEntries(keys.map((k) => [k, k === "up" || k === "down" ? t(k, { n: "{n}" }) : t(k)])), tableNames, zones } as Parameters<typeof ProjectedTable>[0]["labels"];
   return (

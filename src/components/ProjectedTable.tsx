@@ -30,6 +30,9 @@ export interface ProjectedLabels {
   same: string;
   historyTitle: string;
   historyNote: string;
+  /** A round worked out with a new model: under the picker, and in the round-by-round grid's note. */
+  modelChange: string;
+  modelChangeNote: string;
   /** Each table's name (conferences), by table id. */
   tableNames: Record<string, string>;
   zones: Partial<Record<ZoneKind, string>>;
@@ -79,7 +82,8 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
   const move = (id: number) => {
     const now = entry.teams[id]?.place;
     const then = before?.teams[id]?.place;
-    if (now === undefined || then === undefined) return <span className="text-zinc-400">–</span>;
+    // A new model since the round before: its moves aren't the results'.
+    if (now === undefined || then === undefined || entry.modelChange) return <span className="text-zinc-400">–</span>;
     const d = then - now;
     if (!d)
       return (
@@ -135,6 +139,13 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
           <Icon name="chevron-right" size={18} />
         </button>
       </div>
+
+      {entry.modelChange && before && (
+        <p className="flex items-start gap-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400" data-testid="projected-model-change">
+          <Icon name="info" size={16} className="mt-px shrink-0 text-pitch-700 dark:text-pitch-300" />
+          {labels.modelChange}
+        </p>
+      )}
 
       <div className={`grid gap-4 ${tables.length > 1 ? "lg:grid-cols-2" : ""}`}>
         {tables.map((table) => (
@@ -201,7 +212,10 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
       {entries.length > 1 && (
         <div className="space-y-2" data-testid="projected-history">
           <h3 className="text-base font-bold">{labels.historyTitle}</h3>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400">{labels.historyNote}</p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+            {labels.historyNote}
+            {entries.some((e) => e.modelChange) ? ` ${labels.modelChangeNote}` : ""}
+          </p>
           {tables.map((table, t) => (
             <div key={table.id} className="space-y-1">
               {tables.length > 1 && labels.tableNames[table.id] && <p className="text-xs font-semibold text-zinc-500">{labels.tableNames[table.id]}</p>}
@@ -214,8 +228,8 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
                   <thead>
                     <tr>
                       <th className="sticky left-0 z-10 min-w-32 border-r border-zinc-200 bg-white px-2 py-1.5 text-left font-semibold text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900">{labels.club}</th>
-                      {entries.map((_, i) => (
-                        <th key={i} className="p-0.5 font-semibold">
+                      {entries.map((e, i) => (
+                        <th key={i} className={`p-0.5 font-semibold ${e.modelChange ? "border-l-2 border-l-zinc-400 dark:border-l-zinc-500" : ""}`}>
                           <button
                             type="button"
                             onClick={() => setIndex(i)}
@@ -247,7 +261,7 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
                             return (
                               <td
                                 key={i}
-                                className={`border-t border-zinc-200/70 px-1 py-1 text-center dark:border-zinc-800 ${zone ? ZONE_STYLES[zone].row : ""} ${i === index ? "font-extrabold outline outline-1 -outline-offset-1 outline-pitch-600" : ""}`}
+                                className={`border-t border-zinc-200/70 px-1 py-1 text-center dark:border-zinc-800 ${e.modelChange ? "border-l-2 border-l-zinc-400 dark:border-l-zinc-500" : ""} ${zone ? ZONE_STYLES[zone].row : ""} ${i === index ? "font-extrabold outline outline-1 -outline-offset-1 outline-pitch-600" : ""}`}
                               >
                                 {place ?? "–"}
                               </td>

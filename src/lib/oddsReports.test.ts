@@ -7,7 +7,8 @@ import { firstCardThatRenders } from "./cardFallback.ts";
 import { withClubPages } from "./clubs.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { buildReport, categoryValue, clubGames, reportCategories, reportGames, reportPath, resultOfRound, roundFromParam, seasonReports, seasonYearLabel } from "./oddsReports.ts";
-import { addSnapshots, completedRounds, snapshotAfter, type OddsSnapshot, type TeamSnapshot } from "./snapshots.ts";
+import { SIM_VERSION } from "./simVersion.ts";
+import { addSnapshots, completedRounds, snapshotAfter, snapshotModel, storedRounds, type OddsSnapshot, type TeamSnapshot } from "./snapshots.ts";
 
 const pl = getLeagueByCode("PL")!;
 const snap = JSON.parse(readFileSync(new URL("./testdata/pl-2026-27-md9.json", import.meta.url), "utf8")) as { teams: Team[]; fixtures: Fixture[] };
@@ -64,6 +65,40 @@ describe("odds reports", () => {
     assert.ok(first.movers.every((m) => !m.up.length && !m.down.length));
     assert.equal(buildReport(pl, season, 30), undefined);
     assert.equal(buildReport(pl, season)!.snapshot.round, 9, "no round: the latest");
+  });
+
+  it("a report across a model change: no changes, movers or result of the round, and the race marks the round", () => {
+    assert.equal(at(9).modelVersion, SIM_VERSION, "a snapshot carries today's model");
+    // Snapshots from before the field: model "1".
+    const older = (s: OddsSnapshot): OddsSnapshot => {
+      const { modelVersion: _, ...rest } = s;
+      return rest;
+    };
+    assert.equal(snapshotModel(older(at(8))), "1");
+    const mixed = seasonReports(addSnapshots(undefined, "PL", data.seasonKey, data.season, [older(at(7)), older(at(8)), at(9)]), data.seasonKey)!;
+    const report = buildReport(pl, mixed, 9)!;
+    assert.equal(report.modelChange, true);
+    assert.equal(report.previous!.round, 8);
+    for (const row of report.rows) for (const c of Object.values(row.values)) assert.ok(c!.before !== undefined && c!.delta === undefined);
+    assert.ok(report.movers.every((m) => !m.up.length && !m.down.length));
+    assert.equal(resultOfRound(report, reportGames(report, data)), undefined);
+    assert.deepEqual(report.race.modelChanges, [9]);
+    // The round before: one model on both sides, its changes as usual.
+    const before = buildReport(pl, mixed, 8)!;
+    assert.equal(before.modelChange, false);
+    assert.ok(before.rows.some((r) => r.values.title!.delta !== undefined));
+    assert.deepEqual(before.race.modelChanges, []);
+    assert.equal(buildReport(pl, season, 9)!.modelChange, false);
+  });
+
+  it("a rebuild takes the season's stored rounds again, each as of its own moment", () => {
+    const stored = storedRounds(file, data.seasonKey, rounds);
+    assert.deepEqual(stored, [7, 8, 9].map((n) => rounds.find((r) => r.round === n)!));
+    // A round that no longer counts as completed: as of its stored moment.
+    const last = storedRounds(file, data.seasonKey, rounds.filter((r) => r.round !== 9)).at(-1)!;
+    assert.equal(last.round, 9);
+    assert.equal(Date.parse(last.lastKickoff), Date.parse(at(9).asOf) - 60_000);
+    assert.deepEqual(storedRounds(undefined, data.seasonKey, rounds), []);
   });
 
   it("the round's games, and the one that moved the odds most", () => {

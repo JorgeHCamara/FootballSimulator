@@ -6,6 +6,7 @@ import { buildSplitPhase, splitFixtures, splitGroupTable, splitGroupsFrom } from
 import { computeStandings, type StandingsOptions } from "../engine/standings.ts";
 import type { Fixture, ResultMap, StandingRow, Team, TeamId } from "../engine/types.ts";
 import { leagueFacts } from "./leagueFacts.ts";
+import { seasonRatingNoise } from "./seasonNoise.ts";
 import { domesticModelOptions, domesticPriors } from "./priors.ts";
 import { canGenerateSplit, realGroupsOf, shareCardSupported, splitRoundOf } from "./splitSetup.ts";
 
@@ -153,7 +154,9 @@ export function scenarioSimulation(league: LeagueConfig, data: ScenarioData, pre
     input = { teams, fixtures: played, fixed: effective, model, standings: base };
   }
 
-  return { facts, model, rows, played, input, offset };
+  // The season's chances allow for the ratings being estimates (domestic leagues: see SEASON_RATING_NOISE).
+  const ratingNoise = seasonRatingNoise(league);
+  return { facts, model, rows, played, input: ratingNoise ? { ...input, ratingNoise } : input, offset };
 }
 
 /**

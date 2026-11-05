@@ -9,6 +9,7 @@
 //   npm run snapshots -- --dry-run    print, write nothing
 //   npm run snapshots -- --backfill   also every earlier completed round of the season not stored yet
 //   npm run snapshots -- --projected  add each club's projected place to the season's stored rounds that lack it
+//   npm run snapshots -- --rebuild    take the season's stored rounds again with today's engine (each as of its own moment)
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -16,13 +17,15 @@ import { fileURLToPath } from "node:url";
 import { LEAGUES } from "../src/config/leagues.ts";
 import { hasClubPages } from "../src/lib/clubs.ts";
 import { getLeagueData } from "../src/lib/leagueData.ts";
-import { addSnapshots, backfillFrom, completedRounds, missingRounds, pendingRounds, snapshotAfter, type LeagueSnapshots } from "../src/lib/snapshots.ts";
+import { SIM_VERSION } from "../src/lib/simVersion.ts";
+import { addSnapshots, backfillFrom, completedRounds, missingRounds, pendingRounds, snapshotAfter, snapshotModel, storedRounds, type LeagueSnapshots } from "../src/lib/snapshots.ts";
 
 const DIR = join(dirname(fileURLToPath(import.meta.url)), "../src/data/snapshots");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const backfill = args.includes("--backfill");
 const projectedOnly = args.includes("--projected");
+const rebuild = args.includes("--rebuild");
 const only = args.filter((a) => !a.startsWith("--"));
 
 // Real data only: never snapshot the generated sample leagues.
@@ -58,7 +61,8 @@ for (const league of LEAGUES.filter((l) => hasClubPages(l) && (!only.length || o
     const file = await read(league.code);
     if (projectedOnly) {
       const season = file?.seasons[data.seasonKey];
-      const todo = season?.snapshots.filter((x) => Object.values(x.teams).some((t) => t.projected === undefined)) ?? [];
+      // Only rounds taken with today's model: today's engine can't redo an older one.
+      const todo = season?.snapshots.filter((x) => snapshotModel(x) === SIM_VERSION && Object.values(x.teams).some((t) => t.projected === undefined)) ?? [];
       let differ = 0;
       for (const stored of todo) {
         // The same run again (same data up to the same moment, same seed): only the projected places are taken from it.
@@ -79,7 +83,11 @@ for (const league of LEAGUES.filter((l) => hasClubPages(l) && (!only.length || o
     }
     const completed = completedRounds(data.fixtures);
     const from = backfill ? backfillFrom(league, data) : undefined;
-    const pending = backfill ? missingRounds(file, data.seasonKey, completed).filter((r) => !from || r.lastKickoff >= from) : pendingRounds(file, data.seasonKey, completed);
+    const pending = rebuild
+      ? storedRounds(file, data.seasonKey, completed)
+      : backfill
+        ? missingRounds(file, data.seasonKey, completed).filter((r) => !from || r.lastKickoff >= from)
+        : pendingRounds(file, data.seasonKey, completed);
     if (!pending.length) {
       console.log(`${league.code} ${data.season}: up to date`);
       continue;

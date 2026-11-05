@@ -1013,7 +1013,11 @@
     "short": {
       "aclElite": "ACL Elite"
     },
-    "descriptionFirst": "{league} {season}: every club's {topics} chances after {round}, from {count} simulated seasons. {leader} lead the {race} at {leaderPct}."
+    "descriptionFirst": "{league} {season}: every club's {topics} chances after {round}, from {count} simulated seasons. {leader} lead the {race} at {leaderPct}.",
+    "modelChangeTitle": "The model changed since the last report",
+    "modelChange": "The simulation now allows for each club's rating being an estimate, more so early in the season, so the chances are a little less sure. Changes since {previous} would mix that with the results, so this report shows none; they're back next round.",
+    "chartModelChange": "Model update",
+    "chartModelNote": "The line before {round} marks a model update: the step there is the model's, not the results'."
   },
   "Projected": {
     "title": "Projected final table",
@@ -1038,6 +1042,8 @@
     "down": "Down {n}",
     "same": "No change",
     "historyTitle": "Round by round",
-    "historyNote": "Each club's place in the projected final table after every round. Tap a round to see its table."
+    "historyNote": "Each club's place in the projected final table after every round. Tap a round to see its table.",
+    "modelChange": "The model changed before this round (it now allows for each club's rating being an estimate): the places moved with it as well as with the results, so no change is shown.",
+    "modelChangeNote": "A line before a round marks a model update."
   }
 }

@@ -4,6 +4,7 @@ import type { Fixture } from "../engine/types.ts";
 import { dataAsOf, leagueOutlook } from "./clubOutlook.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { localDate } from "./matches.ts";
+import { SIM_VERSION } from "./simVersion.ts";
 
 /*
  * Odds snapshots: every club's season chances after each completed round,
@@ -41,11 +42,20 @@ export interface OddsSnapshot {
   /** League games played by then. */
   played: number;
   iterations: number;
+  /**
+   * The model it was taken with (SIM_VERSION then; none before the field
+   * existed: model "1", see snapshotModel). Chances from two models differ by
+   * more than the results between them, so a report across a change says so.
+   */
+  modelVersion?: string;
   /** Places over the whole table, within each conference (MLS), or in the annual table. */
   scope: "table" | "eachTable" | "annual";
   /** By club id. */
   teams: Record<string, TeamSnapshot>;
 }
+
+/** The model a snapshot was taken with: its modelVersion, or "1" for one taken before snapshots carried it. */
+export const snapshotModel = (snapshot: Pick<OddsSnapshot, "modelVersion">) => snapshot.modelVersion ?? "1";
 
 export interface LeagueSnapshots {
   league: CompetitionCode;
@@ -123,6 +133,7 @@ export function snapshotAfter(league: LeagueConfig, data: LeagueData, round: num
     takenAt: takenAt.toISOString(),
     played: then.fixtures.filter((f) => f.result).length,
     iterations: outlook.iterations,
+    modelVersion: SIM_VERSION,
     scope: outlook.scope,
     teams,
   };
@@ -138,6 +149,17 @@ export function pendingRounds(file: LeagueSnapshots | undefined, seasonKey: stri
   if (!stored.length) return completed.slice(-1);
   const last = Math.max(...stored.map((s) => s.round));
   return completed.filter((r) => r.round > last);
+}
+
+/**
+ * The season's stored rounds, to take again (a rebuild with today's engine):
+ * each as of its last kick-off now (as of its stored moment when its round no
+ * longer counts as completed).
+ */
+export function storedRounds(file: LeagueSnapshots | undefined, seasonKey: string, completed: readonly { round: number; lastKickoff: string }[]) {
+  return (file?.seasons[seasonKey]?.snapshots ?? []).map(
+    (s) => completed.find((r) => r.round === s.round) ?? { round: s.round, lastKickoff: new Date(Date.parse(s.asOf) - 60_000).toISOString() },
+  );
 }
 
 /**
