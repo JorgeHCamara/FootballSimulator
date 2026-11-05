@@ -1,0 +1,48 @@
+name: Snapshot drift
+
+# Checks that the live engine still reproduces every league's latest stored odds
+# snapshot (scripts/check-snapshots.ts): exactly the same chances, expected
+# places and projected places from ESPN's data as of that round. Runs when a
+# change touches what the chances are made of (the engine, the outlook, the
+# league config, the starting ratings, xG or the snapshots themselves), and
+# daily, to catch ESPN correcting a result or a game's xG arriving late.
+# A drift fails the run: retake the league with `npm run snapshots -- <CODE>
+# --rebuild`, or bump SIM_VERSION when the model changed on purpose.
+on:
+  push:
+    paths:
+      - "src/engine/**"
+      - "src/lib/**"
+      - "src/config/**"
+      - "src/data/**"
+      - "scripts/check-snapshots.ts"
+      - "scripts/snapshot-odds.ts"
+      - ".github/workflows/snapshot-drift.yml"
+  pull_request:
+    paths:
+      - "src/engine/**"
+      - "src/lib/**"
+      - "src/config/**"
+      - "src/data/**"
+      - "scripts/check-snapshots.ts"
+      - "scripts/snapshot-odds.ts"
+      - ".github/workflows/snapshot-drift.yml"
+  schedule:
+    - cron: "23 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run snapshots:check
