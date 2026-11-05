@@ -18,7 +18,11 @@ async function tableOrder(page) {
   return page.locator('[data-testid="standings-row"] td:nth-child(2)').allInnerTexts();
 }
 
+/** E2E_ONLY="match pages" runs only the steps whose name contains it (for a quick rerun of one check). */
+const ONLY = process.env.E2E_ONLY;
+
 async function step(name, fn) {
+  if (ONLY && !name.includes(ONLY)) return;
   process.stdout.write(`- ${name} … `);
   await fn();
   console.log("ok");
@@ -1730,7 +1734,8 @@ async function step(name, fn) {
       // A game moved to another day: its old address redirects; an unknown one is a 404.
       const moved = await p.request.get(`${BASE_URL}${upcoming.replace(/\d{2}$/, (d) => String(Number(d) === 1 ? 2 : Number(d) - 1).padStart(2, "0"))}`, { maxRedirects: 0 });
       assert.equal(moved.status(), 308);
-      assert.equal(new URL(moved.headers().location, BASE_URL).pathname, upcoming);
+      // (`next start` sends an ISR page's redirect with the same Location twice; Playwright joins them.)
+      assert.equal(new URL(moved.headers().location.split(", ")[0], BASE_URL).pathname, upcoming);
       assert.equal((await p.goto(`${BASE_URL}/en/premier-league/match/nobody-vs-noone-2026-11-08`)).status(), 404);
       // From a club page's fixture list.
       const club = sitemap.match(/https:\/\/footsimu\.com(\/en\/premier-league\/team\/[a-z0-9-]+)/)[1];
