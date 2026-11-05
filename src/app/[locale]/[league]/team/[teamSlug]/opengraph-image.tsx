@@ -10,6 +10,8 @@ import { crestDataUri, renderClubCard, renderGenericShareCard } from "../../../.
 export const alt = "Foot Simu club chances";
 export const size = OG_SIZE;
 export const contentType = "image/png";
+/** As the club page: room for a cold render (see page.tsx). */
+export const maxDuration = 60;
 
 /** A club page's card: its crest and name, where it stands and its chances (the page's own numbers). */
 export default async function Image({ params }: { params: Promise<{ locale: string; league: string; teamSlug: string }> }) {

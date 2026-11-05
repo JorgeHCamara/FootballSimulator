@@ -1,8 +1,9 @@
 import type { LeagueConfig, SiteLocale, ZoneKind } from "../config/leagues.ts";
 import type { TeamId } from "../engine/types.ts";
-import { cachedLeagueOutlook, type LeagueOutlook } from "./clubOutlook.ts";
+import type { LeagueOutlook } from "./clubOutlook.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { readSnapshots, seasonReports } from "./oddsReports.ts";
+import { sharedLeagueOutlook } from "./sharedOutlook.ts";
 import { SIM_VERSION } from "./simVersion.ts";
 import { snapshotModel, type OddsSnapshot } from "./snapshots.ts";
 
@@ -107,7 +108,7 @@ function fromOutlook(outlook: LeagueOutlook): Record<string, ProjectedClub> {
 
 /** A domestic league's projected table now and after each round of its current season (undefined: none to show). */
 export async function projectedHistory(league: LeagueConfig, data: LeagueData): Promise<ProjectedHistory | undefined> {
-  const [file, outlook] = [await readSnapshots(league.code), cachedLeagueOutlook(league, data)];
+  const [file, outlook] = await Promise.all([readSnapshots(league.code), sharedLeagueOutlook(league, data)]);
   const season = seasonReports(file, data.seasonKey);
   const snapshots = season?.seasonKey === data.seasonKey ? season.snapshots : [];
   const first = outlook?.clubs.values().next().value;
