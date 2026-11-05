@@ -22,7 +22,8 @@
  * Options: --rating-noise <sd[,sd…]> runs each checkpoint once per spread of
  * the engine's rating noise (each simulated season starts with every club's
  * attack and defence times exp(N(0, sd × √(k / (k + games played)))); 0, the
- * default, is the live engine). --noise-k <k> (default 18, the prior's weight
+ * default, is none, and each run's spread replaces the site's own,
+ * SEASON_RATING_NOISE). --noise-k <k[,k…]> (default 18, the prior's weight
  * in games), --iterations <n> (default 10,000), --jobs <n> (leagues run at a
  * time; default: the CPUs), --out <file> (default
  * backtest-results/season-<season>.json).
@@ -203,7 +204,8 @@ async function backtestLeague(code: string, { year, configs, iterations }: Optio
     if (!s) continue;
     const runs: CheckpointResult["runs"] = {};
     for (const { key, sd, k } of configs) {
-      const result = runMonteCarlo({ ...s.input, iterations, seed: SCENARIO_SEED, ...(sd > 0 ? { ratingNoise: { sd, k } } : {}) });
+      // Each run's own noise in place of the site's (sd 0: none).
+      const result = runMonteCarlo({ ...s.input, iterations, seed: SCENARIO_SEED, ratingNoise: { sd, k } });
       const outlook = outlookFromRun(league, at, s, result);
       runs[key] = Object.fromEntries(
         [...outlook.clubs.values()].map((c) => {

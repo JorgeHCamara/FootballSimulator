@@ -46,6 +46,12 @@ describe("rating noise (the season backtest's option)", () => {
     for (const t of teams) assert.equal(noisy.positionCounts[t.id]!.reduce((a, b) => a + b, 0), 3000);
   });
 
+  it("leaves the model as it was (the game odds and the dice read it)", () => {
+    const before = JSON.stringify([...model.strengths]);
+    runMonteCarlo({ ...input, ratingNoise: { sd: 0.3, k: 18 } });
+    assert.equal(JSON.stringify([...model.strengths]), before);
+  });
+
   it("draws scores from the same Dixon–Coles distribution as the score matrix", () => {
     const xg = expectedGoals(model, 1, 8);
     const matrix = scoreMatrix(xg, -0.1);

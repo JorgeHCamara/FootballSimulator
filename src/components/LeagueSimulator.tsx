@@ -31,6 +31,7 @@ import {
 } from "../engine/split.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
 import type { Fixture, ResultMap, Score, StandingRow, Team } from "../engine/types.ts";
+import { seasonRatingNoise } from "../lib/seasonNoise.ts";
 import { decodeResults, encodeResults } from "../lib/shareCodec.ts";
 import { canGenerateSplit, shareCardSupported, shareFixtureList, splitRoundOf } from "../lib/splitSetup.ts";
 import { ShareMenu } from "./ShareMenu.tsx";
@@ -506,6 +507,7 @@ export function LeagueSimulator({
     else setConfirmReset(true);
   };
 
+  const ratingNoise = seasonRatingNoise(league);
   const monteCarloInput = useMemo<MonteCarloInput | null>(
     () =>
       tab === "chances" && hydrated
@@ -537,6 +539,8 @@ export function LeagueSimulator({
               ? { project: { afterRound: splitRound, afterDate: lastReal.utcDate, groups: splitConfig.groups } }
               : {}),
             ...(qualifiedElsewhere?.length ? { passDown: qualifiedElsewhere } : {}),
+            // The ratings are estimates: as the server's outlook (club pages, snapshots), domestic leagues only.
+            ...(ratingNoise ? { ratingNoise } : {}),
             // Continental competitions: the chance of winning it takes the knockout phase too.
             // Also a title play-off seeded from groups (Argentina): the chance of winning the tournament.
             // and a title play-off of a single table (Colombia).
@@ -545,7 +549,7 @@ export function LeagueSimulator({
               : {}),
           }
         : null,
-    [tab, hydrated, teams, allFixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere, canGenerate, phase, extraRounds, splitConfig, lastReal, splitRound, groupTableOptions], // eslint-disable-line react-hooks/exhaustive-deps
+    [tab, hydrated, teams, allFixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere, canGenerate, phase, extraRounds, splitConfig, lastReal, splitRound, groupTableOptions, ratingNoise], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const actionButton =

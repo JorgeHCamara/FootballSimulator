@@ -7,7 +7,7 @@ const MAX_RATE = 6;
 /** Goals per side the score matrix covers (0..10); the rest is folded in by renormalising. */
 export const MAX_SCORE = 10;
 
-const clampRate = (x: number) => Math.min(MAX_RATE, Math.max(MIN_RATE, x));
+export const clampRate = (x: number) => Math.min(MAX_RATE, Math.max(MIN_RATE, x));
 
 export interface ExpectedGoals {
   home: number;
@@ -19,7 +19,7 @@ export interface ExpectedGoals {
  * advantage), applied half to each venue in log terms: k^¼ on both sides of
  * its home games, k^-¼ on its away games, so its average strength is unchanged.
  */
-const venueFactor = (model: LeagueModel, id: TeamId) => Math.pow(model.homeFactor?.get(id) ?? 1, 0.25);
+export const venueFactor = (model: LeagueModel, id: TeamId) => Math.pow(model.homeFactor?.get(id) ?? 1, 0.25);
 
 export function expectedGoals(model: LeagueModel, homeId: TeamId, awayId: TeamId): ExpectedGoals {
   const h = model.strengths.get(homeId) ?? { attack: 1, defence: 1 };
@@ -132,12 +132,32 @@ export function sampleScore(sampler: ScoreSampler, rng: Rng): Score {
  * season would cost too much.
  */
 export function sampleDixonColes(xg: ExpectedGoals, rho: number, rng: Rng, max = MAX_SCORE): Score {
-  const tauMax = Math.max(1, dixonColesTau(0, 0, xg, rho), dixonColesTau(0, 1, xg, rho), dixonColesTau(1, 0, xg, rho), dixonColesTau(1, 1, xg, rho));
+  // dixonColesTau and samplePoisson written out (the same draws and the same answers): it runs for every
+  // remaining game of every simulated season when the season outlook has rating noise.
+  const { home: l, away: m } = xg;
+  const t00 = 1 - l * m * rho;
+  const t01 = 1 + l * rho;
+  const t10 = 1 + m * rho;
+  const t11 = 1 - rho;
+  const tauMax = Math.max(1, t00, t01, t10, t11);
+  const limitHome = Math.exp(-l);
+  const limitAway = Math.exp(-m);
   for (;;) {
-    const home = samplePoisson(xg.home, rng);
-    const away = samplePoisson(xg.away, rng);
+    let home = 0;
+    let p = rng();
+    while (p > limitHome) {
+      home++;
+      p *= rng();
+    }
+    let away = 0;
+    p = rng();
+    while (p > limitAway) {
+      away++;
+      p *= rng();
+    }
     if (home > max || away > max) continue;
-    if (rng() * tauMax < Math.max(0, dixonColesTau(home, away, xg, rho))) return { home, away };
+    const tau = home > 1 || away > 1 ? 1 : home === 0 ? (away === 0 ? t00 : t01) : away === 0 ? t10 : t11;
+    if (rng() * tauMax < Math.max(0, tau)) return { home, away };
   }
 }
 

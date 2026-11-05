@@ -10,6 +10,7 @@ import { CONTINENTAL, leagueFacts } from "./leagueFacts.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { domesticModelOptions } from "./priors.ts";
 import { SCENARIO_ITERATIONS, SCENARIO_SEED, scenarioSimulation } from "./scenario.ts";
+import { seasonRatingNoise } from "./seasonNoise.ts";
 import { annualFixtures, tournamentChampion, tournamentConfig, tournamentStages } from "./tournaments.ts";
 
 /** A place a club can finish in, with its chance (ranges of the same kind merged: Greece's two Conference League places). */
@@ -216,6 +217,9 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
   const facts = leagueFacts(league);
   if (!facts) return null;
   const base: StandingsOptions = { tiebreakers: league.tiebreakers, ...(data.deductions ? { deductions: data.deductions } : {}) };
+  // The season's chances allow for the ratings being estimates (as scenarioSimulation's; see SEASON_RATING_NOISE).
+  const ratingNoise = seasonRatingNoise(league);
+  const noise = ratingNoise ? { ratingNoise } : {};
 
   // One table (or a split): as the share card sets it up.
   const simulation = scenarioSimulation(league, data, {});
@@ -256,7 +260,7 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
     return {
       model,
       rows: computeStandings(teams, fixtures, fixed, base),
-      input: { teams, fixtures, fixed, model, standings: base, ...(champions.length ? { passDown: [...new Set(champions)] } : {}) },
+      input: { teams, fixtures, fixed, model, standings: base, ...(champions.length ? { passDown: [...new Set(champions)] } : {}), ...noise },
       offset: new Map(),
       places: league.annual.zones,
       scope: "annual",
@@ -281,7 +285,7 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
     return {
       model,
       rows,
-      input: { teams: data.teams, fixtures: data.fixtures, fixed, model, standings: base, groups: data.groups.map((g) => g.teamIds) },
+      input: { teams: data.teams, fixtures: data.fixtures, fixed, model, standings: base, groups: data.groups.map((g) => g.teamIds), ...noise },
       offset: new Map(),
       places: facts.places,
       scope: "eachTable",
