@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { getLeagueByCode } from "../config/leagues.ts";
 import type { Fixture, Team } from "../engine/types.ts";
+import { firstCardThatRenders } from "./cardFallback.ts";
 import { withClubPages } from "./clubs.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { buildReport, categoryValue, clubGames, reportCategories, reportGames, reportPath, resultOfRound, roundFromParam, seasonReports, seasonYearLabel } from "./oddsReports.ts";
@@ -91,5 +92,18 @@ describe("odds reports", () => {
     const two = addSnapshots(file, "PL", "PL:espn:2027", "2027/28", [{ ...at(9), round: 1, asOf: "2027-08-20T00:00:00.000Z" }]);
     assert.equal(seasonReports(two, "PL:espn:2026")!.seasonKey, "PL:espn:2026");
     assert.equal(seasonReports(two, "PL:espn:2028")!.seasonKey, "PL:espn:2027");
+  });
+
+  it("a share card always comes back as an image: a failing attempt (thrown, or while streaming) falls back to the next", async () => {
+    const image = (bytes: number[]) => async () => new Response(new Uint8Array(bytes), { headers: { "content-type": "image/png" } });
+    const throws = async (): Promise<Response> => {
+      throw new Error("crest");
+    };
+    // Fails only once its body is read, as next/og does when it can't draw.
+    const failsWhileStreaming = async () => new Response(new ReadableStream({ pull: (c) => c.error(new Error("satori")) }), { headers: { "content-type": "image/png" } });
+    const res = await firstCardThatRenders([throws, failsWhileStreaming, image([1, 2, 3])]);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("content-type"), "image/png");
+    assert.deepEqual([...new Uint8Array(await res.arrayBuffer())], [1, 2, 3]);
   });
 });

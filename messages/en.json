@@ -1012,6 +1012,7 @@
     },
     "short": {
       "aclElite": "ACL Elite"
-    }
+    },
+    "descriptionFirst": "{league} {season}: every club's {topics} chances after {round}, from {count} simulated seasons. {leader} lead the {race} at {leaderPct}."
   }
 }

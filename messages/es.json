@@ -956,7 +956,7 @@
     "moversNote": "Cambios desde la {round}, en puntos porcentuales.",
     "up": "Suben",
     "down": "Bajan",
-    "noMoves": "Las probabilidades de ningún club cambiaron un punto o más.",
+    "noMoves": "Ningún club cambió sus probabilidades en un punto o más.",
     "firstReport": "Este es el primer informe de la temporada: los cambios empiezan con la próxima jornada.",
     "rise": "{club} {result} y sus probabilidades de {topic} subieron del {from} al {to}.",
     "fall": "{club} {result} y sus probabilidades de {topic} bajaron del {from} al {to}.",
@@ -967,8 +967,8 @@
     "result": {
       "winHome": "venció a {opponent} por {score} en casa",
       "winAway": "venció a {opponent} por {score} a domicilio",
-      "drawHome": "empató {score} con {opponent} en casa",
-      "drawAway": "empató {score} con {opponent} a domicilio",
+      "drawHome": "empató por {score} con {opponent} en casa",
+      "drawAway": "empató por {score} con {opponent} a domicilio",
       "lossHome": "perdió {score} ante {opponent} en casa",
       "lossAway": "perdió {score} ante {opponent} a domicilio"
     },
@@ -1012,6 +1012,7 @@
     },
     "short": {
       "aclElite": "ACL Élite"
-    }
+    },
+    "descriptionFirst": "{league} {season}: las probabilidades de {topics} de cada club tras la {round}, en {count} temporadas simuladas. {leader} lidera la {race} con el {leaderPct}."
   }
 }

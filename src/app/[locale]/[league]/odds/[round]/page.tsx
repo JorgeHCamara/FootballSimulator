@@ -21,11 +21,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const n = roundFromParam(round);
   const loaded = n === undefined ? undefined : await loadReport(league, n);
   if (!loaded) return {};
-  const { title, description, path } = await reportMetadata(loaded, locale, false);
+  const { title, description, path, indexable } = await reportMetadata(loaded, locale, false);
   return {
     title,
     description,
     alternates: alternates(locale, path),
+    ...(indexable ? {} : { robots: { index: false, follow: true } }),
     openGraph: { type: "article", siteName: SITE_NAME, title, description, url: `/${locale}${path}`, locale: OG_LOCALE[locale], publishedTime: loaded.report.snapshot.date },
     twitter: { card: "summary_large_image", title, description },
   };

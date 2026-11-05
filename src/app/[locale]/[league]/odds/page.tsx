@@ -19,11 +19,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { locale, league } = await params;
   const loaded = await loadReport(league);
   if (!loaded) return {};
-  const { title, description, path } = await reportMetadata(loaded, locale, true);
+  const { title, description, path, indexable } = await reportMetadata(loaded, locale, true);
   return {
     title,
     description,
     alternates: alternates(locale, path),
+    ...(indexable ? {} : { robots: { index: false, follow: true } }),
     openGraph: { type: "article", siteName: SITE_NAME, title, description, url: `/${locale}${path}`, locale: OG_LOCALE[locale], publishedTime: loaded.report.snapshot.date },
     twitter: { card: "summary_large_image", title, description },
   };

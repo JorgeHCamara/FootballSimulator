@@ -28,7 +28,8 @@ export async function reportText(loaded: LoadedReport, lang: SiteLocale) {
   const leader = [...report.rows].sort((a, b) => (b.values[report.lead.kind]?.now ?? 0) - (a.values[report.lead.kind]?.now ?? 0))[0];
   const name = (id: TeamId) => teams.get(id)?.shortName ?? "";
   const count = new Intl.NumberFormat(lang).format(report.snapshot.iterations);
-  const description = t("description", {
+  // The season's first report has nothing to compare with: the chances after the round, no "who rose and who fell".
+  const description = t(report.previous ? "description" : "descriptionFirst", {
     league: league.name,
     season,
     round,
@@ -47,5 +48,6 @@ export async function reportMetadata(loaded: LoadedReport, locale: string, lates
   const { t, h1, season, round, description } = await reportText(loaded, lang);
   const path = latestPage ? latestReportPath(loaded.league) : reportPath(loaded.league, loaded.report.snapshot.round);
   const title = latestPage ? t("metaTitleLatest", { league: loaded.league.name, round }) : t("metaTitle", { h1, season });
-  return { title, description, path };
+  // The season's first report (no changes to show): the page loads, search engines are pointed at the later ones.
+  return { title, description, path, indexable: Boolean(loaded.report.previous) };
 }

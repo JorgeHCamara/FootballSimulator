@@ -2,17 +2,24 @@ import { getLeagueBySlug, type SiteLocale } from "../config/leagues.ts";
 import { dateLocale, reportText } from "./oddsText.ts";
 import { percent } from "./clubText.ts";
 import { loadReport } from "./oddsPage.ts";
+import { firstCardThatRenders } from "./cardFallback.ts";
 import { crestDataUri, renderGenericShareCard, renderOddsCard } from "./shareCard.tsx";
 import { getTranslations } from "next-intl/server";
 
 /** A report's card (its latest without `round`): the race after the round, the top five with their changes. */
 export async function oddsCardImage(locale: string, leagueSlug: string, round?: number) {
   const lang = (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
-  const loaded = await loadReport(leagueSlug, round).catch(() => undefined);
-  if (!loaded) {
+  const generic = async () => {
     const ts = await getTranslations({ locale: lang, namespace: "ShareCard" });
     return renderGenericShareCard({ title: getLeagueBySlug(leagueSlug)?.name ?? "Foot Simu", subtitle: ts("genericSubtitle"), cta: ts("cta") });
-  }
+  };
+  const loaded = await loadReport(leagueSlug, round).catch(() => undefined);
+  if (!loaded) return firstCardThatRenders([generic]);
+  // With the crests; if that fails (a crest that can't be drawn), with the clubs' initials; then the branded card.
+  return firstCardThatRenders([() => reportCard(loaded, lang, true), () => reportCard(loaded, lang, false), generic]);
+}
+
+async function reportCard(loaded: NonNullable<Awaited<ReturnType<typeof loadReport>>>, lang: SiteLocale, withCrests: boolean) {
   const { t, race, round: roundName, season, count } = await reportText(loaded, lang);
   const { report, teams, league } = loaded;
   const raceName = race(report.lead);
@@ -20,7 +27,8 @@ export async function oddsCardImage(locale: string, leagueSlug: string, round?: 
     report.race.series.map(async (s) => {
       const team = teams.get(s.teamId);
       const change = report.rows.find((r) => r.teamId === s.teamId)?.values[report.lead.kind];
-      const crest = await crestDataUri(team?.crest);
+      // A crest that fails or takes too long: the initials (crestDataUri never throws).
+      const crest = withCrests ? await crestDataUri(team?.crest) : undefined;
       return {
         name: team?.shortName ?? "",
         tla: team?.tla ?? "",

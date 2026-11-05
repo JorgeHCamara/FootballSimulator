@@ -240,7 +240,11 @@ export async function crestDataUri(url: string | undefined): Promise<string | un
     const type = res.headers.get("content-type")?.split(";")[0]?.trim() ?? "";
     if (!res.ok || !["image/png", "image/jpeg"].includes(type)) return undefined;
     const bytes = Buffer.from(await res.arrayBuffer());
-    return bytes.length > 400_000 ? undefined : `data:${type};base64,${bytes.toString("base64")}`;
+    // Only what it says it is: a PNG or JPEG by its first bytes (a broken image would break the card).
+    const png = bytes.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+    const jpeg = bytes[0] === 0xff && bytes[1] === 0xd8;
+    if (bytes.length > 400_000 || !(type === "image/png" ? png : jpeg)) return undefined;
+    return `data:${type};base64,${bytes.toString("base64")}`;
   } catch {
     return undefined;
   }
@@ -403,3 +407,4 @@ export async function renderOddsCard(text: OddsCardText) {
     { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
   );
 }
+

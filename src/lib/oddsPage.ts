@@ -48,8 +48,9 @@ export async function reportPaths(): Promise<{ latest: string[]; rounds: { path:
     leagues.map(async (league) => {
       const season = seasonReports(await readSnapshots(league.code));
       if (!season) return;
-      latest.push(latestReportPath(league));
-      for (const s of season.snapshots) rounds.push({ path: reportPath(league, s.round), date: s.date });
+      // The season's first report has no changes (noindex): left out, as is the latest page while it's the only one.
+      if (season.snapshots.length > 1) latest.push(latestReportPath(league));
+      for (const s of season.snapshots.slice(1)) rounds.push({ path: reportPath(league, s.round), date: s.date });
     }),
   );
   return { latest, rounds };

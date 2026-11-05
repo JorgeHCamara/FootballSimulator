@@ -1865,6 +1865,22 @@ async function step(name, fn) {
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${archive[1]}`);
       assert.match(await p.title(), new RegExp(`^Premier League title odds after Matchday ${earlier} \\(\\d{4}(/\\d{2})?\\) \\| Foot Simu$`));
       assert.equal((await p.request.get(`${BASE_URL}${archive[1]}/opengraph-image`)).headers()["content-type"], "image/png");
+      // Indexable, unlike the season's first report.
+      assert.equal(await p.locator('meta[name="robots"][content*="noindex"]').count(), 0);
+      // The season's first report: nothing to compare with, so no changes, its own description, noindex, not in the sitemap.
+      const first = archive.at(-1);
+      await p.goto(`${BASE_URL}${first}`);
+      assert.match(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex,\s*follow/);
+      const firstDescription = await p.locator('meta[name="description"]').getAttribute("content");
+      assert.doesNotMatch(firstDescription, /rose|fell|since the last round/);
+      assert.match(firstDescription, /every club's .+ chances after Matchday \d+, from [\d,]+ simulated seasons\./);
+      assert.equal(await p.locator('meta[property="og:description"]').getAttribute("content"), firstDescription);
+      assert.match(await p.getByTestId("odds-movers").innerText(), /first report/);
+      assert.equal(await p.locator('[data-testid="odds-table"] svg[data-icon^="trending"]').count(), 0, "no changes");
+      assert.doesNotMatch(await p.getByTestId("odds-table").innerText(), /±0/, "no made-up ±0");
+      const firstMap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      assert.ok(!firstMap.includes(`https://footsimu.com${first}<`), "the first report isn't in the sitemap");
+      assert.ok(firstMap.includes(`https://footsimu.com${archive[0]}<`), "the latest is");
       // Portuguese and Spanish.
       await p.goto(`${BASE_URL}/pt/premier-league/odds`);
       assert.match(await p.locator("h1").innerText(), /^Premier League: chances de título após a Rodada \d+$/);
@@ -1879,7 +1895,7 @@ async function step(name, fn) {
       assert.ok((await p.getByTestId("odds-hub-item").count()) >= 30);
       // Every report in the sitemap.
       const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
-      for (const path of ["/en/odds", "/pt/premier-league/odds", ...archive.map((a) => a.replace(/^\/en/, "/es"))]) assert.ok(sitemap.includes(`https://footsimu.com${path}<`), path);
+      for (const path of ["/en/odds", "/pt/premier-league/odds", ...archive.slice(0, -1).map((a) => a.replace(/^\/en/, "/es"))]) assert.ok(sitemap.includes(`https://footsimu.com${path}<`), path);
       await p.close();
       // Phones: nothing past the screen's edge; the menu's link.
       for (const width of [360, 390]) {

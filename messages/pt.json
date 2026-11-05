@@ -956,7 +956,7 @@
     "moversNote": "Mudanças desde a {round}, em pontos percentuais.",
     "up": "Subiram",
     "down": "Caíram",
-    "noMoves": "As chances de nenhum clube mudaram um ponto ou mais.",
+    "noMoves": "Nenhum clube teve suas chances alteradas em um ponto ou mais.",
     "firstReport": "Este é o primeiro relatório da temporada: as mudanças começam na próxima rodada.",
     "rise": "{club} {result} e viu suas chances de {topic} subirem de {from} para {to}.",
     "fall": "{club} {result} e viu suas chances de {topic} caírem de {from} para {to}.",
@@ -1013,6 +1013,7 @@
     "short": {
       "relegation": "Rebaix.",
       "aclElite": "ACL Elite"
-    }
+    },
+    "descriptionFirst": "{league} {season}: as chances de {topics} de cada clube após a {round}, em {count} temporadas simuladas. {leader} lidera a {race} com {leaderPct}."
   }
 }
