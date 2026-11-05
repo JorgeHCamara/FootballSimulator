@@ -179,6 +179,9 @@ export interface Candidate {
   eligible: boolean;
 }
 
+/** The selection rule's margins: calibration error per checkpoint (absolute), title Brier (a share). */
+export const NOISE_RULE = { calibrationMargin: 0.002, titleMargin: 0.01 } as const;
+
 /**
  * The selection rule for rating noise: the run with the best (lowest) pooled
  * RPS, as long as its calibration error is no worse than no noise's at any
@@ -189,7 +192,7 @@ export interface Candidate {
 export function chooseNoise(
   runs: Record<string, PooledScores>,
   base = "0",
-  { calibrationMargin = 0.002, titleMargin = 0.01 }: { calibrationMargin?: number; titleMargin?: number } = {},
+  { calibrationMargin = NOISE_RULE.calibrationMargin, titleMargin = NOISE_RULE.titleMargin }: { calibrationMargin?: number; titleMargin?: number } = {},
 ): { chosen?: string; runnerUp?: string; candidates: Candidate[] } {
   const none = runs[base];
   if (!none) throw new Error(`no "${base}" run to compare with`);

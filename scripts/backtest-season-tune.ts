@@ -11,14 +11,15 @@
  *   npm run backtest:season:tune -- 2022 2023 2024 2025
  *
  * Prints Markdown tables (per checkpoint for no noise, the chosen run and the
- * runner-up; each season apart; the whole grid) and writes them to
+ * runner-up, or the grid's best RPS when no other run is eligible; each season
+ * apart; the whole grid) and writes them to
  * backtest-results/rating-noise-tune.md, with the numbers in
  * backtest-results/rating-noise-tune.json.
  */
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { chooseNoise, metrics, scoreClubs, type Category, type ClubPrediction, type Metrics, type PooledScores, type Scored } from "./seasonScoring.ts";
+import { chooseNoise, metrics, NOISE_RULE, scoreClubs, type Candidate, type Category, type ClubPrediction, type Metrics, type PooledScores, type Scored } from "./seasonScoring.ts";
 
 const DIR = join(dirname(fileURLToPath(import.meta.url)), "../backtest-results");
 /** Seasons the chosen run has to beat no noise in for the live change (roadmap item 4) to go ahead. */
@@ -81,7 +82,13 @@ const n = (x: number | undefined, digits = 4) => (x !== undefined && Number.isFi
 const label = (key: string) => (key === "0" ? "no noise" : `sd ${key.split("/")[0]}, k ${key.split("/")[1] ?? "18"}`);
 const lines: string[] = [];
 const say = (s = "") => lines.push(s);
-const shown = ["0", ...(chosen ? [chosen] : []), ...(runnerUp ? [runnerUp] : [])];
+// Without an eligible runner-up, the tables show the grid's best RPS instead, as a reference (it fails the rule).
+const reference = !runnerUp && candidates[0] && candidates[0].key !== chosen ? candidates[0].key : undefined;
+const shown = ["0", ...(chosen ? [chosen] : []), ...(runnerUp ? [runnerUp] : []), ...(reference ? [reference] : [])];
+const rowLabel = (key: string) => (key === reference ? `${label(key)} (best RPS, not eligible)` : label(key));
+/** Why a run fails the rule. */
+const fails = (c: Candidate) =>
+  [c.rps >= pooled["0"]!.all.rps && "RPS", c.worstCalibrationGap > NOISE_RULE.calibrationMargin + 1e-12 && "calibration", c.titleBrierChange > NOISE_RULE.titleMargin + 1e-12 && "title Brier"].filter(Boolean).join(", ");
 
 say(`## Rating noise tune: seasons ${seasons.join(", ")}`);
 say();
@@ -89,7 +96,7 @@ for (const f of files) say(`- ${f.season}: ${f.leagues.map((l) => l.code).join("
 say();
 say(
   chosen
-    ? `**Chosen: ${label(chosen)}** (runner-up: ${runnerUp ? label(runnerUp) : "none"}). It beats no noise's RPS in ${holds.length} of ${files.length} seasons (${holds.join(", ") || "none"}): ${goAhead ? `the live change (item 4) can go ahead` : `fewer than ${SEASONS_NEEDED}, so item 4 is cancelled`}.`
+    ? `**Chosen: ${label(chosen)}** (runner-up: ${runnerUp ? label(runnerUp) : `none${reference ? `; the tables also show the best RPS of the grid, ${label(reference)}, which fails the rule (${fails(candidates[0]!)})` : ""}`}). It beats no noise's RPS in ${holds.length} of ${files.length} seasons (${holds.join(", ") || "none"}): ${goAhead ? `the live change (item 4) can go ahead` : `fewer than ${SEASONS_NEEDED}, so item 4 is cancelled`}.`
     : "**No run meets the selection rule: keep rating noise off** (item 4 is cancelled).",
 );
 say();
@@ -100,7 +107,7 @@ say("|---|---|---|---|---|---|---|");
 for (const cp of [...Object.keys(pooled["0"]!.byCheckpoint), "all"]) {
   for (const key of shown) {
     const m: Metrics = cp === "all" ? pooled[key]!.all : pooled[key]!.byCheckpoint[cp]!;
-    say(`| ${cp === "all" ? "**all**" : cp} | ${label(key)} | ${n(m.rps)} | ${n(m.calibrationError)} | ${n(m.brier.title)} | ${n(m.brier.top)} | ${n(m.brier.relegation)} |`);
+    say(`| ${cp === "all" ? "**all**" : cp} | ${rowLabel(key)} | ${n(m.rps)} | ${n(m.calibrationError)} | ${n(m.brier.title)} | ${n(m.brier.top)} | ${n(m.brier.relegation)} |`);
   }
 }
 say();
@@ -112,22 +119,22 @@ for (const f of files) {
   for (const key of shown) {
     const m = perSeason[f.season]![key]!.all;
     const beats = key === "0" ? "" : m.rps < perSeason[f.season]!["0"]!.all.rps ? "yes" : "no";
-    say(`| ${f.season} | ${label(key)} | ${n(m.rps)} | ${n(m.calibrationError)} | ${n(m.brier.title)} | ${n(m.brier.top)} | ${n(m.brier.relegation)} | ${beats} |`);
+    say(`| ${f.season} | ${rowLabel(key)} | ${n(m.rps)} | ${n(m.calibrationError)} | ${n(m.brier.title)} | ${n(m.brier.top)} | ${n(m.brier.relegation)} | ${beats} |`);
   }
 }
 say();
 say("### The whole grid, all seasons pooled");
 say();
-say("Eligible: lower RPS than no noise, no checkpoint's calibration error worse than no noise's by more than 0.002, the title Brier no more than 1% worse.");
+say(`Eligible: lower RPS than no noise, no checkpoint's calibration error worse than no noise's by more than ${NOISE_RULE.calibrationMargin}, the title Brier no more than ${100 * NOISE_RULE.titleMargin}% worse.`);
 say();
 say("| Run | RPS | vs no noise | Worst calibration gap | Title Brier change | Eligible |");
 say("|---|---|---|---|---|---|");
 say(`| no noise | ${n(pooled["0"]!.all.rps)} | | | | |`);
 for (const c of candidates) {
-  say(`| ${label(c.key)} | ${n(c.rps)} | ${(c.rps - pooled["0"]!.all.rps >= 0 ? "+" : "") + n(c.rps - pooled["0"]!.all.rps)} | ${(c.worstCalibrationGap >= 0 ? "+" : "") + n(c.worstCalibrationGap)} | ${(c.titleBrierChange >= 0 ? "+" : "") + (100 * c.titleBrierChange).toFixed(1)}% | ${c.eligible ? "yes" : "no"} |`);
+  say(`| ${label(c.key)} | ${n(c.rps)} | ${(c.rps - pooled["0"]!.all.rps >= 0 ? "+" : "") + n(c.rps - pooled["0"]!.all.rps)} | ${(c.worstCalibrationGap >= 0 ? "+" : "") + n(c.worstCalibrationGap)} | ${(c.titleBrierChange >= 0 ? "+" : "") + (100 * c.titleBrierChange).toFixed(1)}% | ${c.eligible ? "yes" : `no (${fails(c)})`} |`);
 }
 const report = lines.join("\n");
 console.log(report);
 await writeFile(join(DIR, "rating-noise-tune.md"), `${report}\n`);
-await writeFile(join(DIR, "rating-noise-tune.json"), JSON.stringify({ seasons, runs: keys, chosen: chosen ?? null, runnerUp: runnerUp ?? null, holds, goAhead, candidates, pooled, perSeason }));
+await writeFile(join(DIR, "rating-noise-tune.json"), JSON.stringify({ seasons, runs: keys, chosen: chosen ?? null, runnerUp: runnerUp ?? null, reference: reference ?? null, rule: NOISE_RULE, holds, goAhead, candidates, pooled, perSeason }));
 console.error(`\nWritten: backtest-results/rating-noise-tune.md and .json`);
