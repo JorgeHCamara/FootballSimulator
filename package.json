@@ -16,6 +16,7 @@
     "priors": "NODE_USE_ENV_PROXY=1 node scripts/build-priors.ts",
     "backtest": "NODE_USE_ENV_PROXY=1 node scripts/backtest.ts",
     "backtest:season": "NODE_USE_ENV_PROXY=1 node scripts/backtest-season.ts",
+    "backtest:season:tune": "node scripts/backtest-season-tune.ts",
     "snapshots": "NODE_USE_ENV_PROXY=1 node scripts/snapshot-odds.ts",
     "xg": "NODE_USE_ENV_PROXY=1 node scripts/fetch-xg.ts"
   },

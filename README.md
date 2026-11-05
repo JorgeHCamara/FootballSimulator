@@ -224,6 +224,24 @@ the prior's weight). It's an engine option (`ratingNoise` in
 `runMonteCarlo`), off unless given: the site, its snapshots and the dice don't
 use it.
 
+To tune it, run a grid of spreads and fade constants for each season (several
+values for both flags: every spread with every k, plus no noise, keyed
+`sd/k`), then pool the seasons:
+
+```bash
+npm run backtest:season -- 2025 PL ELC PD BL1 SA FL1 BSA MLS ARG MX --rating-noise 0,0.15,0.2,0.25,0.3 --noise-k 5,10,20,40
+npm run backtest:season:tune -- 2022 2023 2024 2025
+```
+
+The second reads `backtest-results/season-<season>.json` for each season,
+scores every run on all of them together and applies the selection rule: the
+lowest pooled RPS, as long as its calibration error is no worse than no
+noise's at any checkpoint by more than 0.002, its title Brier is no more than
+1% worse, and it beats no noise. It prints Markdown tables (each checkpoint for
+no noise, the chosen run and the runner-up; each season apart; the whole grid)
+and writes them to `backtest-results/rating-noise-tune.md` (numbers in
+`rating-noise-tune.json`). A grid of 17 runs takes a few minutes per season.
+
 What it found (2025 seasons, 10 leagues, 218 clubs per checkpoint; the 2024
 seasons, 9 leagues, agree):
 

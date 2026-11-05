@@ -45,7 +45,7 @@ import { getPastSeasonData, type LeagueData } from "../src/lib/leagueData.ts";
 import type { PriorSeason } from "../src/lib/priors.ts";
 import { readXg } from "../src/lib/xgStore.ts";
 import { buildLeaguePriors, fetchSeason, round3 } from "./priorsLib.ts";
-import { BUCKETS, baselinePredictions, categoriesOf, metrics, MIN_BUCKET, PLAYOFF_KINDS, scoreClubs, type Category, type ClubPrediction, type Metrics, type Scored } from "./seasonScoring.ts";
+import { BUCKETS, baselinePredictions, categoriesOf, metrics, MIN_BUCKET, noiseConfigs, PLAYOFF_KINDS, scoreClubs, type Category, type ClubPrediction, type Metrics, type NoiseConfig, type Scored } from "./seasonScoring.ts";
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const OUT_DIR = join(dirname(SCRIPT), "../backtest-results");
@@ -57,10 +57,11 @@ const MISSING_ALLOWED = 2;
 
 interface Options {
   year: number;
-  sds: number[];
-  k: number;
+  /** The rating-noise runs: a spread and a fade constant each, under a key ("0" for none). */
+  configs: NoiseConfig[];
   iterations: number;
 }
+
 
 interface CheckpointResult {
   /** On the 38-round scale, and in the league's own rounds. */
@@ -148,7 +149,7 @@ async function lastSeasonBaseline(league: LeagueConfig, year: number, tables: Te
   return out;
 }
 
-async function backtestLeague(code: string, { year, sds, k, iterations }: Options): Promise<LeagueResult> {
+async function backtestLeague(code: string, { year, configs, iterations }: Options): Promise<LeagueResult> {
   const started = Date.now();
   const league = getLeagueByCode(code);
   if (!league || !hasClubPages(league)) throw new Error(`${code}: not a domestic league with club pages`);
@@ -201,10 +202,10 @@ async function backtestLeague(code: string, { year, sds, k, iterations }: Option
     const s = outlookSetup(league, at);
     if (!s) continue;
     const runs: CheckpointResult["runs"] = {};
-    for (const sd of sds) {
+    for (const { key, sd, k } of configs) {
       const result = runMonteCarlo({ ...s.input, iterations, seed: SCENARIO_SEED, ...(sd > 0 ? { ratingNoise: { sd, k } } : {}) });
       const outlook = outlookFromRun(league, at, s, result);
-      runs[String(sd)] = Object.fromEntries(
+      runs[key] = Object.fromEntries(
         [...outlook.clubs.values()].map((c) => {
           tableSize[c.team.id] = c.tableSize;
           return [String(c.team.id), { dist: c.distribution.map((p) => Math.round(p * 1e5) / 1e5), expected: Math.round(c.expectedPosition * 1e4) / 1e4 }];
@@ -248,12 +249,14 @@ function parseArgs(argv: string[]) {
   if (!Number.isInteger(year) || !codes.length) throw new Error("usage: npm run backtest:season -- <season> <codes...> [--rating-noise 0,0.05] [--noise-k 18] [--iterations 10000] [--jobs n] [--out file]");
   const sds = (flags.get("rating-noise") ?? "0").split(",").map(Number);
   if (sds.some((sd) => !(sd >= 0))) throw new Error("--rating-noise: spreads of 0 or more, comma-separated");
+  const ks = (flags.get("noise-k") ?? "18").split(",").map(Number);
+  if (ks.some((k) => !(k > 0))) throw new Error("--noise-k: fade constants above 0, comma-separated");
   return {
     codes,
     worker: flags.get("worker"),
     out: flags.get("out"),
     jobs: Number(flags.get("jobs") ?? Math.min(availableParallelism(), codes.length)),
-    options: { year, sds, k: Number(flags.get("noise-k") ?? 18), iterations: Number(flags.get("iterations") ?? 10_000) } satisfies Options,
+    options: { year, configs: noiseConfigs(sds, ks), iterations: Number(flags.get("iterations") ?? 10_000) } satisfies Options,
   };
 }
 
@@ -301,7 +304,7 @@ async function main() {
   leagues.sort((a, b) => codes.indexOf(a.code) - codes.indexOf(b.code));
 
   // Scores: per league and checkpoint, then pooled by checkpoint and overall, for each spread and the baseline.
-  const sdKeys = options.sds.map(String);
+  const sdKeys = options.configs.map((c) => c.key);
   const pooled: Record<string, { baseline: Scored[]; runs: Record<string, Scored[]> }> = {};
   const all = { baseline: [] as Scored[], runs: Object.fromEntries(sdKeys.map((k) => [k, [] as Scored[]])) };
   const perLeague = leagues.map((league) => ({
@@ -315,6 +318,7 @@ async function main() {
     missingResults: league.missingResults,
     categories: league.categories,
     final: league.final,
+    tableSize: league.tableSize,
     seconds: league.seconds,
     checkpoints: league.checkpoints.map((cp) => {
       const base = scoreClubs(league, baselinePredictions(league, cp.baseline));
@@ -340,7 +344,7 @@ async function main() {
   const best = Object.fromEntries(
     Object.entries(pooledMetrics).map(([cp, m]) => {
       const by = (f: (x: Metrics) => number) => sdKeys.reduce((a, b) => (f(m.runs[b]!) < f(m.runs[a]!) ? b : a));
-      return [cp, { byRps: Number(by((x) => x.rps)), byCalibrationError: Number(by((x) => x.calibrationError)) }];
+      return [cp, { byRps: by((x) => x.rps), byCalibrationError: by((x) => x.calibrationError) }];
     }),
   );
   const seconds = (Date.now() - started) / 1000;
@@ -354,7 +358,7 @@ async function main() {
       generatedAt: new Date().toISOString(),
       iterations: options.iterations,
       seed: SCENARIO_SEED,
-      ratingNoise: { sds: options.sds, k: options.k },
+      ratingNoise: { configs: options.configs },
       checkpoints: CHECKPOINTS,
       buckets: BUCKETS.map(([from, to]) => [from, Math.min(1, to)]),
       minBucket: MIN_BUCKET,
@@ -369,7 +373,7 @@ async function main() {
   const lines: string[] = [];
   const say = (s = "") => lines.push(s);
   say(`SEASON BACKTEST ${options.year}: ${leagues.length} league(s), ${options.iterations.toLocaleString("en")} simulated seasons per run, seed ${SCENARIO_SEED}`);
-  say(`Rating noise sd: ${options.sds.join(", ")} (k = ${options.k}). Lower is better for every score.`);
+  say(`Rating noise (sd${options.configs.some((c) => c.key.includes("/")) ? "/k" : ""}): ${options.configs.map((c) => (c.key.includes("/") || c.sd === 0 ? c.key : `${c.key} (k = ${c.k})`)).join(", ")}. Lower is better for every score.`);
   if (failed.length) say(`Not run: ${failed.join(", ")} (see the errors above)`);
   const sd0 = sdKeys[0]!;
   say();
@@ -385,27 +389,44 @@ async function main() {
       );
     }
   }
-  say();
-  say("POOLED BY CHECKPOINT (all leagues)");
-  say(`cp   clubs | ${sdKeys.map((sd) => pad(`sd ${sd}: RPS / MAE / calib. err.`, 30)).join(" | ")} | baseline RPS / MAE`);
-  for (const [cp, m] of Object.entries(pooledMetrics)) {
-    say(
-      `${lpad(cp, 3)} ${lpad(String(m.baseline.clubs), 6)} | ${sdKeys.map((sd) => pad(`${num(m.runs[sd]!.rps)} / ${num(m.runs[sd]!.mae, 2)} / ${num(m.runs[sd]!.calibrationError)}`, 30)).join(" | ")} | ${num(m.baseline.rps)} / ${num(m.baseline.mae, 2)}`,
-    );
+  const grid = sdKeys.length > 4;
+  if (grid) {
+    // A grid: one row per run, a column per checkpoint.
+    const cps = Object.keys(pooledMetrics);
+    const matrix = (title: string, f: (m: Metrics) => number) => {
+      say();
+      say(title);
+      say(`${pad("run", 10)} ${cps.map((cp) => lpad(`cp ${cp}`, 8)).join(" ")} ${lpad("all", 8)}`);
+      for (const sd of sdKeys) say(`${pad(sd, 10)} ${cps.map((cp) => lpad(num(f(pooledMetrics[cp]!.runs[sd]!)), 8)).join(" ")} ${lpad(num(f(overall.runs[sd]!)), 8)}`);
+      say(`${pad("baseline", 10)} ${cps.map((cp) => lpad(num(f(pooledMetrics[cp]!.baseline)), 8)).join(" ")} ${lpad(num(f(overall.baseline)), 8)}`);
+    };
+    matrix("RPS, POOLED BY CHECKPOINT (all leagues)", (m) => m.rps);
+    matrix("CALIBRATION ERROR, POOLED BY CHECKPOINT", (m) => m.calibrationError);
+    matrix("TITLE BRIER, POOLED BY CHECKPOINT", (m) => m.brier.title ?? NaN);
   }
-  say(`all ${lpad(String(overall.baseline.clubs), 6)} | ${sdKeys.map((sd) => pad(`${num(overall.runs[sd]!.rps)} / ${num(overall.runs[sd]!.mae, 2)} / ${num(overall.runs[sd]!.calibrationError)}`, 30)).join(" | ")} | ${num(overall.baseline.rps)} / ${num(overall.baseline.mae, 2)}`);
-  say();
-  say("BRIER, POOLED BY CHECKPOINT (title / top places / relegation)");
-  for (const [cp, m] of Object.entries(pooledMetrics)) {
-    const cell = (x: Metrics) => `${num(x.brier.title)} / ${num(x.brier.top)} / ${num(x.brier.relegation)}`;
-    say(`${lpad(cp, 3)} | ${sdKeys.map((sd) => pad(`sd ${sd}: ${cell(m.runs[sd]!)}`, 36)).join(" | ")} | baseline ${cell(m.baseline)}`);
+  if (!grid) {
+    say();
+    say("POOLED BY CHECKPOINT (all leagues)");
+    say(`cp   clubs | ${sdKeys.map((sd) => pad(`sd ${sd}: RPS / MAE / calib. err.`, 30)).join(" | ")} | baseline RPS / MAE`);
+    for (const [cp, m] of Object.entries(pooledMetrics)) {
+      say(
+        `${lpad(cp, 3)} ${lpad(String(m.baseline.clubs), 6)} | ${sdKeys.map((sd) => pad(`${num(m.runs[sd]!.rps)} / ${num(m.runs[sd]!.mae, 2)} / ${num(m.runs[sd]!.calibrationError)}`, 30)).join(" | ")} | ${num(m.baseline.rps)} / ${num(m.baseline.mae, 2)}`,
+      );
+    }
+    say(`all ${lpad(String(overall.baseline.clubs), 6)} | ${sdKeys.map((sd) => pad(`${num(overall.runs[sd]!.rps)} / ${num(overall.runs[sd]!.mae, 2)} / ${num(overall.runs[sd]!.calibrationError)}`, 30)).join(" | ")} | ${num(overall.baseline.rps)} / ${num(overall.baseline.mae, 2)}`);
+    say();
+    say("BRIER, POOLED BY CHECKPOINT (title / top places / relegation)");
+    for (const [cp, m] of Object.entries(pooledMetrics)) {
+      const cell = (x: Metrics) => `${num(x.brier.title)} / ${num(x.brier.top)} / ${num(x.brier.relegation)}`;
+      say(`${lpad(cp, 3)} | ${sdKeys.map((sd) => pad(`sd ${sd}: ${cell(m.runs[sd]!)}`, 36)).join(" | ")} | baseline ${cell(m.baseline)}`);
+    }
   }
   if (sdKeys.length > 1) {
     say();
     say("BEST RATING NOISE BY CHECKPOINT (lowest pooled RPS; lowest calibration error)");
     for (const [cp, b] of Object.entries(best)) say(`${lpad(cp, 3)}: RPS → sd ${b.byRps}; calibration → sd ${b.byCalibrationError}`);
   }
-  for (const sd of sdKeys) {
+  for (const sd of grid ? [sd0] : sdKeys) {
     say();
     say(`CALIBRATION, all leagues and checkpoints, rating noise ${sd} (every chance scored: title, top places, relegation, play-offs)`);
     say("bucket      predicted  actual     n");
