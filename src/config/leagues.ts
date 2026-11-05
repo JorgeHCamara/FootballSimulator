@@ -130,6 +130,8 @@ export interface LeagueConfig {
   ratingPriorGames?: number;
   /** Recency weighting of this league's ratings (games for a game's weight to halve); defaults to RATING_HALF_LIFE. */
   ratingHalfLife?: number;
+  /** How much this league's ratings lean on xG where ESPN has it (0–1); defaults to XG_WEIGHT. */
+  ratingXgWeight?: number;
   /** Separate tables (MLS conferences); zones then apply within each group. */
   groups?: readonly LeagueGroup[];
   /**

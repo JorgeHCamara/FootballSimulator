@@ -4,7 +4,11 @@
  */
 import { LEAGUES, type LeagueConfig } from "../src/config/leagues.ts";
 import { dixonColesTau, expectedGoals } from "../src/engine/match.ts";
-import { buildLeagueModel, NO_DATA_PRIOR, type LeagueModel, type TeamStrength } from "../src/engine/ratings.ts";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { buildLeagueModel, NO_DATA_PRIOR, ratingXgWeight, type LeagueModel, type TeamStrength } from "../src/engine/ratings.ts";
+import { xgByFixture, type GameXg, type XgFile } from "../src/lib/xg.ts";
 import { realResults } from "../src/engine/results.ts";
 import type { Fixture, ResultMap, Team, TeamId } from "../src/engine/types.ts";
 import { espnFixtures, espnTeams, fetchEspnSeason } from "../src/lib/espn.ts";
@@ -40,6 +44,17 @@ export interface Season {
   teams: Team[];
   fixtures: Fixture[];
   results: ResultMap;
+  /** Each game's xG where ESPN has it (src/data/xg), by fixture id. */
+  xg: Record<number, GameXg>;
+}
+
+/** A league's stored xG (src/data/xg), if it has any. */
+function storedXg(code: string): Record<number, GameXg> {
+  try {
+    return xgByFixture(JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../src/data/xg", `${code}.json`), "utf8")) as XgFile);
+  } catch {
+    return {};
+  }
 }
 
 const seasons = new Map<string, Promise<Season>>();
@@ -52,7 +67,8 @@ export function fetchSeason(code: string, year: number): Promise<Season> {
       key,
       fetchEspnSeason(league.espn.slug, year, league.espn.seasons).then((events) => {
         const fixtures = espnFixtures(events);
-        return { teams: espnTeams(events), fixtures, results: realResults(fixtures) };
+        const xg = storedXg(code);
+        return { teams: espnTeams(events), fixtures, results: realResults(fixtures), xg: Object.fromEntries(fixtures.flatMap((f) => (xg[f.id] ? [[f.id, xg[f.id]!]] : []))) };
       }),
     );
   }
@@ -69,8 +85,8 @@ const gamesPlayed = (season: Season) => {
  * A season's opponent-adjusted ratings. With `halfLife`, its later games
  * count a bit more, so a club that finished strongly starts a bit higher.
  */
-export function seasonRatings(season: Season, halfLife = Infinity) {
-  const model = buildLeagueModel(season.teams, season.fixtures, season.results, { priorGames: 3, halfLife, minEffectiveGames: 0 });
+export function seasonRatings(season: Season, halfLife = Infinity, xgWeight = 0) {
+  const model = buildLeagueModel(season.teams, season.fixtures, season.results, { priorGames: 3, halfLife, minEffectiveGames: 0, xg: season.xg, xgWeight });
   return { model, games: gamesPlayed(season) };
 }
 
@@ -124,7 +140,7 @@ export function pool(...parts: Season[]): Season {
   const teams = new Map<number, Team>();
   for (const part of parts) for (const t of part.teams) teams.set(t.id, t);
   const fixtures = parts.flatMap((p) => p.fixtures.filter((f) => p.results[f.id]));
-  return { teams: [...teams.values()], fixtures, results: Object.assign({}, ...parts.map((p) => p.results)) };
+  return { teams: [...teams.values()], fixtures, results: Object.assign({}, ...parts.map((p) => p.results)), xg: Object.assign({}, ...parts.map((p) => p.xg)) };
 }
 
 /**
@@ -215,13 +231,18 @@ export interface LeaguePriors {
  * `halfLife`), and rho and the home splits from last season and, with
  * `includeCurrent`, the current season's games so far.
  */
-export async function buildLeaguePriors(league: LeagueConfig, year: number, { halfLife = Infinity, includeCurrent = true }: { halfLife?: number; includeCurrent?: boolean } = {}): Promise<LeaguePriors | null> {
+export async function buildLeaguePriors(
+  league: LeagueConfig,
+  year: number,
+  { halfLife = Infinity, includeCurrent = true, xgWeight = ratingXgWeight(league) }: { halfLife?: number; includeCurrent?: boolean; xgWeight?: number } = {},
+): Promise<LeaguePriors | null> {
   const current = await fetchSeason(league.code, year);
   if (current.teams.length < 4) return null;
+  // Last season's ratings, on the same blend of xG and goals as the league's ratings (games without xG on goals).
   const lastSeason = await fetchSeason(league.code, year - 1).catch(() => null);
-  const last = lastSeason ? seasonRatings(lastSeason, halfLife) : null;
-  const lower = LOWER[league.code] ? await fetchSeason(LOWER[league.code]!, year - 1).then((s) => seasonRatings(s, halfLife)).catch(() => null) : null;
-  const upper = UPPER[league.code] ? await fetchSeason(UPPER[league.code]!, year - 1).then((s) => seasonRatings(s, halfLife)).catch(() => null) : null;
+  const last = lastSeason ? seasonRatings(lastSeason, halfLife, xgWeight) : null;
+  const lower = LOWER[league.code] ? await fetchSeason(LOWER[league.code]!, year - 1).then((s) => seasonRatings(s, halfLife, xgWeight)).catch(() => null) : null;
+  const upper = UPPER[league.code] ? await fetchSeason(UPPER[league.code]!, year - 1).then((s) => seasonRatings(s, halfLife, xgWeight)).catch(() => null) : null;
   const { strengths, counts, returning } = clubPriors(current.teams, last, lower, upper);
   // rho and home splits: from the league's games, last season (+ this one so far).
   const parts = [lastSeason, includeCurrent ? current : null].filter((p): p is Season => Boolean(p));

@@ -55,6 +55,14 @@ export interface ModelOptions {
    * swamp a short season and a short streak can't stand in for a season.
    */
   minEffectiveGames?: number;
+  /**
+   * Expected goals per game (home, away), by fixture id. With `xgWeight`, a
+   * game with xG rates attack and defence on xgWeight × xG + (1 − xgWeight) ×
+   * goals; a game without xG on its goals. League goal averages stay on goals.
+   */
+  xg?: Readonly<Record<number, readonly [number, number]>>;
+  /** 0 (the default): goals only. 1: xG only, for games that have it. */
+  xgWeight?: number;
 }
 
 /** Recent-form weight of a game `age` games ago. */
@@ -77,6 +85,16 @@ export const DIXON_COLES = true;
 export const TEAM_HOME_ADVANTAGE = false;
 /** Games for a rating's weight to halve (Infinity: every game the same); see ModelOptions.halfLife. */
 export const RATING_HALF_LIFE = Infinity;
+
+/**
+ * How much the ratings lean on expected goals (xG) where ESPN has them: 0 =
+ * goals only. Set by the backtest (scripts/backtest.ts --xg); a league can
+ * set its own (LeagueConfig.ratingXgWeight).
+ */
+export const XG_WEIGHT = 0;
+
+/** A league's xG weight. */
+export const ratingXgWeight = (league: { ratingXgWeight?: number }) => league.ratingXgWeight ?? XG_WEIGHT;
 
 /** A league's match parameters, as plain data (server to browser): rho and clubs' home splits. */
 export interface MatchParams {
@@ -152,14 +170,19 @@ export function buildLeagueModel(
   // (with decay) its weight, by how many games the team has played since.
   const games = new Map<TeamId, { home: boolean; gf: number; ga: number; opponent: TeamId; weight: number }[]>();
   for (const t of teams) games.set(t.id, []);
+  const xgWeight = Math.min(1, Math.max(0, options.xgWeight ?? 0));
   for (const f of sortFixtures(fixtures)) {
     const r = results[f.id];
     if (!r) continue;
     const h = games.get(f.homeId);
     const a = games.get(f.awayId);
     if (!h || !a) continue;
-    h.push({ home: true, gf: r.home, ga: r.away, opponent: f.awayId, weight: 1 });
-    a.push({ home: false, gf: r.away, ga: r.home, opponent: f.homeId, weight: 1 });
+    // What the ratings are fitted to: the goals, or their blend with the game's xG when it has one.
+    const xg = xgWeight > 0 ? options.xg?.[f.id] : undefined;
+    const home = xg ? xgWeight * xg[0] + (1 - xgWeight) * r.home : r.home;
+    const away = xg ? xgWeight * xg[1] + (1 - xgWeight) * r.away : r.away;
+    h.push({ home: true, gf: home, ga: away, opponent: f.awayId, weight: 1 });
+    a.push({ home: false, gf: away, ga: home, opponent: f.homeId, weight: 1 });
   }
   const halfLife = options.halfLife ?? Infinity;
   const minEffective = options.minEffectiveGames ?? MIN_EFFECTIVE_GAMES;

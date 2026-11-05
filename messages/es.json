@@ -969,8 +969,8 @@
       "winAway": "venció a {opponent} por {score} a domicilio",
       "drawHome": "empató por {score} con {opponent} en casa",
       "drawAway": "empató por {score} con {opponent} a domicilio",
-      "lossHome": "perdió {score} ante {opponent} en casa",
-      "lossAway": "perdió {score} ante {opponent} a domicilio"
+      "lossHome": "perdió por {score} ante {opponent} en casa",
+      "lossAway": "perdió por {score} ante {opponent} a domicilio"
     },
     "leader": "{club} lidera la {race} con el {pct}.",
     "tableTitle": "Las probabilidades de cada club",
