@@ -834,7 +834,7 @@
       "playoffs": "reach the play-offs in {pct}",
       "relegation": "go down in {pct}"
     },
-    "summaryLikeliest": "Their most likely finish is {position} ({pct} of seasons), averaging {avgPoints} points.",
+    "summaryLikeliest": "In the most likely final table they finish {position} ({pct} of seasons), averaging {avgPoints} points.",
     "chancesTitle": "Season chances",
     "chancesNote": "From {count} simulations of the rest of the season, starting from the real results so far. Updated every few hours.",
     "likeliest": "Most likely finish",

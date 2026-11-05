@@ -834,7 +834,7 @@
       "playoffs": "vai aos playoffs em {pct}",
       "relegation": "é rebaixado em {pct}"
     },
-    "summaryLikeliest": "A posição final mais provável é o {position} lugar ({pct} das temporadas), com média de {avgPoints} pontos.",
+    "summaryLikeliest": "Na classificação final mais provável, termina em {position} lugar ({pct} das temporadas), com média de {avgPoints} pontos.",
     "chancesTitle": "Chances na temporada",
     "chancesNote": "Em {count} simulações do resto da temporada, a partir dos resultados reais até agora. Atualizado a cada poucas horas.",
     "likeliest": "Posição final mais provável",

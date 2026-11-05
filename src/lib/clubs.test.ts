@@ -58,9 +58,11 @@ describe("a club's outlook", () => {
       assert.ok(Math.abs(club.distribution.reduce((a, b) => a + b, 0) - 1) < 1e-9, club.team.name);
       assert.deepEqual(club.zones.map((z) => z.kind), ["title", "championsLeague", "europaLeague", "conferenceLeague", "relegation"]);
       assert.deepEqual(club.headline.map((h) => `${h.kind}:${h.zone}`), ["title:title", "continental:championsLeague", "relegation:relegation"]);
-      assert.equal(club.likeliest.chance, Math.max(...club.distribution));
       assert.equal(club.distribution[club.likeliest.position - 1], club.likeliest.chance);
+      assert.ok(club.likeliest.chance > 0, `${club.team.name} finishes where it can`);
     }
+    // The most likely finishes are a table: every place once.
+    assert.deepEqual([...outlook.clubs.values()].map((c) => c.likeliest.position).sort((a, b) => a - b), Array.from({ length: 20 }, (_, i) => i + 1));
     // All clubs' title chances add up to 1, and so do 20 places of each kind.
     const sum = (kind: string) => [...outlook.clubs.values()].reduce((s, c) => s + c.zones.find((z) => z.kind === kind)!.chance, 0);
     assert.ok(Math.abs(sum("title") - 1) < 1e-9);

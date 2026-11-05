@@ -1,4 +1,5 @@
 import type { LeagueConfig, SiteLocale, Zone, ZoneKind } from "../config/leagues.ts";
+import { mostLikelyPlaces } from "../engine/finishes.ts";
 import { expectedGoals, expectedGoalsNeutral, outcomeProbabilities } from "../engine/match.ts";
 import { runMonteCarlo, type MonteCarloInput, type MonteCarloResult } from "../engine/montecarlo.ts";
 import { buildLeagueModel, type LeagueModel } from "../engine/ratings.ts";
@@ -320,10 +321,8 @@ export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: Outloo
       const byPlace = (from: number, to: number) => distribution.slice(from - 1, to).reduce((a, b) => a + b, 0);
       zones = zones.map((z) => ({ ...z, chance: z.kind === "relegation" ? Math.min(1, z.ranges.reduce((sum, [from, to]) => sum + byPlace(from, to), 0)) : z.kind === first ? 1 : 0 }));
     }
-    let likeliest = { position: row.position, chance: 0 };
-    distribution.forEach((chance, p) => {
-      if (chance > likeliest.chance) likeliest = { position: p + 1, chance };
-    });
+    // Set below, from the most likely final table (one club per place).
+    const likeliest = { position: row.position, chance: distribution[row.position - 1] ?? 0 };
     const expectedPosition = distribution.reduce((sum, chance, p) => sum + chance * (p + 1), 0);
     const group = s.groupOf?.get(row.teamId);
     clubs.set(row.teamId, {
@@ -340,7 +339,31 @@ export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: Outloo
       ...(group ? { group } : {}),
     });
   }
+  setLikeliestFinishes(clubs, s.scope === "eachTable" ? s.groupOf : undefined);
   return { league, season: data.season, iterations: result.iterations, complete: s.complete, scope: s.scope, clubs, order: s.rows.map((r) => r.teamId), model: s.model };
+}
+
+/**
+ * Each club's most likely finish: its place in the most likely final table
+ * (mostLikelyPlaces), so no two clubs share one. One table per conference
+ * when the places are counted within each (`groupOf`).
+ */
+function setLikeliestFinishes(clubs: Map<TeamId, ClubOutlook>, groupOf?: ReadonlyMap<TeamId, unknown>) {
+  const tables = new Map<unknown, ClubOutlook[]>();
+  for (const [id, club] of clubs) {
+    const key = groupOf?.get(id) ?? null;
+    tables.set(key, [...(tables.get(key) ?? []), club]);
+  }
+  for (const table of tables.values()) {
+    const places = mostLikelyPlaces(
+      table.map((c) => c.distribution),
+      table.map((c) => c.row.position - 1),
+    );
+    table.forEach((club, i) => {
+      const p = places[i]!;
+      club.likeliest = { position: p + 1, chance: club.distribution[p] ?? 0 };
+    });
+  }
 }
 
 /**
