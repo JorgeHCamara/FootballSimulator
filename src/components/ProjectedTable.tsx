@@ -229,7 +229,7 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
                     <tr>
                       <th className="sticky left-0 z-10 min-w-32 border-r border-zinc-200 bg-white px-2 py-1.5 text-left font-semibold text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900">{labels.club}</th>
                       {entries.map((e, i) => (
-                        <th key={i} className={`p-0.5 font-semibold ${e.modelChange ? "border-l border-l-zinc-400 dark:border-l-zinc-500" : ""}`}>
+                        <th key={i} className={`p-0.5 font-semibold ${e.modelChange ? "border-l-2 border-l-zinc-400 dark:border-l-zinc-500" : ""}`}>
                           <button
                             type="button"
                             onClick={() => setIndex(i)}
@@ -261,7 +261,7 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
                             return (
                               <td
                                 key={i}
-                                className={`border-t border-zinc-200/70 px-1 py-1 text-center dark:border-zinc-800 ${e.modelChange ? "border-l border-l-zinc-400 dark:border-l-zinc-500" : ""} ${zone ? ZONE_STYLES[zone].row : ""} ${i === index ? "font-extrabold outline outline-1 -outline-offset-1 outline-pitch-600" : ""}`}
+                                className={`border-t border-zinc-200/70 px-1 py-1 text-center dark:border-zinc-800 ${e.modelChange ? "border-l-2 border-l-zinc-400 dark:border-l-zinc-500" : ""} ${zone ? ZONE_STYLES[zone].row : ""} ${i === index ? "font-extrabold outline outline-1 -outline-offset-1 outline-pitch-600" : ""}`}
                               >
                                 {place ?? "–"}
                               </td>

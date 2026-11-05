@@ -119,7 +119,8 @@ export function RaceChart({ rounds, series, locale, modelChanges = [], labels }:
               <g key={`model-${i}`} data-testid="race-model-change">
                 <line x1={at} x2={at} y1={PAD.top} y2={PAD.top + plotH} stroke="var(--axis)" strokeWidth={1} strokeDasharray="3 3" />
                 {labels.modelChange && (
-                  <text x={at + 4} y={PAD.top + 10} fontSize={10} fill="var(--axis)">
+                  // Beside the line, on the side with room (left of it in the plot's right half).
+                  <text x={at > PAD.left + plotW / 2 ? at - 4 : at + 4} y={PAD.top + 10} textAnchor={at > PAD.left + plotW / 2 ? "end" : "start"} fontSize={10} fill="var(--axis)">
                     {labels.modelChange}
                   </text>
                 )}
