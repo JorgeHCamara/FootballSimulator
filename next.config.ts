@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
     "/*/odds": ["./src/data/snapshots/**/*"],
     "/*/*": ["./src/data/snapshots/**/*"],
     "/sitemap.xml": ["./src/data/snapshots/**/*"],
+    // Leagues whose ratings use xG read it at run time (src/lib/xgStore.ts), on every page that builds their model.
+    "/**": ["./src/data/xg/**/*"],
   },
   experimental: {
     // Generate all pages in one worker so each league is fetched once per build

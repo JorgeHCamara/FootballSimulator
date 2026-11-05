@@ -2,8 +2,8 @@ name: Odds snapshots
 
 # After each completed round of each domestic league, every club's season
 # chances are added to src/data/snapshots/<CODE>.json (scripts/snapshot-odds.ts)
-# and committed to main. Runs every six hours; a run with no newly completed
-# round commits nothing.
+# and committed to main, along with new games' xG (src/data/xg). Runs every
+# six hours; a run with no newly completed round and no new xG commits nothing.
 on:
   schedule:
     - cron: "41 */6 * * *"
@@ -29,16 +29,21 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # New games' xG first (src/data/xg, scripts/fetch-xg.ts), so a round's
+      # snapshot already rates on it where the league's ratings use xG. ESPN's
+      # core API being down mustn't hold up the snapshots.
+      - run: npm run xg
+        continue-on-error: true
       - run: npm run snapshots
-      - name: Commit new snapshots
+      - name: Commit new snapshots and xG
         run: |
-          if [ -z "$(git status --porcelain -- src/data/snapshots)" ]; then
-            echo "No new snapshots."
+          if [ -z "$(git status --porcelain -- src/data/snapshots src/data/xg)" ]; then
+            echo "No new snapshots or xG."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/data/snapshots
+          git add src/data/snapshots src/data/xg
           git commit -m "Odds snapshots $(date -u +%Y-%m-%d)"
           # main may have moved while the job ran.
           git pull --rebase origin main

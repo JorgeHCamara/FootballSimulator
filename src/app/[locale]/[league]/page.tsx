@@ -1,4 +1,4 @@
-import { domesticMatchParams, domesticPriors } from "../../../lib/priors.ts";
+import { domesticPriors, leagueMatchParams } from "../../../lib/priors.ts";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -202,8 +202,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
       : loaded.config.continental
         ? await getContinentalPriors(loaded.config, leagueTeams.map((t) => t.id))
         : domesticPriors(loaded.config.code, loaded.data.seasonYear);
-  // The league's rho (and home splits) for the match model.
-  const matchParams = loaded.kind === "league" && !loaded.config.continental ? domesticMatchParams(loaded.config.code, loaded.data.seasonYear) : undefined;
+  // The league's rho (and home splits, and its games' xG when its ratings use it) for the match model.
+  const matchParams = loaded.kind === "league" && !loaded.config.continental ? leagueMatchParams(loaded.config, loaded.data.seasonYear, loaded.data.xg) : undefined;
   const stepKey = (step: "step1" | "step2" | "step3") =>
     wording === "cupBracket" && step === "step2"
       ? "step2CupBracket"

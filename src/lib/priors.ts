@@ -6,6 +6,7 @@ import {
   matchParamOptions,
   NO_DATA_PRIOR,
   ratingHalfLife,
+  ratingXgWeight,
   TEAM_HOME_ADVANTAGE,
   type MatchParams,
   type ModelOptions,
@@ -76,18 +77,28 @@ export function domesticMatchParams(code: string, year: number | undefined, seas
   };
 }
 
+/**
+ * A league's match parameters (domesticMatchParams) and, when its ratings use
+ * xG (LeagueConfig.ratingXgWeight), its played games' xG and the weight they
+ * get; leagues without it get exactly domesticMatchParams.
+ */
+export function leagueMatchParams(league: LeagueConfig, year: number | undefined, xg?: Readonly<Record<number, readonly [number, number]>>): MatchParams {
+  const weight = ratingXgWeight(league);
+  return { ...domesticMatchParams(league.code, year), ...(xg && weight > 0 ? { xg, xgWeight: weight } : {}) };
+}
+
 /** How much this season's form weighs against the prior in a domestic league. */
 export function domesticPriorGames(league: LeagueConfig): number {
   return league.ratingPriorGames ?? DOMESTIC_PRIOR_GAMES;
 }
 
 /** Rating options for a domestic league's own model (its page, and its clubs elsewhere: cups, continental). */
-export function domesticModelOptions(league: LeagueConfig, year: number | undefined): ModelOptions {
+export function domesticModelOptions(league: LeagueConfig, year: number | undefined, xg?: Readonly<Record<number, readonly [number, number]>>): ModelOptions {
   const priors = domesticPriors(league.code, year);
   return {
     priorGames: domesticPriorGames(league),
     halfLife: ratingHalfLife(league),
-    ...matchParamOptions(domesticMatchParams(league.code, year)),
+    ...matchParamOptions(leagueMatchParams(league, year, xg)),
     ...(priors ? { priorStrengths: new Map(Object.entries(priors).map(([id, s]) => [Number(id), s])), missingPrior: NO_DATA_PRIOR } : {}),
   };
 }

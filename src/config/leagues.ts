@@ -879,6 +879,8 @@ export const LEAGUES: readonly LeagueConfig[] = [
     aka: { en: "Brazilian Série A", pt: "Campeonato Brasileiro", es: "Liga brasileña" },
     teams: 20,
     espn: { slug: "bra.1", seasons: "calendar" },
+    // ESPN has xG for every game of the 2026 season; rating on half xG, half goals beat goals alone in the backtest (scripts/backtest.ts --xg).
+    ratingXgWeight: 0.5,
     tiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadPoints"],
     zones: [
       { kind: "libertadores", from: 1, to: 4 },
@@ -923,6 +925,8 @@ export const LEAGUES: readonly LeagueConfig[] = [
     teams: 30,
     // Unbalanced schedule: 34 games each, more of them against the own conference.
     gamesPerTeam: 34,
+    // ESPN has xG for nearly every game of the 2026 season; rating on half xG, half goals beat goals alone in the backtest (scripts/backtest.ts --xg).
+    ratingXgWeight: 0.5,
     groups: [
       {
         id: "east",

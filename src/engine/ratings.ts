@@ -100,13 +100,17 @@ export const ratingXgWeight = (league: { ratingXgWeight?: number }) => league.ra
 export interface MatchParams {
   rho?: number;
   homeFactor?: Record<number, number>;
+  /** Games' xG by fixture id and the weight the ratings give it (leagues with ratingXgWeight). */
+  xg?: Readonly<Record<number, readonly [number, number]>>;
+  xgWeight?: number;
 }
 
 /** Model options from match parameters. */
-export function matchParamOptions(params: MatchParams | undefined): Pick<ModelOptions, "rho" | "homeFactor"> {
+export function matchParamOptions(params: MatchParams | undefined): Pick<ModelOptions, "rho" | "homeFactor" | "xg" | "xgWeight"> {
   return {
     ...(params?.rho ? { rho: params.rho } : {}),
     ...(params?.homeFactor ? { homeFactor: new Map(Object.entries(params.homeFactor).map(([id, k]) => [Number(id), k])) } : {}),
+    ...(params?.xg && params.xgWeight ? { xg: params.xg, xgWeight: params.xgWeight } : {}),
   };
 }
 

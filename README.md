@@ -134,6 +134,49 @@ with priors, rho and home splits from the season before):
 npm run backtest -- 2025 PL PD SA BSA
 ```
 
+#### Expected goals (xG)
+
+ESPN's core API gives each club's `expectedGoals` in a game's team statistics
+(`…/events/{id}/competitions/{id}/competitors/{team}/statistics`: the home side's
+`offensive.expectedGoals` and `goalKeeping.expectedGoalsConceded`) for 14
+competitions: Premier League, Championship, La Liga, Bundesliga, Serie A,
+Ligue 1, Brasileirão, MLS, Argentina, Liga MX, Champions League, Europa League,
+Conference League and Libertadores (`XG_LEAGUES` in `src/lib/xg.ts`). It starts
+with the 2026 seasons (2026/27 in Europe; Argentina from its Clausura), so last
+season, and the priors built from it, has none. `npm run xg` stores it per game
+in `src/data/xg/<CODE>.json` by ESPN game id, `null` where ESPN has none (never
+a 0), fetching only games not stored yet (two requests at a time, retries with
+backoff); the odds snapshots job runs it every six hours before the snapshots.
+
+A league's ratings can rate attack and defence on `w × xG + (1 − w) × goals`
+for each game with xG (goals alone for the others), with
+`ratingXgWeight` in `src/config/leagues.ts` (default `XG_WEIGHT`, 0: goals
+only). Everything else (opponent adjustment, priors, Dixon–Coles, the league's
+goal averages) stays on goals. The backtest of the 2026 season so far
+(`npm run backtest -- 2026 PL ELC PD BL1 SA FL1 BSA MLS ARG MX --xg`, each
+matchday predicted from earlier games),
+1X2 log loss:
+
+| League | Games | w = 0 | 0.3 | 0.5 | 0.7 | 1 |
+|---|---|---|---|---|---|---|
+| Premier League | 90 | **1.0391** | 1.0402 | 1.0414 | 1.0431 | 1.0463 |
+| Championship | 168 | 1.0641 | **1.0639** | 1.0643 | 1.0651 | 1.0672 |
+| La Liga | 109 | **0.9636** | 0.9662 | 0.9683 | 0.9707 | 0.9748 |
+| Bundesliga | 72 | 1.0187 | 1.0157 | 1.0140 | 1.0125 | **1.0108** |
+| Serie A | 100 | **0.8928** | 0.8979 | 0.9023 | 0.9076 | 0.9171 |
+| Ligue 1 | 81 | 1.0067 | 1.0056 | **1.0052** | 1.0053 | 1.0059 |
+| Brasileirão | 336 | 1.0169 | 1.0126 | 1.0105 | 1.0092 | **1.0084** |
+| MLS | 496 | 1.0528 | 1.0496 | 1.0481 | 1.0471 | **1.0464** |
+| Argentina | 480 | 1.0572 | 1.0567 | 1.0564 | 1.0562 | **1.0561** |
+| Liga MX | 134 | 1.0800 | 1.0786 | 1.0782 | **1.0781** | 1.0788 |
+| All | 2066 | 1.0346 | 1.0332 | 1.0328 | **1.0327** | 1.0334 |
+
+Only the Brasileirão and MLS, with xG for a whole season's worth of games,
+improve clearly (about two standard errors, game by game, on both log loss and
+Brier score), so they rate on `ratingXgWeight: 0.5`. The European leagues have
+ten rounds or so each, within noise, and three of them lean worse; they stay on
+goals until there's more of the season to test.
+
 ![League page](docs/screenshots/league.png)
 
 ## Project layout

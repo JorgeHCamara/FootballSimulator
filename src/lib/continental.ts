@@ -72,7 +72,7 @@ export async function getContinentalPriors(league: LeagueConfig, clubs: readonly
           const data = await getLeagueData(feeder);
           if (data.source !== "live") return null;
           // The domestic model, with its own starting ratings (last season).
-          const model = buildLeagueModel(data.teams, data.fixtures, realResults(data.fixtures), domesticModelOptions(feeder, data.seasonYear));
+          const model = buildLeagueModel(data.teams, data.fixtures, realResults(data.fixtures), domesticModelOptions(feeder, data.seasonYear, data.xg));
           return { tier: LEAGUE_TIERS[feeder.code]!, strengths: model.strengths };
         } catch (error) {
           // Its clubs then start like clubs from leagues the site doesn't cover.

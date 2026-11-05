@@ -60,6 +60,14 @@ const add = (key: string, s: Score) => {
 };
 
 const rows: string[] = [];
+/** --xg: each game's log loss per weight (same games, same order), for paired comparisons with goals only. */
+const perGame = new Map<string, Map<string, number[]>>();
+const paired = (base: number[], other: number[]) => {
+  const d = other.map((x, i) => x - base[i]!);
+  const mean = d.reduce((a, b) => a + b, 0) / d.length;
+  const sd = Math.sqrt(d.reduce((a, b) => a + (b - mean) ** 2, 0) / Math.max(1, d.length - 1));
+  return { mean, se: sd / Math.sqrt(d.length) };
+};
 for (const code of leagues) {
   const league = getLeagueByCode(code)!;
   const season = await fetchSeason(code, year);
@@ -93,7 +101,12 @@ for (const code of leagues) {
         const p = outcomeProbabilities(expectedGoals(model, f.homeId, f.awayId), rho);
         const outcome = r.home > r.away ? "home" : r.home === r.away ? "draw" : "away";
         score.n++;
-        score.logLoss += -Math.log(Math.max(1e-12, p[outcome]));
+        const loss = -Math.log(Math.max(1e-12, p[outcome]));
+        score.logLoss += loss;
+        if (xgMode) {
+          const byConfig = perGame.get(code) ?? perGame.set(code, new Map()).get(code)!;
+          (byConfig.get(config.name) ?? byConfig.set(config.name, []).get(config.name)!).push(loss);
+        }
         score.brier += (["home", "draw", "away"] as const).reduce((sum, k) => sum + (p[k] - (k === outcome ? 1 : 0)) ** 2, 0);
         score.predictedDraws += p.draw;
         score.draws += outcome === "draw" ? 1 : 0;
@@ -110,6 +123,23 @@ for (const code of leagues) {
   rows.push("");
 }
 console.log(rows.join("\n"));
+if (xgMode) {
+  // Log loss change from goals only, game by game: mean ± standard error (negative = xG helps).
+  console.log("\nPAIRED vs xG weight 0 (log-loss change per game, mean ± SE)");
+  const pooled = new Map<string, number[]>();
+  for (const [code, byConfig] of perGame) {
+    const base = byConfig.get(XG_CONFIGS[0]!.name)!;
+    const cells = XG_CONFIGS.slice(1).map((c) => {
+      const { mean, se } = paired(base, byConfig.get(c.name)!);
+      pooled.set(c.name, [...(pooled.get(c.name) ?? []), ...byConfig.get(c.name)!]);
+      return `w${c.xgWeight} ${mean >= 0 ? "+" : ""}${mean.toFixed(4)} ± ${se.toFixed(4)}`;
+    });
+    pooled.set(XG_CONFIGS[0]!.name, [...(pooled.get(XG_CONFIGS[0]!.name) ?? []), ...base]);
+    console.log(`  ${code.padEnd(4)} ${cells.join("   ")}`);
+  }
+  const base = pooled.get(XG_CONFIGS[0]!.name)!;
+  console.log(`  ALL  ${XG_CONFIGS.slice(1).map((c) => { const { mean, se } = paired(base, pooled.get(c.name)!); return `w${c.xgWeight} ${mean >= 0 ? "+" : ""}${mean.toFixed(4)} ± ${se.toFixed(4)}`; }).join("   ")}`);
+}
 console.log("ALL (pooled)");
 for (const [name, t] of totals) {
   console.log(

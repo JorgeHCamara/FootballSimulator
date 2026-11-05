@@ -6,7 +6,7 @@ import { LeagueSimulator } from "../../../../../components/LeagueSimulator.tsx";
 import { ShareMenu } from "../../../../../components/ShareMenu.tsx";
 import { getLeagueBySlug } from "../../../../../config/leagues.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
-import { domesticMatchParams, domesticPriors } from "../../../../../lib/priors.ts";
+import { domesticPriors, leagueMatchParams } from "../../../../../lib/priors.ts";
 import { loadSharedScenario } from "../../../../../lib/sharedScenario.ts";
 import { alternates, OG_LOCALE, SITE_NAME } from "../../../../../lib/site.ts";
 
@@ -57,7 +57,7 @@ export default async function SharePage({ params }: { params: Params }) {
   const [t, ts] = await Promise.all([getTranslations("SharePage"), getTranslations("Simulator")]);
   const values = { league: league.name, season: data.season };
   const priorStrengths = domesticPriors(league.code, data.seasonYear);
-  const matchParams = domesticMatchParams(league.code, data.seasonYear);
+  const matchParams = leagueMatchParams(league, data.seasonYear, data.xg);
   const path = `/${locale}/${slug}/share/${code}`;
   const shareProps = {
     path,

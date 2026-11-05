@@ -23,6 +23,8 @@ export interface ScenarioData {
   firstPhaseIds?: readonly number[];
   deductions?: Readonly<Record<number, number>>;
   seasonYear?: number;
+  /** Played games' xG, for a league whose ratings use it (LeagueData.xg). */
+  xg?: Readonly<Record<number, readonly [number, number]>>;
 }
 
 export interface ScenarioRow extends StandingRow {
@@ -66,7 +68,7 @@ export function scenarioSimulation(league: LeagueConfig, data: ScenarioData, pre
   if (!facts) return null;
   const { teams, fixtures } = data;
   const base: StandingsOptions = { tiebreakers: league.tiebreakers, ...(data.deductions ? { deductions: data.deductions } : {}) };
-  const model = buildLeagueModel(teams, fixtures, realResults(fixtures), domesticModelOptions(league, data.seasonYear));
+  const model = buildLeagueModel(teams, fixtures, realResults(fixtures), domesticModelOptions(league, data.seasonYear, data.xg));
   const groups = data.groups;
   const realGroups = realGroupsOf(league, groups);
   const canGenerate = canGenerateSplit(league, fixtures, teams, groups);

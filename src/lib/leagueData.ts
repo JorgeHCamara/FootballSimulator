@@ -6,6 +6,8 @@ import { EspnError, espnFixtures, espnSplitSeason, espnTeams, espnVenues, fetchE
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
 import { withClubPages } from "./clubs.ts";
+import { ratingXgWeight } from "../engine/ratings.ts";
+import { readXg } from "./xgStore.ts";
 
 export interface LeagueData {
   teams: Team[];
@@ -35,6 +37,12 @@ export interface LeagueData {
   provider?: "espn" | "football-data";
   /** Each game's ground, by fixture id, when the feed names it (match pages). */
   venues?: Record<number, string>;
+  /**
+   * Each played game's xG (home, away) by fixture id, for a league whose
+   * ratings use it (LeagueConfig.ratingXgWeight); games ESPN has none for are
+   * left out (their goals count alone).
+   */
+  xg?: Record<number, readonly [number, number]>;
 }
 
 export interface Tournament {
@@ -304,13 +312,27 @@ export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
   // runtime only while the request is in flight, so hourly refreshes still fetch.
   const pending = inflight.get(league.code);
   if (pending) return pending;
-  const promise = loadLeagueData(league).then((data) => ({ ...data, teams: withClubPages(league, data.teams) }));
+  const promise = loadLeagueData(league).then(async (data) => withXg(league, { ...data, teams: withClubPages(league, data.teams) }));
   inflight.set(league.code, promise);
   const forget = () => {
     if (!isBuildPhase()) inflight.delete(league.code);
   };
   promise.then(forget, () => inflight.delete(league.code));
   return promise;
+}
+
+/**
+ * The season's played games' stored xG, for a league whose ratings use it
+ * (ESPN data only: the files are by ESPN game id). Every other league's data
+ * is returned as it is.
+ */
+async function withXg(league: LeagueConfig, data: LeagueData): Promise<LeagueData> {
+  if (data.source !== "live" || data.provider !== "espn" || !(ratingXgWeight(league) > 0)) return data;
+  const stored = await readXg(league.code);
+  const games = [...data.fixtures, ...(data.postseason ?? []), ...(data.tournaments ?? []).flatMap((t) => [...t.fixtures, ...(t.postseason ?? [])])];
+  const xg: Record<number, readonly [number, number]> = {};
+  for (const f of games) if (f.result && stored[f.id]) xg[f.id] = stored[f.id]!;
+  return Object.keys(xg).length ? { ...data, xg } : data;
 }
 
 const pastInflight = new Map<string, Promise<LeagueData | undefined>>();

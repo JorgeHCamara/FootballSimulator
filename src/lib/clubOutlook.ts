@@ -207,7 +207,7 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
     const ordered = [...data.tournaments].reverse();
     const fixtures = annualFixtures(annual, ordered);
     const fixed = realResults(fixtures);
-    const model = buildLeagueModel(data.teams, fixtures, fixed, domesticModelOptions(league, data.seasonYear));
+    const model = buildLeagueModel(data.teams, fixtures, fixed, domesticModelOptions(league, data.seasonYear, data.xg));
     const stages = tournamentStages(league);
     const champions = league.annual.championsQualify
       ? ordered.flatMap((x) => {
@@ -234,7 +234,7 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
   // Separate tables (MLS conferences): places within each.
   if (data.groups?.length) {
     const fixed = realResults(data.fixtures);
-    const model = buildLeagueModel(data.teams, data.fixtures, fixed, domesticModelOptions(league, data.seasonYear));
+    const model = buildLeagueModel(data.teams, data.fixtures, fixed, domesticModelOptions(league, data.seasonYear, data.xg));
     const byId = new Map(data.teams.map((t) => [t.id, t]));
     const groupOf = new Map<TeamId, Record<SiteLocale, string>>();
     const rows = data.groups.flatMap((g) => {
