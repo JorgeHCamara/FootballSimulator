@@ -61,6 +61,13 @@ describe("a club's outlook", () => {
       assert.equal(club.distribution[club.likeliest.position - 1], club.likeliest.chance);
       assert.ok(club.likeliest.chance > 0, `${club.team.name} finishes where it can`);
     }
+    // Each club's likely finish: a run of places it ends in at least 75% of the time, its chance the sum of those places.
+    for (const club of outlook.clubs.values()) {
+      const { from, to, chance } = club.likelyRange;
+      assert.ok(from >= 1 && from <= to && to <= 20, club.team.name);
+      assert.ok(chance >= 0.75 - 1e-9, `${club.team.name}: ${chance}`);
+      assert.ok(Math.abs(club.distribution.slice(from - 1, to).reduce((a, b) => a + b, 0) - chance) < 1e-9);
+    }
     // The most likely finishes are a table: every place once.
     assert.deepEqual([...outlook.clubs.values()].map((c) => c.likeliest.position).sort((a, b) => a - b), Array.from({ length: 20 }, (_, i) => i + 1));
     // All clubs' title chances add up to 1, and so do 20 places of each kind.

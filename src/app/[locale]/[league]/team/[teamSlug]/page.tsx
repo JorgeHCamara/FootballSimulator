@@ -99,7 +99,7 @@ export default async function ClubPage({ params }: { params: Params }) {
         ]
       : []),
     ...(!outlook.complete
-      ? [t("summaryLikeliest", { position: ordinal(club.likeliest.position, lang), pct: pct(club.likeliest.chance), avgPoints: Math.round(club.averagePoints) })]
+      ? [t("summaryLikeliest", { range: placeRange(club.likelyRange.from, club.likelyRange.to, lang), pct: pct(club.likelyRange.chance), avgPoints: Math.round(club.averagePoints) })]
       : []),
   ].join(" ");
 
@@ -322,8 +322,11 @@ export default async function ClubPage({ params }: { params: Params }) {
               <Icon name="target" size={14} className="shrink-0 text-zinc-500" />
               <span className="leading-tight">{t("likeliest")}</span>
             </div>
-            <p className="mt-2 text-2xl font-extrabold tabular-nums">{ordinal(club.likeliest.position, lang)}</p>
-            <p className="text-xs text-zinc-500">{pct(club.likeliest.chance)}</p>
+            {/* The shortest run of places it ends in at least 75% of the time ("6th–9th"), and that chance. */}
+            <p className="mt-2 whitespace-nowrap text-xl font-extrabold tabular-nums sm:text-2xl" data-testid="club-likely-finish">
+              {placeRange(club.likelyRange.from, club.likelyRange.to, lang)}
+            </p>
+            <p className="text-xs text-zinc-500">{pct(club.likelyRange.chance)}</p>
           </div>
           <div className={card}>
             <div className="flex items-center gap-2 text-xs font-semibold">

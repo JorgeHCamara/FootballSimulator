@@ -834,10 +834,10 @@
       "playoffs": "llega a los playoffs en el {pct}",
       "relegation": "desciende en el {pct}"
     },
-    "summaryLikeliest": "En la clasificación final más probable, termina en el {position} puesto ({pct} de las temporadas), con {avgPoints} puntos de media.",
+    "summaryLikeliest": "Su puesto final probable es {range} ({pct} de las temporadas), con {avgPoints} puntos de media.",
     "chancesTitle": "Probabilidades de la temporada",
     "chancesNote": "En {count} simulaciones del resto de la temporada, a partir de los resultados reales hasta ahora. Se actualiza cada pocas horas.",
-    "likeliest": "Puesto final más probable",
+    "likeliest": "Puesto probable",
     "averagePoints": "Puntos de media",
     "distributionTitle": "Puesto final",
     "distributionNote": "En qué parte de las temporadas simuladas {club} termina en cada puesto.",
@@ -863,7 +863,7 @@
     "shareText": "Las probabilidades de {club} en {league} {season} en Foot Simu",
     "otherClubs": "Otros clubes – {league}",
     "card": {
-      "likeliest": "Puesto más probable: {position}",
+      "likeliest": "Puesto probable: {range}",
       "basedOn": "En {count} temporadas simuladas",
       "cta": "Todos los clubes en footsimu.com",
       "chance": {
