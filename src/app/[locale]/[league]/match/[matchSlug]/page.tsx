@@ -5,15 +5,16 @@ import { Flag } from "../../../../../components/Flag.tsx";
 import { Icon, type IconName } from "../../../../../components/Icon.tsx";
 import { JsonLd } from "../../../../../components/JsonLd.tsx";
 import { LocalKickoff } from "../../../../../components/LocalKickoff.tsx";
+import { MatchImpact } from "../../../../../components/MatchImpact.tsx";
 import { MatchDice } from "../../../../../components/MatchDice.tsx";
 import { TeamBadge } from "../../../../../components/TeamBadge.tsx";
-import { zoneHex } from "../../../../../components/zones.ts";
 import type { SiteLocale } from "../../../../../config/leagues.ts";
 import type { FormResult, Team } from "../../../../../engine/types.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
 import type { ClubOutlook } from "../../../../../lib/clubOutlook.ts";
 import { ordinal, percent } from "../../../../../lib/clubText.ts";
-import { impactRows, loadMatch, matchScenarios, type ImpactRow, type LoadedMatch } from "../../../../../lib/matchPreview.ts";
+import { hasImpact } from "../../../../../lib/matchImpact.ts";
+import { loadMatch, type LoadedMatch } from "../../../../../lib/matchPreview.ts";
 import { inIndexWindow } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
 
@@ -95,7 +96,7 @@ export default async function MatchPage({ params }: { params: Params }) {
   // A game moved to another day: its new address.
   if ("moved" in loaded) permanentRedirect(`/${locale}${loaded.moved}`);
   const lang = langOf(locale);
-  const [t, tc, tz, seo] = await Promise.all([getTranslations("Match"), getTranslations("Club"), getTranslations("Zones"), getTranslations("Seo")]);
+  const [t, tc, seo] = await Promise.all([getTranslations("Match"), getTranslations("Club"), getTranslations("Seo")]);
   const { league, match, result, state, odds, xg, scores, outlook, homeClub, awayClub, venue, timeZone, season } = loaded;
   const { fixture, home, away } = match;
   const pct = (share: number) => percent(share, lang);
@@ -111,18 +112,7 @@ export default async function MatchPage({ params }: { params: Params }) {
   const tableName = (club: ClubOutlook) =>
     outlook?.scope === "eachTable" && club.group ? club.group[lang] : outlook?.scope === "annual" && league.annual ? league.annual.name[lang] : league.name;
 
-  // "What this result means": three more season simulations, for a game still to play.
-  const scenarios = matchScenarios(loaded);
-  const impacts: ImpactRow[] =
-    scenarios && homeClub && awayClub
-      ? [homeClub, awayClub].flatMap((club) =>
-          impactRows(club.team.id, club, {
-            home: scenarios.after.home.get(club.team.id),
-            draw: scenarios.after.draw.get(club.team.id),
-            away: scenarios.after.away.get(club.team.id),
-          }),
-        )
-      : [];
+
   const scoreText = (s: { home: number; away: number }) => `${s.home}–${s.away}`;
 
   const teamName = (team: Team, className = "") => {
@@ -193,26 +183,6 @@ export default async function MatchPage({ params }: { params: Params }) {
   );
 
   // A change in a chance, in points, coloured by whether it's good for that club.
-  const delta = (row: ImpactRow, value: number) => {
-    // From the figures shown (whole points, places to one decimal), so "1% → 2%" reads "+1".
-    const diff = row.kind === "position" ? (Math.round(value * 10) - Math.round(row.now * 10)) / 10 : Math.round(value * 100) - Math.round(row.now * 100);
-    const size = Math.abs(diff);
-    if (size === 0) return <span className="text-[11px] text-zinc-400">±0</span>;
-    const better = row.kind === "relegation" || row.kind === "position" ? diff < 0 : diff > 0;
-    const sign = diff > 0 ? "+" : "−";
-    return (
-      <span className={`text-[11px] font-semibold tabular-nums ${better ? "text-pitch-700 dark:text-pitch-300" : "text-red-600 dark:text-red-400"}`}>
-        {row.kind === "position" ? `${sign}${size.toFixed(1)}` : t("impactDelta", { sign, n: size })}
-      </span>
-    );
-  };
-  const impactValue = (row: ImpactRow, value: number) => (row.kind === "position" ? value.toFixed(1) : pct(value));
-  const impactLabel = (row: ImpactRow) => {
-    const team = row.teamId === home.id ? home : away;
-    const kind = row.kind === "continental" ? tz(row.zone!) : t(`impactKind.${row.kind}`);
-    return `${team.shortName}: ${kind}`;
-  };
-
   return (
     <div className="space-y-6" data-testid="match-page" data-state={state}>
       <JsonLd
@@ -395,59 +365,8 @@ export default async function MatchPage({ params }: { params: Params }) {
         <p className="text-xs text-zinc-500">{t(played ? "preMatchNote" : "predictionNote")}</p>
       </section>
 
-      {impacts.length > 0 && scenarios && (
-        <section className="space-y-3" data-testid="match-impact">
-          <h2 className="text-xl font-bold tracking-tight">{t("impactTitle")}</h2>
-          <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="grid grid-cols-4 gap-1 border-b border-zinc-200 bg-zinc-100 px-3 py-2 text-[11px] font-semibold leading-tight text-zinc-600 sm:text-xs dark:border-zinc-800 dark:bg-zinc-800/60 dark:text-zinc-300">
-              <span>{t("impactNow")}</span>
-              {/* Phones: each result as the winner's crest and its score; the full label from tablets up (and for screen readers). */}
-              {(
-                [
-                  ["home", t("impactHome", { team: home.shortName }), home],
-                  ["draw", t("impactDraw"), null],
-                  ["away", t("impactAway", { team: away.shortName }), away],
-                ] as const
-              ).map(([k, label, team]) => (
-                <span key={k} className="flex min-w-0 flex-wrap items-center gap-x-1" data-testid="match-impact-head">
-                  {team ? (
-                    <>
-                      <span className="sm:hidden" aria-hidden>
-                        <TeamBadge team={team} size={16} />
-                      </span>
-                      <span className="sr-only sm:not-sr-only">{label}</span>
-                    </>
-                  ) : (
-                    <span>{label}</span>
-                  )}
-                  <span className="font-normal tabular-nums">{scoreText(scenarios.scores[k])}</span>
-                </span>
-              ))}
-            </div>
-            <ul className="divide-y divide-zinc-200/70 dark:divide-zinc-800">
-              {impacts.map((row) => (
-                <li key={`${row.teamId}-${row.kind}`} className="px-3 py-2.5" data-testid="match-impact-row" data-kind={row.kind}>
-                  <p className="flex items-center gap-2 text-xs font-semibold">
-                    {row.zone && <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: zoneHex(row.zone) }} />}
-                    <span className="min-w-0 truncate">{impactLabel(row)}</span>
-                  </p>
-                  <div className="mt-1 grid grid-cols-4 gap-1">
-                    <span className="text-base font-bold tabular-nums">{impactValue(row, row.now)}</span>
-                    {(["home", "draw", "away"] as const).map((k) => (
-                      <span key={k} className="flex flex-col leading-tight">
-                        <span className="text-base font-bold tabular-nums">{impactValue(row, row[k])}</span>
-                        {delta(row, row[k])}
-                      </span>
-                    ))}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <p className="text-xs text-zinc-500">{t("impactNote", { count })}</p>
-          {impacts.some((r) => r.kind === "position") && <p className="text-xs text-zinc-500">{t("impactPositionNote")}</p>}
-        </section>
-      )}
+      {/* "What this result means": three more season simulations, fetched once the page has loaded. */}
+      {hasImpact(loaded) && <MatchImpact src={`/${locale}${match.path}/impact`} title={t("impactTitle")} />}
 
       <section className="space-y-3" data-testid="match-form-table">
         <h2 className="text-xl font-bold tracking-tight">{t("formTitle")}</h2>

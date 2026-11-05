@@ -1717,8 +1717,18 @@ async function step(name, fn) {
       assert.ok(total >= 98 && total <= 102, String(total));
       assert.equal(await p.locator('[data-testid="match-scores"] li').count(), 5);
       assert.match(await p.getByTestId("match-xg").innerText(), /\d\.\d\d\s*–\s*\d\.\d\d/);
-      // What each result means: rows for both clubs.
+      // What each result means: loaded after the page (a placeholder until then), rows for both clubs.
+      await p.getByTestId("match-impact").waitFor({ timeout: 60_000 });
+      assert.equal(await p.getByTestId("match-impact-loading").count(), 0);
       assert.ok((await p.getByTestId("match-impact-row").count()) >= 2);
+      // Its own address: JSON, kept by the CDN, not for search engines; an unknown game's is a 404.
+      const impact = await p.request.get(`${new URL(p.url()).pathname}/impact`.replace(/^/, BASE_URL));
+      assert.equal(impact.status(), 200);
+      assert.match(impact.headers()["content-type"], /application\/json/);
+      assert.equal(impact.headers()["x-robots-tag"], "noindex");
+      assert.match(impact.headers()["cache-control"], /s-maxage=600/);
+      assert.ok((await impact.json()).rows.length >= 2);
+      assert.equal((await p.request.get(`${BASE_URL}/en/premier-league/match/nobody-vs-nobody-2026-01-01/impact`)).status(), 404);
       // The dice: one of the likeliest scores, another one each roll.
       const dice = p.getByTestId("match-dice");
       await dice.click();
@@ -1751,6 +1761,7 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("match-subtitle").innerText(), /^Final score and pre-match prediction · Premier League · Matchday \d+$/);
       assert.match(await p.title(), /^.+ \d+–\d+ .+ \(.+\): result and pre-match prediction \| Foot Simu$/);
       assert.equal(await p.getByTestId("match-impact").count(), 0);
+      assert.equal(await p.getByTestId("match-impact-loading").count(), 0, "played: no placeholder either");
       // Played: no dice (it has its real score).
       assert.equal(await p.getByTestId("match-dice").count(), 0);
       assert.equal(await p.locator('nav[aria-label="Breadcrumb"]').count(), 1);
@@ -1800,6 +1811,7 @@ async function step(name, fn) {
         const ctx = await browser.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true });
         const m = await ctx.newPage();
         await m.goto(`${BASE_URL}${upcoming}`);
+        await m.getByTestId("match-impact").waitFor({ timeout: 60_000 });
         // (Screen-reader-only content, like the H1 on phones, is clipped: not counted.)
         const right = await m.evaluate(() => Math.max(...[...document.querySelectorAll("body *")].filter((e) => !e.closest(".sr-only")).map((e) => e.getBoundingClientRect().right)));
         // Phones: no visible H1 (the match card names the clubs), but one in the page.

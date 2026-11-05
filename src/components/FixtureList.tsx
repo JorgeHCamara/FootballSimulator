@@ -6,6 +6,7 @@ import { needsShootout, seriesGames, tieOutcome, type PlayoffSide, type PlayoffT
 import { isSlotTeamId } from "../engine/split.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { Link } from "../i18n/navigation.ts";
+import { LinkPendingIcon } from "./LinkPendingIcon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { Icon } from "./Icon.tsx";
 
@@ -509,11 +510,15 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
           {preview && (
             <Link
               href={preview}
+              // Fetched while the button is on screen, so the page is ready when it's tapped (a first
+              // visit works out the season; its "What this result means" loads after, on the page).
+              prefetch
               aria-label={t("matchPreview")}
               className={actionButton}
               data-testid="match-preview-link"
             >
-              <Icon name="chart-column" size={18} />
+              {/* A spinner from the tap until the preview shows (when it isn't prefetched yet). */}
+              <LinkPendingIcon name="chart-column" />
             </Link>
           )}
           {showInputs && !disabled && !inlineDice && (
