@@ -101,7 +101,9 @@ export default async function MatchPage({ params }: { params: Params }) {
   const pct = (share: number) => percent(share, lang);
   const values = textValues(loaded, lang);
   const played = state === "played";
-  const heading = t(played ? "h1Played" : "h1", values);
+  // Phones: short names when the full ones would wrap into several lines.
+  const shortOnPhones = home.name.length + away.name.length > 22 && (home.shortName !== home.name || away.shortName !== away.name);
+  const subtitle = t(played ? "subtitlePlayed" : "subtitle", { league: league.name, matchday: t("matchday", { n: fixture.matchday }) });
   const simulator = league.simulatorName[lang];
   const leaguePath = `/${league.slug}`;
   const pageUrl = `${SITE_URL}/${locale}${match.path}`;
@@ -271,10 +273,32 @@ export default async function MatchPage({ params }: { params: Params }) {
         >
           <Flag code={league.flag} width={18} />
           <span className="truncate">
-            {league.name} {season} · {t("matchday", { n: fixture.matchday })}
+            {league.name} {season}
           </span>
         </Link>
-        <h1 className="text-2xl font-extrabold tracking-tight break-words sm:text-3xl">{heading}</h1>
+        <div>
+          <h1 className="flex flex-wrap items-center gap-x-2 gap-y-1 text-2xl font-extrabold tracking-tight sm:text-3xl" data-testid="match-h1">
+            {([home, away] as const).map((team, i) => (
+              <span key={team.id} className="contents">
+                {i === 1 && <span className="font-semibold text-zinc-400">{t("vs")}</span>}
+                <span className="inline-flex min-w-0 items-center gap-2">
+                  <TeamBadge team={team} size={32} textless />
+                  {shortOnPhones ? (
+                    <>
+                      <span className="break-words sm:hidden">{team.shortName}</span>
+                      <span className="hidden break-words sm:inline">{team.name}</span>
+                    </>
+                  ) : (
+                    <span className="break-words">{team.name}</span>
+                  )}
+                </span>
+              </span>
+            ))}
+          </h1>
+          <p className="mt-1 text-sm font-medium text-zinc-600 dark:text-zinc-400" data-testid="match-subtitle">
+            {subtitle}
+          </p>
+        </div>
         <div className="flex flex-col gap-1 text-sm text-zinc-600 sm:flex-row sm:flex-wrap sm:gap-x-5 dark:text-zinc-400">
           <span className="flex items-center gap-1.5">
             <Icon name="calendar-days" size={16} className="shrink-0" />

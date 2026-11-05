@@ -11,7 +11,7 @@ import type { SiteLocale, ZoneKind } from "../../../../../config/leagues.ts";
 import type { FormResult, Team, TeamId } from "../../../../../engine/types.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
 import { mustWinGames, toughestGames, type ClubFixture } from "../../../../../lib/clubOutlook.ts";
-import { clubDescription, clubHeading, loadClub } from "../../../../../lib/clubPage.ts";
+import { clubDescription, clubHeading, clubSubtitle, loadClub } from "../../../../../lib/clubPage.ts";
 import { listOf, ordinal, percent, placeRange } from "../../../../../lib/clubText.ts";
 import { inIndexWindow, matchPath, matchSlug } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
@@ -66,7 +66,6 @@ export default async function ClubPage({ params }: { params: Params }) {
   const teams = new Map<TeamId, Team>(data.teams.map((x) => [x.id, x]));
   const pct = (share: number) => percent(share, lang);
   const count = new Intl.NumberFormat(lang).format(outlook.iterations);
-  const heading = clubHeading(loaded, lang, t as never, tz as never);
   const simulator = league.simulatorName[lang];
   const leaguePath = `/${league.slug}`;
   const pageUrl = `${SITE_URL}/${locale}${team.page}`;
@@ -240,7 +239,12 @@ export default async function ClubPage({ params }: { params: Params }) {
           <span className="mt-0.5 shrink-0 sm:mt-0">
             <TeamBadge team={team} size={40} />
           </span>
-          <h1 className="min-w-0 break-words text-2xl font-extrabold tracking-tight sm:text-3xl">{heading}</h1>
+          <div className="min-w-0">
+            <h1 className="break-words text-2xl font-extrabold tracking-tight sm:text-3xl">{team.name}</h1>
+            <p className="mt-0.5 text-sm font-medium text-zinc-600 dark:text-zinc-400" data-testid="club-subtitle">
+              {clubSubtitle(loaded, lang, t as never, tz as never)}
+            </p>
+          </div>
         </div>
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300" data-testid="club-summary">
           {summary}

@@ -45,6 +45,15 @@ export function clubHeading(loaded: LoadedClub, locale: SiteLocale, t: Translate
   return topics.length ? t("h1", { ...values, topics: listOf(topics, locale) }) : t("h1Plain", values);
 }
 
+/** The line under the club's name: "2026/27 · Title, Champions League and relegation chances". */
+export function clubSubtitle(loaded: LoadedClub, locale: SiteLocale, t: Translate, tz: Translate): string {
+  const topics = loaded.club.headline.map((h) => topicName(h, t, tz));
+  if (!topics.length) return t("subtitlePlain", { season: loaded.season });
+  const list = listOf(topics, locale);
+  // English starts with the topics ("Title, …"); Portuguese and Spanish with "Chances de" / "Probabilidades de".
+  return t("subtitle", { season: loaded.season, topics: locale === "en" ? list.charAt(0).toUpperCase() + list.slice(1) : list });
+}
+
 /** The meta description: the headline chances, then what's on the page. */
 export function clubDescription(loaded: LoadedClub, locale: SiteLocale, t: Translate, tz: Translate): string {
   const stats = loaded.club.headline.map((h) => `${topicName(h, t, tz)} ${percent(h.chance, locale)}`).join(", ");

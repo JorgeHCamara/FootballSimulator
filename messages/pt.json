@@ -871,11 +871,11 @@
         "playoffs": "Playoffs",
         "relegation": "Rebaixamento"
       }
-    }
+    },
+    "subtitle": "{season} · Chances de {topics}",
+    "subtitlePlain": "{season} · Chances na temporada"
   },
   "Match": {
-    "h1": "Palpite {home} x {away}: probabilidades e placares simulados",
-    "h1Played": "{home} {homeGoals}–{awayGoals} {away}: resultado e palpite pré-jogo",
     "title": "Palpite {home} x {away} ({date}): probabilidades e placares simulados",
     "titlePlayed": "{home} {homeGoals}–{awayGoals} {away} ({date}): resultado e palpite pré-jogo",
     "description": "{home} x {away}, {league}, {date}: vitória de {home} {homeWin}, empate {draw}, vitória de {away} {awayWin}. Gols esperados {homeXg}–{awayXg}, os cinco placares mais prováveis e o que cada resultado significa na temporada.",
@@ -929,6 +929,8 @@
       "fullTime": "Fim de jogo",
       "preMatch": "Palpite pré-jogo",
       "cta": "Palpites em footsimu.com"
-    }
+    },
+    "subtitle": "Palpite, probabilidades e placares simulados · {league} · {matchday}",
+    "subtitlePlayed": "Placar final e palpite pré-jogo · {league} · {matchday}"
   }
 }

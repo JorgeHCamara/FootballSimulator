@@ -871,11 +871,11 @@
         "playoffs": "Play-offs",
         "relegation": "Relegation"
       }
-    }
+    },
+    "subtitle": "{season} · {topics} chances",
+    "subtitlePlain": "{season} · Season chances"
   },
   "Match": {
-    "h1": "{home} vs {away} prediction: odds and simulated scores",
-    "h1Played": "{home} {homeGoals}–{awayGoals} {away}: result and pre-match prediction",
     "title": "{home} vs {away} prediction ({date}): odds and simulated scores",
     "titlePlayed": "{home} {homeGoals}–{awayGoals} {away} ({date}): result and pre-match prediction",
     "description": "{home} vs {away}, {league}, {date}: {home} win {homeWin}, draw {draw}, {away} win {awayWin}. Expected goals {homeXg}–{awayXg}, the five likeliest scores and what each result means for the season.",
@@ -929,6 +929,8 @@
       "fullTime": "Full time",
       "preMatch": "Pre-match prediction",
       "cta": "Match odds at footsimu.com"
-    }
+    },
+    "subtitle": "Prediction, odds and simulated scores · {league} · {matchday}",
+    "subtitlePlayed": "Final score and pre-match prediction · {league} · {matchday}"
   }
 }

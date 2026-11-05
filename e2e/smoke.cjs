@@ -1623,9 +1623,12 @@ async function step(name, fn) {
       await link.click();
       await p.waitForURL(`${BASE_URL}${href}`);
       await p.goto(`${BASE_URL}${href}`);
-      const h1 = await p.locator("h1").innerText();
-      assert.match(h1, /: title, Champions League and relegation chances$/);
-      assert.equal(await p.title(), `${h1} | Foot Simu`);
+      // One short H1 (the club), the chances wording under it; the title keeps the full wording.
+      assert.equal(await p.locator("h1").count(), 1);
+      const h1 = (await p.locator("h1").innerText()).trim();
+      assert.match(await p.getByTestId("club-subtitle").innerText(), /^\d{4}(\/\d{2})? · Title, Champions League and relegation chances$/);
+      const title = await p.title();
+      assert.ok(title.startsWith(`${h1} `) && title.endsWith(": title, Champions League and relegation chances | Foot Simu"), title);
       assert.match(await p.locator('meta[name="description"]').getAttribute("content"), /title \S+%, Champions League \S+%, relegation \S+% in 10,000 simulated seasons/);
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${href}`);
       for (const [lang, path] of [["en", "en"], ["pt-BR", "pt"], ["es", "es"]]) {
@@ -1649,9 +1652,10 @@ async function step(name, fn) {
       assert.equal(card.headers()["content-type"], "image/png");
       // In Portuguese and Spanish too.
       await p.goto(`${BASE_URL}${href.replace(/^\/en/, "/pt")}`);
-      assert.match(await p.locator("h1").innerText(), /: chances de título, Champions League e rebaixamento$/);
+      assert.equal((await p.locator("h1").innerText()).trim(), h1);
+      assert.match(await p.getByTestId("club-subtitle").innerText(), / · Chances de título, Champions League e rebaixamento$/);
       await p.goto(`${BASE_URL}${href.replace(/^\/en/, "/es")}`);
-      assert.match(await p.locator("h1").innerText(), /: probabilidades de título, Champions League y descenso$/);
+      assert.match(await p.getByTestId("club-subtitle").innerText(), / · Probabilidades de título, Champions League y descenso$/);
       // Conferences (MLS) and annual tables (Argentina) have pages too; continental competitions don't.
       const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
       for (const slug of ["mls", "argentina-primera-division", "greek-super-league", "brasileirao"]) {
@@ -1687,8 +1691,11 @@ async function step(name, fn) {
         }
       }
       assert.ok(upcoming, "an upcoming game");
-      const h1 = await p.locator("h1").innerText();
-      assert.match(h1, /^.+ vs .+ prediction: odds and simulated scores$/);
+      // One short H1 (the two clubs, with crests), the wording under it.
+      assert.equal(await p.locator("h1").count(), 1);
+      assert.match((await p.locator("h1").innerText()).replace(/\s+/g, " ").trim(), /^\S.* vs \S.*$/);
+      assert.equal(await p.locator("h1 img, h1 [aria-hidden]").count(), 2, "both crests");
+      assert.match(await p.getByTestId("match-subtitle").innerText(), /^Prediction, odds and simulated scores · Premier League · Matchday \d+$/);
       assert.match(await p.title(), /^.+ vs .+ prediction \(\d{1,2} [A-Z][a-z]{2} \d{4}\): odds and simulated scores \| Foot Simu$/);
       assert.match(await p.locator('meta[name="description"]').getAttribute("content"), / win \d+%, draw \d+%, .+ win \d+%\. Expected goals \d\.\d–\d\.\d/);
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${upcoming}`);
@@ -1721,9 +1728,9 @@ async function step(name, fn) {
       assert.equal((await p.request.get(`${BASE_URL}${upcoming}/opengraph-image`)).headers()["content-type"], "image/png");
       // Portuguese and Spanish.
       await p.goto(`${BASE_URL}${upcoming.replace(/^\/en/, "/pt")}`);
-      assert.match(await p.locator("h1").innerText(), /^Palpite .+ x .+: probabilidades e placares simulados$/);
+      assert.match(await p.getByTestId("match-subtitle").innerText(), /^Palpite, probabilidades e placares simulados · Premier League · Rodada \d+$/);
       await p.goto(`${BASE_URL}${upcoming.replace(/^\/en/, "/es")}`);
-      assert.match(await p.locator("h1").innerText(), /^Pronóstico .+ vs .+: probabilidades y resultados simulados$/);
+      assert.match(await p.getByTestId("match-subtitle").innerText(), /^Pronóstico, probabilidades y marcadores simulados · Premier League · Jornada \d+$/);
       // A played game: the final score on top, the pre-match odds kept, no "what it means".
       let playedUrl;
       for (const url of [...urls].reverse()) {
@@ -1736,7 +1743,8 @@ async function step(name, fn) {
       assert.ok(playedUrl, "a played game");
       assert.match(await p.getByTestId("match-final-score").innerText(), /^\d+–\d+$/);
       assert.match(await p.locator('[data-testid="match-prediction"] h2').innerText(), /^Pre-match prediction$/);
-      assert.match(await p.locator("h1").innerText(), /^.+ \d+–\d+ .+: result and pre-match prediction$/);
+      assert.match(await p.getByTestId("match-subtitle").innerText(), /^Final score and pre-match prediction · Premier League · Matchday \d+$/);
+      assert.match(await p.title(), /^.+ \d+–\d+ .+ \(.+\): result and pre-match prediction \| Foot Simu$/);
       assert.equal(await p.getByTestId("match-impact").count(), 0);
       // Played: no dice (it has its real score).
       assert.equal(await p.getByTestId("match-dice").count(), 0);

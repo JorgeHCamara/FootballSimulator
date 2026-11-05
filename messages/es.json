@@ -871,11 +871,11 @@
         "playoffs": "Playoffs",
         "relegation": "Descenso"
       }
-    }
+    },
+    "subtitle": "{season} · Probabilidades de {topics}",
+    "subtitlePlain": "{season} · Probabilidades de la temporada"
   },
   "Match": {
-    "h1": "Pronóstico {home} vs {away}: probabilidades y resultados simulados",
-    "h1Played": "{home} {homeGoals}–{awayGoals} {away}: resultado y pronóstico previo",
     "title": "Pronóstico {home} vs {away} ({date}): probabilidades y resultados simulados",
     "titlePlayed": "{home} {homeGoals}–{awayGoals} {away} ({date}): resultado y pronóstico previo",
     "description": "{home} vs {away}, {league}, {date}: victoria de {home} {homeWin}, empate {draw}, victoria de {away} {awayWin}. Goles esperados {homeXg}–{awayXg}, los cinco resultados más probables y qué significa cada resultado para la temporada.",
@@ -929,6 +929,8 @@
       "fullTime": "Final",
       "preMatch": "Pronóstico previo",
       "cta": "Pronósticos en footsimu.com"
-    }
+    },
+    "subtitle": "Pronóstico, probabilidades y marcadores simulados · {league} · {matchday}",
+    "subtitlePlayed": "Resultado final y pronóstico previo · {league} · {matchday}"
   }
 }
