@@ -197,11 +197,13 @@ export function espnTeams(events: readonly EspnEvent[]): Team[] {
     for (const { team } of [home, away]) {
       const id = Number(team.id);
       if (teams.has(id)) continue;
+      // Some names come with a trailing space ("Boca ").
+      const name = team.displayName.trim();
       teams.set(id, {
         id,
-        name: team.displayName,
-        shortName: team.shortDisplayName ?? team.displayName,
-        tla: team.abbreviation ?? team.displayName.slice(0, 3).toUpperCase(),
+        name,
+        shortName: team.shortDisplayName?.trim() || name,
+        tla: team.abbreviation?.trim() || name.slice(0, 3).toUpperCase(),
         ...(team.logo ? { crest: team.logo } : {}),
       });
     }
