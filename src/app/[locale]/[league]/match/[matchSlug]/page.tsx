@@ -101,8 +101,6 @@ export default async function MatchPage({ params }: { params: Params }) {
   const pct = (share: number) => percent(share, lang);
   const values = textValues(loaded, lang);
   const played = state === "played";
-  // Phones: short names when the full ones would wrap into several lines.
-  const shortOnPhones = home.name.length + away.name.length > 22 && (home.shortName !== home.name || away.shortName !== away.name);
   const subtitle = t(played ? "subtitlePlayed" : "subtitle", { league: league.name, matchday: t("matchday", { n: fixture.matchday }) });
   const simulator = league.simulatorName[lang];
   const leaguePath = `/${league.slug}`;
@@ -277,26 +275,20 @@ export default async function MatchPage({ params }: { params: Params }) {
           </span>
         </Link>
         <div>
-          <h1 className="flex flex-wrap items-center gap-x-2 gap-y-1 text-2xl font-extrabold tracking-tight sm:text-3xl" data-testid="match-h1">
+          {/* Phones: no visible heading (the match card below names both clubs); it stays in the page for search engines and screen readers. */}
+          <h1 className="sr-only sm:not-sr-only sm:flex sm:flex-wrap sm:items-center sm:gap-x-2 sm:gap-y-1 sm:text-3xl sm:font-extrabold sm:tracking-tight" data-testid="match-h1">
             {([home, away] as const).map((team, i) => (
               <span key={team.id} className="contents">
                 {i === 1 && <span className="font-semibold text-zinc-400">{t("vs")}</span>}
                 {/* Name, crest × crest, name: each crest next to the "vs". */}
                 <span className={`inline-flex min-w-0 items-center gap-2 ${i === 0 ? "flex-row-reverse" : ""}`}>
                   <TeamBadge team={team} size={32} textless />
-                  {shortOnPhones ? (
-                    <>
-                      <span className="break-words sm:hidden">{team.shortName}</span>
-                      <span className="hidden break-words sm:inline">{team.name}</span>
-                    </>
-                  ) : (
-                    <span className="break-words">{team.name}</span>
-                  )}
+                  <span className="break-words">{team.name}</span>
                 </span>
               </span>
             ))}
           </h1>
-          <p className="mt-1 text-sm font-medium text-zinc-600 dark:text-zinc-400" data-testid="match-subtitle">
+          <p className="text-sm font-medium text-zinc-600 sm:mt-1 dark:text-zinc-400" data-testid="match-subtitle">
             {subtitle}
           </p>
         </div>

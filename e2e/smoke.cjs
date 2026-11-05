@@ -1795,7 +1795,11 @@ async function step(name, fn) {
         const ctx = await browser.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true });
         const m = await ctx.newPage();
         await m.goto(`${BASE_URL}${upcoming}`);
-        const right = await m.evaluate(() => Math.max(...[...document.querySelectorAll("body *")].map((e) => e.getBoundingClientRect().right)));
+        // (Screen-reader-only content, like the H1 on phones, is clipped: not counted.)
+        const right = await m.evaluate(() => Math.max(...[...document.querySelectorAll("body *")].filter((e) => !e.closest(".sr-only")).map((e) => e.getBoundingClientRect().right)));
+        // Phones: no visible H1 (the match card names the clubs), but one in the page.
+        assert.equal(await m.locator("h1").count(), 1);
+        assert.ok(!(await m.locator("h1").isVisible()) || (await m.locator("h1").boundingBox()).width <= 1, `${width}px: no visible H1`);
         assert.ok(right <= width + 0.5, `${width}px: content reaches ${right}px`);
         const heads = await m.getByTestId("match-impact-head").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
         assert.equal(heads.length, 3);
