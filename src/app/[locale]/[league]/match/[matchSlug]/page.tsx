@@ -281,7 +281,8 @@ export default async function MatchPage({ params }: { params: Params }) {
             {([home, away] as const).map((team, i) => (
               <span key={team.id} className="contents">
                 {i === 1 && <span className="font-semibold text-zinc-400">{t("vs")}</span>}
-                <span className="inline-flex min-w-0 items-center gap-2">
+                {/* Name, crest × crest, name: each crest next to the "vs". */}
+                <span className={`inline-flex min-w-0 items-center gap-2 ${i === 0 ? "flex-row-reverse" : ""}`}>
                   <TeamBadge team={team} size={32} textless />
                   {shortOnPhones ? (
                     <>
