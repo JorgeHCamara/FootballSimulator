@@ -27,9 +27,11 @@ export function MatchImpact({ src, title }: { src: string; title: string }) {
   if (view === null) return null;
   if (view === undefined)
     return (
-      <section className="space-y-3" data-testid="match-impact-loading" aria-busy="true">
+      // As tall as the finished section with its usual two rows (about 292px on phones, 259px from tablets up), so the page doesn't jump when it arrives.
+      <section className="flex min-h-[292px] flex-col gap-3 sm:min-h-[259px]" data-testid="match-impact-loading" aria-busy="true">
         <h2 className="text-xl font-bold tracking-tight">{title}</h2>
-        <div className="h-72 animate-pulse rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-800/60" />
+        <div className="flex-1 animate-pulse rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-800/60" />
+        <div className="h-8 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800/60" />
       </section>
     );
   return (
