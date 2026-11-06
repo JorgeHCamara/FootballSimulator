@@ -3,7 +3,7 @@ import { COMPETITIONS } from "../config/competitions.ts";
 import { routing } from "../i18n/routing.ts";
 import { clubAndMatchPaths } from "../lib/clubPage.ts";
 import { reportPaths } from "../lib/oddsPage.ts";
-import { HREFLANG, SITE_PAGES, SITE_URL } from "../lib/site.ts";
+import { HREFLANG, MY_WORLD_LISTED, SITE_PAGES, SITE_URL } from "../lib/site.ts";
 
 /** Regenerated daily: clubs come and go between seasons, and the window of games moves on. */
 export const revalidate = 86400;
@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Chance pages: a league's ("/premier-league/chances/title") and a club's ("…/team/arsenal/chances/title").
   const isClubChance = (path: string) => path.includes("/team/");
   const isChance = new Set(chances);
-  const paths = ["", ...COMPETITIONS.map((c) => `/${c.slug}`), ...SITE_PAGES.map((p) => `/${p}`), ...clubs, ...chances, ...matches, "/odds", "/quiz", "/my-world", ...reports.latest, ...reports.rounds.map((r) => r.path)];
+  const paths = ["", ...COMPETITIONS.map((c) => `/${c.slug}`), ...SITE_PAGES.map((p) => `/${p}`), ...clubs, ...chances, ...matches, "/odds", "/quiz", ...(MY_WORLD_LISTED ? ["/my-world"] : []), ...reports.latest, ...reports.rounds.map((r) => r.path)];
   const isSitePage = (path: string) => SITE_PAGES.some((p) => path === `/${p}`);
   return paths.flatMap((path) =>
     routing.locales.map((locale) => ({

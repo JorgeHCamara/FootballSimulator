@@ -5,7 +5,7 @@ import { Icon } from "../../components/Icon.tsx";
 import { JsonLd } from "../../components/JsonLd.tsx";
 import { LEAGUES, type CompetitionCode, type SiteLocale } from "../../config/leagues.ts";
 import { Link } from "../../i18n/navigation.ts";
-import { HREFLANG, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem } from "../../lib/site.ts";
+import { HREFLANG, MY_WORLD_LISTED, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem } from "../../lib/site.ts";
 
 /** Leagues with a card on the home page; every league is still in the header menu and footer. */
 const HOME_LEAGUES: readonly CompetitionCode[] = ["PL", "ELC", "PD", "BL1", "SA", "FL1", "PPL", "BSA", "MLS"];
@@ -67,10 +67,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <p className="mx-auto mt-3 max-w-2xl text-zinc-600 text-pretty dark:text-zinc-400">{t("subheading")}</p>
       </section>
 
-      {/* The game modes, by the main simulators: My World (a club's seasons up the English pyramid) and the daily quiz. */}
-      <div className="grid gap-3 md:grid-cols-2">
+      {/* The game modes, by the main simulators: My World (a club's seasons up the English pyramid; unlisted for now, see MY_WORLD_LISTED) and the daily quiz. */}
+      <div className={`grid gap-3 ${MY_WORLD_LISTED ? "md:grid-cols-2" : ""}`}>
         {[
-          { href: "/my-world", icon: "globe" as const, title: worldT("homeTitle"), body: worldT("homeBody"), cta: worldT("homeCta"), testId: "home-my-world" },
+          ...(MY_WORLD_LISTED ? [{ href: "/my-world", icon: "globe" as const, title: worldT("homeTitle"), body: worldT("homeBody"), cta: worldT("homeCta"), testId: "home-my-world" }] : []),
           { href: "/quiz", icon: "circle-help" as const, title: t("quizTitle"), body: t("quizBody"), cta: t("quizCta"), testId: "home-quiz" },
         ].map((mode) => (
           <Link

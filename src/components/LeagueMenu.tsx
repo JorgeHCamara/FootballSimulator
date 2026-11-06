@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { continents, type ContinentGroup, type CountryGroup } from "../config/competitions.ts";
 import { Link, usePathname } from "../i18n/navigation.ts";
+import { MY_WORLD_LISTED } from "../lib/site.ts";
 import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
 
@@ -173,18 +174,20 @@ export function LeagueMenu() {
             {nav("latestOdds")}
           </Link>
         </li>
-        {/* My World: a club's seasons up the English pyramid. */}
-        <li>
-          <Link
-            href="/my-world"
-            aria-current={pathname === "/my-world" ? "page" : undefined}
-            className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium text-pitch-50 hover:bg-white/10 ${pathname === "/my-world" || pathname.endsWith("/my-world") ? "bg-white/10" : ""}`}
-            data-testid="nav-my-world"
-          >
-            <Icon name="globe" size={14} />
-            {nav("myWorld")}
-          </Link>
-        </li>
+        {/* My World: a club's seasons up the English pyramid (unlisted for now, see MY_WORLD_LISTED). */}
+        {MY_WORLD_LISTED && (
+          <li>
+            <Link
+              href="/my-world"
+              aria-current={pathname === "/my-world" ? "page" : undefined}
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium text-pitch-50 hover:bg-white/10 ${pathname === "/my-world" || pathname.endsWith("/my-world") ? "bg-white/10" : ""}`}
+              data-testid="nav-my-world"
+            >
+              <Icon name="globe" size={14} />
+              {nav("myWorld")}
+            </Link>
+          </li>
+        )}
         {/* The daily quiz. */}
         <li>
           <Link
