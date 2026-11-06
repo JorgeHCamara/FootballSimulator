@@ -1105,5 +1105,100 @@
     "shareText": "I got {score} of {total} in today's Foot Simu football quiz.",
     "copied": "Copied",
     "simulate": "Simulate the leagues"
+  },
+  "Chances": {
+    "topic": {
+      "title": "title",
+      "titlePlayoff": "{name}",
+      "promotion": "promotion",
+      "playoffs": "play-off",
+      "relegation": "relegation"
+    },
+    "Topic": {
+      "title": "Title",
+      "titlePlayoff": "{name}",
+      "promotion": "Promotion",
+      "playoffs": "Play-offs",
+      "relegation": "Relegation"
+    },
+    "chanceLabel": {
+      "title": "Title chance",
+      "titlePlayoff": "Chance of winning the {name}",
+      "promotion": "Promotion chance",
+      "playoffs": "Play-off chance",
+      "relegation": "Relegation chance"
+    },
+    "chip": "{Topic} chances",
+    "columns": {
+      "club": "Club",
+      "position": "Pos.",
+      "points": "Pts",
+      "chance": "Chance"
+    },
+    "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
+    "pointsPlayed": "{points, plural, one {# pt} other {# pts}} · {played, plural, one {# game} other {# games}}",
+    "simulate": "Open the {simulator}",
+    "latestReport": "Latest odds report",
+    "league": {
+      "h1": {
+        "title": "{league} {season} title odds",
+        "titlePlayoff": "{name} {season} odds",
+        "promotion": "{league} {season} promotion odds",
+        "playoffs": "{league} {season} play-off odds",
+        "relegation": "{league} {season} relegation odds"
+      },
+      "metaTitle": "{h1}: every club's chances",
+      "question": {
+        "title": "Who will win the {league} {season}?",
+        "titlePlayoff": "Who will win the {name} {season}?",
+        "promotion": "Who will be promoted from the {league} {season}?",
+        "playoffs": "Who will reach the {league} {season} play-offs?",
+        "relegation": "Who will be relegated from the {league} {season}?"
+      },
+      "next": "Next: {list}.",
+      "metaTail": "Every club's {topic} chances, updated after the results.",
+      "tableTitle": "Every club's {topic} chances",
+      "rest": "{count, plural, one {# other club} other {# other clubs}}: 0% (not once in {iterations} simulated seasons).",
+      "complete": "The {season} season is over: these are its final outcomes.",
+      "more": "More {league} chances"
+    },
+    "club": {
+      "h1": {
+        "title": "{club}'s chances of winning the {league} {season}",
+        "titlePlayoff": "{club}'s chances of winning the {name} {season}",
+        "promotion": "{club}'s promotion chances: {league} {season}",
+        "playoffs": "{club}'s play-off chances: {league} {season}",
+        "relegation": "{club}'s relegation chances: {league} {season}"
+      },
+      "metaDescription": "{label}: {pct}. {club} in the {league} {season}, from {count} simulated seasons: where they stand, their likely finish and the race.",
+      "question": {
+        "title": "What are {club}'s chances of winning the {league}?",
+        "titlePlayoff": "What are {club}'s chances of winning the {name}?",
+        "promotion": "What are {club}'s chances of promotion?",
+        "playoffs": "What are {club}'s chances of reaching the play-offs?",
+        "relegation": "Will {club} be relegated?"
+      },
+      "finishQuestion": "Where will {club} finish?",
+      "raceTitle": "{Topic}: the likeliest clubs",
+      "raceNote": "The {count} likeliest clubs, from the same simulated seasons.",
+      "fullPage": "All of {club}'s chances and games",
+      "allClubs": "Every club's {topic} chances",
+      "more": "More on {club}"
+    },
+    "faq": {
+      "howQ": "How are these chances worked out?",
+      "howA": "Foot Simu plays out the rest of the {league} season {count} times, starting from the real results so far. Each game's score is drawn from both clubs' attack and defence this season, with home advantage. A club's chance is the share of those seasons in which it {verb}.",
+      "verb": {
+        "title": "wins the title",
+        "titlePlayoff": "wins the {name}",
+        "promotion": "is promoted",
+        "playoffs": "reaches the play-offs",
+        "relegation": "goes down"
+      },
+      "updateQ": "How often are they updated?",
+      "updateA": "Every few hours, from the latest results: each result changes the chances of every club in the race.",
+      "oddsQ": "Are these bookmakers' odds?",
+      "oddsA": "No. They are the chances from Foot Simu's own simulated seasons, not betting odds."
+    }
   }
 }

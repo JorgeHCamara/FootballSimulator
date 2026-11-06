@@ -10,11 +10,14 @@ export const revalidate = 86400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const [{ clubs, matches }, reports] = await Promise.all([clubAndMatchPaths(now.getTime()), reportPaths()]);
+  const [{ clubs, matches, chances }, reports] = await Promise.all([clubAndMatchPaths(now.getTime()), reportPaths()]);
   const reportDates = new Map(reports.rounds.map((r) => [r.path, r.date]));
   const isClub = new Set(clubs);
   const isMatch = new Set(matches);
-  const paths = ["", ...COMPETITIONS.map((c) => `/${c.slug}`), ...SITE_PAGES.map((p) => `/${p}`), ...clubs, ...matches, "/odds", "/quiz", ...reports.latest, ...reports.rounds.map((r) => r.path)];
+  // Chance pages: a league's ("/premier-league/chances/title") and a club's ("…/team/arsenal/chances/title").
+  const isClubChance = (path: string) => path.includes("/team/");
+  const isChance = new Set(chances);
+  const paths = ["", ...COMPETITIONS.map((c) => `/${c.slug}`), ...SITE_PAGES.map((p) => `/${p}`), ...clubs, ...chances, ...matches, "/odds", "/quiz", ...reports.latest, ...reports.rounds.map((r) => r.path)];
   const isSitePage = (path: string) => SITE_PAGES.some((p) => path === `/${p}`);
   return paths.flatMap((path) =>
     routing.locales.map((locale) => ({
@@ -23,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: reportDates.has(path) ? new Date(`${reportDates.get(path)}T12:00:00Z`) : now,
       // About, Privacy, Contact: rarely change.
       changeFrequency: isSitePage(path) ? ("monthly" as const) : path ? ("daily" as const) : ("weekly" as const),
-      priority: isSitePage(path) ? 0.3 : path === "/quiz" ? 0.8 : reportDates.has(path) ? 0.5 : isMatch.has(path) ? 0.6 : isClub.has(path) ? 0.7 : path ? 0.9 : 1,
+      priority: isSitePage(path) ? 0.3 : isChance.has(path) ? (isClubChance(path) ? 0.6 : 0.8) : path === "/quiz" ? 0.8 : reportDates.has(path) ? 0.5 : isMatch.has(path) ? 0.6 : isClub.has(path) ? 0.7 : path ? 0.9 : 1,
       alternates: {
         languages: Object.fromEntries(routing.locales.map((l) => [HREFLANG[l] ?? l, `${SITE_URL}/${l}${path}`])),
       },

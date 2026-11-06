@@ -22,6 +22,7 @@ import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd, fill, 
 import { Icon } from "../../../components/Icon.tsx";
 import { hasClubPages } from "../../../lib/clubs.ts";
 import { latestReportPath, readSnapshots, seasonReports } from "../../../lib/oddsReports.ts";
+import { leagueChancePath, snapshotOutcomeKey, snapshotOutcomes } from "../../../lib/chancePages.ts";
 
 export const revalidate = 3600;
 
@@ -138,10 +139,12 @@ export default async function LeaguePage({ params }: { params: Params }) {
   const loaded = await load(slug);
   if (!loaded) notFound();
 
-  // The latest "what changed" report (domestic leagues with snapshots).
-  const latestOdds =
-    loaded.kind === "league" && hasClubPages(loaded.config) ? seasonReports(await readSnapshots(loaded.config.code), loaded.data.seasonKey)?.snapshots.at(-1)?.round : undefined;
-  const oddsT = await getTranslations("Odds");
+  // The latest "what changed" report (domestic leagues with snapshots), and the chance pages its places make.
+  const latestSnapshot =
+    loaded.kind === "league" && hasClubPages(loaded.config) ? seasonReports(await readSnapshots(loaded.config.code), loaded.data.seasonKey)?.snapshots.at(-1) : undefined;
+  const latestOdds = latestSnapshot?.round;
+  const chanceLinks = loaded.kind === "league" && latestSnapshot ? snapshotOutcomes(loaded.config, latestSnapshot).map((o) => ({ outcome: o, ...snapshotOutcomeKey(loaded.config, latestSnapshot, o) })) : [];
+  const [oddsT, chancesT] = await Promise.all([getTranslations("Odds"), getTranslations("Chances")]);
   const [t, seo, faqT, meta] = await Promise.all([
     getTranslations("Simulator"),
     getTranslations("Seo"),
@@ -282,6 +285,22 @@ export default async function LeaguePage({ params }: { params: Params }) {
             <Icon name="trending-up" size={16} className="shrink-0" />
             {oddsT("leagueLink", { round: oddsT("round", { n: latestOdds }) })}
           </Link>
+        )}
+        {chanceLinks.length > 0 && (
+          // Every club's title, promotion, play-off and relegation chances, each on its own page.
+          <ul className="flex flex-wrap gap-2" data-testid="league-chances">
+            {chanceLinks.map((c) => (
+              <li key={c.outcome}>
+                <Link
+                  href={leagueChancePath(config, c.outcome)}
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-semibold hover:border-pitch-500 hover:bg-pitch-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-pitch-900/30"
+                >
+                  <Icon name="chart-column" size={16} className="shrink-0 text-zinc-500" />
+                  {chancesT("chip", { Topic: chancesT(`Topic.${c.key}`, { name: c.name }), topic: chancesT(`topic.${c.key}`, { name: c.name }) })}
+                </Link>
+              </li>
+            ))}
+          </ul>
         )}
       </header>
 

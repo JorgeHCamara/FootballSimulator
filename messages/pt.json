@@ -1106,5 +1106,100 @@
     "shareText": "Acertei {score} de {total} no quiz de futebol de hoje do Foot Simu.",
     "copied": "Copiado",
     "simulate": "Simular os campeonatos"
+  },
+  "Chances": {
+    "topic": {
+      "title": "título",
+      "titlePlayoff": "{name}",
+      "promotion": "acesso",
+      "playoffs": "playoffs",
+      "relegation": "rebaixamento"
+    },
+    "Topic": {
+      "title": "Título",
+      "titlePlayoff": "{name}",
+      "promotion": "Acesso",
+      "playoffs": "Playoffs",
+      "relegation": "Rebaixamento"
+    },
+    "chanceLabel": {
+      "title": "Chance de título",
+      "titlePlayoff": "Chance de conquistar a {name}",
+      "promotion": "Chance de acesso",
+      "playoffs": "Chance de playoffs",
+      "relegation": "Chance de rebaixamento"
+    },
+    "chip": "Chances de {topic}",
+    "columns": {
+      "club": "Clube",
+      "position": "Pos.",
+      "points": "Pts",
+      "chance": "Chance"
+    },
+    "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
+    "pointsPlayed": "{points, plural, one {# pt} other {# pts}} · {played, plural, one {# jogo} other {# jogos}}",
+    "simulate": "Abrir o {simulator}",
+    "latestReport": "Último relatório de chances",
+    "league": {
+      "h1": {
+        "title": "{league} {season}: chances de título",
+        "titlePlayoff": "{name} {season}: chances de título",
+        "promotion": "{league} {season}: chances de acesso",
+        "playoffs": "{league} {season}: chances de playoffs",
+        "relegation": "{league} {season}: chances de rebaixamento"
+      },
+      "metaTitle": "{h1} de todos os clubes",
+      "question": {
+        "title": "{league} {season}: quem vai ser campeão?",
+        "titlePlayoff": "{name} {season}: quem vai ser campeão?",
+        "promotion": "{league} {season}: quem vai subir?",
+        "playoffs": "{league} {season}: quem vai aos playoffs?",
+        "relegation": "{league} {season}: quem vai ser rebaixado?"
+      },
+      "next": "Em seguida: {list}.",
+      "metaTail": "Chances de {topic} de cada clube, atualizadas após os resultados.",
+      "tableTitle": "Chances de {topic} de cada clube",
+      "rest": "{count, plural, one {# outro clube} other {# outros clubes}}: 0% (nenhuma vez em {iterations} temporadas simuladas).",
+      "complete": "A temporada {season} terminou: estes são os resultados finais.",
+      "more": "Mais chances em {league}"
+    },
+    "club": {
+      "h1": {
+        "title": "{club}: chances de título em {league} {season}",
+        "titlePlayoff": "{club}: chances de conquistar a {name} {season}",
+        "promotion": "{club}: chances de acesso em {league} {season}",
+        "playoffs": "{club}: chances de playoffs em {league} {season}",
+        "relegation": "{club}: chances de rebaixamento em {league} {season}"
+      },
+      "metaDescription": "{label}: {pct}. {club} em {league} {season}, em {count} temporadas simuladas: a posição atual, a posição provável e a disputa.",
+      "question": {
+        "title": "Quais são as chances de título de {club}?",
+        "titlePlayoff": "Quais são as chances de {club} conquistar a {name}?",
+        "promotion": "Quais são as chances de acesso de {club}?",
+        "playoffs": "Quais são as chances de {club} ir aos playoffs?",
+        "relegation": "{club} vai ser rebaixado?"
+      },
+      "finishQuestion": "Em que posição {club} vai terminar?",
+      "raceTitle": "{Topic}: os clubes com mais chances",
+      "raceNote": "Os {count} clubes com mais chances, nas mesmas temporadas simuladas.",
+      "fullPage": "Todas as chances e jogos de {club}",
+      "allClubs": "Chances de {topic} de cada clube",
+      "more": "Mais sobre {club}"
+    },
+    "faq": {
+      "howQ": "Como essas chances são calculadas?",
+      "howA": "O Foot Simu simula o resto da temporada de {league} {count} vezes, a partir dos resultados reais até agora. O placar de cada jogo sai do ataque e da defesa dos dois clubes nesta temporada, com o fator casa. A chance de um clube é a parcela dessas temporadas em que ele {verb}.",
+      "verb": {
+        "title": "é campeão",
+        "titlePlayoff": "conquista a {name}",
+        "promotion": "conquista o acesso",
+        "playoffs": "vai aos playoffs",
+        "relegation": "é rebaixado"
+      },
+      "updateQ": "Com que frequência elas são atualizadas?",
+      "updateA": "A cada poucas horas, a partir dos resultados mais recentes: cada resultado muda as chances de todos os clubes na disputa.",
+      "oddsQ": "Essas são as odds das casas de apostas?",
+      "oddsA": "Não. São as chances das temporadas simuladas pelo próprio Foot Simu, não odds de apostas."
+    }
   }
 }

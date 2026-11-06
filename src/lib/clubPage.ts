@@ -1,20 +1,37 @@
 import { getLeagueBySlug, LEAGUES, type LeagueConfig, type SiteLocale, type ZoneKind } from "../config/leagues.ts";
 import type { Team } from "../engine/types.ts";
+import { clubChancePath, leagueChancePath, snapshotOpen, snapshotOutcomes } from "./chancePages.ts";
 import { featuredChances, type ClubOutlook, type HeadlineChance, type LeagueOutlook } from "./clubOutlook.ts";
 import { hasClubPages } from "./clubs.ts";
-import { listOf, percent } from "./clubText.ts";
+import { listOf, ordinal, percent } from "./clubText.ts";
 import { getLeagueData, type LeagueData } from "./leagueData.ts";
 import { INDEX_NEXT_DAYS, INDEX_PAST_DAYS, matchesBetween } from "./matches.ts";
+import { readSnapshots, seasonReports } from "./oddsReports.ts";
 import { sharedLeagueOutlook } from "./sharedOutlook.ts";
 
-export interface LoadedClub {
+/** A domestic league's outlook: the shared one, as its league, club and chance pages read it. */
+export interface LoadedLeague {
   league: LeagueConfig;
   data: LeagueData;
   outlook: LeagueOutlook;
+  /** The season the pages cover: "2026/27", or a season of several tournaments by its year ("2026", not "Clausura 2026"). */
+  season: string;
+}
+
+export interface LoadedClub extends LoadedLeague {
   club: ClubOutlook;
   team: Team;
-  /** The season the page covers: "2026/27", or a season of several tournaments by its year ("2026", not "Clausura 2026"). */
-  season: string;
+}
+
+/** A league with club pages and its shared outlook, or undefined (an unknown league, or none worked out: a 404). */
+export async function loadLeague(leagueSlug: string): Promise<LoadedLeague | undefined> {
+  const league = getLeagueBySlug(leagueSlug);
+  if (!league || !hasClubPages(league)) return undefined;
+  const data = await getLeagueData(league);
+  const outlook = await sharedLeagueOutlook(league, data);
+  if (!outlook) return undefined;
+  const season = data.tournaments ? (data.season.split(" ").at(-1) ?? data.season) : data.season;
+  return { league, data, outlook, season };
 }
 
 /**
@@ -28,11 +45,26 @@ export async function loadClub(leagueSlug: string, teamSlug: string): Promise<Lo
   const data = await getLeagueData(league);
   const team = data.teams.find((t) => t.slug === teamSlug);
   if (!team) return undefined;
-  const outlook = await sharedLeagueOutlook(league, data);
-  const club = outlook?.clubs.get(team.id);
-  if (!outlook || !club) return undefined;
-  const season = data.tournaments ? (data.season.split(" ").at(-1) ?? data.season) : data.season;
-  return { league, data, outlook, club, team, season };
+  const loaded = await loadLeague(leagueSlug);
+  const club = loaded?.outlook.clubs.get(team.id);
+  if (!loaded || !club) return undefined;
+  return { ...loaded, club, team };
+}
+
+/** Where a club stands: "Arsenal are 3rd in the Premier League table with 24 points from 9 games." (or before its first game, or once the season is over). */
+export function clubStanding(loaded: LoadedClub, locale: SiteLocale, t: Translate): string {
+  const { outlook, club, team, league } = loaded;
+  const { row } = club;
+  const table =
+    outlook.scope === "eachTable" && club.group
+      ? t("tableGroup", { group: club.group[locale] })
+      : outlook.scope === "annual"
+        ? t("tableAnnual", { league: league.name })
+        : t("tableLeague", { league: league.name });
+  const position = ordinal(row.position, locale);
+  if (row.played === 0) return t("summaryStart", { club: team.name });
+  if (outlook.complete) return t("summaryFinal", { club: team.name, position, table, points: row.points });
+  return t("summaryPosition", { club: team.name, position, table, points: row.points, played: row.played });
 }
 
 type Translate = (key: string, values?: Record<string, string | number>) => string;
@@ -77,27 +109,53 @@ export function clubDescription(loaded: LoadedClub, locale: SiteLocale, t: Trans
 }
 
 /**
- * Every club page's path (without the locale), and every match page's for
- * games inside the index window (INDEX_PAST_DAYS ago to INDEX_NEXT_DAYS ahead), league by
- * league; a league whose data can't load is left out.
+ * The chance pages search engines are given (src/lib/chancePages.ts), from
+ * the league's latest snapshot (none worked out here): its league pages while
+ * the season is on, and each club's while the outcome is still open for it.
+ * Before the season's first snapshot, every club's (from the last season's
+ * outcomes).
  */
-export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: string[]; matches: string[] }> {
+async function chancePaths(league: LeagueConfig, data: LeagueData): Promise<string[]> {
+  if (data.fixtures.every((f) => f.result)) return [];
+  const season = seasonReports(await readSnapshots(league.code), data.seasonKey);
+  const latest = season?.snapshots.at(-1);
+  if (!latest) return [];
+  const current = season!.seasonKey === data.seasonKey;
+  const outcomes = snapshotOutcomes(league, latest);
+  return [
+    ...outcomes.map((o) => leagueChancePath(league, o)),
+    ...data.teams.flatMap((team) => {
+      if (!team.page) return [];
+      const chances = current ? latest.teams[String(team.id)]?.chances : undefined;
+      return outcomes.filter((o) => !chances || snapshotOpen(o, chances)).map((o) => clubChancePath(team.page!, o));
+    }),
+  ];
+}
+
+/**
+ * Every club page's path (without the locale), every match page's for games
+ * inside the index window (INDEX_PAST_DAYS ago to INDEX_NEXT_DAYS ahead), and
+ * the chance pages (chancePaths), league by league; a league whose data
+ * can't load is left out.
+ */
+export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: string[]; matches: string[]; chances: string[] }> {
   const leagues = LEAGUES.filter(hasClubPages);
   const day = 86_400_000;
   const pages = await Promise.all(
     leagues.map((league) =>
       getLeagueData(league).then(
-        (data) => ({
+        async (data) => ({
           clubs: data.teams.flatMap((team) => (team.page ? [team.page] : [])),
           matches: matchesBetween(league, data, now - INDEX_PAST_DAYS * day, now + INDEX_NEXT_DAYS * day).map((m) => m.path),
+          chances: await chancePaths(league, data).catch(() => []),
         }),
         (error: unknown) => {
           console.warn(`sitemap: no club or match pages for ${league.code}:`, error);
-          return { clubs: [], matches: [] };
+          return { clubs: [], matches: [], chances: [] };
         },
       ),
     ),
   );
-  return { clubs: pages.flatMap((p) => p.clubs), matches: pages.flatMap((p) => p.matches) };
+  return { clubs: pages.flatMap((p) => p.clubs), matches: pages.flatMap((p) => p.matches), chances: pages.flatMap((p) => p.chances) };
 }
 
