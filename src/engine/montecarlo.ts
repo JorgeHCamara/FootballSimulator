@@ -1,5 +1,5 @@
 import { clampRate, expectedGoals, sampleDixonColes, sampleNormal, sampleScore, scoreSampler, venueFactor, type ScoreSampler } from "./match.ts";
-import { seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
+import { playoffCancelled, seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
 import { createRng } from "./rng.ts";
 import { splitFixtures, splitGroupsFrom, type SplitGroupConfig } from "./split.ts";
@@ -76,6 +76,8 @@ export interface MonteCarloResult {
   playoffReached?: Record<TeamId, number[]>;
   /** With `playoff`: runs the club won the knockout phase. */
   playoffWins?: Record<TeamId, number>;
+  /** With a play-off that isn't held when a club is far enough clear (`directIfClear`, Serie B): runs that club went up instead. */
+  playoffSkips?: Record<TeamId, number>;
 }
 
 /** Rating noise's spread for a club with `gamesPlayed` games so far: sd × √(k / (k + games)), shrinking as games come in. */
@@ -106,6 +108,8 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
     ? input.groups.map((ids) => ids.flatMap((id) => byId.get(id) ?? []))
     : [teams];
   const rng = createRng(input.seed);
+  // The knockout phase draws from its own stream, so playing it (or not) leaves every table's draws as they are.
+  const knockout = createRng((input.seed ^ 0x9e3779b9) >>> 0);
   // Each remaining game's score distribution (Dixon–Coles adjusted), built once.
   const rho = model.rho ?? 0;
   const remaining = fixtures
@@ -154,7 +158,10 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
   };
 
   const grouped = Boolean(input.groups?.length);
-  const playoff = !grouped || input.playoff?.config.seedFromGroups ? input.playoff : undefined;
+  // After separate tables, a knockout seeded from their places (Libertadores) or one whose first rounds are
+  // played within each table (MLS conferences: `groupStage`, the later ones seeded by the overall table).
+  const playoff = !grouped || input.playoff?.config.seedFromGroups || input.playoff?.config.groupStage ? input.playoff : undefined;
+  const groupStage = Boolean(grouped && playoff?.config.groupStage);
   const passDown = new Set(input.passDown ?? []);
   // Each variant's counts.
   const counts = variants.map(() => {
@@ -167,7 +174,14 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
       pointsTotal[t.id] = 0;
       if (passDown.size) zonePositionCounts[t.id] = new Array<number>(teams.length).fill(0);
     }
-    return { positionCounts, pointsTotal, zonePositionCounts, playoffReached: {} as Record<TeamId, number[]>, playoffWins: {} as Record<TeamId, number> };
+    return {
+      positionCounts,
+      pointsTotal,
+      zonePositionCounts,
+      playoffReached: {} as Record<TeamId, number[]>,
+      playoffWins: {} as Record<TeamId, number>,
+      playoffSkips: {} as Record<TeamId, number>,
+    };
   });
 
   const tableOptions: StandingsOptions = { ...standings, includeForm: false };
@@ -179,6 +193,8 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
   const groupOptions = tables.map((_, g) => (input.groupStandings?.[g] ? { ...input.groupStandings[g], includeForm: false } : tableOptions));
   const builders = tables.map((group, g) => (input.project ? undefined : standingsBuilder(group, input.groupFixtures?.[g] ?? fixtures, fixed, groupOptions[g]!, changing)));
   const splitTable = input.project ? standingsBuilder(teams, fixtures, fixed, { ...tableOptions, split: undefined }, changing) : undefined;
+  // A group-stage play-off's later rounds are seeded by the overall table (MLS: the Supporters' Shield).
+  const overallTable = groupStage ? standingsBuilder(teams, fixtures, fixed, tableOptions, changing) : undefined;
   const splitGames = new Map<string, Fixture[]>();
   // A projected split ranked straight from the table at the split: when the table's own split is this one and every
   // first-phase game is in `fixtures` (so computeStandings's first-phase table is that same table).
@@ -207,14 +223,18 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
     } else for (const r of remaining) results[r.id] = sampleScore(r.sampler, rng);
     const drawn = overridden.map((id) => results[id]);
     const at = rng.state;
+    const knockoutAt = knockout.state;
     // Where the first variant's season left the draws: the next season goes on from there, so the first variant
     // is exactly a run of its own (runMonteCarlo with its override), whatever the others draw.
     let after = at;
+    let knockoutAfter = knockoutAt;
     for (const [v, variant] of variants.entries()) {
       const count = counts[v]!;
       if (v > 0) {
         after = v === 1 ? rng.state : after;
+        knockoutAfter = v === 1 ? knockout.state : knockoutAfter;
         rng.state = at;
+        knockout.state = knockoutAt;
         overridden.forEach((id, j) => {
           const score = drawn[j];
           if (score) results[id] = score;
@@ -257,11 +277,12 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
       }
       if (playoff) {
         const seeding = playoff.config.seedFromGroups;
-        const rows = grouped ? seedByGroupPlace(groupRows, playoff.external, seeding?.places, seeding?.interleave) : groupRows[0]!;
+        const rows = groupStage ? overallTable!(results) : grouped ? seedByGroupPlace(groupRows, playoff.external, seeding?.places, seeding?.interleave) : groupRows[0]!;
+        const options = groupStage ? { ...playoff.options, groups: groupRows } : playoff.options;
         // The bracket only needs the table and knockout results (real ones come with the options).
         const roundCount = playoff.config.rounds.length;
         let final: PlayoffTie | undefined;
-        const played = simulatePlayoff(rows, playoff.config, {}, season, rng, playoff.options, (r, ties) => {
+        const played = simulatePlayoff(rows, playoff.config, {}, season, knockout, options, (r, ties) => {
           for (const tie of ties) {
             for (const id of [tie.higher.teamId, tie.lower.teamId]) {
               if (id !== null) (count.playoffReached[id] ??= new Array<number>(roundCount).fill(0))[r]!++;
@@ -271,12 +292,21 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
         });
         const winner = final ? tieOutcome(final, played)?.winner : undefined;
         if (winner !== undefined) count.playoffWins[winner] = (count.playoffWins[winner] ?? 0) + 1;
+        // Not held (Serie B: 3rd far enough clear of 4th): that club goes up directly instead.
+        const clear = playoff.config.directIfClear;
+        if (clear && playoffCancelled(playoff.config, rows)) {
+          const id = rows.find((r) => r.position === clear.position)?.teamId;
+          if (id !== undefined) count.playoffSkips[id] = (count.playoffSkips[id] ?? 0) + 1;
+        }
       }
     }
-    if (variants.length > 1) rng.state = after;
+    if (variants.length > 1) {
+      rng.state = after;
+      knockout.state = knockoutAfter;
+    }
   }
 
-  return counts.map(({ positionCounts, pointsTotal, zonePositionCounts, playoffReached, playoffWins }) => {
+  return counts.map(({ positionCounts, pointsTotal, zonePositionCounts, playoffReached, playoffWins, playoffSkips }) => {
     const averagePoints: Record<TeamId, number> = {};
     for (const t of teams) averagePoints[t.id] = iterations > 0 ? pointsTotal[t.id]! / iterations : 0;
     return {
@@ -284,7 +314,7 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
       positionCounts,
       averagePoints,
       ...(passDown.size ? { zonePositionCounts } : {}),
-      ...(playoff ? { playoffReached, playoffWins } : {}),
+      ...(playoff ? { playoffReached, playoffWins, ...(playoff.config.directIfClear ? { playoffSkips } : {}) } : {}),
     };
   });
 }

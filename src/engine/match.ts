@@ -301,13 +301,18 @@ export function simulateFixtures(
   known: ResultMap,
   model: LeagueModel,
   rng: Rng,
-  { likely = false }: { likely?: boolean } = {},
+  /**
+   * `fast`: each score from the same distribution without building its matrix
+   * (sampleDixonColes): for games drawn once each, as a simulated season's
+   * play-off games are. Other draws than the matrix's, so off by default.
+   */
+  { likely = false, fast = false }: { likely?: boolean; fast?: boolean } = {},
 ): ResultMap {
   const out: ResultMap = {};
   for (const f of fixtures) {
     if (known[f.id]) continue;
     const xg = f.neutral ? expectedGoalsNeutral(model, f.homeId, f.awayId) : expectedGoals(model, f.homeId, f.awayId);
-    out[f.id] = likely ? sampleLikelyScore(xg, rng, model.rho ?? 0) : simulateScore(xg, rng, model.rho ?? 0);
+    out[f.id] = likely ? sampleLikelyScore(xg, rng, model.rho ?? 0) : fast ? sampleDixonColes(xg, model.rho ?? 0, rng) : simulateScore(xg, rng, model.rho ?? 0);
   }
   return out;
 }

@@ -191,6 +191,8 @@ export interface ImpactRow {
   /** A season chance, or the average final place when none of them moves. */
   kind: HeadlineKind | "position";
   zone?: ZoneKind;
+  /** "playoffWin": what winning the play-off is ("MLS Cup"). */
+  name?: string;
   now: number;
   home: number;
   draw: number;
@@ -218,7 +220,7 @@ export function impactRows(teamId: TeamId, now: ClubChances, after: { home?: Clu
     const all = [h.chance, home, draw, away];
     const swing = Math.max(...all) - Math.min(...all);
     const settled = all.every((x) => x < MOVES) || all.every((x) => x > 1 - MOVES);
-    if (swing >= MOVES && !settled) rows.push({ teamId, kind: h.kind, zone: h.zone, now: h.chance, home, draw, away, swing });
+    if (swing >= MOVES && !settled) rows.push({ teamId, kind: h.kind, zone: h.zone, ...(h.name ? { name: h.name } : {}), now: h.chance, home, draw, away, swing });
   }
   rows.sort((a, b) => b.swing - a.swing);
   if (rows.length) return rows.slice(0, count).map(({ swing: _, ...row }) => row);

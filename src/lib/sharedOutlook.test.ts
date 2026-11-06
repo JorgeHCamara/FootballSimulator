@@ -24,6 +24,8 @@ const near = (actual: number, expected: number, label: string) => assert.ok(Math
 describe("the shared outlook", () => {
   it("keys and tags: the league, its data version and the model; the pages, the data and the runs apart", () => {
     assert.deepEqual(outlookKey("PL", "PL:espn:2026:380:abc"), ["league-outlook", "PL", "PL:espn:2026:380:abc", `sim-${SIM_VERSION}`]);
+    // A run that plays the play-off too is stored apart from one that doesn't.
+    assert.deepEqual(outlookKey("ELC", "ELC:espn:2026:552:abc", "playoff"), ["league-outlook", "ELC", "ELC:espn:2026:552:abc", `sim-${SIM_VERSION}`, "playoff"]);
     assert.equal(outlookTag("MLS"), "league:MLS-outlook");
     assert.equal(dataTag("MLS"), "league:MLS");
     assert.equal(runTag("MLS"), "league:MLS-runs");

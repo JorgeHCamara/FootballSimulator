@@ -98,7 +98,7 @@ export default async function ClubPage({ params }: { params: Params }) {
             club: team.shortName,
             count,
             clauses: listOf(
-              club.headline.map((h) => t(`clause.${h.kind}`, { pct: pct(h.chance), zone: tz(h.zone) })),
+              club.headline.map((h) => t(`clause.${h.kind}`, { pct: pct(h.chance), zone: tz(h.zone), name: h.name ?? "" })),
               lang,
             ),
           }),
@@ -323,6 +323,25 @@ export default async function ClubPage({ params }: { params: Params }) {
               </div>
             </div>
           ))}
+          {club.playoff && (
+            // The play-off after the table: how often it wins it (promotion, the MLS Cup…) and reaches the final.
+            <div className={card} data-testid="club-playoff" data-kind={club.playoff.kind}>
+              <div className="flex items-start gap-2 text-xs font-semibold">
+                <Icon name="trophy" size={14} className="mt-px shrink-0 text-zinc-500" />
+                <span className="leading-tight">{t(`playoff.${club.playoff.kind}`, { name: club.playoff.name ?? "" })}</span>
+              </div>
+              <p className="mt-2 text-2xl font-extrabold tabular-nums">{pct(club.playoff.win)}</p>
+              <p className="text-xs text-zinc-500">{t("playoff.final", { pct: pct(club.playoff.final) })}</p>
+              {club.playoff.promoted !== undefined && (
+                <p className="text-xs text-zinc-500" data-testid="club-promoted">
+                  {t("playoff.promoted", { pct: pct(club.playoff.promoted) })}
+                </p>
+              )}
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+                <div className="h-full rounded-full bg-pitch-600" style={{ width: `${club.playoff.win * 100}%` }} />
+              </div>
+            </div>
+          )}
           <div className={card}>
             <div className="flex items-center gap-2 text-xs font-semibold">
               <Icon name="target" size={14} className="shrink-0 text-zinc-500" />

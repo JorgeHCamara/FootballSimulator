@@ -32,8 +32,15 @@ export const dataTag = (code: string) => `league:${code}`;
 /** The tag of a league's stored runs (one per data version; revalidating it makes them run again). */
 export const runTag = (code: string) => `league:${code}-runs`;
 
-/** The data cache key of a league's run: league, data version and SIM_VERSION. */
-export const outlookKey = (code: string, version: string) => ["league-outlook", code, version, `sim-${SIM_VERSION}`];
+/**
+ * What a stored run holds besides the table: "table", or "playoff" when the
+ * season outlook plays the league's play-off too (its winners' counts). A run
+ * stored before the outlook played it must not stand in for one that does.
+ */
+export type RunShape = "table" | "playoff";
+
+/** The data cache key of a league's run: league, data version, SIM_VERSION and what the run holds. */
+export const outlookKey = (code: string, version: string, shape: RunShape = "table") => ["league-outlook", code, version, `sim-${SIM_VERSION}`, ...(shape === "table" ? [] : [shape])];
 
 /** Outside a Next.js server or build (scripts, tests) there is no data cache: the run is worked out on the spot. */
 const noDataCache = (error: unknown) => error instanceof Error && error.message.includes("incrementalCache missing");
@@ -60,7 +67,8 @@ const pending = new Map<string, Promise<MonteCarloResult>>();
 
 /** The Monte Carlo of a league's setup, from the data cache (or worked out once and stored there). */
 function sharedRun(league: LeagueConfig, setup: OutlookSetup, version: string): Promise<MonteCarloResult> {
-  const id = `${league.code}:${version}`;
+  const shape: RunShape = setup.input.playoff ? "playoff" : "table";
+  const id = `${league.code}:${version}:${shape}`;
   const work = () => {
     let promise = pending.get(id);
     if (!promise) {
@@ -72,7 +80,7 @@ function sharedRun(league: LeagueConfig, setup: OutlookSetup, version: string): 
     return promise;
   };
   // The same data and model always give the same run: kept until runTag is revalidated.
-  return fromDataCache(work, outlookKey(league.code, version), [runTag(league.code)]);
+  return fromDataCache(work, outlookKey(league.code, version, shape), [runTag(league.code)]);
 }
 
 /**

@@ -38,7 +38,8 @@ export async function loadClub(leagueSlug: string, teamSlug: string): Promise<Lo
 type Translate = (key: string, values?: Record<string, string | number>) => string;
 
 /** A headline chance's name: "title", "Champions League", "relegation"… */
-export const topicName = (h: HeadlineChance, t: Translate, tz: Translate) => (h.kind === "continental" ? tz(h.zone) : t(`topic.${h.kind}`));
+export const topicName = (h: HeadlineChance, t: Translate, tz: Translate) =>
+  h.kind === "continental" ? tz(h.zone) : h.kind === "playoffWin" ? (h.name ?? t("topic.playoffs")) : t(`topic.${h.kind}`);
 
 /** The page heading (and title): "Arsenal 2026/27: title, Champions League and relegation chances". */
 export function clubHeading(loaded: LoadedClub, locale: SiteLocale, t: Translate, tz: Translate): string {
@@ -59,7 +60,7 @@ export function clubSubtitle(loaded: LoadedClub, locale: SiteLocale, t: Translat
 /** The chances a club's card and link preview show (see featuredChances), named as the card names them. */
 export function clubCardChances(loaded: Pick<LoadedClub, "club">, locale: SiteLocale, t: Translate, tz: Translate): { label: string; value: string; chance: number; zone: ZoneKind }[] {
   return featuredChances(loaded.club).map((c) => ({
-    label: c.kind === "continental" || c.kind === "zone" ? tz(c.zone) : t(`card.chance.${c.kind}`),
+    label: c.kind === "continental" || c.kind === "zone" ? tz(c.zone) : c.kind === "playoffWin" ? (c.name ?? t("card.chance.playoffs")) : t(`card.chance.${c.kind}`),
     value: percent(c.chance, locale),
     chance: c.chance,
     zone: c.zone,

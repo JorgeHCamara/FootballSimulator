@@ -1692,6 +1692,26 @@ async function step(name, fn) {
       for (const [path, status] of statuses) assert.equal(status, 200, path);
     });
 
+    await step("club pages: play-off chances (Championship promotion, the MLS Cup) next to the play-off places", async () => {
+      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const first = (slug) => sitemap.match(new RegExp(`https://footsimu\\.com(/en/${slug}/team/[a-z0-9-]+)`))[1];
+      await p.goto(`${BASE_URL}${first("championship")}`);
+      const elc = p.getByTestId("club-playoff");
+      assert.equal(await elc.getAttribute("data-kind"), "promotion");
+      assert.match(await elc.innerText(), /Promoted via the play-offs[\s\S]*\d+%[\s\S]*Reaches the final: \d+%[\s\S]*Promoted in all: \d+%/);
+      await p.goto(`${BASE_URL}${first("mls")}`);
+      const mls = p.getByTestId("club-playoff");
+      assert.equal(await mls.getAttribute("data-kind"), "title");
+      assert.match(await mls.innerText(), /Wins the MLS Cup[\s\S]*\d+%/);
+      assert.match(await p.getByTestId("club-subtitle").innerText(), /MLS Cup chances$/);
+      assert.match(await p.title(), /MLS Cup/);
+      // A league without a play-off has none.
+      await p.goto(`${BASE_URL}${first("premier-league")}`);
+      assert.equal(await p.getByTestId("club-playoff").count(), 0);
+      await p.close();
+    });
+
     await step("match pages: odds, scores, dice, what each result means, played games, SEO, card, redirects, sitemap", async () => {
       const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
       const urls = [...sitemap.matchAll(/<loc>https:\/\/footsimu\.com(\/en\/premier-league\/match\/[a-z0-9-]+)<\/loc>/g)].map((m) => m[1]);
