@@ -200,7 +200,7 @@ export interface World {
   divisions: DivisionSeason[];
   /** Finished seasons, oldest first. */
   history: SeasonRecord[];
-  /** The last season has just been played: its review shows until the next season is started. */
+  /** The last season has just ended: its review shows, and the next season's tables and fixtures wait until it's started. */
   review: boolean;
   /** How many new clubs have come up so far (their ids and names). */
   newClubs: number;
@@ -783,7 +783,7 @@ export function playSeason(world: World): World {
   };
 }
 
-/** The last season's review has been seen (closed). */
+/** The next season starts, from the last season's review: its tables and fixtures show. */
 export const startNextSeason = (world: World): World => ({ ...world, review: false });
 
 /** A row of a table as the page shows it. */
