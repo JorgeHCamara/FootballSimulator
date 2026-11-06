@@ -1105,7 +1105,15 @@
     "share": "Compartir el resultado",
     "shareText": "Acerté {score} de {total} en el quiz de fútbol de hoy de Foot Simu.",
     "copied": "Copiado",
-    "simulate": "Simular las ligas"
+    "simulate": "Simular las ligas",
+    "playedElsewhere": "Ya jugaste el quiz de hoy en {language}: es un quiz al día, en cualquier idioma.",
+    "startedElsewhere": "Empezaste el quiz de hoy en {language}. Es un quiz al día, en cualquier idioma: termínalo allí.",
+    "continueIn": "Continuar en {language}",
+    "languages": {
+      "en": "inglés",
+      "pt": "portugués",
+      "es": "español"
+    }
   },
   "Chances": {
     "topic": {

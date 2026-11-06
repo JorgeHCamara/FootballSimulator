@@ -72,9 +72,9 @@ export default async function Page({ params }: { params: Params }) {
   const { date, questions, iterations } = await todaysQuiz(lang);
   const count = new Intl.NumberFormat(lang).format(iterations);
   const items = questions.map((q) => itemOf(q, lang, t, tz, count));
-  const keys = ["question", "right", "wrong", "next", "finish", "score", "perfect", "good", "tryAgain", "tomorrow", "share", "shareText", "copied", "simulate"] as const;
-  // "{n}", "{total}", "{score}" stay for the component to fill in.
-  const labels = Object.fromEntries(keys.map((k) => [k, t.raw(k) as string])) as unknown as QuizLabels;
+  const keys = ["question", "right", "wrong", "next", "finish", "score", "perfect", "good", "tryAgain", "tomorrow", "share", "shareText", "copied", "simulate", "playedElsewhere", "startedElsewhere", "continueIn", "languages"] as const;
+  // "{n}", "{total}", "{score}", "{language}" stay for the component to fill in.
+  const labels = Object.fromEntries(keys.map((k) => [k, t.raw(k) as unknown])) as unknown as QuizLabels;
   const day = new Intl.DateTimeFormat(lang === "en" ? "en-GB" : lang, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`));
   return (
     <div className="mx-auto max-w-2xl space-y-6" data-testid="quiz" data-date={date}>
