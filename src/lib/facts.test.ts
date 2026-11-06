@@ -102,6 +102,15 @@ describe("the sitemap", () => {
     for (const locale of ["en", "pt", "es"]) for (const page of ["about", "privacy", "contact"]) assert.ok(urls.some((u) => u.endsWith(`/${locale}/${page}`)), `${locale}/${page}`);
   });
 
+  it("lists the daily quiz in every language", async () => {
+    const entries = await sitemap();
+    for (const locale of ["en", "pt", "es"]) {
+      const quiz = entries.find((e) => e.url.endsWith(`/${locale}/quiz`));
+      assert.ok(quiz, `${locale}/quiz`);
+      assert.equal(quiz.changeFrequency, "daily");
+    }
+  });
+
   it("lists every club page of every domestic league, in every language, with its alternates", async () => {
     const entries = await sitemap();
     const clubs = entries.filter((e) => e.url.includes("/team/"));

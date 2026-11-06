@@ -1401,9 +1401,10 @@ async function step(name, fn) {
       // Europe's row: UEFA and the big five's flags, whatever the menu's order.
       assert.deepEqual(await rows.nth(0).locator("[data-flag]").evaluateAll((els) => els.map((e) => e.dataset.flag)), ["eu", "gb-eng", "es", "de", "it", "fr"]);
       assert.deepEqual(await rows.evaluateAll((els) => els.map((e) => e.firstElementChild.textContent.trim())), ["Europe", "South America", "North America", "Asia"]);
-      // Closed: no competition links, only the latest odds.
-      assert.equal(await mobile.locator('a:not([data-testid="mobile-latest-odds"])').count(), 0, "continents start closed");
+      // Closed: no competition links, only the latest odds and the quiz.
+      assert.equal(await mobile.locator('a:not([data-testid="mobile-latest-odds"]):not([data-testid="mobile-quiz"])').count(), 0, "continents start closed");
       assert.equal(await mobile.getByTestId("mobile-latest-odds").getAttribute("href"), "/en/odds");
+      assert.equal(await mobile.getByTestId("mobile-quiz").getAttribute("href"), "/en/quiz");
       const countriesShown = async () => (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
       // Asia: only its countries.
       await rows.nth(3).tap();
@@ -2001,6 +2002,74 @@ async function step(name, fn) {
         assert.equal(await m.getByTestId("mobile-latest-odds").getAttribute("href"), "/pt/odds");
         await ctx.close();
       }
+    });
+
+    await step("daily quiz: six questions, right or wrong at once, the score, kept for the day, the same set on a reload, nav, home, sitemap", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en`);
+      assert.equal(await p.getByTestId("nav-quiz").getAttribute("href"), "/en/quiz");
+      assert.equal(await p.getByTestId("home-quiz").getAttribute("href"), "/en/quiz");
+      await p.getByTestId("home-quiz").click();
+      await p.waitForURL(/\/en\/quiz$/);
+      const quiz = p.getByTestId("quiz");
+      assert.equal(await quiz.getAttribute("data-date"), new Date().toISOString().slice(0, 10), "today's set (UTC)");
+      // The title arrives with the client-side navigation's metadata.
+      await p.waitForFunction(() => /quiz/i.test(document.title));
+      assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/quiz");
+      const question = p.getByTestId("quiz-question");
+      await question.waitFor();
+      assert.match(await question.innerText(), /Question 1 of 6/);
+      // The first prompt and options, to compare after a reload.
+      const firstSet = async () => [await question.locator("h2").innerText(), ...(await question.getByTestId("quiz-option").allInnerTexts())];
+      const first = await firstSet();
+      const prompts = [];
+      for (let i = 0; i < 6; i++) {
+        assert.equal(await question.getAttribute("data-index"), String(i));
+        prompts.push(await question.locator("h2").innerText());
+        const options = question.getByTestId("quiz-option");
+        const count = await options.count();
+        assert.ok(count === 2 || count === 4, `two or four options (${count})`);
+        assert.equal(await p.getByTestId("quiz-feedback").count(), 0, "no answer shown before choosing");
+        await options.nth(i % count).click();
+        const feedback = p.getByTestId("quiz-feedback");
+        await feedback.waitFor();
+        assert.match(await feedback.innerText(), /^(Right!|Not quite\.)/);
+        // Every option is locked and shows its detail (place and points, or the chance).
+        for (let o = 0; o < count; o++) {
+          assert.equal(await options.nth(o).isDisabled(), true);
+          assert.match(await options.nth(o).innerText(), /\d/);
+        }
+        await p.getByTestId("quiz-next").click();
+      }
+      assert.equal(new Set(prompts).size, 6, "six different questions");
+      const score = p.getByTestId("quiz-score");
+      await score.waitFor();
+      assert.match(await score.innerText(), /[0-6] of 6/);
+      assert.equal(await score.getByRole("link").getAttribute("href"), "/en");
+      // Kept for the day: a reload shows the score again.
+      await p.reload();
+      await score.waitFor();
+      // The same set for everyone: a fresh browser gets the same first question.
+      await p.evaluate(() => localStorage.clear());
+      await p.reload();
+      await question.waitFor();
+      assert.deepEqual(await firstSet(), first);
+      await p.close();
+      for (const [locale, title, label] of [
+        ["pt", "O quiz de futebol de hoje", "Pergunta 1 de 6"],
+        ["es", "El quiz de fútbol de hoy", "Pregunta 1 de 6"],
+      ]) {
+        const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })).newPage();
+        await phone.goto(`${BASE_URL}/${locale}/quiz`);
+        assert.equal(await phone.locator("h1").innerText(), title);
+        assert.match(await phone.getByTestId("quiz-question").innerText(), new RegExp(label));
+        await phone.getByTestId("quiz-option").first().tap();
+        await phone.getByTestId("quiz-feedback").waitFor();
+        assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${locale}: no horizontal scroll`);
+        await phone.close();
+      }
+      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/quiz<`));
     });
 
     await step("unknown league returns 404", async () => {

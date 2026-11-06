@@ -90,6 +90,16 @@ export function MobileMenu() {
               <Icon name="trending-up" size={18} className="shrink-0 text-pitch-600" />
               {nav("latestOdds")}
             </Link>
+            {/* The daily quiz. */}
+            <Link
+              href="/quiz"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-lg border-b border-zinc-100 px-2 py-3 text-base font-extrabold text-zinc-800 hover:bg-pitch-50 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-pitch-900/40"
+              data-testid="mobile-quiz"
+            >
+              <Icon name="circle-help" size={18} className="shrink-0 text-pitch-600" />
+              {nav("quiz")}
+            </Link>
             {groups.map((group) => {
               const isOpen = expanded === group.continent;
               const id = `mobile-${group.continent.toLowerCase().replace(/\s+/g, "-")}`;

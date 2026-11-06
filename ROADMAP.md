@@ -30,8 +30,8 @@ reliability (item 5) comes next, then growth, engagement and monetisation
 | 4 | Rating noise: live (gated on item 3) | done | `roadmap/4-rating-noise-live` |
 | 5 | Club page reliability: MLS 500s and consistent odds | done | `roadmap/5-club-page-reliability` |
 | 6 | Snapshot integrity | done | `roadmap/6-snapshot-integrity` |
-| 7 | Play-offs and MLS Cup on club pages | in-pr | `roadmap/7-club-playoffs` |
-| 8 | Quiz with historical data | todo | `roadmap/8-quiz-historical` |
+| 7 | Play-offs and MLS Cup on club pages | done | `roadmap/7-club-playoffs` |
+| 8 | Quiz with historical data | in-pr | `roadmap/8-quiz-historical` |
 | 9 | Prediction league | todo | `roadmap/9-prediction-league` |
 | 10 | Shareable content: club outlook and biggest movers cards | todo | `roadmap/10-shareable-content` |
 | 11 | SEO: programmatic chance landing pages | todo | `roadmap/11-seo-chance-pages` |

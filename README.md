@@ -84,6 +84,10 @@ A round counts once it and every round before it are played (a game postponed fa
 
 After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` to your Google Search Console code, then submit `/sitemap.xml` in Search Console.
 
+### Daily quiz
+
+`/{locale}/quiz` ("Quiz" in the menu, and a card on the home page) asks six questions a day, picked from the UTC date and the language alone (`dailyQuiz` in `src/lib/quiz.ts`), so everyone playing in a language that day gets the same set; leagues come up by how much each language's visitors follow them. Four are about past seasons, one of each kind (who won it, who finished second, which of four was relegated, which of two finished higher), from `src/data/history.json`: the final tables of the leagues whose table decides the champion, from 2015/16 on. Two ask which of two clubs is likelier to win the title, reach the top place (a continental competition or promotion) or go down this season, from the shared outlook of two leagues picked for the day (`src/lib/quizPage.ts`); the chances are shown only once answered. When a league's season is over, its live question is replaced with one from the past. Answers stay in the visitor's browser for the day; the score can be shared as text. The page is rebuilt every 15 minutes, so a new set appears shortly after midnight UTC. `npm run history` (`scripts/build-history.ts`) rebuilds the dataset from ESPN's final standings (relegated clubs from ESPN's notes, or the league's relegation places when a season has none); run it once a season has ended.
+
 ### Other commands
 
 | Command | What it does |
@@ -92,6 +96,7 @@ After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_
 | `npm test` | Engine and library unit tests |
 | `npm run typecheck` | TypeScript check |
 | `npm run snapshots` | Add odds snapshots for newly completed rounds (real data; see Odds snapshots) |
+| `npm run history` | Rebuild the quiz's past final tables (`src/data/history.json`) from ESPN (real data; see Daily quiz) |
 | `npm run snapshots:check` | Check that the live engine reproduces every league's latest stored snapshot (real data; see Odds snapshots) |
 | `npm run test:e2e` | Browser test against a running server built and started with `FOOTSIMU_SAMPLE_DATA=1` (`FOOTSIMU_SAMPLE_DATA=1 npm run build && FOOTSIMU_SAMPLE_DATA=1 npm start`: share pages and cards render on request, so the server needs it too; needs Playwright: `npx playwright install chromium`) |
 
