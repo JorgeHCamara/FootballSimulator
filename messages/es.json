@@ -1281,6 +1281,7 @@
     },
     "endSeason": "Terminar temporada",
     "endSeasonNote": "Ya se jugaron todos los partidos: termina la temporada {season} para ver su resumen, con los campeones y quién sube y quién baja.",
+    "country": "País",
     "seasonHeading": "La temporada {season}",
     "seasonSelect": "Temporada",
     "seasonCurrent": "{season} (esta temporada)",
@@ -1337,7 +1338,6 @@
     },
     "path": {
       "title": "Las temporadas de {club}",
-      "country": "País",
       "league": "Liga",
       "club": "Club",
       "empty": "Aún no hay temporadas jugadas.",

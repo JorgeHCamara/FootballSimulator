@@ -1281,6 +1281,7 @@
     },
     "endSeason": "End season",
     "endSeasonNote": "Every game has been played: end the {season} season to see its review, with the champions and who goes up and down.",
+    "country": "Country",
     "seasonHeading": "The {season} season",
     "seasonSelect": "Season",
     "seasonCurrent": "{season} (this season)",
@@ -1337,7 +1338,6 @@
     },
     "path": {
       "title": "{club}'s seasons",
-      "country": "Country",
       "league": "League",
       "club": "Club",
       "empty": "No seasons played yet.",
