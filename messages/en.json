@@ -26,7 +26,8 @@
     "leagues": "Leagues",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "latestOdds": "Latest odds"
+    "latestOdds": "Latest odds",
+    "quiz": "Quiz"
   },
   "Home": {
     "subheading": "Pick a league, enter your predictions or let the simulator play the remaining matches, and watch the table change live.",
@@ -39,7 +40,10 @@
     "featureChancesTitle": "Season chances",
     "featureChancesBody": "10,000 simulated seasons show the odds of the title, Europe and relegation.",
     "heading": "Football Simulator",
-    "tagline": "Simulate the season before it happens"
+    "tagline": "Simulate the season before it happens",
+    "quizTitle": "Daily quiz",
+    "quizBody": "Six questions a day on past champions and this season's chances.",
+    "quizCta": "Play today's quiz"
   },
   "Simulator": {
     "regularSeasonShort": "Regular",
@@ -1053,5 +1057,46 @@
     "historyNote": "Each club's place in the projected final table after every round. Tap a round to see its table.",
     "modelChange": "The model changed before this round (it now allows for each club's rating being an estimate): the places moved with it as well as with the results, so no change is shown.",
     "modelChangeNote": "A line before a round marks a model update."
+  },
+  "Quiz": {
+    "metaTitle": "Daily football quiz: past champions and this season's chances",
+    "metaDescription": "Six questions a day on past league champions, runners-up and relegations, and on this season's title, place and relegation chances from 10,000 simulated seasons. Free, in English, Portuguese and Spanish.",
+    "eyebrow": "Daily quiz · {date}",
+    "title": "Today's football quiz",
+    "intro": "{count} questions: past champions, runners-up and relegations of Europe's and Brazil's leagues, and who is likelier this season from our 10,000 simulated seasons. A new set every day.",
+    "champion": "{league} {season}: who won it?",
+    "runnerUp": "{league} {season}: who finished second?",
+    "relegated": "{league} {season}: which of these clubs went down?",
+    "higher": "{league} {season}: who finished higher?",
+    "likelier": {
+      "title": "{league}: who is likelier to win it this season?",
+      "zone": "{league}: who is likelier to finish in the {zone} places this season?",
+      "promotion": "{league}: who is likelier to go up this season?",
+      "relegation": "{league}: who is likelier to go down this season?"
+    },
+    "contextPast": "{league} · {season}",
+    "contextLive": "{league} · this season",
+    "placePoints": "{place} · {points} pts",
+    "reveal": {
+      "champion": "{club} won it with {points} points.",
+      "runnerUp": "{club} finished second on {points} points.",
+      "relegated": "{club} finished {place} and went down.",
+      "higher": "{club} finished {place}, {other} {otherPlace}.",
+      "likelier": "From {count} simulated seasons of the rest of this one: {a} {pctA}, {b} {pctB}."
+    },
+    "question": "Question {n} of {total}",
+    "right": "Right!",
+    "wrong": "Not quite.",
+    "next": "Next",
+    "finish": "See your score",
+    "score": "{score} of {total}",
+    "perfect": "Perfect: every one right.",
+    "good": "Well played.",
+    "tryAgain": "Tougher than it looks. Better luck tomorrow.",
+    "tomorrow": "A new set of questions every day.",
+    "share": "Share your score",
+    "shareText": "I got {score} of {total} in today's Foot Simu football quiz.",
+    "copied": "Copied",
+    "simulate": "Simulate the leagues"
   }
 }

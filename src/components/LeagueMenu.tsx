@@ -173,6 +173,18 @@ export function LeagueMenu() {
             {nav("latestOdds")}
           </Link>
         </li>
+        {/* The daily quiz. */}
+        <li>
+          <Link
+            href="/quiz"
+            aria-current={pathname === "/quiz" ? "page" : undefined}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium text-pitch-50 hover:bg-white/10 ${pathname === "/quiz" || pathname.endsWith("/quiz") ? "bg-white/10" : ""}`}
+            data-testid="nav-quiz"
+          >
+            <Icon name="circle-help" size={14} />
+            {nav("quiz")}
+          </Link>
+        </li>
       </ul>
     </nav>
   );

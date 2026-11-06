@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Faq } from "../../components/Faq.tsx";
 import { Flag } from "../../components/Flag.tsx";
+import { Icon } from "../../components/Icon.tsx";
 import { JsonLd } from "../../components/JsonLd.tsx";
 import { LEAGUES, type CompetitionCode, type SiteLocale } from "../../config/leagues.ts";
 import { Link } from "../../i18n/navigation.ts";
@@ -86,6 +87,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </li>
         ))}
       </ul>
+
+      {/* The daily quiz. */}
+      <Link
+        href="/quiz"
+        className="group flex flex-col gap-3 rounded-xl border border-pitch-100 bg-pitch-50 p-4 transition hover:border-pitch-500 hover:shadow-md sm:flex-row sm:items-center dark:border-pitch-900 dark:bg-pitch-900/30"
+        data-testid="home-quiz"
+      >
+        <span className="flex min-w-0 flex-1 items-start gap-3">
+          <Icon name="circle-help" size={28} className="shrink-0 text-pitch-600 dark:text-pitch-100" />
+          <span className="min-w-0">
+            <span className="block font-bold">{t("quizTitle")}</span>
+            <span className="block text-sm text-zinc-600 dark:text-zinc-400">{t("quizBody")}</span>
+          </span>
+        </span>
+        <span className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-pitch-600 px-4 text-sm font-semibold text-white group-hover:bg-pitch-700">
+          {t("quizCta")}
+          <Icon name="chevron-right" size={18} />
+        </span>
+      </Link>
 
       <section className="space-y-4">
         <ul className="grid gap-4 sm:grid-cols-3">

@@ -26,7 +26,8 @@
     "leagues": "Ligas",
     "openMenu": "Abrir menú",
     "closeMenu": "Cerrar menú",
-    "latestOdds": "Últimas probabilidades"
+    "latestOdds": "Últimas probabilidades",
+    "quiz": "Quiz"
   },
   "Home": {
     "subheading": "Elige una liga, escribe tus pronósticos o deja que el simulador juegue los partidos restantes, y mira cómo cambia la clasificación en directo.",
@@ -39,7 +40,10 @@
     "featureChancesTitle": "Probabilidades de la temporada",
     "featureChancesBody": "10.000 temporadas simuladas muestran las probabilidades de título, Europa y descenso.",
     "heading": "Simulador de Fútbol",
-    "tagline": "Simula la temporada antes de que ocurra"
+    "tagline": "Simula la temporada antes de que ocurra",
+    "quizTitle": "Quiz diario",
+    "quizBody": "Seis preguntas al día sobre campeones del pasado y las opciones de esta temporada.",
+    "quizCta": "Jugar el quiz de hoy"
   },
   "Simulator": {
     "regularSeasonShort": "Regular",
@@ -1053,5 +1057,46 @@
     "historyNote": "El puesto de cada club en la clasificación final proyectada tras cada jornada. Toca una jornada para ver su tabla.",
     "modelChange": "El modelo cambió antes de esta jornada (ahora tiene en cuenta que la fuerza de cada club es una estimación): los puestos cambiaron con él y con los resultados, por eso no se muestra ningún cambio.",
     "modelChangeNote": "Una línea antes de una jornada marca una actualización del modelo."
+  },
+  "Quiz": {
+    "metaTitle": "Quiz diario de fútbol: campeones del pasado y las opciones de esta temporada",
+    "metaDescription": "Seis preguntas al día sobre campeones, subcampeones y descensos de las ligas y sobre las opciones de título, plazas y descenso de esta temporada en 10.000 temporadas simuladas. Gratis, en español, inglés y portugués.",
+    "eyebrow": "Quiz diario · {date}",
+    "title": "El quiz de fútbol de hoy",
+    "intro": "{count} preguntas: campeones, subcampeones y descensos de las ligas de Europa y del Brasileirão, y quién tiene más opciones esta temporada según nuestras 10.000 temporadas simuladas. Preguntas nuevas cada día.",
+    "champion": "{league} {season}: ¿quién fue campeón?",
+    "runnerUp": "{league} {season}: ¿quién fue subcampeón?",
+    "relegated": "{league} {season}: ¿cuál de estos clubes descendió?",
+    "higher": "{league} {season}: ¿quién terminó por delante?",
+    "likelier": {
+      "title": "{league}: ¿quién tiene más opciones de ser campeón esta temporada?",
+      "zone": "{league}: ¿quién tiene más opciones de terminar en puestos de {zone} esta temporada?",
+      "promotion": "{league}: ¿quién tiene más opciones de ascender esta temporada?",
+      "relegation": "{league}: ¿quién tiene más opciones de descender esta temporada?"
+    },
+    "contextPast": "{league} · {season}",
+    "contextLive": "{league} · esta temporada",
+    "placePoints": "{place} · {points} pts",
+    "reveal": {
+      "champion": "{club} fue campeón con {points} puntos.",
+      "runnerUp": "{club} fue subcampeón con {points} puntos.",
+      "relegated": "{club} terminó {place} y descendió.",
+      "higher": "{club} terminó {place}; {other}, {otherPlace}.",
+      "likelier": "En {count} temporadas simuladas del resto de esta: {a} {pctA}, {b} {pctB}."
+    },
+    "question": "Pregunta {n} de {total}",
+    "right": "¡Correcto!",
+    "wrong": "No esta vez.",
+    "next": "Siguiente",
+    "finish": "Ver el resultado",
+    "score": "{score} de {total}",
+    "perfect": "Perfecto: todas acertadas.",
+    "good": "Bien jugado.",
+    "tryAgain": "Más difícil de lo que parece. Suerte mañana.",
+    "tomorrow": "Preguntas nuevas cada día.",
+    "share": "Compartir el resultado",
+    "shareText": "Acerté {score} de {total} en el quiz de fútbol de hoy de Foot Simu.",
+    "copied": "Copiado",
+    "simulate": "Simular las ligas"
   }
 }

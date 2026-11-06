@@ -26,7 +26,8 @@
     "leagues": "Campeonatos",
     "openMenu": "Abrir menu",
     "closeMenu": "Fechar menu",
-    "latestOdds": "Últimas probabilidades"
+    "latestOdds": "Últimas probabilidades",
+    "quiz": "Quiz"
   },
   "Home": {
     "subheading": "Escolha um campeonato, digite seus palpites ou deixe o simulador jogar as partidas restantes, e veja a tabela mudar ao vivo.",
@@ -39,7 +40,10 @@
     "featureChancesTitle": "Chances na temporada",
     "featureChancesBody": "10.000 temporadas simuladas mostram as chances de título, vaga continental e rebaixamento.",
     "heading": "Simulador de Futebol",
-    "tagline": "Simule a temporada antes que ela aconteça"
+    "tagline": "Simule a temporada antes que ela aconteça",
+    "quizTitle": "Quiz diário",
+    "quizBody": "Seis perguntas por dia sobre campeões do passado e as chances desta temporada.",
+    "quizCta": "Jogar o quiz de hoje"
   },
   "Simulator": {
     "regularSeasonShort": "Regular",
@@ -1054,5 +1058,46 @@
     "historyNote": "A posição de cada clube na classificação final projetada após cada rodada. Toque numa rodada para ver a tabela dela.",
     "modelChange": "O modelo mudou antes desta rodada (agora leva em conta que a força de cada clube é uma estimativa): as posições mudaram com ele e com os resultados, por isso nenhuma mudança é mostrada.",
     "modelChangeNote": "Uma linha antes de uma rodada marca uma atualização do modelo."
+  },
+  "Quiz": {
+    "metaTitle": "Quiz diário de futebol: campeões do passado e as chances desta temporada",
+    "metaDescription": "Seis perguntas por dia sobre campeões, vice-campeões e rebaixados dos campeonatos e sobre as chances de título, vagas e rebaixamento desta temporada em 10.000 temporadas simuladas. Grátis, em português, inglês e espanhol.",
+    "eyebrow": "Quiz diário · {date}",
+    "title": "O quiz de futebol de hoje",
+    "intro": "{count} perguntas: campeões, vice-campeões e rebaixados dos campeonatos europeus e do Brasileirão, e quem tem mais chances nesta temporada segundo as nossas 10.000 temporadas simuladas. Perguntas novas todos os dias.",
+    "champion": "{league} {season}: quem foi campeão?",
+    "runnerUp": "{league} {season}: quem foi vice-campeão?",
+    "relegated": "{league} {season}: qual destes clubes foi rebaixado?",
+    "higher": "{league} {season}: quem terminou à frente?",
+    "likelier": {
+      "title": "{league}: quem tem mais chances de ser campeão nesta temporada?",
+      "zone": "{league}: quem tem mais chances de terminar na zona de {zone} nesta temporada?",
+      "promotion": "{league}: quem tem mais chances de subir nesta temporada?",
+      "relegation": "{league}: quem tem mais chances de ser rebaixado nesta temporada?"
+    },
+    "contextPast": "{league} · {season}",
+    "contextLive": "{league} · esta temporada",
+    "placePoints": "{place} · {points} pts",
+    "reveal": {
+      "champion": "{club} foi campeão com {points} pontos.",
+      "runnerUp": "{club} foi vice com {points} pontos.",
+      "relegated": "{club} terminou em {place} e foi rebaixado.",
+      "higher": "{club} terminou em {place}; {other}, em {otherPlace}.",
+      "likelier": "Em {count} temporadas simuladas do resto desta: {a} {pctA}, {b} {pctB}."
+    },
+    "question": "Pergunta {n} de {total}",
+    "right": "Acertou!",
+    "wrong": "Não foi desta vez.",
+    "next": "Próxima",
+    "finish": "Ver o resultado",
+    "score": "{score} de {total}",
+    "perfect": "Perfeito: acertou todas.",
+    "good": "Bom jogo.",
+    "tryAgain": "Mais difícil do que parece. Boa sorte amanhã.",
+    "tomorrow": "Perguntas novas todos os dias.",
+    "share": "Compartilhar o resultado",
+    "shareText": "Acertei {score} de {total} no quiz de futebol de hoje do Foot Simu.",
+    "copied": "Copiado",
+    "simulate": "Simular os campeonatos"
   }
 }
