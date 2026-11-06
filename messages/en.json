@@ -1214,7 +1214,7 @@
     "metaTitle": "My World: take your club up the English football pyramid",
     "metaDescription": "Pick a club from the Premier League to League Two and play season after season of all four leagues, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
     "title": "My World",
-    "intro": "Pick a club, then play season after season of the English pyramid, from the Premier League to League Two: a round at a time, a whole season at once, or every result your way, with the play-offs, promotion and relegation. Can you take a League Two club to the Premier League?",
+    "intro": "Pick a club, then play season after season of the English pyramid, from the Premier League to League Two, every result your way, as on the league pages: the play-offs, promotion and relegation included. Can you take a League Two club to the Premier League?",
     "savedNote": "Your world is saved in this browser only.",
     "notSaved": "This browser isn't saving your world (private browsing, or storage full): it will be lost when you leave the page.",
     "reset": {
@@ -1258,18 +1258,19 @@
     "season": "Season {season}",
     "yourClub": "Your club",
     "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
-    "notStarted": "Not started",
-    "play": "Play the {season} season",
-    "playRest": "Play the rest of the season",
-    "playRound": "Play the next round",
-    "playNote": "Both play all four leagues at once: the next round, or every game left, play-offs included. Or pick the results yourself in the fixtures below.",
-    "playing": "Playing the season…",
-    "finish": "Finish the {season} season",
-    "finishNote": "Every game has been played: see the final tables and who goes up and down.",
-    "next": "Next {in}: {round}",
-    "leagueOver": "{league}: every game played.",
+    "left": {
+      "title": "Games left to play",
+      "count": "{count, plural, =0 {All played} one {# game left} other {# games left}}",
+      "note": "Play each league's games by its fixtures below: the dice, Simulate matchday or Simulate rest of season, play-offs included. Then go to the next season here."
+    },
+    "nextSeason": "Go to next season",
+    "nextSeasonNote": "Every game has been played: promotion and relegation, then the {season} season.",
     "seasonHeading": "The {season} season",
-    "firstSeason": "This season started from the real one, with its results so far: from here, the world is yours. Change any result, roll the dice, or play a round or the whole season at once.",
+    "seasonSelect": "Season",
+    "seasonCurrent": "{season} (this season)",
+    "pastNote": "The {season} season: its final tables and every result.",
+    "pastNoFixtures": "This season's results weren't kept (it was played before My World kept them): its final table is here.",
+    "firstSeason": "This season started from the real one, with its results so far: from here, the world is yours. Change any result, roll the dice or simulate the rest, league by league.",
     "newSeason": "A new season: every club starts on 0 points.",
     "tables": "Tables",
     "resetTitle": "Reset this league's season?",
@@ -1293,7 +1294,7 @@
       "in_": "New in League Two",
       "final": "Play-off final: {winner} {score} {loser}",
       "penalties": "{score}, on penalties",
-      "next": "Start the {season} season"
+      "close": "Close"
     },
     "outNotice": "{club} dropped out of the Football League in {season}. My World has no National League yet: you can keep playing the seasons, or start a new world.",
     "newClub": "New",
@@ -1306,7 +1307,8 @@
       "drawn": "D",
       "lost": "L",
       "goalDifference": "GD",
-      "points": "Pts"
+      "points": "Pts",
+      "note": "Outcome"
     },
     "notes": {
       "C": "Champions",
@@ -1315,13 +1317,6 @@
       "O": "Play-offs",
       "R": "Relegated",
       "out": "Out of the League"
-    },
-    "history": {
-      "title": "Past seasons",
-      "season": "Season",
-      "empty": "No seasons played yet: play the {season} season to see its final tables here.",
-      "ago": "{count, plural, one {last season} other {# seasons ago}}",
-      "league": "League"
     },
     "path": {
       "title": "{club}'s seasons",

@@ -12,10 +12,12 @@ import {
   divisionConfig,
   divisionState,
   ENGLAND,
+  FIXTURE_SEASONS,
+  gamesLeft,
   movementCounts,
   NEW_CLUB_ID_BASE,
   packReady,
-  playRound,
+  pastDivision,
   playSeason,
   resetDivision,
   rollScore,
@@ -246,50 +248,33 @@ describe("My World: a season played your way", () => {
   const NOW = new Date("2026-11-06T12:00:00Z");
   const start = () => createWorld(pack, { league: "EL2", club: pack.leagues[3]!.teams[0]!.id }, 7, NOW);
   const picked = (world: World, code: DivisionCode) => Object.keys(world.divisions.find((d) => d.code === code)!.scores ?? {}).length;
-  /** Plays round after round until the whole season is decided; how many rounds that took. */
-  const playOut = (world: World, rng = createRng(3)) => {
-    let rounds = 0;
-    while (!seasonDone(world)) {
-      world = playRound(world, rng);
-      if (++rounds > 100) throw new Error("the season never ends");
-    }
-    return { world, rounds };
-  };
+  /** Every league's rest of the season, as the page plays it: Simulate rest of season in each. */
+  const playOut = (world: World, seed = 3) => ENGLAND.reduce((w, code, i) => simulateRest(w, code, createRng(seed + i)), world);
 
-  it("a round: every league plays its next matchday, from where the real season is", () => {
-    const world = start();
-    const before = seasonStates(world);
-    assert.deepEqual(before.map((s) => s.nextRound), [16, 19, 19, 19], "the sample leagues' next matchdays");
-    const after = playRound(world, createRng(1));
-    for (const [i, state] of seasonStates(after).entries()) {
-      const was = before[i]!;
-      const round = state.fixtures.filter((f) => f.matchday === was.nextRound);
-      assert.ok(round.length > 0 && round.every((f) => state.results[f.id]), `${state.code}: matchday ${was.nextRound} played`);
-      assert.equal(Object.keys(state.picks).length, round.length, `${state.code}: only that matchday`);
-      assert.equal(state.nextRound, was.nextRound! + 1);
-      // The results the world started with stand.
-      for (const f of state.fixtures) if (f.result) assert.deepEqual(state.results[f.id], f.result);
-    }
-    // The table shows the round.
-    const pl = currentTable(after, "PL");
-    assert.equal(pl.reduce((n, r) => n + r.played, 0), currentTable(world, "PL").reduce((n, r) => n + r.played, 0) + 20);
+  it("games left: every league game and play-off game, counted down as they're played", () => {
+    const world = startNextSeason(playSeason(start()));
+    // A new season: 380 Premier League games; 552 in each EFL league, plus 7 play-off games in the Championship (eliminators too) and 5 below.
+    assert.deepEqual(seasonStates(world).map(gamesLeft), [380, 552 + 7, 552 + 5, 552 + 5]);
+    assert.equal(gamesLeft(divisionState(simulateMatchday(world, "PL", 1, createRng(1)), "PL")), 370);
+    const elc = simulateRest(world, "ELC", createRng(2));
+    assert.equal(gamesLeft(divisionState(elc, "ELC")), 0);
+    // A level final still needs its shoot-out: one game left.
+    const final = divisionState(elc, "ELC").bracket.at(-1)![0]!;
+    let level = setScore(elc, "ELC", final.legs[0]!, { home: 1, away: 1 });
+    level = setScore(level, "ELC", divisionState(level, "ELC").bracket.at(-1)![0]!.shootout!, null);
+    assert.equal(gamesLeft(divisionState(level, "ELC")), 1);
+    assert.equal(divisionState(level, "ELC").done, false);
   });
 
-  it("round after round to the end of the play-offs, then the season is finished from those scores", () => {
-    const { world, rounds } = playOut(start());
-    // The Championship takes longest: matchdays 19 to 46, then the eliminators, both semi-final legs and the final.
-    assert.equal(rounds, 28 + 4);
-    const states = seasonStates(world);
-    assert.ok(states.every((s) => s.done && s.nextRound === null));
-    for (const s of states.slice(1)) {
-      const final = s.bracket.at(-1)![0]!;
-      assert.ok(tieOutcome(final, s.picks), `${s.code}: the final is decided`);
-    }
+  it("every league played to the end by its own buttons, then the season finishes from those scores", () => {
+    const world = playOut(start());
+    assert.ok(seasonDone(world));
+    assert.deepEqual(seasonStates(world).map(gamesLeft), [0, 0, 0, 0]);
     const tables = ENGLAND.map((code) => currentTable(world, code));
-    const finals = states.map((s) => (s.bracket.length ? tieOutcome(s.bracket.at(-1)![0]!, s.picks)!.winner : null));
+    const finals = seasonStates(world).map((s) => (s.bracket.length ? tieOutcome(s.bracket.at(-1)![0]!, s.picks)!.winner : null));
     const after = playSeason(world);
     assert.equal(after.review, true);
-    // Nothing more is drawn: the saved tables are the ones the rounds made, and the final's winner went up.
+    // Nothing more is drawn: the saved tables are the ones played, and each final's winner went up.
     for (const [i, code] of ENGLAND.entries()) {
       const saved = savedTable(after, world.year, code)!;
       assert.deepEqual(saved.rows.map((r) => [r.clubId, r.played, r.won, r.drawn, r.lost, r.goalsFor, r.goalsAgainst, r.points]), tables[i]!.map((r) => [r.clubId, r.played, r.won, r.drawn, r.lost, r.goalsFor, r.goalsAgainst, r.points]));
@@ -299,23 +284,66 @@ describe("My World: a season played your way", () => {
       }
     }
     assert.ok(after.divisions.every((d) => d.scores === undefined), "the next season starts with no scores");
+    // The new season is open at once (its review is a summary on top, closed when seen).
+    assert.deepEqual(seasonStates(after).map(gamesLeft), [380, 559, 557, 557]);
+    assert.equal(startNextSeason(after).review, false);
   });
 
-  it("a season mixed: picked scores, a few rounds, then the rest at once", () => {
+  it("a finished season keeps every result: its fixtures matchday by matchday and its play-off", () => {
+    const world = playOut(start(), 11);
+    const states = seasonStates(world);
+    const after = playSeason(world);
+    for (const state of states) {
+      const past = pastDivision(after, world.year, state.code)!;
+      assert.equal(past.fixtures!.length, state.fixtures.length, `${state.code}: every game`);
+      const played = new Map(state.fixtures.map((f) => [`${f.matchday}-${f.homeId}-${f.awayId}`, state.results[f.id]]));
+      for (const f of past.fixtures!) assert.deepEqual(f.result, played.get(`${f.matchday}-${f.homeId}-${f.awayId}`), `${state.code}: the same score`);
+      assert.deepEqual(past.rows.map((r) => r.clubId), savedTable(after, world.year, state.code)!.rows.map((r) => r.clubId));
+      if (!state.bracket.length) {
+        assert.deepEqual(past.bracket, []);
+        continue;
+      }
+      // The play-off as it was: every game with its score, the final's winner the saved one.
+      const saved = savedTable(after, world.year, state.code)!.final!;
+      const final = past.bracket.at(-1)![0]!;
+      assert.equal(tieOutcome(final, {})!.winner, saved[0]);
+      assert.ok(past.bracket.flat().every((tie) => tie.legs.length > 0 && tie.legs.every((leg) => leg.result)));
+    }
+    // The packed games are small: five characters a game.
+    const record = after.history[0]!;
+    assert.equal(record.divisions[0]!.games!.length, 380 * 5);
+    // A season finished before results were kept: its table only.
+    const old = { ...after, history: [{ ...record, divisions: record.divisions.map(({ games: _g, playoff: _p, ...rest }) => rest) }] };
+    assert.equal(pastDivision(old, world.year, "PL")!.fixtures, null);
+    assert.deepEqual(pastDivision(old, world.year, "ELC")!.bracket, []);
+    assert.equal(pastDivision(after, world.year - 1, "PL"), undefined);
+  });
+
+  it(`keeps every result of the last ${FIXTURE_SEASONS} seasons; older ones keep their final tables`, () => {
+    const once = playSeason(start());
+    const record = once.history[0]!;
+    // A long-running world: FIXTURE_SEASONS seasons with every result, then one more is finished.
+    const long = { ...once, year: record.year + FIXTURE_SEASONS, history: Array.from({ length: FIXTURE_SEASONS }, (_, i) => ({ ...record, year: record.year + i })) };
+    const after = playSeason(long);
+    assert.equal(after.history.length, FIXTURE_SEASONS + 1);
+    assert.equal(after.history[0]!.divisions[0]!.games, undefined, "the oldest keeps its table only");
+    assert.equal(after.history[0]!.divisions[0]!.rows.length, 20);
+    assert.ok(after.history.slice(1).every((s) => s.divisions.every((d) => typeof d.games === "string")));
+  });
+
+  it("picked scores stand when the rest of the season is played", () => {
     let world = start();
     const me = world.userClub;
     // The visitor's club wins every game it has left, 4–0.
     const mine = divisionState(world, "EL2").fixtures.filter((f) => !f.result && (f.homeId === me || f.awayId === me));
     for (const f of mine) world = setScore(world, "EL2", f, f.homeId === me ? { home: 4, away: 0 } : { home: 0, away: 4 });
     assert.equal(picked(world, "EL2"), mine.length);
-    world = playRound(playRound(world, createRng(5)), createRng(6));
-    const won = currentTable(world, "EL2").find((r) => r.clubId === me)!;
+    world = simulateRest(simulateRest(world, "EL2", createRng(5)), "PL", createRng(6));
     const after = playSeason(world);
     const row = savedTable(after, world.year, "EL2")!.rows.find((r) => r.clubId === me)!;
     const startRow = currentTable(start(), "EL2").find((r) => r.clubId === me)!;
     assert.equal(row.won, startRow.won + mine.length, "every picked win stands");
     assert.equal(row.goalsFor, startRow.goalsFor + 4 * mine.length);
-    assert.ok(won.played <= row.played);
   });
 
   it("a result the world started with can be changed, and typing it back in leaves it as it was", () => {
@@ -409,7 +437,7 @@ describe("My World: a season played your way", () => {
     assert.equal(simulatePlayoffs(world, "EL2", createRng(1)), world);
   });
 
-  it("games postponed in the real season are played with the first round, not as rounds of their own", () => {
+  it("games postponed in the real season: the fixtures open on the current matchday, and the postponed game counts as left", () => {
     const late = {
       ...pack,
       leagues: pack.leagues.map((l) => (l.code === "EL2" ? { ...l, games: l.games.map((g, i) => (i === 40 ? [g[0], g[1], g[2], g[3], null, null] as typeof g : g)) } : l)),
@@ -418,9 +446,10 @@ describe("My World: a season played your way", () => {
     const state = divisionState(world, "EL2");
     const postponed = state.fixtures.find((f) => !f.result && f.matchday < 19)!;
     assert.ok(postponed, "a game left from an early matchday");
-    assert.equal(state.nextRound, 19);
-    const after = divisionState(playRound(world, createRng(1)), "EL2");
-    assert.ok(after.results[postponed.id], "played with the first round");
-    assert.equal(after.nextRound, 20);
+    assert.equal(state.nextRound, 19, "the fixtures open on the real season's current matchday");
+    assert.equal(gamesLeft(state), (46 - 18) * 12 + 1 + 5);
+    // Simulating matchday 19 leaves it; the rest of the season plays it.
+    assert.equal(divisionState(simulateMatchday(world, "EL2", 19, createRng(1)), "EL2").results[postponed.id], undefined);
+    assert.ok(divisionState(simulateRest(world, "EL2", createRng(1)), "EL2").results[postponed.id]);
   });
 });

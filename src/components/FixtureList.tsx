@@ -54,10 +54,12 @@ interface Props {
   matchPage?: (fixture: Fixture) => string | undefined;
   /** Each game's kick-off time (off for My World, whose calendar has no real dates). */
   kickOff?: boolean;
+  /** Results to look at only (a past My World season): no score boxes or dice, nothing to change. */
+  readOnly?: boolean;
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels, matchPage, kickOff = true } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels, matchPage, kickOff = true, readOnly = false } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -117,7 +119,7 @@ export function FixtureList(props: Props) {
               onScore={(score) => onScore(f, score)}
               onSimulate={() => onSimulate(f)}
               // Places standing in for clubs not known yet: nothing to predict.
-              disabled={isSlotTeamId(f.homeId)}
+              disabled={readOnly || isSlotTeamId(f.homeId)}
               {...(matchPage?.(f) ? { preview: matchPage(f)! } : {})}
               kickOff={kickOff}
             />
@@ -129,7 +131,7 @@ export function FixtureList(props: Props) {
 }
 
 /** Two-legged play-off ties: both legs, the rule and the aggregate once decided. */
-function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff = true }: Props & { playoff: PlayoffView }) {
+function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff = true, readOnly = false }: Props & { playoff: PlayoffView }) {
   const t = useTranslations("Simulator");
   const { bracket, seasonComplete } = playoff;
   const lastRound = bracket.length - 1;
@@ -201,6 +203,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff
       {...(label ? { label } : {})}
       {...layout}
       kickOff={kickOff}
+      disabled={readOnly}
       onScore={(score) => onScore(fixture, score)}
       onSimulate={() => onSimulate(fixture)}
     />
@@ -306,6 +309,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff
                       label={t("penalties")}
                       attached
                       kickOff={kickOff}
+                      disabled={readOnly}
                       onScore={(score) => onScore(tie.shootout!, score)}
                       onSimulate={() => onSimulate(tie.shootout!)}
                     />
@@ -496,11 +500,16 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
                 onChange={(e) => update("away", e.target.value)}
               />
             </>
+          ) : disabled ? (
+            // A result to look at only: not a button.
+            <span className="flex h-9 items-center gap-1 rounded-md bg-zinc-100 px-3 text-base font-bold tabular-nums dark:bg-zinc-800" data-testid="match-score">
+              {shown!.home} <span className="text-zinc-400">–</span> {shown!.away}
+            </span>
           ) : (
             <button
               type="button"
               title={t("editResult")}
-              onClick={() => !disabled && setEditing(true)}
+              onClick={() => setEditing(true)}
               className="flex h-9 items-center gap-1 rounded-md bg-zinc-100 px-3 text-base font-bold tabular-nums dark:bg-zinc-800"
             >
               {shown!.home} <span className="text-zinc-400">–</span> {shown!.away}
