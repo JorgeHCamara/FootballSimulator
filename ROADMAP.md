@@ -36,9 +36,10 @@ reliability (item 5) comes next, then growth, engagement and monetisation
 | 9 | Prediction league | skipped | `roadmap/9-prediction-league` |
 | 10 | Shareable content: club outlook and biggest movers cards | done | `roadmap/10-shareable-content` |
 | 11 | SEO: programmatic chance landing pages | done | `roadmap/11-seo-chance-pages` |
-| 12 | Ad-slot readiness (placeholders behind a flag) | in-pr | `roadmap/12-ad-slot-readiness` |
+| 12 | Ad-slot readiness (placeholders behind a flag) | done | `roadmap/12-ad-slot-readiness` |
 | 13 | Neutral venues (backlog) | skipped | `roadmap/13-neutral-venues` |
 | 14 | PL and EFL tiebreakers (backlog) | skipped | `roadmap/14-pl-efl-tiebreakers` |
+| 15 | My World (first version) | in-pr | `roadmap/15-my-world` |
 
 ## 1. Match impact cache key and skeleton
 
@@ -376,3 +377,34 @@ deciding play-off for meaningful ties; the EFL follows Regulation 9.
   comment why) and the deciding match follows where the place matters.
 - Tests covering the head-to-head and deciding-match paths; the dice unchanged.
 - PR: "[Roadmap 14] PL and EFL tiebreakers".
+
+## 15. My World (first version)
+
+**Goal:** a new game mode (EN My World, PT Meu mundo, ES Mi mundo), the first
+step toward a football world simulator. The visitor picks a club from the
+English pyramid's four leagues and plays season after season, with promotion
+and relegation, so a League Two club can be taken to the Premier League. Every
+season's final tables stay browsable.
+
+**Acceptance:**
+
+- England's four leagues only (PL, ELC, EL1, EL2), from their league configs,
+  zones and play-off setups and the site's match and play-off engine; no new
+  promotion rules. Each season plays all four, then moves clubs together: 3
+  between the PL and the Championship, 3 between the Championship and League
+  One, 4 between League One and League Two; League Two's 2 relegated clubs
+  leave (kept in the save) and 2 new, labelled clubs come up.
+- The world starts from the live data (clubs, ratings, results so far, the
+  games left); the first season finishes the real one, later seasons are new
+  double round robins. Ratings carry over (a documented between-season rule,
+  outside the live path); season labels follow the English split year.
+- Saved in the browser (no accounts or database): every league's final table
+  every season, the visitor's club's path, resume, a new world with a confirm,
+  older saves set aside instead of crashing. The live site's odds, snapshots
+  and SIM_VERSION are untouched.
+- EN/PT/ES, Lucide only, mobile and desktop; an entry from the home page and
+  the menu; its own route.
+- Unit tests for movement and destinations, a League Two club promoted to the
+  Premier League, past tables after later seasons, and persistence; e2e in
+  EN/PT/ES on phones and desktops.
+- PR: "[Roadmap 15] My World (first version)".

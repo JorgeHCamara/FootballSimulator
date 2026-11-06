@@ -173,6 +173,18 @@ export function LeagueMenu() {
             {nav("latestOdds")}
           </Link>
         </li>
+        {/* My World: a club's seasons up the English pyramid. */}
+        <li>
+          <Link
+            href="/my-world"
+            aria-current={pathname === "/my-world" ? "page" : undefined}
+            className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-medium text-pitch-50 hover:bg-white/10 ${pathname === "/my-world" || pathname.endsWith("/my-world") ? "bg-white/10" : ""}`}
+            data-testid="nav-my-world"
+          >
+            <Icon name="globe" size={14} />
+            {nav("myWorld")}
+          </Link>
+        </li>
         {/* The daily quiz. */}
         <li>
           <Link

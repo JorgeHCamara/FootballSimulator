@@ -27,7 +27,8 @@
     "openMenu": "Abrir menu",
     "closeMenu": "Fechar menu",
     "latestOdds": "Últimas probabilidades",
-    "quiz": "Quiz"
+    "quiz": "Quiz",
+    "myWorld": "Meu mundo"
   },
   "Home": {
     "subheading": "Escolha um campeonato, digite seus palpites ou deixe o simulador jogar as partidas restantes, e veja a tabela mudar ao vivo.",
@@ -1201,5 +1202,126 @@
       "oddsQ": "Essas são as odds das casas de apostas?",
       "oddsA": "Não. São as chances das temporadas simuladas pelo próprio Foot Simu, não odds de apostas."
     }
+  },
+  "World": {
+    "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês",
+    "metaDescription": "Escolha um clube da Premier League à League Two e jogue temporada após temporada das quatro ligas, com playoffs, acesso e rebaixamento. Salvo no seu navegador, com as tabelas de todas as temporadas.",
+    "title": "Meu mundo",
+    "intro": "Escolha um clube e jogue temporada após temporada da pirâmide inglesa, da Premier League à League Two: os jogos de todas as ligas, os playoffs, o acesso e o rebaixamento. Você consegue levar um clube da League Two até a Premier League?",
+    "savedNote": "Seu mundo fica salvo só neste navegador.",
+    "notSaved": "Este navegador não está salvando seu mundo (navegação privada ou armazenamento cheio): ele será perdido quando você sair da página.",
+    "reset": {
+      "incompatible": "Seu mundo salvo era de uma versão antiga do Meu mundo, então um novo começa.",
+      "unreadable": "Não deu para ler seu mundo salvo, então um novo começa.",
+      "none": "",
+      "unavailable": ""
+    },
+    "missing": "Não dá para começar um mundo agora: os dados ao vivo de {leagues} não carregaram. Tente de novo mais tarde.",
+    "loading": "Carregando seu mundo…",
+    "leagues": {
+      "PL": {
+        "name": "Premier League",
+        "the": "a Premier League",
+        "in": "na Premier League"
+      },
+      "ELC": {
+        "name": "Championship",
+        "the": "a Championship",
+        "in": "na Championship"
+      },
+      "EL1": {
+        "name": "League One",
+        "the": "a League One",
+        "in": "na League One"
+      },
+      "EL2": {
+        "name": "League Two",
+        "the": "a League Two",
+        "in": "na League Two"
+      }
+    },
+    "setup": {
+      "title": "Crie seu mundo",
+      "league": "Escolha uma liga",
+      "club": "Escolha seu clube",
+      "create": "Criar meu mundo",
+      "summary": "{club} {league}, começando pela temporada {season}.",
+      "clubs": "{count} clubes"
+    },
+    "season": "Temporada {season}",
+    "yourClub": "Seu clube",
+    "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
+    "notStarted": "Não começou",
+    "play": "Jogar a temporada {season}",
+    "playNote": "Joga o resto da temporada das quatro ligas de uma vez, com os playoffs.",
+    "playing": "Jogando a temporada…",
+    "firstSeason": "A tabela real até agora: o resto da temporada é simulado quando você jogar.",
+    "newSeason": "Uma nova temporada: todos os clubes começam com 0 ponto.",
+    "tables": "Tabelas",
+    "review": {
+      "title": "A temporada {season} terminou",
+      "C": "Campeão! {club} venceu {league}.",
+      "CUp": "Campeão! {club} venceu {league} e sobe para {to}.",
+      "P": "Acesso! {club} terminou em {position} {in} e sobe para {to}.",
+      "W": "Acesso! {club} venceu a final dos playoffs {in} e sobe para {to}.",
+      "O": "{club} terminou em {position} {in} e caiu nos playoffs.",
+      "R": "Rebaixado: {club} terminou em {position} {in} e cai para {to}.",
+      "out": "{club} terminou em {position} {in} e saiu da Football League.",
+      "stay": "{club} terminou em {position} {in}.",
+      "champions": "Campeões",
+      "up": "Sobem",
+      "down": "Caem",
+      "out_": "Fora da Football League",
+      "in_": "Novos na League Two",
+      "final": "Final dos playoffs: {winner} {score} {loser}",
+      "penalties": "{score}, nos pênaltis",
+      "next": "Começar a temporada {season}"
+    },
+    "outNotice": "{club} saiu da Football League em {season}. O Meu mundo ainda não tem a National League: você pode continuar jogando as temporadas ou começar um novo mundo.",
+    "newClub": "Novo",
+    "newClubHint": "Um clube novo, vindo de fora da Football League",
+    "columns": {
+      "position": "#",
+      "club": "Clube",
+      "played": "J",
+      "won": "V",
+      "drawn": "E",
+      "lost": "D",
+      "goalDifference": "SG",
+      "points": "Pts"
+    },
+    "notes": {
+      "C": "Campeão",
+      "P": "Acesso",
+      "W": "Vencedor dos playoffs",
+      "O": "Playoffs",
+      "R": "Rebaixado",
+      "out": "Fora da liga"
+    },
+    "history": {
+      "title": "Temporadas anteriores",
+      "season": "Temporada",
+      "empty": "Nenhuma temporada jogada ainda: jogue a temporada {season} para ver as tabelas finais aqui.",
+      "ago": "{count, plural, one {temporada passada} other {há # temporadas}}",
+      "league": "Liga"
+    },
+    "path": {
+      "title": "As temporadas de {club}",
+      "empty": "Nenhuma temporada jogada ainda.",
+      "up": "Acesso",
+      "down": "Rebaixado",
+      "stay": "Ficou",
+      "champions": "Campeão",
+      "out": "Saiu da liga"
+    },
+    "newWorld": {
+      "button": "Novo mundo",
+      "confirm": "Começar um novo mundo? Este será apagado deste navegador.",
+      "yes": "Apagar e recomeçar",
+      "no": "Manter este mundo"
+    },
+    "homeTitle": "Meu mundo",
+    "homeBody": "Leve um clube da League Two até a Premier League, temporada após temporada, com acesso, rebaixamento e playoffs.",
+    "homeCta": "Começar seu mundo"
   }
 }

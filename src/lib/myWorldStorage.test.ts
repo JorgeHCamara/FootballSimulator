@@ -1,0 +1,94 @@
+import assert from "node:assert/strict";
+import { before, describe, it } from "node:test";
+import { createWorld, playSeason, savedTable, startNextSeason, WORLD_VERSION, type StartPack, type World } from "./myWorld.ts";
+import { worldStartPack } from "./myWorldStart.ts";
+import { clearWorld, isWorld, loadWorld, saveWorld, WORLD_KEY } from "./myWorldStorage.ts";
+
+/** A browser's localStorage, in memory; `full` makes every write fail (storage full or blocked). */
+function memoryStore({ full = false, blocked = false } = {}) {
+  const items = new Map<string, string>();
+  return {
+    items,
+    getItem: (k: string) => {
+      if (blocked) throw new Error("SecurityError");
+      return items.get(k) ?? null;
+    },
+    setItem: (k: string, v: string) => {
+      if (full || blocked) throw new Error("QuotaExceededError");
+      items.set(k, v);
+    },
+    removeItem: (k: string) => void items.delete(k),
+  };
+}
+
+let pack: StartPack;
+let world: World;
+before(async () => {
+  process.env.FOOTSIMU_SAMPLE_DATA = "1";
+  pack = await worldStartPack();
+  world = createWorld(pack, { league: "EL1", club: pack.leagues[2]!.teams[3]!.id }, 99, new Date("2026-11-06T12:00:00Z"));
+});
+
+describe("My World: the save", () => {
+  it("saves and reloads the same world", () => {
+    const store = memoryStore();
+    assert.deepEqual(loadWorld(store), { world: null, reason: "none" });
+    assert.equal(saveWorld(store, world), true);
+    assert.deepEqual(loadWorld(store).world, world);
+    assert.ok(store.items.get(WORLD_KEY)!.length < 60_000, "a new world is small");
+  });
+
+  it("after seasons are played, a reload finds every season's tables (history lookup)", () => {
+    const store = memoryStore();
+    let w = world;
+    for (let i = 0; i < 3; i++) {
+      w = playSeason(w);
+      assert.equal(saveWorld(store, w), true, "saved after the season");
+      w = startNextSeason(w);
+      assert.equal(saveWorld(store, w), true, "saved when the next one starts");
+    }
+    const loaded = loadWorld(store).world!;
+    assert.deepEqual(loaded, w);
+    assert.equal(loaded.history.length, 3);
+    for (const season of w.history) for (const code of ["PL", "ELC", "EL1", "EL2"] as const) assert.deepEqual(savedTable(loaded, season.year, code), savedTable(w, season.year, code));
+    // A season's review survives a refresh.
+    const mid = playSeason(loaded);
+    saveWorld(store, mid);
+    assert.equal(loadWorld(store).world!.review, true);
+    // The save stays small: a few kilobytes a season.
+    assert.ok(store.items.get(WORLD_KEY)!.length < 60_000);
+  });
+
+  it("a new world replaces the old one (after the reset)", () => {
+    const store = memoryStore();
+    saveWorld(store, playSeason(world));
+    clearWorld(store);
+    assert.deepEqual(loadWorld(store), { world: null, reason: "none" });
+    const fresh = createWorld(pack, { league: "PL", club: pack.leagues[0]!.teams[0]!.id }, 5, new Date("2026-11-07T12:00:00Z"));
+    saveWorld(store, fresh);
+    assert.equal(loadWorld(store).world!.history.length, 0);
+    assert.equal(loadWorld(store).world!.userClub, fresh.userClub);
+  });
+
+  it("an older version's save, or one that can't be read, is set aside (a new world starts, nothing breaks)", () => {
+    const old = memoryStore();
+    old.setItem(WORLD_KEY, JSON.stringify({ ...world, version: WORLD_VERSION - 1 }));
+    assert.deepEqual(loadWorld(old), { world: null, reason: "incompatible" });
+    assert.equal(old.items.has(WORLD_KEY), false, "removed");
+    for (const text of ["{not json", "null", "[]", JSON.stringify({ ...world, divisions: [] }), JSON.stringify({ ...world, userClub: 123456789 }), JSON.stringify({ ...world, history: [{ year: 2026, divisions: [{ code: "PL", rows: [[1, 2]] }] }] })]) {
+      const broken = memoryStore();
+      broken.setItem(WORLD_KEY, text);
+      assert.deepEqual(loadWorld(broken), { world: null, reason: "unreadable" }, text.slice(0, 40));
+      assert.equal(broken.items.has(WORLD_KEY), false);
+    }
+    assert.equal(isWorld(world), true);
+  });
+
+  it("without storage the world still plays, unsaved", () => {
+    assert.deepEqual(loadWorld(undefined), { world: null, reason: "unavailable" });
+    assert.deepEqual(loadWorld(memoryStore({ blocked: true })), { world: null, reason: "unavailable" });
+    assert.equal(saveWorld(memoryStore({ full: true }), world), false);
+    assert.equal(saveWorld(undefined, world), false);
+    assert.doesNotThrow(() => clearWorld(undefined));
+  });
+});
