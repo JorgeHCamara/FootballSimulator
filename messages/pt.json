@@ -1261,6 +1261,9 @@
         "in": "na National League"
       }
     },
+    "countries": {
+      "ENG": "Inglaterra"
+    },
     "setup": {
       "title": "Crie seu mundo",
       "league": "Escolha uma liga",
@@ -1335,6 +1338,9 @@
     },
     "path": {
       "title": "As temporadas de {club}",
+      "country": "País",
+      "league": "Liga",
+      "club": "Clube",
       "empty": "Nenhuma temporada jogada ainda.",
       "champions": "Campeão",
       "promoted": "Acesso",

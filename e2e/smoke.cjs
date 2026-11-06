@@ -2475,6 +2475,28 @@ async function step(name, fn) {
       const outcomes = ["champions", "promoted", "playoffWinners", "playoffs", "relegated", "out", "championsLeague", "europaLeague", "conferenceLeague", "neutral", "nationalLeague"];
       for (const o of await path.evaluateAll((rows) => rows.map((r) => r.dataset.outcome))) assert.ok(outcomes.includes(o), o);
       assert.ok(!(await p.getByTestId("world-path").innerText()).includes("Stayed"));
+      // Any club's seasons, by country, league and club: England, the visitor's league and club to begin with.
+      const [country, leaguePick, clubPick] = ["world-path-country", "world-path-league", "world-path-club"].map((id) => p.getByTestId(id));
+      assert.equal(await country.inputValue(), "ENG");
+      assert.deepEqual(await country.locator("option").allInnerTexts(), ["England"]);
+      assert.deepEqual(await leaguePick.locator("option").allInnerTexts(), ["Premier League", "Championship", "League One", "League Two"]);
+      const myLeague = await leaguePick.inputValue();
+      const myId = await clubPick.inputValue();
+      assert.equal((await clubPick.locator("option:checked").innerText()).trim(), name);
+      const heading = () => p.getByTestId("world-path").locator("h2").innerText();
+      const myHeading = await heading();
+      // The Premier League's twenty clubs; another club's seasons.
+      await leaguePick.selectOption("PL");
+      assert.equal(await clubPick.locator("option").count(), 20);
+      const other = await clubPick.locator("option").nth(3).getAttribute("value");
+      await clubPick.selectOption(other);
+      assert.equal(await clubPick.inputValue(), other);
+      assert.notEqual(await heading(), myHeading);
+      assert.equal(await path.count(), 2, "its two seasons");
+      // The visitor's league again: its club again.
+      await leaguePick.selectOption(myLeague);
+      assert.equal(await clubPick.inputValue(), myId);
+      assert.equal(await heading(), myHeading);
       // A new world: asked first; cancelling keeps this one, confirming deletes it (for good, after a refresh too).
       await p.getByTestId("world-new-button").click();
       await p.getByTestId("world-new-cancel").click();

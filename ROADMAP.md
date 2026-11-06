@@ -446,7 +446,8 @@ look back at past seasons from a season picker.
 - No fictional clubs: the National League (Boreham Wood and Harrogate Town to
   begin with) swaps its two clubs with League Two's relegated ones each season.
 - The club's seasons, the latest first, each with its outcome: champions,
-  promoted, the play-offs, relegated, a European place, or the neutral zone.
+  promoted, the play-offs, relegated, a European place, or the neutral zone;
+  any club's, picked by country (England), league and club.
 - Unit tests for the games left, picked scores standing, play-off scores tied
   to their pairing, finishing a season from its scores, the kept results, and
   the save; e2e on desktop and phones, EN/PT/ES.

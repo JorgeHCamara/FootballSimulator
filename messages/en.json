@@ -1260,6 +1260,9 @@
         "in": "in the National League"
       }
     },
+    "countries": {
+      "ENG": "England"
+    },
     "setup": {
       "title": "Create your world",
       "league": "Pick a league",
@@ -1334,6 +1337,9 @@
     },
     "path": {
       "title": "{club}'s seasons",
+      "country": "Country",
+      "league": "League",
+      "club": "Club",
       "empty": "No seasons played yet.",
       "champions": "Champions",
       "promoted": "Promoted",

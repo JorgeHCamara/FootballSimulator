@@ -30,7 +30,7 @@ import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { zoneHex } from "./zones.ts";
-import { DivisionTabs, openingMatchday, WorldSeason } from "./WorldSeason.tsx";
+import { DivisionTabs, openingMatchday, Picker, WorldSeason } from "./WorldSeason.tsx";
 
 type View = { kind: "loading" } | { kind: "setup"; reset?: "incompatible" | "unreadable" } | { kind: "world"; world: World; saved: boolean };
 
@@ -396,7 +396,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
         </section>
       )}
 
-      <Path world={world} me={me} locale={locale} />
+      <Path world={world} locale={locale} />
 
       <section className="space-y-2 border-t border-zinc-200 pt-6 dark:border-zinc-800" data-testid="world-new">
         <p className="text-xs text-zinc-500">{t("savedNote")}</p>
@@ -529,13 +529,57 @@ const OUTCOME_STYLE: Record<PathOutcome, { icon?: "trophy" | "arrow-up" | "arrow
   neutral: { tone: "text-zinc-500" },
 };
 
-/** The visitor's club, season by season, the latest first: its division, its place and what came of it. */
-function Path({ world, me, locale }: { world: World; me: WorldClub; locale: SiteLocale }) {
+/**
+ * Any club, season by season, the latest first: its division, its place and
+ * what came of it. Picked by country (England, for now), league and club; the
+ * visitor's club to begin with.
+ */
+function Path({ world, locale }: { world: World; locale: SiteLocale }) {
   const t = useTranslations("World");
-  const steps = [...clubPath(world, me.id)].reverse();
+  const [picked, setPicked] = useState(world.userClub);
+  // A new world: its club again.
+  useEffect(() => setPicked(world.userClub), [world.id, world.userClub]);
+  const club = world.clubs[picked] ?? world.clubs[world.userClub]!;
+  const steps = useMemo(() => [...clubPath(world, club.id)].reverse(), [world, club.id]);
+  const clubsOf = (code: DivisionCode) =>
+    [...(world.divisions.find((d) => d.code === code)?.clubs ?? [])].sort((a, b) => world.clubs[a]!.name.localeCompare(world.clubs[b]!.name, locale));
+  // A club's league this season; for a season in the National League, the last one it played in (it's listed there).
+  const leagueOf = (id: TeamId): DivisionCode =>
+    clubDivision(world, id) ?? ([...clubPath(world, id)].reverse().find((s) => s.code !== "NL")?.code as DivisionCode | undefined) ?? "EL2";
+  const league = leagueOf(club.id);
+  const clubs = clubsOf(league);
+  if (!clubs.includes(club.id)) clubs.push(club.id);
+  /** Another league: the visitor's club if it's that club's league, else the league's first club. */
+  const pickLeague = (code: DivisionCode) => setPicked(leagueOf(world.userClub) === code ? world.userClub : (clubsOf(code)[0] ?? club.id));
   return (
     <section className="space-y-3" data-testid="world-path">
-      <h2 className="text-xl font-bold tracking-tight">{t("path.title", { club: me.shortName })}</h2>
+      <h2 className="text-xl font-bold tracking-tight">{t("path.title", { club: club.shortName })}</h2>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" data-testid="world-path-pickers">
+        <Picker
+          icon={<Flag code="gb-eng" width={18} className="shrink-0" />}
+          label={t("path.country")}
+          value={world.pyramid}
+          options={[{ value: "ENG", label: t("countries.ENG") }]}
+          onChange={() => {}}
+          testId="world-path-country"
+        />
+        <Picker
+          icon={<Icon name="trophy" size={16} className="shrink-0 text-zinc-500" />}
+          label={t("path.league")}
+          value={league}
+          options={ENGLAND.map((code) => ({ value: code, label: t(`leagues.${code}.name`) }))}
+          onChange={(code) => pickLeague(code as DivisionCode)}
+          testId="world-path-league"
+        />
+        <Picker
+          icon={<TeamBadge team={club} size={18} textless />}
+          label={t("path.club")}
+          value={String(club.id)}
+          options={clubs.map((id) => ({ value: String(id), label: world.clubs[id]!.name }))}
+          onChange={(id) => setPicked(Number(id))}
+          testId="world-path-club"
+        />
+      </div>
       {steps.length === 0 ? (
         <p className="text-sm text-zinc-500">{t("path.empty")}</p>
       ) : (
