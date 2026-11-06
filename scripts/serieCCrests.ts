@@ -4,6 +4,11 @@
 // transparent PNG: the background is the flat colour around the crest, found
 // from the image's border and flood-filled inwards, so white inside the crest
 // (Paysandu's, Santa Cruz's) stays wherever the crest's outline encloses it.
+// Nothing is cut off the original's edges, where a crest's outline can run
+// within a pixel of the border (Santa Cruz's, at 70 px: trimming the edges
+// opened its outline, and the fill ran into the white within). The fill never
+// comes within WALL pixels of the crest's solid pixels either, which closes a
+// gap of a pixel in a thin outline; the band it leaves is the crest's soft edge.
 // Pixels near the crest's edge get a partial alpha with the background's tint
 // taken out, so the edge is smooth on any colour, without a pale halo. The
 // result is trimmed to the crest and centred on a square, so every club's
@@ -29,15 +34,18 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 export const ORIGINALS = join(ROOT, "scripts/data/serie-c-crests");
 export const OUT = join(ROOT, "public/crests/serie-c");
 
-/** Colour distance (0–441) under which a pixel joined to the border is background… */
+/** Colour distance (0–441) under which the background's fill spreads from the border (not within WALL pixels of the crest)… */
 const FILL = 70;
-/** …fully transparent below this, partly transparent between the two. */
+const WALL = 2;
+/** …and under which a pixel next to it, at most EDGE_DEPTH pixels in, is the crest's soft edge… */
+const EDGE_DEPTH = WALL + 1;
+/** Background pixels this close to the crest's solid pixels can be its soft edge; further out, pale specks of the scan are clear. */
+const SOFT = 2 * WALL + 2;
+/** …and fully transparent below this, partly transparent up to FILL. */
 const CLEAR = 18;
 /** The square's side, and the crest's margin in it. */
 const SIZE = 160;
 const MARGIN = 0.04;
-/** Share of the original's edge cut off first (the scans' edge lines). */
-const EDGE = 0.015;
 /** A crest at least this share near-black gets an outline, this share of its size thick. */
 const DARK_SHARE = 0.55;
 const OUTLINE = 0.02;
@@ -67,19 +75,29 @@ export async function cutOut(input: Buffer): Promise<Buffer> {
   // Upscaled first (the smallest originals are 70 px), so the soft edge is drawn finely.
   const scale = 3;
   const meta = await sharp(input).metadata();
-  const edge = Math.ceil((meta.width ?? 0) * EDGE);
-  const cw = (meta.width ?? 0) - 2 * edge;
-  const ch = (meta.height ?? 0) - 2 * edge;
-  const w = cw * scale;
-  const h = ch * scale;
-  const px = new Uint8Array(
-    await sharp(input).removeAlpha().extract({ left: edge, top: edge, width: cw, height: ch }).resize(w, h, { kernel: "lanczos3" }).raw().toBuffer(),
-  );
+  const w = (meta.width ?? 0) * scale;
+  const h = (meta.height ?? 0) * scale;
+  const px = new Uint8Array(await sharp(input).removeAlpha().resize(w, h, { kernel: "lanczos3" }).raw().toBuffer());
   const bg = borderColour(px, w, h);
-  // Flood fill from the border through background-like pixels.
+  // Flood fill from the border through background pixels.
   const inBg = new Uint8Array(w * h);
   const stack: number[] = [];
-  const near = (p: number) => dist(px[p * 3]!, px[p * 3 + 1]!, px[p * 3 + 2]!, bg) < FILL;
+  const d = (p: number) => dist(px[p * 3]!, px[p * 3 + 1]!, px[p * 3 + 2]!, bg);
+  // The crest's solid pixels grown by WALL (the fill doesn't go there) and by SOFT (where it can be the soft edge).
+  const wall = new Uint8Array(w * h);
+  const soft = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (d(y * w + x) < FILL) continue;
+      for (let yy = Math.max(0, y - SOFT); yy <= Math.min(h - 1, y + SOFT); yy++) {
+        for (let xx = Math.max(0, x - SOFT); xx <= Math.min(w - 1, x + SOFT); xx++) {
+          soft[yy * w + xx] = 1;
+          if (Math.abs(xx - x) <= WALL && Math.abs(yy - y) <= WALL) wall[yy * w + xx] = 1;
+        }
+      }
+    }
+  }
+  const near = (p: number) => !wall[p] && d(p) < FILL;
   for (let x = 0; x < w; x++) stack.push(x, (h - 1) * w + x);
   for (let y = 0; y < h; y++) stack.push(y * w, y * w + w - 1);
   while (stack.length) {
@@ -92,13 +110,23 @@ export async function cutOut(input: Buffer): Promise<Buffer> {
     if (p >= w) stack.push(p - w);
     if (p < w * (h - 1)) stack.push(p + w);
   }
+  // The crest's soft edge: paler pixels touching the background, a few deep, which don't spread it.
+  for (let ring = 0; ring < EDGE_DEPTH; ring++) {
+    const next: number[] = [];
+    for (let p = 0; p < w * h; p++) {
+      if (inBg[p] || d(p) >= FILL) continue;
+      const x = p % w;
+      if ((x > 0 && inBg[p - 1]) || (x < w - 1 && inBg[p + 1]) || (p >= w && inBg[p - w]) || (p < w * (h - 1) && inBg[p + w])) next.push(p);
+    }
+    for (const p of next) inBg[p] = 1;
+  }
   const out = Buffer.alloc(w * h * 4);
   for (let p = 0; p < w * h; p++) {
     let [r, g, b] = [px[p * 3]!, px[p * 3 + 1]!, px[p * 3 + 2]!];
     let a = 1;
     if (inBg[p]) {
-      const d = dist(r, g, b, bg);
-      a = d <= CLEAR ? 0 : (d - CLEAR) / (FILL - CLEAR);
+      const away = d(p);
+      a = away <= CLEAR || !soft[p] ? 0 : Math.min(1, (away - CLEAR) / (FILL - CLEAR));
       // The background's share taken out of the colour (it was blended over bg with alpha a).
       if (a > 0) [r, g, b] = [r, g, b].map((v, c) => Math.max(0, Math.min(255, Math.round((v - bg[c]! * (1 - a)) / a)))) as [number, number, number];
     }
@@ -121,19 +149,25 @@ export async function cutOut(input: Buffer): Promise<Buffer> {
     .toBuffer();
 }
 
-/** Opaque pixels' connected parts that are thin lines (a scan's edge), not part of the crest: made transparent. Stars and letters are compact, and stay. */
+/**
+ * Connected parts of the crest that are thin lines (a scan's line along an
+ * edge), not part of it: made transparent with their faint fringe. Parts are
+ * judged by their solid pixels (faint JPEG noise around them doesn't join them
+ * to the crest); stars and letters are compact, and stay.
+ */
 function dropSpecks(rgba: Buffer, w: number, h: number) {
-  const seen = new Uint8Array(w * h);
-  const opaque = (p: number) => rgba[p * 4 + 3]! > 0;
+  const label = new Int32Array(w * h).fill(-1);
+  const solid = (p: number) => rgba[p * 4 + 3]! >= 128;
+  const lines: [number, number, number, number, number][] = [];
+  let next = 0;
   for (let start = 0; start < w * h; start++) {
-    if (seen[start] || !opaque(start)) continue;
-    const part: number[] = [];
+    if (label[start] !== -1 || !solid(start)) continue;
+    const id = next++;
     const stack = [start];
-    seen[start] = 1;
+    label[start] = id;
     let [x0, x1, y0, y1] = [w, 0, h, 0];
     while (stack.length) {
       const p = stack.pop()!;
-      part.push(p);
       const x = p % w;
       const y = (p - x) / w;
       x0 = Math.min(x0, x);
@@ -141,15 +175,25 @@ function dropSpecks(rgba: Buffer, w: number, h: number) {
       y0 = Math.min(y0, y);
       y1 = Math.max(y1, y);
       for (const q of [x > 0 ? p - 1 : -1, x < w - 1 ? p + 1 : -1, p - w, p + w]) {
-        if (q >= 0 && q < w * h && !seen[q] && opaque(q)) {
-          seen[q] = 1;
+        if (q >= 0 && q < w * h && label[q] === -1 && solid(q)) {
+          label[q] = id;
           stack.push(q);
         }
       }
     }
     const thin = Math.min(x1 - x0, y1 - y0) + 1;
     const long = Math.max(x1 - x0, y1 - y0) + 1;
-    if (thin <= w * 0.03 && long >= thin * 4) for (const p of part) rgba[p * 4 + 3] = 0;
+    if (thin <= w * 0.03 && long >= thin * 4) lines.push([id, x0, x1, y0, y1]);
+  }
+  // Each line, and the faint pixels around it (a few pixels out) that belong to no other part.
+  const pad = 2 * EDGE_DEPTH + 2;
+  for (const [id, x0, x1, y0, y1] of lines) {
+    for (let y = Math.max(0, y0 - pad); y <= Math.min(h - 1, y1 + pad); y++) {
+      for (let x = Math.max(0, x0 - pad); x <= Math.min(w - 1, x1 + pad); x++) {
+        const p = y * w + x;
+        if (label[p] === id || label[p] === -1) rgba[p * 4 + 3] = 0;
+      }
+    }
   }
 }
 
