@@ -2,8 +2,8 @@ import type { Fixture, TeamId } from "./types.ts";
 
 /**
  * Double round-robin via the circle method: every team meets every other team once
- * at home and once away. Used for test leagues now and for generated seasons in
- * the phase 2 career mode.
+ * at home and once away. Used for the sample leagues and for My World's
+ * generated seasons (src/lib/myWorld.ts).
  */
 export function doubleRoundRobin(teamIds: readonly TeamId[], startDate = "2025-08-01T15:00:00Z"): Fixture[] {
   const ids: (TeamId | null)[] = [...teamIds];

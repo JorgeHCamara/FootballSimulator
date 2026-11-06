@@ -14,6 +14,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Home");
+  const worldT = await getTranslations("World");
   const meta = await getTranslations("Metadata");
   const faq = (await getTranslations("Faq")).raw("home") as FaqItem[];
   const lang = locale as SiteLocale;
@@ -66,6 +67,33 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <p className="mx-auto mt-3 max-w-2xl text-zinc-600 text-pretty dark:text-zinc-400">{t("subheading")}</p>
       </section>
 
+      {/* The game modes, by the main simulators: My World (a club's seasons up the English pyramid) and the daily quiz. */}
+      <div className="grid gap-3 md:grid-cols-2">
+        {[
+          { href: "/my-world", icon: "globe" as const, title: worldT("homeTitle"), body: worldT("homeBody"), cta: worldT("homeCta"), testId: "home-my-world" },
+          { href: "/quiz", icon: "circle-help" as const, title: t("quizTitle"), body: t("quizBody"), cta: t("quizCta"), testId: "home-quiz" },
+        ].map((mode) => (
+          <Link
+            key={mode.href}
+            href={mode.href}
+            className="group flex flex-col gap-3 rounded-xl border border-pitch-100 bg-pitch-50 p-4 transition hover:border-pitch-500 hover:shadow-md dark:border-pitch-900 dark:bg-pitch-900/30"
+            data-testid={mode.testId}
+          >
+            <span className="flex min-w-0 flex-1 items-start gap-3">
+              <Icon name={mode.icon} size={28} className="shrink-0 text-pitch-600 dark:text-pitch-100" />
+              <span className="min-w-0">
+                <span className="block font-bold">{mode.title}</span>
+                <span className="block text-sm text-zinc-600 dark:text-zinc-400">{mode.body}</span>
+              </span>
+            </span>
+            <span className="flex h-11 items-center justify-center gap-1.5 self-stretch rounded-lg bg-pitch-600 px-4 text-sm font-semibold text-white group-hover:bg-pitch-700 sm:self-start">
+              {mode.cta}
+              <Icon name="chevron-right" size={18} />
+            </span>
+          </Link>
+        ))}
+      </div>
+
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {HOME_LEAGUES.flatMap((code) => LEAGUES.filter((l) => l.code === code)).map((l) => (
           <li key={l.code}>
@@ -87,25 +115,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </li>
         ))}
       </ul>
-
-      {/* The daily quiz. */}
-      <Link
-        href="/quiz"
-        className="group flex flex-col gap-3 rounded-xl border border-pitch-100 bg-pitch-50 p-4 transition hover:border-pitch-500 hover:shadow-md sm:flex-row sm:items-center dark:border-pitch-900 dark:bg-pitch-900/30"
-        data-testid="home-quiz"
-      >
-        <span className="flex min-w-0 flex-1 items-start gap-3">
-          <Icon name="circle-help" size={28} className="shrink-0 text-pitch-600 dark:text-pitch-100" />
-          <span className="min-w-0">
-            <span className="block font-bold">{t("quizTitle")}</span>
-            <span className="block text-sm text-zinc-600 dark:text-zinc-400">{t("quizBody")}</span>
-          </span>
-        </span>
-        <span className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-pitch-600 px-4 text-sm font-semibold text-white group-hover:bg-pitch-700">
-          {t("quizCta")}
-          <Icon name="chevron-right" size={18} />
-        </span>
-      </Link>
 
       <section className="space-y-4">
         <ul className="grid gap-4 sm:grid-cols-3">
