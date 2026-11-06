@@ -35,10 +35,10 @@ reliability (item 5) comes next, then growth, engagement and monetisation
 | 8 | Quiz with historical data | done | `roadmap/8-quiz-historical` |
 | 9 | Prediction league | skipped | `roadmap/9-prediction-league` |
 | 10 | Shareable content: club outlook and biggest movers cards | done | `roadmap/10-shareable-content` |
-| 11 | SEO: programmatic chance landing pages | in-pr | `roadmap/11-seo-chance-pages` |
-| 12 | Ad-slot readiness (placeholders behind a flag) | todo | `roadmap/12-ad-slot-readiness` |
-| 13 | Neutral venues (backlog) | todo | `roadmap/13-neutral-venues` |
-| 14 | PL and EFL tiebreakers (backlog) | todo | `roadmap/14-pl-efl-tiebreakers` |
+| 11 | SEO: programmatic chance landing pages | done | `roadmap/11-seo-chance-pages` |
+| 12 | Ad-slot readiness (placeholders behind a flag) | in-pr | `roadmap/12-ad-slot-readiness` |
+| 13 | Neutral venues (backlog) | skipped | `roadmap/13-neutral-venues` |
+| 14 | PL and EFL tiebreakers (backlog) | skipped | `roadmap/14-pl-efl-tiebreakers` |
 
 ## 1. Match impact cache key and skeleton
 
@@ -332,6 +332,8 @@ behind a flag that is off by default.
 
 ## 13. Neutral venues (backlog)
 
+**Skipped for now** (6 November 2026): not to be worked on in this run of the roadmap.
+
 **Backlog** (accuracy polish: only after items 5–12).
 
 **Goal:** the season Monte Carlo honours neutral venues (no home advantage),
@@ -351,6 +353,8 @@ from ESPN's `neutralSite` or the venue itself.
 - PR: "[Roadmap 13] Neutral venues".
 
 ## 14. PL and EFL tiebreakers (backlog)
+
+**Skipped for now** (6 November 2026): not to be worked on in this run of the roadmap.
 
 **Backlog** (accuracy polish: only after items 5–13).
 

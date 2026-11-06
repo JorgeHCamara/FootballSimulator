@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { AdSlot } from "../../../../../components/AdSlot.ts";
 import { Flag } from "../../../../../components/Flag.tsx";
 import { Icon, type IconName } from "../../../../../components/Icon.tsx";
 import { JsonLd } from "../../../../../components/JsonLd.tsx";
@@ -417,6 +418,9 @@ export default async function ClubPage({ params }: { params: Params }) {
           <p className="mt-3 text-xs text-zinc-500">{t("distributionNote", { club: team.shortName })}</p>
         </div>
       </section>
+
+      {/* A reserved ad placement, after the chances and finishing positions: nothing unless the slots are turned on (src/lib/adSlots.ts). */}
+      <AdSlot kind="inContent" />
 
       {club.fixtures.length > 0 && (
         <div className="grid gap-6 lg:grid-cols-2">

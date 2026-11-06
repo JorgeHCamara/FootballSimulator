@@ -35,6 +35,15 @@ In **Settings → Environment Variables**, add these for *Production* and *Previ
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Added in step 7 |
 | `REVALIDATE_TOKEN` | Optional: a long random string (e.g. `openssl rand -hex 32`). With it, and the same value as the GitHub repository secret `REVALIDATE_TOKEN`, a scheduled job refreshes a league's page and all its club pages together when new results come in (see "Shared outlook" in the README). Production only. |
 
+Ad slots (see "Ad slots" in the README) stay off unless these are set, after the AdSense review and alongside `NEXT_PUBLIC_ADSENSE_CLIENT`:
+
+| Name | Value |
+|---|---|
+| `NEXT_PUBLIC_ADS_SLOTS` | `1` turns the reserved ad slots on (off when unset). |
+| `NEXT_PUBLIC_ADS_UNIT_IN_CONTENT` | The AdSense ad unit id (digits) for the slots in the pages. |
+| `NEXT_PUBLIC_ADS_UNIT_RAIL` | The ad unit id for a desktop rail (none is placed yet). |
+| `NEXT_PUBLIC_ADS_DEBUG` | `1` shows each slot's box labelled "Ad", to check the layout on a preview. |
+
 Redeploy after changing variables: **Deployments → … → Redeploy**.
 
 ## 5. Connect footsimu.com

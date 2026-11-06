@@ -90,6 +90,16 @@ A round counts once it and every round before it are played (a game postponed fa
 
 After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` to your Google Search Console code, then submit `/sitemap.xml` in Search Console.
 
+### Ad slots (off)
+
+Reserved placements for display ads, for once the AdSense review is over (`src/lib/adSlots.ts`, `src/components/AdSlot.ts`): one in each league page below the simulator and its projected table, and one in each club page after its finishing positions. Each keeps the exact size of its ad, a 300×250 rectangle on phones and a 728×90 leaderboard from 768px up (a 300×600 desktop rail is defined, not placed), so a filled ad never moves the page.
+
+- **Off by default** (`NEXT_PUBLIC_ADS_SLOTS` unset): a slot renders nothing, so the site is exactly as without them. That's chosen over an empty reserved box while the site is under review, so visitors see no blank gaps. The flag is a build setting, so the layout changes between deployments, never while a page loads.
+- **On** (`NEXT_PUBLIC_ADS_SLOTS=1`, with `NEXT_PUBLIC_ADSENSE_CLIENT` and the slot's ad unit id `NEXT_PUBLIC_ADS_UNIT_IN_CONTENT`): the box with its `<ins class="adsbygoogle">`, filled by the Auto ads script the layout already loads. Slots add no script, and `ads.txt` and that script are unchanged. Without the publisher id or the unit, the slot is the empty box at its size.
+- **`NEXT_PUBLIC_ADS_DEBUG=1`**: the box is outlined and labelled "Ad", to check the layout on a preview before any ad is live.
+
+To check a flagged build, run the e2e suite with `E2E_ADS=1` against a build with `NEXT_PUBLIC_ADS_SLOTS=1`. It measures each box (300×250 on a phone, 728×90 on desktop) and fills it with an ad of that size, checking that nothing below moves.
+
 ### Daily quiz
 
 `/{locale}/quiz` ("Quiz" in the menu, and a card on the home page) asks six questions a day, picked from the UTC date and the language alone (`dailyQuiz` in `src/lib/quiz.ts`), so everyone playing in a language that day gets the same set; leagues come up by how much each language's visitors follow them. Four are about past seasons, one of each kind (who won it, who finished second, which of four was relegated, which of two finished higher), from `src/data/history.json`: the final tables of the leagues whose table decides the champion, from 2015/16 on. Two ask which of two clubs is likelier to win the title, reach the top place (a continental competition or promotion) or go down this season, from the shared outlook of two leagues picked for the day (`src/lib/quizPage.ts`); the chances are shown only once answered. When a league's season is over, its live question is replaced with one from the past. Answers stay in the visitor's browser for the day; the score can be shared as text. The page is rebuilt every 15 minutes, so a new set appears shortly after midnight UTC. `npm run history` (`scripts/build-history.ts`) rebuilds the dataset from ESPN's final standings (relegated clubs from ESPN's notes, or the league's relegation places when a season has none); run it once a season has ended.

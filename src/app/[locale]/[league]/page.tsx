@@ -2,6 +2,7 @@ import { domesticPriors, leagueMatchParams } from "../../../lib/priors.ts";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { AdSlot } from "../../../components/AdSlot.ts";
 import { CupSimulator } from "../../../components/CupSimulator.tsx";
 import { LeagueFactsSection } from "../../../components/LeagueFactsSection.tsx";
 import { ProjectedSection } from "../../../components/ProjectedSection.tsx";
@@ -336,6 +337,9 @@ export default async function LeaguePage({ params }: { params: Params }) {
       )}
 
       {loaded.kind === "league" && hasClubPages(loaded.config) && <ProjectedSection league={loaded.config} data={loaded.data} locale={locale as SiteLocale} />}
+
+      {/* A reserved ad placement, below the simulator: nothing unless the slots are turned on (src/lib/adSlots.ts). */}
+      <AdSlot kind="inContent" />
 
       {loaded.kind === "league" && <LeagueFactsSection league={loaded.config} locale={locale as SiteLocale} />}
 
