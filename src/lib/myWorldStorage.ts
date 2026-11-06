@@ -39,6 +39,8 @@ export function isWorld(value: unknown): value is World {
   const { clubs, ratings, divisions, history, params } = value;
   if (!isNumber(value.year) || !isNumber(value.seed) || !isNumber(value.userClub) || !isNumber(value.newClubs) || typeof value.review !== "boolean") return false;
   if (!isRecord(clubs) || !isRecord(ratings) || !isRecord(params) || !Array.isArray(divisions) || !Array.isArray(history)) return false;
+  // The National League's clubs (absent from saves from before it: upgradeWorld adds it).
+  if (value.nationalLeague !== undefined && !(Array.isArray(value.nationalLeague) && value.nationalLeague.every((id) => isRecord(clubs[String(id)])))) return false;
   if (!isRecord(clubs[String(value.userClub)])) return false;
   if (divisions.length !== ENGLAND.length || !divisions.every((d, i) => isRecord(d) && d.code === ENGLAND[i] && Array.isArray(d.clubs) && d.clubs.every((id) => isRecord(clubs[String(id)])) && isScores(d.scores) && (d.calendar === undefined || d.calendar === 2))) return false;
   if (!ENGLAND.every((code) => isRecord(params[code]) && isNumber(params[code].avgHomeGoals) && isNumber(params[code].avgAwayGoals))) return false;

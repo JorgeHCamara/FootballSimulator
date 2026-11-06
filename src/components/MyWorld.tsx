@@ -19,6 +19,7 @@ import {
   seasonStates,
   startNextSeason,
   type DivisionCode,
+  type PathOutcome,
   type SeasonRecord,
   type StartPack,
   type World,
@@ -28,6 +29,7 @@ import { browserStore, clearWorld, loadWorld, saveWorld } from "../lib/myWorldSt
 import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
+import { zoneHex } from "./zones.ts";
 import { DivisionTabs, openingMatchday, WorldSeason } from "./WorldSeason.tsx";
 
 type View = { kind: "loading" } | { kind: "setup"; reset?: "incompatible" | "unreadable" } | { kind: "world"; world: World; saved: boolean };
@@ -301,7 +303,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
             </p>
             <p className="text-sm text-zinc-600 dark:text-zinc-400" data-testid="world-season">
               {t("season", { season })}
-              {myDivision ? ` · ${t(`leagues.${myDivision}.name`)}` : ""}
+              {myDivision ? ` · ${t(`leagues.${myDivision}.name`)}` : world.nationalLeague.includes(me.id) ? ` · ${t("leagues.NL.name")}` : ""}
               {myRow && myRow.played > 0 ? ` · ${t("standing", { position: ordinal(myRow.position, locale), points: myRow.points })}` : ""}
             </p>
           </div>
@@ -354,7 +356,10 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
       {!myDivision && me.left !== undefined && (
         <p className={`${card} flex gap-2 text-sm`} role="status" data-testid="world-out">
           <Icon name="info" size={18} className="mt-0.5 shrink-0 text-pitch-700" />
-          {t("outNotice", { club: me.name, season: seasonLabel(me.left) })}
+          {/* A season in the National League, then back up; or (a world from before it) gone for good. */}
+          {world.nationalLeague.includes(me.id)
+            ? t("outNotice", { club: me.name, season: seasonLabel(me.left) })
+            : t("goneNotice", { club: me.name, season: seasonLabel(me.left) })}
         </p>
       )}
 
@@ -509,9 +514,25 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
 }
 
 /** The visitor's club, season by season: its division, its place and what came of it. */
+/** Each season's outcome: its icon (or a European place's colour) and tone. */
+const OUTCOME_STYLE: Record<PathOutcome, { icon?: "trophy" | "arrow-up" | "arrow-down" | "target"; zone?: "championsLeague" | "europaLeague" | "conferenceLeague"; tone: string }> = {
+  champions: { icon: "trophy", tone: "text-pitch-700 dark:text-pitch-100" },
+  promoted: { icon: "arrow-up", tone: "text-pitch-700 dark:text-pitch-100" },
+  playoffWinners: { icon: "arrow-up", tone: "text-pitch-700 dark:text-pitch-100" },
+  nationalLeague: { icon: "arrow-up", tone: "text-pitch-700 dark:text-pitch-100" },
+  playoffs: { icon: "target", tone: "text-sky-700 dark:text-sky-300" },
+  relegated: { icon: "arrow-down", tone: "text-red-600" },
+  out: { icon: "arrow-down", tone: "text-red-600" },
+  championsLeague: { zone: "championsLeague", tone: "text-zinc-800 dark:text-zinc-100" },
+  europaLeague: { zone: "europaLeague", tone: "text-zinc-800 dark:text-zinc-100" },
+  conferenceLeague: { zone: "conferenceLeague", tone: "text-zinc-800 dark:text-zinc-100" },
+  neutral: { tone: "text-zinc-500" },
+};
+
+/** The visitor's club, season by season, the latest first: its division, its place and what came of it. */
 function Path({ world, me, locale }: { world: World; me: WorldClub; locale: SiteLocale }) {
   const t = useTranslations("World");
-  const steps = clubPath(world, me.id);
+  const steps = [...clubPath(world, me.id)].reverse();
   return (
     <section className="space-y-3" data-testid="world-path">
       <h2 className="text-xl font-bold tracking-tight">{t("path.title", { club: me.shortName })}</h2>
@@ -520,16 +541,21 @@ function Path({ world, me, locale }: { world: World; me: WorldClub; locale: Site
       ) : (
         <ol className="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
           {steps.map((s) => {
-            const label = s.note === "C" ? t("path.champions") : s.move === "up" ? t("path.up") : s.move === "down" ? (s.code === "EL2" ? t("path.out") : t("path.down")) : t("path.stay");
-            const tone = s.move === "up" || s.note === "C" ? "text-pitch-700 dark:text-pitch-100" : s.move === "down" ? "text-red-600" : "text-zinc-500";
+            const style = OUTCOME_STYLE[s.outcome];
+            const place = s.position === null ? "–" : ordinal(s.position, locale);
             return (
-              <li key={s.year} className="flex items-center gap-3 px-3 py-2.5 text-sm" data-testid="world-path-step" data-league={s.code} data-move={s.move}>
+              <li key={s.year} className="flex items-center gap-3 px-3 py-2.5 text-sm" data-testid="world-path-step" data-league={s.code} data-move={s.move} data-outcome={s.outcome}>
                 <span className="w-16 shrink-0 font-semibold tabular-nums">{seasonLabel(s.year)}</span>
-                <span className="min-w-0 flex-1 truncate">{t(`leagues.${s.code}.name`)}</span>
-                <span className="w-10 shrink-0 text-right tabular-nums text-zinc-600 dark:text-zinc-300">{ordinal(s.position, locale)}</span>
-                <span className={`flex w-28 shrink-0 items-center justify-end gap-1 text-xs font-semibold ${tone}`}>
-                  {s.note === "C" ? <Icon name="trophy" size={14} /> : s.move === "up" ? <Icon name="arrow-up" size={14} strokeWidth={2.5} /> : s.move === "down" ? <Icon name="arrow-down" size={14} strokeWidth={2.5} /> : null}
-                  {label}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">{t(`leagues.${s.code}.name`)}</span>
+                  {/* Phones: the place under the league. */}
+                  <span className="block text-xs tabular-nums text-zinc-500 sm:hidden">{place}</span>
+                </span>
+                <span className="hidden w-10 shrink-0 text-right tabular-nums text-zinc-600 sm:block dark:text-zinc-300">{place}</span>
+                <span className={`flex w-36 shrink-0 items-center justify-end gap-1.5 text-right text-xs font-semibold sm:w-44 ${style.tone}`}>
+                  {style.icon && <Icon name={style.icon} size={14} strokeWidth={style.icon === "trophy" || style.icon === "target" ? 2 : 2.5} className="shrink-0" />}
+                  {style.zone && <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: zoneHex(style.zone) }} aria-hidden />}
+                  <span className="min-w-0 truncate">{t(`path.${s.outcome}`)}</span>
                 </span>
               </li>
             );
