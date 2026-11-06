@@ -2211,7 +2211,7 @@ async function step(name, fn) {
       await phone.close();
     });
 
-    await step("daily quiz: six questions, right or wrong at once, the score, kept for the day, the same set on a reload, nav, home, sitemap", async () => {
+    await step("daily quiz: six questions, right or wrong at once, the score, kept for the day, once a day whatever the language, the same set on a reload, nav, home, sitemap", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en`);
       assert.equal(await p.getByTestId("nav-quiz").getAttribute("href"), "/en/quiz");
@@ -2256,6 +2256,17 @@ async function step(name, fn) {
       // Kept for the day: a reload shows the score again.
       await p.reload();
       await score.waitFor();
+      const played = (await score.innerText()).match(/(\d) of 6/)[1];
+      // One quiz a day, whatever the language: the other languages show the same score, not their own set.
+      for (const [locale, language] of [["pt", "inglês"], ["es", "inglés"]]) {
+        await p.goto(`${BASE_URL}/${locale}/quiz`);
+        await p.getByTestId("quiz-played-elsewhere").waitFor();
+        assert.match(await p.getByTestId("quiz-played-elsewhere").innerText(), new RegExp(language));
+        assert.equal(await p.getByTestId("quiz-question").count(), 0, `${locale}: no questions once played`);
+        assert.match(await score.innerText(), new RegExp(`${played} de 6`), `${locale}: the same score`);
+      }
+      await p.goto(`${BASE_URL}/en/quiz`);
+      await score.waitFor();
       // The same set for everyone: a fresh browser gets the same first question.
       await p.evaluate(() => localStorage.clear());
       await p.reload();
@@ -2273,6 +2284,19 @@ async function step(name, fn) {
         await phone.getByTestId("quiz-option").first().tap();
         await phone.getByTestId("quiz-feedback").waitFor();
         assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${locale}: no horizontal scroll`);
+        // Started here: another language sends the visitor back to finish it, rather than starting its own set.
+        const other = locale === "pt" ? "es" : "pt";
+        await phone.goto(`${BASE_URL}/${other}/quiz`);
+        const elsewhere = phone.getByTestId("quiz-elsewhere");
+        await elsewhere.waitFor();
+        assert.equal(await elsewhere.getAttribute("data-locale"), locale);
+        assert.equal(await elsewhere.getByRole("link").getAttribute("href"), `/${locale}/quiz`);
+        assert.equal(await phone.getByTestId("quiz-question").count(), 0, `${other}: no questions once started in ${locale}`);
+        assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${other}: no horizontal scroll`);
+        await elsewhere.getByRole("link").tap();
+        await phone.waitForURL(new RegExp(`/${locale}/quiz$`));
+        // Back where they got to: the second question.
+        await phone.locator('[data-testid="quiz-question"][data-index="1"]').waitFor();
         await phone.close();
       }
       const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
