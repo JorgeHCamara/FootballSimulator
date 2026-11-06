@@ -47,8 +47,12 @@ import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
  *
  * A season is played league by league as on the league pages: any score typed
  * in, a dice roll for one game, a matchday or the rest of a league simulated
- * (setScore, rollScore, simulateMatchday, simulateRest), all likely rolls as
- * there. Every score is kept in the save (DivisionSeason.scores); once every
+ * (setScore, rollScore, simulateMatchday, simulateRest). The dice make a likely
+ * roll, as there; the matchday and the rest of the season are drawn from the
+ * full score distribution, from the season's form, as a whole season is, so
+ * the tables look like real ones (likely rolls never let a club win a game it
+ * has under a one-in-five chance of winning: over a season, a 106-point
+ * champion and a 9-point bottom club). Every score is kept in the save (DivisionSeason.scores); once every
  * game of the four leagues is decided, playSeason finishes the season (it
  * would draw any game left from the season's form) and the next one starts.
  * Each finished season keeps its final tables and every result
@@ -647,31 +651,31 @@ export function rollScore(world: World, code: DivisionCode, fixture: Fixture, rn
   return putScore(world, index, fixture.id, score);
 }
 
-/** Likely rolls for a matchday's games without a score ("Simulate matchday", as on the league pages). */
+/** A matchday's games without a score ("Simulate matchday"), each drawn from the season's form, the full distribution (upsets included). */
 export function simulateMatchday(world: World, code: DivisionCode, matchday: number, rng: Rng = createRng(randomSeed())): World {
   const state = divisionState(world, code);
-  const added = simulateFixtures(state.fixtures.filter((f) => f.matchday === matchday), state.results, state.model, rng, { likely: true });
+  const added = simulateFixtures(state.fixtures.filter((f) => f.matchday === matchday), state.results, state.model, rng, { fast: true });
   return withScores(world, state.index, state.picks, { ...state.picks, ...added });
 }
 
-/** Likely rolls for the play-off's games without a score, once the league is complete ("Simulate matchday" on the play-off). */
+/** The play-off's games without a score, once the league is complete ("Simulate matchday" on the play-off), from the season's form. */
 export function simulatePlayoffs(world: World, code: DivisionCode, rng: Rng = createRng(randomSeed())): World {
   const state = divisionState(world, code);
   if (!state.league.playoff || !state.leagueComplete) return world;
-  const added = simulatePlayoff(state.rows, state.league.playoff, state.picks, state.model, rng, { ...state.playoffOptions, likely: true });
+  const added = simulatePlayoff(state.rows, state.league.playoff, state.picks, state.model, rng, state.playoffOptions);
   return withScores(world, state.index, state.picks, { ...state.picks, ...added });
 }
 
-/** Likely rolls for the rest of one league's season, its play-off included ("Simulate rest of season", as on the league pages). */
+/** The rest of one league's season, its play-off included ("Simulate rest of season"): every game drawn from the season's form, as a whole season is. */
 export function simulateRest(world: World, code: DivisionCode, rng: Rng = createRng(randomSeed())): World {
   const state = divisionState(world, code);
-  const league = simulateFixtures(state.fixtures, state.results, state.model, rng, { likely: true });
+  const league = simulateFixtures(state.fixtures, state.results, state.model, rng, { fast: true });
   const picks = { ...state.picks, ...league };
   if (state.league.playoff) {
     const all = { ...state.results, ...league };
     const d = world.divisions[state.index]!;
     const rows = standingsOf(state.league, d, state.teams, state.fixtures, all);
-    Object.assign(picks, simulatePlayoff(rows, state.league.playoff, { ...state.picks, ...all }, state.model, rng, { ...state.playoffOptions, likely: true }));
+    Object.assign(picks, simulatePlayoff(rows, state.league.playoff, { ...state.picks, ...all }, state.model, rng, state.playoffOptions));
   }
   return withScores(world, state.index, state.picks, picks);
 }

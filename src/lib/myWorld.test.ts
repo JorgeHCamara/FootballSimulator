@@ -463,21 +463,22 @@ describe("My World: a season played your way", () => {
     assert.equal(setScore(world, "PL", open, { home: -1, away: 2 }), world);
   });
 
-  it("the dice and the league buttons make likely rolls, as on the league pages", () => {
+  it("the dice make a likely roll, as on the league pages; Simulate matchday plays that matchday only", () => {
     let world = startNextSeason(playSeason(start()));
-    // Simulate matchday: that matchday's games only, each a likely score.
     world = simulateMatchday(world, "PL", 1, createRng(9));
     const state = divisionState(world, "PL");
     const first = state.fixtures.filter((f) => f.matchday === 1);
     assert.equal(Object.keys(state.picks).length, first.length);
-    for (const f of first) {
-      const likely = likelyScoreSet(expectedGoals(state.model, f.homeId, f.awayId), state.model.rho ?? 0);
-      assert.ok(likely.some((s) => s.home === state.picks[f.id]!.home && s.away === state.picks[f.id]!.away), "a likely score");
-    }
-    // The dice: another score each time.
+    assert.ok(first.every((f) => state.picks[f.id]));
+    // The dice: a likely score, another one each time.
     const game = state.fixtures.find((f) => f.matchday === 2)!;
     const once = rollScore(world, "PL", game, createRng(1));
     const twice = rollScore(once, "PL", game, createRng(1));
+    const likely = likelyScoreSet(expectedGoals(state.model, game.homeId, game.awayId), state.model.rho ?? 0);
+    for (const w of [once, twice]) {
+      const score = divisionState(w, "PL").picks[game.id]!;
+      assert.ok(likely.some((s) => s.home === score.home && s.away === score.away), "a likely score");
+    }
     assert.notDeepEqual(divisionState(twice, "PL").picks[game.id], divisionState(once, "PL").picks[game.id]);
     // Simulate rest of season: the whole league, play-off included; the other leagues untouched.
     const rest = simulateRest(world, "ELC", createRng(2));
@@ -489,6 +490,27 @@ describe("My World: a season played your way", () => {
     const reset = resetDivision(rest, "ELC");
     assert.equal(picked(reset, "ELC"), 0);
     assert.equal(picked(reset, "PL"), first.length);
+  });
+
+  it("Simulate rest of season gives real-world tables season after season: no runaway champions, no hopeless bottom clubs", () => {
+    // Fifteen seasons played the page's way: every league's rest of the season, then the next season.
+    let world = start();
+    const champions: number[] = [];
+    const bottoms: number[] = [];
+    for (let season = 0; season < 15; season++) {
+      world = startNextSeason(playSeason(ENGLAND.reduce((w, code, i) => simulateRest(w, code, createRng(100 * season + i)), world)));
+      const pl = world.history.at(-1)!.divisions[0]!.rows;
+      champions.push(pl[0]![7]);
+      bottoms.push(pl.at(-1)![7]);
+      // The weakest club still wins some games; the champions still drop points.
+      assert.ok(pl.at(-1)![2] >= 2, `${world.year - 1}: the bottom club won ${pl.at(-1)![2]}`);
+    }
+    const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+    // Real Premier League seasons: champions on about 80–100 points, the bottom club on about 11–35.
+    assert.ok(Math.max(...champions) <= 104 && mean(champions) >= 70 && mean(champions) <= 95, `champions: ${champions}`);
+    assert.ok(Math.min(...bottoms) >= 8 && mean(bottoms) >= 18 && mean(bottoms) <= 38, `bottom clubs: ${bottoms}`);
+    // No drift: the last five seasons no more lopsided than the first five.
+    assert.ok(mean(champions.slice(-5)) - mean(bottoms.slice(-5)) <= mean(champions.slice(0, 5)) - mean(bottoms.slice(0, 5)) + 15, `${champions} / ${bottoms}`);
   });
 
   it("play-off scores belong to their pairing, and a shoot-out to a level tie", () => {
