@@ -425,7 +425,9 @@ look back at past seasons from a season picker.
 - Every result, as on the league pages: each league's table and fixtures,
   score boxes and the dice (likely rolls), Simulate matchday, Simulate rest of
   season, Undo, Reset, the play-off ties and the promoted clubs; no match
-  previews. The first season's results can be changed too.
+  previews. The first season's results can be changed too. The league buttons
+  draw from the full distribution, so tables look like real ones season after
+  season (no 106-point champions or 9-point bottom clubs).
 - No "Play the next round" or "Play the season": the club card shows the games
   left in each league (play-offs included) and, once every league is played,
   "End season" (promotion and relegation, then the season's review). The
