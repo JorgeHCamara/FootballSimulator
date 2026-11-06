@@ -16,14 +16,20 @@ interface Props {
   league: string;
   /** "inline": a button next to the table (desktop); "bar": a full-width thumb bar (phones). */
   variant: "inline" | "bar";
+  /** The card's file name when shared or downloaded. */
+  imageName?: string;
+  /** What is shared, for the analytics event: a prediction (the default), a club, a report, its movers… */
+  content?: string;
+  /** Which edge of the button the menu lines up with (the right by default; the left when the button starts a block). */
+  align?: "left" | "right";
 }
 
 type Channel = "native" | "image" | "copy" | "x" | "whatsapp" | "reddit" | "facebook" | "download";
 
 /** Which channel people share through (Vercel Analytics custom event). */
-const report = (channel: Channel, league: string) => {
+const report = (channel: Channel, league: string, content: string) => {
   try {
-    track("Share", { channel, league });
+    track("Share", { channel, league, content });
   } catch {
     // Analytics must never break sharing.
   }
@@ -40,7 +46,7 @@ const hasNativeShare = () => typeof navigator !== "undefined" && typeof navigato
  * the native sheet is missing or fails, a menu: copy the link, X, WhatsApp,
  * Reddit, Facebook, download the card.
  */
-export function ShareMenu({ path, imagePath, title, text, league, variant }: Props) {
+export function ShareMenu({ path, imagePath, title, text, league, variant, imageName = "footsimu-prediction.png", content = "prediction", align = "right" }: Props) {
   const t = useTranslations("Simulator");
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -80,7 +86,7 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
   const url = () => new URL(path, window.location.origin).toString();
 
   const nativeShare = async () => {
-    report("native", league);
+    report("native", league, content);
     try {
       await navigator.share({ title, text, url: url() });
       setOpen(false);
@@ -99,13 +105,13 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
   };
 
   const shareImage = async () => {
-    report("image", league);
+    report("image", league, content);
     let file = image.for === imagePath ? image.file : undefined;
     if (!file) {
       setImage({ state: "loading", for: imagePath });
       try {
         const blob = await (await fetch(imagePath)).blob();
-        file = new File([blob], "footsimu-prediction.png", { type: "image/png" });
+        file = new File([blob], imageName, { type: "image/png" });
       } catch {
         setImage({ state: "idle" });
         setNotice(t("shareFailed"));
@@ -127,7 +133,7 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
   };
 
   const copy = async () => {
-    report("copy", league);
+    report("copy", league, content);
     try {
       await navigator.clipboard.writeText(url());
     } catch {
@@ -156,7 +162,7 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
       aria-label={t("shareMenu")}
       data-testid="share-menu"
       className={`absolute z-30 w-64 rounded-xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 ${
-        variant === "bar" ? "bottom-full right-0 mb-2" : "right-0 top-full mt-2"
+        variant === "bar" ? "bottom-full right-0 mb-2" : `${align === "left" ? "left-0" : "right-0"} top-full mt-2`
       }`}
     >
       {notice && <p className="px-3 py-2 text-xs text-zinc-500" role="status">{notice}</p>}
@@ -166,12 +172,12 @@ export function ShareMenu({ path, imagePath, title, text, league, variant }: Pro
       </button>
       {typeof window !== "undefined" &&
         links().map((link) => (
-          <a key={link.channel} role="menuitem" className={item} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => report(link.channel, league)} data-testid={`share-${link.channel}`}>
+          <a key={link.channel} role="menuitem" className={item} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => report(link.channel, league, content)} data-testid={`share-${link.channel}`}>
             <Icon name={CHANNEL_ICONS[link.channel]} />
             {link.label}
           </a>
         ))}
-      <a role="menuitem" className={item} href={imagePath} download="footsimu-prediction.png" onClick={() => report("download", league)} data-testid="share-download">
+      <a role="menuitem" className={item} href={imagePath} download={imageName} onClick={() => report("download", league, content)} data-testid="share-download">
         <Icon name="download" />
         {t("downloadImage")}
       </a>

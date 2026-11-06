@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Flag } from "../../../../../components/Flag.tsx";
 import { Icon, type IconName } from "../../../../../components/Icon.tsx";
 import { JsonLd } from "../../../../../components/JsonLd.tsx";
+import { ShareCardBlock } from "../../../../../components/ShareCardBlock.tsx";
 import { ShareMenu } from "../../../../../components/ShareMenu.tsx";
 import { TeamBadge } from "../../../../../components/TeamBadge.tsx";
 import { zoneHex, ZONE_STYLES } from "../../../../../components/zones.ts";
@@ -122,6 +123,8 @@ export default async function ClubPage({ params }: { params: Params }) {
     title: t("shareTitle", { club: team.name, season: season }),
     text: t("shareText", { club: team.name, league: league.name, season: season }),
     league: league.code,
+    imageName: `footsimu-${league.slug}-${teamSlug}.png`,
+    content: "club",
   };
   const others = data.teams.filter((x) => x.id !== team.id && outlook.clubs.has(x.id)).sort((a, b) => a.name.localeCompare(b.name, lang));
 
@@ -362,6 +365,14 @@ export default async function ClubPage({ params }: { params: Params }) {
           </div>
         </div>
         <p className="text-xs text-zinc-500">{t("chancesNote", { count })}</p>
+        {/* The club's card, as it's shared: one tap to share it or its link. */}
+        <ShareCardBlock
+          title={t("shareCardTitle", { club: team.shortName })}
+          body={t("shareCardBody")}
+          alt={t("shareCardAlt", { club: team.name })}
+          share={shareProps}
+          testId="club-share-card"
+        />
       </section>
 
       <section className="space-y-3" data-testid="club-distribution">

@@ -6,7 +6,25 @@ import type { Fixture, Team } from "../engine/types.ts";
 import { firstCardThatRenders } from "./cardFallback.ts";
 import { withClubPages } from "./clubs.ts";
 import type { LeagueData } from "./leagueData.ts";
-import { buildReport, categoryValue, clubGames, reportCategories, reportGames, reportPath, resultOfRound, roundFromParam, seasonReports, seasonYearLabel } from "./oddsReports.ts";
+import {
+  buildReport,
+  categoryValue,
+  clubGames,
+  MOVERS_CARD,
+  moversCardSections,
+  reportCategories,
+  reportGames,
+  reportPath,
+  resultOfRound,
+  roundFromParam,
+  seasonReports,
+  seasonYearLabel,
+  topMovers,
+  type Category,
+  type Change,
+  type OddsReport,
+  type ReportRow,
+} from "./oddsReports.ts";
 import { SIM_VERSION } from "./simVersion.ts";
 import { addSnapshots, completedRounds, snapshotAfter, snapshotModel, storedRounds, type OddsSnapshot, type TeamSnapshot } from "./snapshots.ts";
 
@@ -89,6 +107,81 @@ describe("odds reports", () => {
     assert.ok(before.rows.some((r) => r.values.title!.delta !== undefined));
     assert.deepEqual(before.race.modelChanges, []);
     assert.equal(buildReport(pl, season, 9)!.modelChange, false);
+  });
+
+  it("the biggest movers one way: top N by the size of the change, ties in a fixed order", () => {
+    const change = (teamId: number, delta: number | undefined, now: number): Change => ({ teamId, now, ...(delta !== undefined ? { before: now, delta } : {}) });
+    // Table places: club 1 first … club 9 ninth.
+    const position = (id: number) => id;
+    const changes = [change(5, 4, 0.2), change(2, 9, 0.3), change(7, -6, 0.1), change(3, 4, 0.2), change(9, 4, 0.5), change(4, -6, 0.1), change(6, 0, 0.4), change(8, undefined, 0.4), change(1, -2, 0.6)];
+    // Up: +9, then the three +4s: the higher chance now first (club 9, 50%), then the higher place (club 3 before club 5).
+    assert.deepEqual(topMovers(changes, 1, 4, position).map((c) => c.teamId), [2, 9, 3, 5]);
+    assert.deepEqual(topMovers(changes, 1, 2, position).map((c) => c.teamId), [2, 9]);
+    // Down: the two −6s, the same chance now: the higher place first (club 4, then 7), then −2.
+    assert.deepEqual(topMovers(changes, -1, 3, position).map((c) => c.teamId), [4, 7, 1]);
+    // No change and no comparison are never movers.
+    assert.ok(![...topMovers(changes, 1, 9, position), ...topMovers(changes, -1, 9, position)].some((c) => c.teamId === 6 || c.teamId === 8));
+    // The same order whatever order the clubs come in.
+    for (let k = 0; k < 10; k++) {
+      const shuffled = [...changes].sort(() => Math.random() - 0.5);
+      assert.deepEqual(topMovers(shuffled, 1, 4, position).map((c) => c.teamId), [2, 9, 3, 5]);
+      assert.deepEqual(topMovers(shuffled, -1, 3, position).map((c) => c.teamId), [4, 7, 1]);
+    }
+    // Last resort: the club id.
+    assert.deepEqual(topMovers([change(12, 3, 0.2), change(11, 3, 0.2)], 1, 2, () => 1).map((c) => c.teamId), [11, 12]);
+  });
+
+  it("the report's movers are the same as the movers card's, three a side", () => {
+    const report = buildReport(pl, season, 9)!;
+    const cards = moversCardSections(report, { categories: 9, perSide: 3 });
+    for (const m of report.movers.filter((m) => m.up.length || m.down.length)) {
+      const card = cards.find((c) => c.category.kind === m.category.kind)!;
+      assert.deepEqual(card.up, m.up);
+      assert.deepEqual(card.down, m.down);
+    }
+  });
+
+  it("the movers card: up to three categories (title, promotion, relegation first), two risers and fallers each, none without changes", () => {
+    const report = buildReport(pl, season, 9)!;
+    const sections = moversCardSections(report);
+    assert.ok(sections.length > 0 && sections.length <= MOVERS_CARD.categories);
+    for (const s of sections) {
+      assert.ok(s.up.length <= MOVERS_CARD.perSide && s.down.length <= MOVERS_CARD.perSide);
+      assert.ok(s.up.length + s.down.length > 0);
+      const m = report.movers.find((x) => x.category.kind === s.category.kind)!;
+      assert.deepEqual(s.up, m.up.slice(0, MOVERS_CARD.perSide), "the report's own top movers");
+      assert.deepEqual(s.down, m.down.slice(0, MOVERS_CARD.perSide));
+    }
+    // In the report's order.
+    const order = report.categories.map((c) => c.kind);
+    assert.deepEqual(sections.map((s) => s.category.kind), order.filter((k) => sections.some((s) => s.category.kind === k)));
+    // No changes: the season's first report, and the first after a model change.
+    assert.deepEqual(moversCardSections(buildReport(pl, season, 7)!), []);
+    assert.deepEqual(moversCardSections({ ...report, modelChange: true }), []);
+
+    // A second division with five categories: the title, promotion and relegation are picked; one changing less is still shown over one not changing.
+    const cats: Category[] = [
+      { kind: "title", zone: "title" },
+      { kind: "continental", zone: "championsLeague" },
+      { kind: "promotion", zone: "promotion" },
+      { kind: "playoffs", zone: "playoffs" },
+      { kind: "relegation", zone: "relegation" },
+    ];
+    const row = (teamId: number, deltas: Partial<Record<Category["kind"], number>>): ReportRow => ({
+      teamId,
+      position: teamId,
+      points: 0,
+      played: 0,
+      expectedPosition: teamId,
+      values: Object.fromEntries(cats.map((c) => [c.kind, { teamId, now: 0.5, before: 0.5, delta: deltas[c.kind] ?? 0 }])),
+    });
+    const fake = (rows: ReportRow[]) => ({ ...report, categories: cats, rows, modelChange: false }) as OddsReport;
+    const all = fake([row(1, { title: 5, continental: 9, promotion: 3, playoffs: 8, relegation: -1 }), row(2, { title: -5, continental: -9, promotion: -3, playoffs: -8, relegation: 1 })]);
+    assert.deepEqual(moversCardSections(all).map((s) => s.category.kind), ["title", "promotion", "relegation"]);
+    // No title change: the next one in line (the continental places) takes its place, in the report's order.
+    const noTitle = fake([row(1, { continental: 9, promotion: 3, playoffs: 8, relegation: -1 }), row(2, { continental: -9, promotion: -3, playoffs: -8, relegation: 1 })]);
+    assert.deepEqual(moversCardSections(noTitle).map((s) => s.category.kind), ["continental", "promotion", "relegation"]);
+    assert.deepEqual(moversCardSections(noTitle, { categories: 5 }).map((s) => s.category.kind), ["continental", "promotion", "playoffs", "relegation"]);
   });
 
   it("a rebuild takes the season's stored rounds again, each as of its own moment", () => {

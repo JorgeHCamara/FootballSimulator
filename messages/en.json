@@ -873,6 +873,9 @@
     "simulate": "Simulate the rest of {club}'s season",
     "shareTitle": "{club} {season}: season chances",
     "shareText": "{club}'s chances in the {league} {season} on Foot Simu",
+    "shareCardTitle": "Share {club}'s chances",
+    "shareCardBody": "A card with where it stands, its likely finish and its chances, ready to post on X, WhatsApp or Instagram.",
+    "shareCardAlt": "{club}'s season chances card",
     "otherClubs": "Other {league} clubs",
     "card": {
       "likeliest": "Likely finish: {range}",
@@ -965,6 +968,9 @@
       "relegation": "Relegation"
     },
     "moversTitle": "Biggest risers and fallers",
+    "moversShareTitle": "Share the biggest movers",
+    "moversShareBody": "A card with this round's biggest risers and fallers, ready to post on X, WhatsApp or Instagram.",
+    "moversCardAlt": "{league}: biggest movers after {round}",
     "moversNote": "Changes since {round}, in points of percentage.",
     "up": "Up",
     "down": "Down",
@@ -1008,7 +1014,8 @@
     "card": {
       "title": "{race} after {round}",
       "basedOn": "Based on {count} simulated seasons",
-      "cta": "Every report at footsimu.com"
+      "cta": "Every report at footsimu.com",
+      "moversTitle": "Biggest movers after {round}"
     },
     "hubTitle": "Latest odds: what changed after each round",
     "hubDescription": "After every completed round: who rose and who fell in the title, European and relegation races of every league on Foot Simu, from 10,000 simulated seasons.",

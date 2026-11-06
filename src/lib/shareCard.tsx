@@ -432,3 +432,134 @@ export async function renderOddsCard(text: OddsCardText) {
   );
 }
 
+
+/** One club on the biggest-movers card: its change, and its chance before and now. */
+export interface MoverCardRow {
+  name: string;
+  tla: string;
+  crest?: string;
+  /** Its chance before and now ("34%", "46%"). */
+  from: string;
+  to: string;
+  delta: { text: string; good: boolean; up: boolean };
+}
+
+export interface MoversCardText {
+  pill: string;
+  /** "Biggest movers after Matchday 11". */
+  title: string;
+  /** "After the games up to 2 November 2026". */
+  date: string;
+  /** The halves' headings ("Up", "Down"). */
+  up: string;
+  down: string;
+  sections: { name: string; color: string; up: MoverCardRow[]; down: MoverCardRow[] }[];
+  basedOn: string;
+  cta: string;
+}
+
+/** A round's biggest-movers card: up to three races, each with its biggest risers and fallers. The round never changes: kept as the share cards. */
+export async function renderMoversCard(text: MoversCardText) {
+  const rowHeight = text.sections.length > 2 ? 46 : 54;
+  // On the white panel: the crest, or the club's initials in a grey circle.
+  const badge = (r: MoverCardRow) =>
+    r.crest ? (
+      // eslint-disable-next-line @next/next/no-img-element -- next/og renders plain img elements
+      <img src={r.crest} width={30} height={30} style={{ objectFit: "contain" }} alt="" />
+    ) : (
+      <div style={{ width: 30, height: 30, borderRadius: 15, background: "#e4e4e7", color: "#3f3f46", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800 }}>
+        {r.tla.slice(0, 3)}
+      </div>
+    );
+  // Lucide's arrow-right (Inter as bundled has no arrow character).
+  const arrow = (
+    <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  );
+  const half = (rows: MoverCardRow[]) => (
+    <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+      {rows.length ? (
+        rows.map((r) => {
+          const color = r.delta.good ? "#15803d" : "#dc2626";
+          return (
+            <div key={r.name} style={{ display: "flex", alignItems: "center", gap: 10, height: rowHeight }}>
+              {badge(r)}
+              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+                <span style={{ fontSize: 20, fontWeight: 700, overflow: "hidden", whiteSpace: "nowrap" }}>{truncate(r.name, 15)}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 15, fontWeight: 600, color: "#71717a" }}>
+                  {r.from}
+                  {arrow}
+                  {r.to}
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 19, fontWeight: 800, color }}>
+                {trend(r.delta.up, color)}
+                {r.delta.text}
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <span style={{ display: "flex", alignItems: "center", height: rowHeight, fontSize: 20, color: "#a1a1aa" }}>–</span>
+      )}
+    </div>
+  );
+  return new ImageResponse(
+    (
+      <div style={{ width: "100%", height: "100%", display: "flex", background: PITCH_700, fontFamily: "Inter", color: "#ffffff" }}>
+        <div style={{ width: 470, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "48px 28px 48px 56px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <BrandMark size={48} />
+            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ display: "flex" }}>
+              <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 1.5, padding: "8px 16px", borderRadius: 999, background: "rgba(255,255,255,0.16)", color: "#dcfce7" }}>
+                {truncate(text.pill, 30)}
+              </span>
+            </div>
+            <span style={{ fontSize: text.title.length <= 36 ? 44 : 38, fontWeight: 800, lineHeight: 1.08, letterSpacing: -1.5, maxWidth: 386 }}>{text.title}</span>
+            <span style={{ fontSize: 19, color: "#bbf7d0" }}>{text.date}</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <span style={{ fontSize: 18, color: "#bbf7d0" }}>{text.basedOn}</span>
+            <div style={{ display: "flex" }}>
+              <span style={{ fontSize: 21, fontWeight: 700, padding: "12px 20px", borderRadius: 14, background: "#ffffff", color: PITCH_700 }}>{text.cta}</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "32px 44px 32px 4px" }}>
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 14, background: "#ffffff", borderRadius: 24, padding: "20px 26px 18px", color: "#18181b", boxShadow: "0 20px 40px rgba(0,0,0,0.25)" }}>
+            {/* Which way: up on the left, down on the right (arrows drawn as Lucide's trend icons). */}
+            <div style={{ display: "flex", gap: 24, fontSize: 15, fontWeight: 700, letterSpacing: 1, color: "#71717a", textTransform: "uppercase" }}>
+              {[
+                { label: text.up, up: true },
+                { label: text.down, up: false },
+              ].map((h) => (
+                <div key={h.label} style={{ flex: 1, display: "flex", alignItems: "center", gap: 6 }}>
+                  {trend(h.up, "#71717a")}
+                  {h.label}
+                </div>
+              ))}
+            </div>
+            {text.sections.map((s, i) => (
+              <div key={s.name} style={{ display: "flex", flexDirection: "column", paddingTop: 10, borderTop: i === 0 ? "2px solid #e4e4e7" : "1px solid #f4f4f5" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 19, fontWeight: 800, color: "#3f3f46" }}>
+                  <span style={{ width: 14, height: 14, borderRadius: 4, background: s.color }} />
+                  {truncate(s.name, 40)}
+                </div>
+                <div style={{ display: "flex", gap: 24 }}>
+                  {half(s.up)}
+                  {half(s.down)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_HEADERS },
+  );
+}

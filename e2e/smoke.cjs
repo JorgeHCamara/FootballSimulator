@@ -2004,6 +2004,112 @@ async function step(name, fn) {
       }
     });
 
+    await step("share cards: each report's biggest-movers card, the club card on club pages, with their share menus", async () => {
+      /** A PNG's width and height, from its header. */
+      const pngSize = async (res) => {
+        const bytes = Buffer.from(await res.body());
+        assert.equal(bytes.subarray(1, 4).toString(), "PNG");
+        return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
+      };
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/premier-league/odds`);
+      const round = await p.getByTestId("odds-report").getAttribute("data-round");
+      const roundPath = `/en/premier-league/odds/matchday-${round}`;
+      // In the "Biggest risers and fallers" section: the card as it's shared, the round's own (cached by its round).
+      const block = p.locator('[data-testid="odds-movers"] [data-testid="odds-movers-share"]');
+      await block.scrollIntoViewIfNeeded();
+      const img = block.getByTestId("odds-movers-share-image");
+      assert.equal(await img.getAttribute("src"), `${roundPath}/movers-image`);
+      await p.waitForFunction((el) => el.complete && el.naturalWidth > 0, await img.elementHandle(), { timeout: 60000 });
+      assert.deepEqual(await img.evaluate((el) => [el.naturalWidth, el.naturalHeight]), [1200, 630]);
+      assert.match(await block.innerText(), /Share the biggest movers/);
+      await block.locator('[data-testid="share-button"]:visible').click();
+      const menu = block.getByTestId("share-menu");
+      await menu.waitFor();
+      assert.equal(await menu.getByTestId("share-download").getAttribute("href"), `${roundPath}/movers-image`);
+      assert.equal(await menu.getByTestId("share-download").getAttribute("download"), `footsimu-premier-league-matchday-${round}-movers.png`);
+      // The link shared is the round's report (the movers card stays that round's).
+      assert.ok((await menu.getByTestId("share-x").getAttribute("href")).includes(encodeURIComponent(`${BASE_URL}${roundPath}`)));
+      await p.keyboard.press("Escape");
+      // The image: a 1200×630 PNG in every language, kept as long as the share cards (a round's report never changes).
+      for (const locale of ["en", "pt", "es"]) {
+        const res = await p.request.get(`${BASE_URL}/${locale}/premier-league/odds/matchday-${round}/movers-image`);
+        assert.equal(res.status(), 200, locale);
+        assert.equal(res.headers()["content-type"], "image/png");
+        assert.match(res.headers()["cache-control"], /s-maxage=31536000/);
+        assert.deepEqual(await pngSize(res), [1200, 630]);
+      }
+      // A second division (title, promotion, relegation): its card too.
+      await p.goto(`${BASE_URL}/en/championship/odds`);
+      const elcRound = await p.getByTestId("odds-report").getAttribute("data-round");
+      const elc = await p.request.get(`${BASE_URL}/en/championship/odds/matchday-${elcRound}/movers-image`);
+      assert.equal(elc.status(), 200);
+      assert.deepEqual(await pngSize(elc), [1200, 630]);
+      await p.goto(`${BASE_URL}/en/premier-league/odds`);
+      // Unknown rounds and leagues without reports: 404.
+      for (const path of ["/en/premier-league/odds/matchday-999/movers-image", "/en/premier-league/odds/round-1/movers-image", "/en/champions-league/odds/matchday-1/movers-image"]) {
+        assert.equal((await p.request.get(`${BASE_URL}${path}`)).status(), 404, path);
+      }
+      // The season's first report has no changes: no movers card offered, and its address gives the report's card.
+      const archive = await p.locator('[data-testid="odds-archive"] a').evaluateAll((links) => links.map((a) => a.getAttribute("href")));
+      await p.goto(`${BASE_URL}${archive.at(-1)}`);
+      assert.equal(await p.getByTestId("odds-movers-share").count(), 0);
+      const firstCard = await p.request.get(`${BASE_URL}${archive.at(-1)}/movers-image`);
+      assert.equal(firstCard.status(), 200);
+      assert.deepEqual(await pngSize(firstCard), [1200, 630]);
+      // Not pages: none of them in the sitemap.
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      assert.doesNotMatch(sitemap, /movers-image|opengraph-image/);
+
+      // A club page: its card under its chances, with the share menu (as well as the one in its header).
+      const club = sitemap.match(/https:\/\/footsimu\.com(\/en\/premier-league\/team\/[a-z0-9-]+)</)[1];
+      const slug = club.split("/").at(-1);
+      await p.goto(`${BASE_URL}${club}`);
+      const clubBlock = p.locator('[data-testid="club-chances"] [data-testid="club-share-card"]');
+      await clubBlock.scrollIntoViewIfNeeded();
+      const clubImg = clubBlock.getByTestId("club-share-card-image");
+      assert.equal(await clubImg.getAttribute("src"), `${club}/opengraph-image`);
+      await p.waitForFunction((el) => el.complete && el.naturalWidth > 0, await clubImg.elementHandle(), { timeout: 60000 });
+      assert.deepEqual(await clubImg.evaluate((el) => [el.naturalWidth, el.naturalHeight]), [1200, 630]);
+      assert.match(await clubBlock.innerText(), /^Share .+'s chances/);
+      await clubBlock.locator('[data-testid="share-button"]:visible').click();
+      assert.equal(await clubBlock.getByTestId("share-download").getAttribute("download"), `footsimu-premier-league-${slug}.png`);
+      assert.equal(await clubBlock.getByTestId("share-download").getAttribute("href"), `${club}/opengraph-image`);
+      await p.keyboard.press("Escape");
+      assert.equal(await p.locator('header [data-testid="share-button"]:visible').count(), 1, "the header's share stays");
+      await p.close();
+
+      // Phones: one tap on the club's card shares its page; the card itself goes straight to the share sheet.
+      const ctx = await browser.newContext({ viewport: { width: 360, height: 760 }, isMobile: true, hasTouch: true });
+      await ctx.addInitScript(() => {
+        window.__shares = [];
+        navigator.share = async (data) => { window.__shares.push({ ...data, files: data.files?.map((f) => f.name) ?? [] }); };
+        navigator.canShare = (data) => Boolean(data?.files);
+      });
+      const phone = await ctx.newPage();
+      await phone.goto(`${BASE_URL}${club}`);
+      const bar = phone.locator('[data-testid="club-share-card"] [data-testid="share-bar"]');
+      await bar.scrollIntoViewIfNeeded();
+      assert.ok((await bar.getByTestId("share-button").boundingBox()).height >= 44);
+      await bar.getByTestId("share-button").tap();
+      await phone.waitForFunction(() => window.__shares.length === 1);
+      assert.equal(await phone.evaluate(() => window.__shares[0].url), `${BASE_URL}${club}`);
+      await bar.getByTestId("share-image").tap();
+      await phone.waitForFunction(() => window.__shares.length === 2, null, { timeout: 60000 });
+      assert.deepEqual(await phone.evaluate(() => window.__shares[1].files), [`footsimu-premier-league-${slug}.png`]);
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 360, "no sideways scroll");
+      // The report's movers card on a phone.
+      await phone.goto(`${BASE_URL}/en/premier-league/odds`);
+      const moversBar = phone.locator('[data-testid="odds-movers-share"] [data-testid="share-bar"]');
+      await moversBar.scrollIntoViewIfNeeded();
+      await moversBar.getByTestId("share-image").tap();
+      // (A new page: its own list of shares.)
+      await phone.waitForFunction(() => window.__shares.length === 1, null, { timeout: 60000 });
+      assert.deepEqual(await phone.evaluate(() => window.__shares[0].files), [`footsimu-premier-league-matchday-${round}-movers.png`]);
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 360, "no sideways scroll");
+      await ctx.close();
+    });
+
     await step("daily quiz: six questions, right or wrong at once, the score, kept for the day, the same set on a reload, nav, home, sitemap", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en`);
