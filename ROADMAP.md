@@ -428,8 +428,9 @@ look back at past seasons from a season picker.
   previews. The first season's results can be changed too.
 - No "Play the next round" or "Play the season": the club card shows the games
   left in each league (play-offs included) and, once every league is played,
-  "Go to next season" (promotion and relegation; the season's review on top of
-  the new season until closed).
+  "End season" (promotion and relegation, then the season's review). The
+  review's "Start next season", in its bottom-right corner, opens the next
+  season's tables and fixtures, hidden until then.
 - A season picker, on the left of the league's buttons, shows any finished
   season's final tables and fixtures (every result, the play-off ties), read
   only; it replaces the past seasons' tables below the current one.
