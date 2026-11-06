@@ -9,16 +9,17 @@ import {
   clubDivision,
   clubPath,
   createWorld,
-  currentTable,
   divisionConfig,
   ENGLAND,
+  gamesLeft,
   packReady,
   playSeason,
-  savedTable,
   seasonLabel,
   seasonMoves,
+  seasonStates,
   startNextSeason,
   type DivisionCode,
+  type PathOutcome,
   type SeasonRecord,
   type StartPack,
   type World,
@@ -28,9 +29,13 @@ import { browserStore, clearWorld, loadWorld, saveWorld } from "../lib/myWorldSt
 import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
-import { WorldTable } from "./WorldTable.tsx";
+import { zoneHex } from "./zones.ts";
+import { DivisionTabs, openingMatchday, WorldSeason } from "./WorldSeason.tsx";
 
 type View = { kind: "loading" } | { kind: "setup"; reset?: "incompatible" | "unreadable" } | { kind: "world"; world: World; saved: boolean };
+
+/** Changes within a season that Undo can take back (in this visit only). */
+const UNDO_STEPS = 50;
 
 const card = "rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900";
 const primary = "flex h-11 items-center justify-center gap-2 rounded-lg bg-pitch-600 px-4 text-sm font-semibold text-white hover:bg-pitch-700 disabled:opacity-60";
@@ -38,11 +43,14 @@ const secondary = "flex h-11 items-center justify-center gap-2 rounded-lg border
 
 /**
  * My World (see src/lib/myWorld.ts): set up a world from the live data, then
- * play it season by season. Everything happens in the browser and is saved
- * there after every step (src/lib/myWorldStorage.ts).
+ * play it season by season, result by result, league by league. Everything
+ * happens in the browser and is saved there after every step
+ * (src/lib/myWorldStorage.ts).
  */
 export function MyWorld({ pack, locale }: { pack: StartPack; locale: SiteLocale }) {
   const [view, setView] = useState<View>({ kind: "loading" });
+  // The worlds before each change in the season in progress, for Undo.
+  const [past, setPast] = useState<World[]>([]);
 
   // The saved world, once in the browser (the server has none).
   useEffect(() => {
@@ -51,17 +59,48 @@ export function MyWorld({ pack, locale }: { pack: StartPack; locale: SiteLocale 
   }, []);
 
   const keep = (world: World) => setView({ kind: "world", world, saved: saveWorld(browserStore(), world) });
+  /** A change in the season in progress: Undo can take it back. */
+  const change = (world: World) => {
+    if (view.kind === "world") {
+      const current = view.world;
+      setPast((list) => [...list.slice(-(UNDO_STEPS - 1)), current]);
+    }
+    keep(world);
+  };
+  /** A season finished or started, or a new world: nothing to undo before it. */
+  const commit = (world: World) => {
+    setPast([]);
+    keep(world);
+  };
+  const undo = () => {
+    const previous = past.at(-1);
+    if (!previous) return;
+    setPast((list) => list.slice(0, -1));
+    keep(previous);
+  };
 
   if (view.kind === "loading") return <Loading />;
-  if (view.kind === "setup") return <Setup pack={pack} locale={locale} reset={view.reset} onCreate={(league, club) => keep(createWorld(pack, { league, club }))} />;
+  if (view.kind === "setup") {
+    const onCreate = (league: DivisionCode, club: number) => {
+      commit(createWorld(pack, { league, club }));
+      // The world opens at the top: the club, its season and the ways to play it.
+      requestAnimationFrame(() => document.querySelector('[data-testid="my-world"]')?.scrollIntoView({ block: "start" }));
+    };
+    return <Setup pack={pack} locale={locale} reset={view.reset} onCreate={onCreate} />;
+  }
   return (
     <WorldScreen
       world={view.world}
       saved={view.saved}
       locale={locale}
-      onChange={keep}
+      onChange={change}
+      onCommit={commit}
+      onSet={keep}
+      canUndo={past.length > 0}
+      onUndo={undo}
       onReset={() => {
         clearWorld(browserStore());
+        setPast([]);
         setView({ kind: "setup" });
       }}
     />
@@ -185,56 +224,76 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
   );
 }
 
-/** A division picker: one button per league, as tabs. */
-function DivisionTabs({ value, onChange, label, testId }: { value: DivisionCode; onChange: (code: DivisionCode) => void; label: string; testId: string }) {
-  const t = useTranslations("World");
-  return (
-    <div role="tablist" aria-label={label} className="grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 sm:grid-cols-4 dark:bg-zinc-800" data-testid={testId}>
-      {ENGLAND.map((code) => (
-        <button
-          key={code}
-          type="button"
-          role="tab"
-          aria-selected={value === code}
-          onClick={() => onChange(code)}
-          className={`min-h-9 rounded-md px-2 text-sm font-semibold ${value === code ? "bg-white shadow-sm dark:bg-zinc-900" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300"}`}
-          data-league={code}
-        >
-          {t(`leagues.${code}.name`)}
-        </button>
-      ))}
-    </div>
-  );
+interface ScreenProps {
+  world: World;
+  saved: boolean;
+  locale: SiteLocale;
+  /** A change in the season in progress (Undo can take it back). */
+  onChange: (world: World) => void;
+  /** A season finished: the next one starts. */
+  onCommit: (world: World) => void;
+  /** A change that isn't the season's (the next season started from the review): kept, nothing to undo. */
+  onSet: (world: World) => void;
+  canUndo: boolean;
+  onUndo: () => void;
+  onReset: () => void;
 }
 
-function WorldScreen({ world, saved, locale, onChange, onReset }: { world: World; saved: boolean; locale: SiteLocale; onChange: (world: World) => void; onReset: () => void }) {
+function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo, onUndo, onReset }: ScreenProps) {
   const t = useTranslations("World");
   const me = world.clubs[world.userClub]!;
   const myDivision = clubDivision(world, world.userClub);
   const [viewed, setViewed] = useState<DivisionCode>(myDivision ?? "EL2");
+  // The matchday each league's fixtures show (else its next round).
+  const [matchdays, setMatchdays] = useState<Partial<Record<DivisionCode, number>>>({});
+  // The season the tables and fixtures show: this one, or a finished one picked to look back at.
+  const [year, setYear] = useState(world.year);
   const [playing, setPlaying] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const last = world.history.at(-1);
-  // Where the visitor's club is when the season changes: its own division's table.
-  useEffect(() => setViewed(clubDivision(world, world.userClub) ?? "EL2"), [world.year, world.userClub]);
-  const table = useMemo(() => currentTable(world, viewed), [world, viewed]);
-  const myRow = myDivision ? currentTable(world, myDivision).find((r) => r.clubId === world.userClub) : undefined;
+  // Where the visitor's club is when the season changes: its own division, on its next round, this season.
+  useEffect(() => {
+    setViewed(clubDivision(world, world.userClub) ?? "EL2");
+    setMatchdays({});
+    setYear(world.year);
+  }, [world.year, world.userClub]); // eslint-disable-line react-hooks/exhaustive-deps
+  const states = useMemo(() => seasonStates(world), [world]);
+  const state = states.find((s) => s.code === viewed)!;
+  const mine = states.find((s) => s.code === myDivision);
+  const myRow = mine?.rows.find((r) => r.teamId === world.userClub);
   const firstSeason = world.divisions.some((d) => d.games);
   const season = seasonLabel(world.year);
+  // Games left to play in each league (play-offs included); the next season once there are none.
+  const left = states.map((s) => ({ code: s.code, games: gamesLeft(s) }));
+  const done = states.every((s) => s.done);
+  const shownSeason = seasonLabel(year);
 
-  const play = () => {
+  /** Every game is played: the season ends (promotion and relegation) and its review shows; the next season starts from there. */
+  const endSeason = () => {
     setPlaying(true);
-    // Let the button show it's working before the season is played (a few milliseconds).
+    // Let the button show it's working first (the season's ratings are worked out, a few milliseconds).
     setTimeout(() => {
-      onChange(playSeason(world));
+      onCommit(playSeason(world));
       setPlaying(false);
     }, 30);
+  };
+  /** A league's games left, tapped: its table and fixtures, this season. */
+  const showLeague = (code: DivisionCode) => {
+    setViewed(code);
+    setYear(world.year);
+    document.querySelector('[data-testid="world-tables"]')?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  // The fixtures stay on the matchday shown while its scores change (as on the league pages), even once it's complete.
+  const shown = matchdays[viewed] ?? openingMatchday(state);
+  const changeShown = (changed: World) => {
+    setMatchdays((m) => (m[viewed] === undefined ? { ...m, [viewed]: shown } : m));
+    onChange(changed);
   };
 
   return (
     <div className="space-y-6" data-testid="world" data-year={world.year}>
       {/* The visitor's club and the season in progress. */}
-      <section className={`${card} flex flex-col gap-4 sm:flex-row sm:items-center`} data-testid="world-club-card">
+      <section className={`${card} flex scroll-mt-4 flex-col gap-4 lg:flex-row lg:items-center`} data-testid="world-club-card">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <TeamBadge team={me} size={44} textless />
           <div className="min-w-0">
@@ -244,18 +303,46 @@ function WorldScreen({ world, saved, locale, onChange, onReset }: { world: World
             </p>
             <p className="text-sm text-zinc-600 dark:text-zinc-400" data-testid="world-season">
               {t("season", { season })}
-              {myDivision ? ` · ${t(`leagues.${myDivision}.name`)}` : ""}
+              {myDivision ? ` · ${t(`leagues.${myDivision}.name`)}` : world.nationalLeague.includes(me.id) ? ` · ${t("leagues.NL.name")}` : ""}
               {myRow && myRow.played > 0 ? ` · ${t("standing", { position: ordinal(myRow.position, locale), points: myRow.points })}` : ""}
             </p>
           </div>
         </div>
+        {/* Games left in each league; the season's end once every league is played (not while its review shows). */}
         {!world.review && (
-          <div className="space-y-1 sm:text-right">
-            <button type="button" className={`${primary} w-full sm:w-auto`} onClick={play} disabled={playing} data-testid="world-play">
-              <Icon name={playing ? "loader-circle" : "dices"} size={18} className={playing ? "animate-spin" : ""} />
-              {playing ? t("playing") : t("play", { season })}
-            </button>
-            <p className="text-xs text-zinc-500">{t("playNote")}</p>
+          <div className="space-y-2 lg:w-[30rem] lg:shrink-0" data-testid="world-left-card">
+            <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">{t("left.title")}</p>
+            <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+              {left.map(({ code, games }) => (
+                <li key={code}>
+                  <button
+                    type="button"
+                    onClick={() => showLeague(code)}
+                    className={`flex w-full min-w-0 flex-col items-start rounded-lg px-2.5 py-1.5 text-left text-xs hover:ring-1 hover:ring-pitch-500 ${games === 0 ? "bg-pitch-50 text-pitch-800 dark:bg-pitch-900/40 dark:text-pitch-100" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"}`}
+                    data-testid="world-left"
+                    data-league={code}
+                    data-left={games}
+                  >
+                    <span className="w-full truncate font-semibold">{t(`leagues.${code}.name`)}</span>
+                    <span className="flex items-center gap-1 tabular-nums">
+                      {games === 0 && <Icon name="check" size={12} strokeWidth={3} />}
+                      {t("left.count", { count: games })}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {done ? (
+              <div className="space-y-1">
+                <button type="button" className={`${primary} w-full`} onClick={endSeason} disabled={playing} data-testid="world-end-season">
+                  <Icon name={playing ? "loader-circle" : "trophy"} size={18} className={playing ? "animate-spin" : ""} />
+                  {t("endSeason")}
+                </button>
+                <p className="text-xs text-zinc-500">{t("endSeasonNote", { season })}</p>
+              </div>
+            ) : (
+              <p className="text-xs text-zinc-500">{t("left.note")}</p>
+            )}
           </div>
         )}
       </section>
@@ -269,23 +356,46 @@ function WorldScreen({ world, saved, locale, onChange, onReset }: { world: World
       {!myDivision && me.left !== undefined && (
         <p className={`${card} flex gap-2 text-sm`} role="status" data-testid="world-out">
           <Icon name="info" size={18} className="mt-0.5 shrink-0 text-pitch-700" />
-          {t("outNotice", { club: me.name, season: seasonLabel(me.left) })}
+          {/* A season in the National League, then back up; or (a world from before it) gone for good. */}
+          {world.nationalLeague.includes(me.id)
+            ? t("outNotice", { club: me.name, season: seasonLabel(me.left) })
+            : t("goneNotice", { club: me.name, season: seasonLabel(me.left) })}
         </p>
       )}
 
-      {world.review && last && <Review record={last} world={world} locale={locale} onNext={() => onChange(startNextSeason(world))} />}
+      {world.review && last && (
+        <Review
+          record={last}
+          world={world}
+          locale={locale}
+          onStart={() => {
+            onSet(startNextSeason(world));
+            // The new season from its top: the club, its games left, then the tables and fixtures.
+            requestAnimationFrame(() => document.querySelector('[data-testid="world-club-card"]')?.scrollIntoView({ behavior: "smooth", block: "start" }));
+          }}
+        />
+      )}
 
-      {/* The season in progress, league by league. */}
-      <section className="space-y-3" data-testid="world-tables">
-        <h2 className="text-xl font-bold tracking-tight">
-          {t("tables")} <span className="font-semibold text-zinc-500">{season}</span>
-        </h2>
-        <DivisionTabs value={viewed} onChange={setViewed} label={t("tables")} testId="world-tabs" />
-        <p className="text-xs text-zinc-500">{firstSeason ? t("firstSeason") : t("newSeason")}</p>
-        <WorldTable rows={table} code={viewed} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-table" />
-      </section>
+      {/* The season, league by league, as on the league pages (or a finished one, picked to look back at); the next one only once it's started from the review. */}
+      {!world.review && (
+        <section className="scroll-mt-4 space-y-3" data-testid="world-tables">
+          <h2 className="text-xl font-bold tracking-tight">{t("seasonHeading", { season: shownSeason })}</h2>
+          <DivisionTabs value={viewed} onChange={setViewed} label={t("tables")} testId="world-tabs" />
+          <p className="text-xs text-zinc-500">{year !== world.year ? t("pastNote", { season: shownSeason }) : firstSeason ? t("firstSeason") : t("newSeason")}</p>
+          <WorldSeason
+            world={world}
+            state={state}
+            year={year}
+            onYear={setYear}
+            matchday={shown}
+            onMatchday={(md) => setMatchdays((m) => ({ ...m, [viewed]: md }))}
+            onChange={changeShown}
+            canUndo={canUndo}
+            onUndo={onUndo}
+          />
+        </section>
+      )}
 
-      <History world={world} locale={locale} />
       <Path world={world} me={me} locale={locale} />
 
       <section className="space-y-2 border-t border-zinc-200 pt-6 dark:border-zinc-800" data-testid="world-new">
@@ -314,8 +424,8 @@ function WorldScreen({ world, saved, locale, onChange, onReset }: { world: World
   );
 }
 
-/** The season just played: how the visitor's club did, the champions, who went up and down, and on to the next season. */
-function Review({ record, world, locale, onNext }: { record: SeasonRecord; world: World; locale: SiteLocale; onNext: () => void }) {
+/** The season just ended: how the visitor's club did, the champions, who went up and down; the next season starts from here. */
+function Review({ record, world, locale, onStart }: { record: SeasonRecord; world: World; locale: SiteLocale; onStart: () => void }) {
   const t = useTranslations("World");
   const name = (id: TeamId) => world.clubs[id]!.name;
   const leagueOf = (code: DivisionCode) => ({ league: t(`leagues.${code}.the`), in: t(`leagues.${code}.in`) });
@@ -393,76 +503,36 @@ function Review({ record, world, locale, onNext }: { record: SeasonRecord; world
           </div>
         ))}
       </div>
-      <button type="button" className={`${primary} w-full sm:w-auto`} onClick={onNext} data-testid="world-next">
-        {t("review.next", { season: seasonLabel(world.year) })}
-        <Icon name="chevron-right" size={18} />
-      </button>
-    </section>
-  );
-}
-
-/** Any finished season's final tables, league by league. */
-function History({ world, locale }: { world: World; locale: SiteLocale }) {
-  const t = useTranslations("World");
-  const latest = world.history.at(-1)?.year;
-  const [year, setYear] = useState<number | undefined>(latest);
-  const [code, setCode] = useState<DivisionCode>("PL");
-  // A season just played: shown first.
-  useEffect(() => {
-    setYear(latest);
-    if (latest !== undefined) setCode(world.history.at(-1)!.divisions.find((d) => d.rows.some((r) => r[0] === world.userClub))?.code ?? "PL");
-  }, [latest, world.history, world.userClub]);
-  const shown = year !== undefined ? savedTable(world, year, code) : undefined;
-  const final = shown?.final;
-  return (
-    <section className="space-y-3" data-testid="world-history">
-      <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight">
-        <Icon name="history" size={20} className="text-zinc-500" />
-        {t("history.title")}
-      </h2>
-      {world.history.length === 0 ? (
-        <p className="text-sm text-zinc-500" data-testid="world-history-empty">
-          {t("history.empty", { season: seasonLabel(world.year) })}
-        </p>
-      ) : (
-        <>
-          <label className="flex flex-col gap-1 text-xs font-semibold text-zinc-500 sm:flex-row sm:items-center sm:gap-3">
-            {t("history.season")}
-            <select
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-              data-testid="world-history-season"
-            >
-              {[...world.history].reverse().map((s, i) => (
-                <option key={s.year} value={s.year}>
-                  {seasonLabel(s.year)} ({t("history.ago", { count: i + 1 })})
-                </option>
-              ))}
-            </select>
-          </label>
-          <DivisionTabs value={code} onChange={setCode} label={t("history.league")} testId="world-history-tabs" />
-          {shown && <WorldTable rows={shown.rows} code={code} clubs={world.clubs} highlight={world.userClub} final testId="world-history-table" />}
-          {final && (
-            <p className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400" data-testid="world-history-final">
-              <Icon name="trophy" size={16} className="shrink-0 text-amber-500" />
-              {t("review.final", {
-                winner: world.clubs[final[0]]!.name,
-                loser: world.clubs[final[1]]!.name,
-                score: final[4] ? t("review.penalties", { score: `${final[2]}–${final[3]}` }) : `${final[2]}–${final[3]}`,
-              })}
-            </p>
-          )}
-        </>
-      )}
+      <div className="flex justify-end">
+        <button type="button" className={`${primary} w-full sm:w-auto`} onClick={onStart} data-testid="world-start-season">
+          {t("review.next")}
+          <Icon name="chevron-right" size={18} />
+        </button>
+      </div>
     </section>
   );
 }
 
 /** The visitor's club, season by season: its division, its place and what came of it. */
+/** Each season's outcome: its icon (or a European place's colour) and tone. */
+const OUTCOME_STYLE: Record<PathOutcome, { icon?: "trophy" | "arrow-up" | "arrow-down" | "target"; zone?: "championsLeague" | "europaLeague" | "conferenceLeague"; tone: string }> = {
+  champions: { icon: "trophy", tone: "text-pitch-700 dark:text-pitch-100" },
+  promoted: { icon: "arrow-up", tone: "text-pitch-700 dark:text-pitch-100" },
+  playoffWinners: { icon: "arrow-up", tone: "text-pitch-700 dark:text-pitch-100" },
+  nationalLeague: { icon: "arrow-up", tone: "text-pitch-700 dark:text-pitch-100" },
+  playoffs: { icon: "target", tone: "text-sky-700 dark:text-sky-300" },
+  relegated: { icon: "arrow-down", tone: "text-red-600" },
+  out: { icon: "arrow-down", tone: "text-red-600" },
+  championsLeague: { zone: "championsLeague", tone: "text-zinc-800 dark:text-zinc-100" },
+  europaLeague: { zone: "europaLeague", tone: "text-zinc-800 dark:text-zinc-100" },
+  conferenceLeague: { zone: "conferenceLeague", tone: "text-zinc-800 dark:text-zinc-100" },
+  neutral: { tone: "text-zinc-500" },
+};
+
+/** The visitor's club, season by season, the latest first: its division, its place and what came of it. */
 function Path({ world, me, locale }: { world: World; me: WorldClub; locale: SiteLocale }) {
   const t = useTranslations("World");
-  const steps = clubPath(world, me.id);
+  const steps = [...clubPath(world, me.id)].reverse();
   return (
     <section className="space-y-3" data-testid="world-path">
       <h2 className="text-xl font-bold tracking-tight">{t("path.title", { club: me.shortName })}</h2>
@@ -471,16 +541,21 @@ function Path({ world, me, locale }: { world: World; me: WorldClub; locale: Site
       ) : (
         <ol className="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
           {steps.map((s) => {
-            const label = s.note === "C" ? t("path.champions") : s.move === "up" ? t("path.up") : s.move === "down" ? (s.code === "EL2" ? t("path.out") : t("path.down")) : t("path.stay");
-            const tone = s.move === "up" || s.note === "C" ? "text-pitch-700 dark:text-pitch-100" : s.move === "down" ? "text-red-600" : "text-zinc-500";
+            const style = OUTCOME_STYLE[s.outcome];
+            const place = s.position === null ? "–" : ordinal(s.position, locale);
             return (
-              <li key={s.year} className="flex items-center gap-3 px-3 py-2.5 text-sm" data-testid="world-path-step" data-league={s.code} data-move={s.move}>
+              <li key={s.year} className="flex items-center gap-3 px-3 py-2.5 text-sm" data-testid="world-path-step" data-league={s.code} data-move={s.move} data-outcome={s.outcome}>
                 <span className="w-16 shrink-0 font-semibold tabular-nums">{seasonLabel(s.year)}</span>
-                <span className="min-w-0 flex-1 truncate">{t(`leagues.${s.code}.name`)}</span>
-                <span className="w-10 shrink-0 text-right tabular-nums text-zinc-600 dark:text-zinc-300">{ordinal(s.position, locale)}</span>
-                <span className={`flex w-28 shrink-0 items-center justify-end gap-1 text-xs font-semibold ${tone}`}>
-                  {s.note === "C" ? <Icon name="trophy" size={14} /> : s.move === "up" ? <Icon name="arrow-up" size={14} strokeWidth={2.5} /> : s.move === "down" ? <Icon name="arrow-down" size={14} strokeWidth={2.5} /> : null}
-                  {label}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">{t(`leagues.${s.code}.name`)}</span>
+                  {/* Phones: the place under the league. */}
+                  <span className="block text-xs tabular-nums text-zinc-500 sm:hidden">{place}</span>
+                </span>
+                <span className="hidden w-10 shrink-0 text-right tabular-nums text-zinc-600 sm:block dark:text-zinc-300">{place}</span>
+                <span className={`flex w-36 shrink-0 items-center justify-end gap-1.5 text-right text-xs font-semibold sm:w-44 ${style.tone}`}>
+                  {style.icon && <Icon name={style.icon} size={14} strokeWidth={style.icon === "trophy" || style.icon === "target" ? 2 : 2.5} className="shrink-0" />}
+                  {style.zone && <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: zoneHex(style.zone) }} aria-hidden />}
+                  <span className="min-w-0 truncate">{t(`path.${s.outcome}`)}</span>
                 </span>
               </li>
             );

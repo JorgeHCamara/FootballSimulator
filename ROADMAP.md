@@ -39,7 +39,8 @@ reliability (item 5) comes next, then growth, engagement and monetisation
 | 12 | Ad-slot readiness (placeholders behind a flag) | done | `roadmap/12-ad-slot-readiness` |
 | 13 | Neutral venues (backlog) | skipped | `roadmap/13-neutral-venues` |
 | 14 | PL and EFL tiebreakers (backlog) | skipped | `roadmap/14-pl-efl-tiebreakers` |
-| 15 | My World (first version) | in-pr | `roadmap/15-my-world` |
+| 15 | My World (first version) | done | `roadmap/15-my-world` |
+| 16 | My World: every result, league by league | in-pr | `roadmap/16-my-world-match-by-match` |
 
 ## 1. Match impact cache key and skeleton
 
@@ -408,3 +409,45 @@ season's final tables stay browsable.
   Premier League, past tables after later seasons, and persistence; e2e in
   EN/PT/ES on phones and desktops.
 - PR: "[Roadmap 15] My World (first version)".
+
+## 16. My World: every result, league by league
+
+**Goal:** each My World season is played result by result, the same way the
+league simulators work, for the four English leagues. The world inherits the
+leagues as they are when it starts, then it's the player's: no real results are
+synced in. First reviewed on `uat` as "[Roadmap 16] My World: a round at a
+time, or every result"; after testing it, the owner asked to drop the
+world-wide round and season buttons (the leagues' own buttons do it) and to
+look back at past seasons from a season picker.
+
+**Acceptance:**
+
+- Every result, as on the league pages: each league's table and fixtures,
+  score boxes and the dice (likely rolls), Simulate matchday, Simulate rest of
+  season, Undo, Reset, the play-off ties and the promoted clubs; no match
+  previews. The first season's results can be changed too. The league buttons
+  draw from the full distribution, so tables look like real ones season after
+  season (no 106-point champions or 9-point bottom clubs).
+- No "Play the next round" or "Play the season": the club card shows the games
+  left in each league (play-offs included) and, once every league is played,
+  "End season" (promotion and relegation, then the season's review). The
+  review's "Start next season", in its bottom-right corner, opens the next
+  season's tables and fixtures, hidden until then.
+- A season picker, on the left of the league's buttons, shows any finished
+  season's final tables and fixtures (every result, the play-off ties), read
+  only; it replaces the past seasons' tables below the current one.
+- Generated seasons have a real league's home-and-away rhythm: no club plays
+  three games in a row at home or away (a season already being played keeps
+  its calendar).
+- Every score is saved in the browser and survives a reload, and each finished
+  season keeps its results (the last 50 seasons); older saves keep working (no
+  version change).
+- Listed again: the menu, the home page and the sitemap, and indexed.
+- No fictional clubs: the National League (Boreham Wood and Harrogate Town to
+  begin with) swaps its two clubs with League Two's relegated ones each season.
+- The club's seasons, the latest first, each with its outcome: champions,
+  promoted, the play-offs, relegated, a European place, or the neutral zone.
+- Unit tests for the games left, picked scores standing, play-off scores tied
+  to their pairing, finishing a season from its scores, the kept results, and
+  the save; e2e on desktop and phones, EN/PT/ES.
+- PR: "[Roadmap 16] My World: every result, league by league", to `uat`.

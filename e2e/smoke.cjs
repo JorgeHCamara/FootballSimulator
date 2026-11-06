@@ -1405,8 +1405,7 @@ async function step(name, fn) {
       assert.equal(await mobile.locator('a:not([data-testid="mobile-latest-odds"]):not([data-testid="mobile-quiz"]):not([data-testid="mobile-my-world"])').count(), 0, "continents start closed");
       assert.equal(await mobile.getByTestId("mobile-latest-odds").getAttribute("href"), "/en/odds");
       assert.equal(await mobile.getByTestId("mobile-quiz").getAttribute("href"), "/en/quiz");
-      // My World is unlisted for now (MY_WORLD_LISTED in src/lib/site.ts).
-      assert.equal(await mobile.getByTestId("mobile-my-world").count(), 0);
+      assert.equal(await mobile.getByTestId("mobile-my-world").getAttribute("href"), "/en/my-world");
       const countriesShown = async () => (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
       // Asia: only its countries.
       await rows.nth(3).tap();
@@ -2211,7 +2210,7 @@ async function step(name, fn) {
       await phone.close();
     });
 
-    await step("daily quiz: six questions, right or wrong at once, the score, kept for the day, the same set on a reload, nav, home, sitemap", async () => {
+    await step("daily quiz: six questions, right or wrong at once, the score, kept for the day, once a day whatever the language, the same set on a reload, nav, home, sitemap", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en`);
       assert.equal(await p.getByTestId("nav-quiz").getAttribute("href"), "/en/quiz");
@@ -2256,6 +2255,17 @@ async function step(name, fn) {
       // Kept for the day: a reload shows the score again.
       await p.reload();
       await score.waitFor();
+      const played = (await score.innerText()).match(/(\d) of 6/)[1];
+      // One quiz a day, whatever the language: the other languages show the same score, not their own set.
+      for (const [locale, language] of [["pt", "inglês"], ["es", "inglés"]]) {
+        await p.goto(`${BASE_URL}/${locale}/quiz`);
+        await p.getByTestId("quiz-played-elsewhere").waitFor();
+        assert.match(await p.getByTestId("quiz-played-elsewhere").innerText(), new RegExp(language));
+        assert.equal(await p.getByTestId("quiz-question").count(), 0, `${locale}: no questions once played`);
+        assert.match(await score.innerText(), new RegExp(`${played} de 6`), `${locale}: the same score`);
+      }
+      await p.goto(`${BASE_URL}/en/quiz`);
+      await score.waitFor();
       // The same set for everyone: a fresh browser gets the same first question.
       await p.evaluate(() => localStorage.clear());
       await p.reload();
@@ -2273,6 +2283,19 @@ async function step(name, fn) {
         await phone.getByTestId("quiz-option").first().tap();
         await phone.getByTestId("quiz-feedback").waitFor();
         assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${locale}: no horizontal scroll`);
+        // Started here: another language sends the visitor back to finish it, rather than starting its own set.
+        const other = locale === "pt" ? "es" : "pt";
+        await phone.goto(`${BASE_URL}/${other}/quiz`);
+        const elsewhere = phone.getByTestId("quiz-elsewhere");
+        await elsewhere.waitFor();
+        assert.equal(await elsewhere.getAttribute("data-locale"), locale);
+        assert.equal(await elsewhere.getByRole("link").getAttribute("href"), `/${locale}/quiz`);
+        assert.equal(await phone.getByTestId("quiz-question").count(), 0, `${other}: no questions once started in ${locale}`);
+        assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${other}: no horizontal scroll`);
+        await elsewhere.getByRole("link").tap();
+        await phone.waitForURL(new RegExp(`/${locale}/quiz$`));
+        // Back where they got to: the second question.
+        await phone.locator('[data-testid="quiz-question"][data-index="1"]').waitFor();
         await phone.close();
       }
       const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
@@ -2319,17 +2342,20 @@ async function step(name, fn) {
       }
     });
 
-    await step("My World: unlisted (no links, noindex), set up a world, play seasons (all four leagues, promotion and relegation), saved on reload, past seasons' tables, a new world; EN/PT/ES on phones and desktops", async () => {
+    await step("My World: from the home page and the menu (in the sitemap, indexed), set up a world, every league played by its own buttons, the games left in each, End season (promotion and relegation, the review), Start next season, saved on reload, past seasons' tables and results in the season picker, a new world; EN/PT/ES on phones and desktops", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-      // Unlisted for now (MY_WORLD_LISTED in src/lib/site.ts): no link from the home page, the menu or the
-      // sitemap, and not indexed; the page still works at its address.
+      // Entry points: the home page (by the main features, on the first screen) and the menu; in the sitemap, and indexed.
       await p.goto(`${BASE_URL}/en`);
-      assert.equal(await p.getByTestId("home-my-world").count(), 0);
-      assert.equal(await p.getByTestId("nav-my-world").count(), 0);
-      assert.doesNotMatch(await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text(), /my-world/);
-      await p.goto(`${BASE_URL}/en/my-world`);
+      const card = p.getByTestId("home-my-world");
+      assert.equal(await card.getAttribute("href"), "/en/my-world");
+      assert.ok((await card.boundingBox()).y < 900, "on the first screen");
+      assert.equal(await p.getByTestId("nav-my-world").getAttribute("href"), "/en/my-world");
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/my-world<`));
+      await card.click();
+      await p.waitForURL(/\/en\/my-world$/);
       await p.getByTestId("world-setup").waitFor();
-      assert.match(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex/);
+      assert.doesNotMatch(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex/);
       assert.equal(await p.locator("h1").innerText(), "My World");
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/my-world");
       assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/my-world");
@@ -2353,50 +2379,102 @@ async function step(name, fn) {
       assert.equal(await p.locator('[data-testid="world-table"] [aria-current="true"]').count(), 1);
       await p.locator('[data-testid="world-tabs"] [data-league="PL"]').click();
       assert.equal(await rows.count(), 20);
-      assert.ok(await p.getByTestId("world-history-empty").isVisible());
-      // Play the season: all four leagues at once, then its review.
-      assert.equal((await p.getByTestId("world-play").innerText()).trim(), `Play the ${label(year)} season`);
-      await p.getByTestId("world-play").click();
+      // No world-wide play buttons: each league is played by its own. The games left in each; no next season yet.
+      assert.equal(await p.getByTestId("world-play").count(), 0);
+      assert.equal(await p.getByTestId("world-round").count(), 0);
+      const left = async () => Object.fromEntries(await p.getByTestId("world-left").evaluateAll((els) => els.map((e) => [e.dataset.league, Number(e.dataset.left)])));
+      const before = await left();
+      assert.deepEqual(Object.keys(before), ["PL", "ELC", "EL1", "EL2"]);
+      assert.ok(Object.values(before).every((n) => n > 0));
+      assert.equal(await p.getByTestId("world-end-season").count(), 0);
+      // The season picker: only this season so far.
+      const picker = p.getByTestId("world-season-select");
+      assert.deepEqual(await picker.locator("option").allInnerTexts(), [`${label(year)} (this season)`]);
+      // One league played out: none left there, but not every league yet.
+      await p.getByTestId("world-simulate-rest").click();
+      assert.equal((await left()).PL, 0);
+      assert.equal(await p.getByTestId("world-end-season").count(), 0, "not until every league is played");
+      /** Every league played out by its own "Simulate rest of season". */
+      const playOut = async () => {
+        for (const code of ["PL", "ELC", "EL1", "EL2"]) {
+          await p.locator(`[data-testid="world-tabs"] [data-league="${code}"]`).click();
+          if ((await left())[code] > 0) await p.getByTestId("world-simulate-rest").click();
+          await p.locator(`[data-testid="world-left"][data-league="${code}"][data-left="0"]`).waitFor();
+        }
+      };
+      await playOut();
+      // End season: promotion and relegation, and the season's review; the next season's tables and fixtures wait for it to start.
+      assert.equal((await p.getByTestId("world-end-season").innerText()).trim(), "End season");
+      await p.getByTestId("world-end-season").click();
       const review = p.getByTestId("world-review");
       await review.waitFor();
+      assert.equal(await p.getByTestId("world-tables").count(), 0, "no tables or fixtures until the next season starts");
+      assert.equal(await p.getByTestId("world-left-card").count(), 0);
       assert.equal(Number(await world.getAttribute("data-year")), year + 1);
       assert.ok((await p.getByTestId("world-review-headline").innerText()).includes(name));
-      // Who went up and down: 3, 3, 4 between the leagues, 2 out of League Two and 2 new clubs in.
+      // Who went up and down: 3, 3, 4 between the leagues, 2 from League Two down to the National League and its 2 clubs up.
       for (const [upper, n] of [["PL", 3], ["ELC", 3], ["EL1", 4], ["EL2", 2]]) {
         assert.equal(await p.locator(`[data-testid="world-moves"][data-upper="${upper}"] li`).count(), 2 * n, upper);
       }
-      assert.ok((await p.locator('[data-testid="world-moves"][data-upper="EL2"]').innerText()).includes("NEW"));
-      // Saved in the browser: a refresh keeps the world, the review too.
+      const nationalLeague = await p.locator('[data-testid="world-moves"][data-upper="EL2"]').innerText();
+      assert.ok(nationalLeague.includes("Boreham Wood") && nationalLeague.includes("Harrogate"), "Boreham Wood and Harrogate Town up from the National League");
+      assert.ok(nationalLeague.includes("UP FROM THE NATIONAL LEAGUE") && !nationalLeague.includes("NEW"), "real clubs, not new ones");
+      // "Start next season", in the review's bottom-right corner.
+      const start = p.getByTestId("world-start-season");
+      assert.equal((await start.innerText()).trim(), "Start next season");
+      const [startBox, reviewBox] = [await start.boundingBox(), await review.boundingBox()];
+      assert.ok(reviewBox.x + reviewBox.width - (startBox.x + startBox.width) < 40 && reviewBox.y + reviewBox.height - (startBox.y + startBox.height) < 40, "bottom-right");
+      // Saved in the browser: a refresh keeps the world, the review too, until the next season starts.
       await p.reload();
       await review.waitFor();
       assert.equal((await p.getByTestId("world-my-club").innerText()).trim(), name);
-      await p.getByTestId("world-next").click();
+      assert.equal(await p.getByTestId("world-tables").count(), 0);
+      await start.click();
       assert.equal(await review.count(), 0);
-      assert.equal((await p.getByTestId("world-play").innerText()).trim(), `Play the ${label(year + 1)} season`);
-      // Last season's final tables: the Premier League with its champions and three relegated, the Championship's play-off final.
-      const history = p.getByTestId("world-history");
-      await history.locator('[data-testid="world-history-tabs"] [data-league="PL"]').click();
-      const saved = history.locator('[data-testid="world-history-table"] [data-testid="world-row"]');
-      assert.equal(await saved.count(), 20);
-      assert.equal(await history.locator('[data-note="C"]').count(), 1);
-      assert.equal(await history.locator('[data-note="R"]').count(), 3);
-      const firstPl = await saved.evaluateAll((r) => r.map((x) => x.innerText));
-      await history.locator('[data-testid="world-history-tabs"] [data-league="ELC"]').click();
-      assert.equal(await saved.count(), 24);
-      assert.match(await p.getByTestId("world-history-final").innerText(), /^Play-off final: .+ \d+–\d+/);
-      // Another season: the older one is still there, two seasons ago, exactly as it was.
-      await p.getByTestId("world-play").click();
+      await p.getByTestId("world-tables").waitFor();
+      assert.deepEqual(Object.values(await left()), [380, 559, 557, 557], "the new season's games, play-offs included");
+      // Last season, in the picker: its final tables (champions, relegated, the play-off final) and every result, nothing to change.
+      assert.deepEqual(await picker.locator("option").allInnerTexts(), [`${label(year + 1)} (this season)`, label(year)]);
+      await picker.selectOption(String(year));
+      const past = p.locator('[data-testid="world-past-table"] [data-testid="world-row"]');
+      await p.locator('[data-testid="world-tabs"] [data-league="PL"]').click();
+      assert.equal(await past.count(), 20);
+      assert.equal(await p.locator('[data-testid="world-past-table"] [data-note="C"]').count(), 1);
+      assert.equal(await p.locator('[data-testid="world-past-table"] [data-note="R"]').count(), 3);
+      assert.equal(await p.locator("h2", { hasText: `The ${label(year)} season` }).count(), 1);
+      const fixtures = p.getByTestId("world-fixtures");
+      assert.equal(await fixtures.getByTestId("matchday-select").inputValue(), "1");
+      assert.equal(await fixtures.getByTestId("match-score").count(), 10, "matchday 1's results");
+      assert.equal(await fixtures.locator("input").count(), 0, "nothing to change");
+      assert.equal(await fixtures.getByTestId("match-dice-button").count(), 0);
+      assert.equal(await p.getByTestId("world-actions").count(), 0, "no buttons for a finished season");
+      const firstPl = await past.evaluateAll((r) => r.map((x) => x.innerText));
+      await p.locator('[data-testid="world-tabs"] [data-league="ELC"]').click();
+      assert.equal(await past.count(), 24);
+      assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
+      await fixtures.getByTestId("matchday-select").selectOption("-1");
+      assert.equal(await fixtures.getByTestId("playoff-tie").count(), 5, "the eliminators, the semi-finals and the final");
+      assert.equal(await fixtures.getByTestId("playoff-result").count(), 5);
+      // Back to this season, with its buttons.
+      await picker.selectOption(String(year + 1));
+      assert.equal(await p.getByTestId("world-actions").count(), 1);
+      // Another season: the older one is still there, exactly as it was.
+      await playOut();
+      await p.getByTestId("world-end-season").click();
       await review.waitFor();
-      await p.getByTestId("world-next").click();
-      const seasons = await p.getByTestId("world-history-season").locator("option").allInnerTexts();
-      assert.deepEqual(seasons, [`${label(year + 1)} (last season)`, `${label(year)} (2 seasons ago)`]);
-      await p.getByTestId("world-history-season").selectOption(String(year));
-      await history.locator('[data-testid="world-history-tabs"] [data-league="PL"]').click();
-      assert.deepEqual(await saved.evaluateAll((r) => r.map((x) => x.innerText)), firstPl, "the Premier League two seasons ago, unchanged");
-      // The club's path: two seasons, starting in League Two.
+      await start.click();
+      assert.deepEqual(await picker.locator("option").allInnerTexts(), [`${label(year + 2)} (this season)`, label(year + 1), label(year)]);
+      await picker.selectOption(String(year));
+      await p.locator('[data-testid="world-tabs"] [data-league="PL"]').click();
+      assert.deepEqual(await past.evaluateAll((r) => r.map((x) => x.innerText)), firstPl, "the Premier League two seasons ago, unchanged");
+      // The club's path: two seasons, the latest first (the first in League Two), each with what came of it.
       const path = p.getByTestId("world-path-step");
       assert.equal(await path.count(), 2);
-      assert.equal(await path.first().getAttribute("data-league"), "EL2");
+      assert.equal(await path.last().getAttribute("data-league"), "EL2");
+      assert.ok((await path.first().innerText()).startsWith(label(year + 1)), "the latest season first");
+      const outcomes = ["champions", "promoted", "playoffWinners", "playoffs", "relegated", "out", "championsLeague", "europaLeague", "conferenceLeague", "neutral", "nationalLeague"];
+      for (const o of await path.evaluateAll((rows) => rows.map((r) => r.dataset.outcome))) assert.ok(outcomes.includes(o), o);
+      assert.ok(!(await p.getByTestId("world-path").innerText()).includes("Stayed"));
       // A new world: asked first; cancelling keeps this one, confirming deletes it (for good, after a refresh too).
       await p.getByTestId("world-new-button").click();
       await p.getByTestId("world-new-cancel").click();
@@ -2413,8 +2491,8 @@ async function step(name, fn) {
       assert.equal(await p.evaluate(() => localStorage.getItem("footsimu:my-world")), null);
       await p.close();
 
-      // Every language, on a phone and a desktop: the page loads and fits; a world plays and a past table opens.
-      for (const [locale, title, play] of [["en", "My World", /^Play the /], ["pt", "Meu mundo", /^Jogar a temporada /], ["es", "Mi mundo", /^Jugar la temporada /]]) {
+      // Every language, on a phone and a desktop: the page loads and fits; a season is played out, the next one starts, last season's table opens.
+      for (const [locale, title, end, next] of [["en", "My World", /^End season$/, /^Start next season$/], ["pt", "Meu mundo", /^Encerrar temporada$/, /^Iniciar próxima temporada$/], ["es", "Mi mundo", /^Terminar temporada$/, /^Empezar próxima temporada$/]]) {
         for (const phone of [true, false]) {
           const ctx = await browser.newContext(phone ? { viewport: { width: 360, height: 760 }, isMobile: true, hasTouch: true } : { viewport: { width: 1280, height: 900 } });
           const q = await ctx.newPage();
@@ -2428,16 +2506,99 @@ async function step(name, fn) {
             await q.getByTestId("world-club").first().tap();
             await q.getByTestId("world-create").tap();
             await q.getByTestId("world").waitFor();
-            assert.match((await q.getByTestId("world-play").innerText()).trim(), play);
-            await q.getByTestId("world-play").tap();
+            const now = Number(await q.getByTestId("world").getAttribute("data-year"));
+            // The fixtures on a phone: a full fingertip for each dice.
+            assert.equal(Math.round((await q.getByTestId("match-dice-button").first().boundingBox()).height), 44);
+            await q.getByTestId("match-dice-button").first().tap();
+            assert.ok(await q.evaluate(() => document.documentElement.scrollWidth <= 360), `${locale}: the fixtures fit a phone`);
+            for (const code of ["PL", "ELC", "EL1", "EL2"]) {
+              await q.locator(`[data-testid="world-tabs"] [data-league="${code}"]`).tap();
+              await q.getByTestId("world-simulate-rest").tap();
+            }
+            assert.match((await q.getByTestId("world-end-season").innerText()).trim(), end);
+            await q.getByTestId("world-end-season").tap();
             await q.getByTestId("world-review").waitFor();
-            await q.getByTestId("world-next").tap();
-            assert.equal(await q.locator('[data-testid="world-history-table"] [data-testid="world-row"]').count(), 20, "the Premier League's final table");
+            assert.match((await q.getByTestId("world-start-season").innerText()).trim(), next);
+            await q.getByTestId("world-start-season").tap();
+            await q.getByTestId("world-season-select").selectOption(String(now));
+            await q.locator('[data-testid="world-tabs"] [data-league="PL"]').tap();
+            assert.equal(await q.locator('[data-testid="world-past-table"] [data-testid="world-row"]').count(), 20, "the Premier League's final table");
             assert.ok(await q.evaluate(() => document.documentElement.scrollWidth <= 360), `${locale}: the world fits a phone`);
           }
           await ctx.close();
         }
       }
+    });
+
+    await step("My World, every result your way, as on the league pages (no match previews): typed in, rolled, Simulate matchday, Undo, saved on reload, Reset, Simulate rest of season with the play-off, the games left counting down", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
+      await p.getByTestId("world-club").nth(4).click();
+      await p.getByTestId("world-create").click();
+      await p.getByTestId("world").waitFor();
+      // Opens at the top: the club, and the games left in each league.
+      assert.ok((await p.getByTestId("world-club-card").boundingBox()).y < 900, "the club card on screen");
+      const leftOf = async (code) => Number(await p.locator(`[data-testid="world-left"][data-league="${code}"]`).getAttribute("data-left"));
+      // The fixtures, as on the league pages: the club's league on its current matchday, a score box pair and a dice per game, no match previews or kick-off times.
+      const fixtures = p.getByTestId("world-fixtures");
+      const round = Number(await fixtures.getByTestId("matchday-select").inputValue());
+      const games = fixtures.getByTestId("match-row");
+      assert.equal(await games.count(), 12);
+      assert.equal(await fixtures.getByTestId("match-dice-button").count(), 12);
+      assert.equal(await fixtures.getByTestId("match-preview-link").count(), 0);
+      assert.equal(await fixtures.getByTestId("kickoff").count(), 0);
+      // The season picker sits on the left of the league's buttons, on one row.
+      const pickerBox = await p.getByTestId("world-season-select").boundingBox();
+      const buttonBox = await p.getByTestId("world-simulate-matchday").boundingBox();
+      assert.ok(Math.abs(pickerBox.y + pickerBox.height / 2 - (buttonBox.y + buttonBox.height / 2)) < 12 && pickerBox.x < buttonBox.x, "the picker on the buttons' row, to their left");
+      const playedSum = async () => (await p.locator('[data-testid="world-table"] [data-testid="world-row"] td:nth-child(3)').allInnerTexts()).reduce((n, x) => n + Number(x), 0);
+      const start = await playedSum();
+      const startLeft = await leftOf("EL2");
+      // Games whose two score boxes have a score, once the boxes have caught up with the change (they follow it right after the render).
+      const filled = async (expected) => {
+        const count = () => games.evaluateAll((rows) => rows.filter((r) => { const boxes = [...r.querySelectorAll("input")]; return boxes.length === 2 && boxes.every((i) => i.value !== ""); }).length);
+        for (let i = 0; i < 50 && (await count()) !== expected; i++) await p.waitForTimeout(50);
+        return count();
+      };
+      // A score typed in: the table counts it, one game fewer left.
+      await games.nth(0).locator("input").nth(0).fill("3");
+      await games.nth(0).locator("input").nth(1).fill("1");
+      assert.equal(await playedSum(), start + 2);
+      assert.equal(await leftOf("EL2"), startLeft - 1);
+      // The dice: a score for that game.
+      await games.nth(1).getByTestId("match-dice-button").click();
+      assert.equal(await filled(2), 2);
+      // Simulate matchday: the rest of it; Undo takes that back.
+      await p.getByTestId("world-simulate-matchday").click();
+      assert.equal(await filled(12), 12);
+      assert.equal(await playedSum(), start + 24);
+      assert.equal(await leftOf("EL2"), startLeft - 12);
+      await p.getByTestId("world-undo").click();
+      assert.equal(await filled(2), 2);
+      // Saved: a refresh keeps every score; the fixtures open on the matchday still being played.
+      await p.reload();
+      await p.getByTestId("world").waitFor();
+      assert.equal(await playedSum(), start + 4);
+      assert.equal(await fixtures.getByTestId("matchday-select").inputValue(), String(round));
+      // Reset: League Two's season as it started (asked first).
+      await p.getByTestId("world-reset-league").click();
+      await p.getByRole("button", { name: "Reset the league" }).click();
+      assert.equal(await playedSum(), start);
+      assert.equal(await leftOf("EL2"), startLeft);
+      // Simulate rest of season: League Two and its play-off, as on the league page; the promoted clubs; none left there.
+      await p.getByTestId("world-simulate-rest").click();
+      await fixtures.getByTestId("matchday-select").selectOption("-1");
+      assert.equal(await fixtures.getByTestId("playoff-tie").count(), 3);
+      assert.equal(await fixtures.getByTestId("playoff-result").count(), 3);
+      assert.equal(await p.getByTestId("promoted-team").count(), 4);
+      assert.equal(await leftOf("EL2"), 0);
+      assert.equal(await p.getByTestId("world-end-season").count(), 0, "the other leagues still to play");
+      // A league's games left, tapped: its table and fixtures.
+      await p.locator('[data-testid="world-left"][data-league="PL"]').click();
+      assert.equal(await p.locator('[data-testid="world-tabs"] [data-league="PL"]').getAttribute("aria-selected"), "true");
+      assert.equal(await p.locator('[data-testid="world-table"] [data-testid="world-row"]').count(), 20);
+      await p.close();
     });
 
     await step("unknown league returns 404", async () => {

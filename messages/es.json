@@ -1105,7 +1105,15 @@
     "share": "Compartir el resultado",
     "shareText": "Acerté {score} de {total} en el quiz de fútbol de hoy de Foot Simu.",
     "copied": "Copiado",
-    "simulate": "Simular las ligas"
+    "simulate": "Simular las ligas",
+    "playedElsewhere": "Ya jugaste el quiz de hoy en {language}: es un quiz al día, en cualquier idioma.",
+    "startedElsewhere": "Empezaste el quiz de hoy en {language}. Es un quiz al día, en cualquier idioma: termínalo allí.",
+    "continueIn": "Continuar en {language}",
+    "languages": {
+      "en": "inglés",
+      "pt": "portugués",
+      "es": "español"
+    }
   },
   "Chances": {
     "topic": {
@@ -1206,7 +1214,7 @@
     "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés",
     "metaDescription": "Elige un club de la Premier League a la League Two y juega temporada tras temporada de las cuatro ligas, con playoffs, ascensos y descensos. Guardado en tu navegador, con las tablas de todas las temporadas.",
     "title": "Mi mundo",
-    "intro": "Elige un club y juega temporada tras temporada de la pirámide inglesa, de la Premier League a la League Two: los partidos de todas las ligas, los playoffs, los ascensos y los descensos. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
+    "intro": "Elige un club y juega temporada tras temporada de la pirámide inglesa, de la Premier League a la League Two, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
     "savedNote": "Tu mundo se guarda solo en este navegador.",
     "notSaved": "Este navegador no está guardando tu mundo (navegación privada o almacenamiento lleno): se perderá cuando salgas de la página.",
     "reset": {
@@ -1237,6 +1245,11 @@
         "name": "League Two",
         "the": "la League Two",
         "in": "en la League Two"
+      },
+      "NL": {
+        "name": "National League",
+        "the": "la National League",
+        "in": "en la National League"
       }
     },
     "setup": {
@@ -1250,13 +1263,25 @@
     "season": "Temporada {season}",
     "yourClub": "Tu club",
     "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
-    "notStarted": "Sin empezar",
-    "play": "Jugar la temporada {season}",
-    "playNote": "Juega el resto de la temporada de las cuatro ligas a la vez, con los playoffs.",
-    "playing": "Jugando la temporada…",
-    "firstSeason": "La tabla real hasta ahora: el resto de la temporada se simula cuando la juegues.",
+    "left": {
+      "title": "Partidos por jugar",
+      "count": "{count, plural, =0 {Todos jugados} one {Falta # partido} other {Faltan # partidos}}",
+      "note": "Juega los partidos de cada liga en los partidos de abajo: los dados, Simular jornada o Simular resto de temporada, con los playoffs. Luego, pasa a la próxima temporada aquí."
+    },
+    "endSeason": "Terminar temporada",
+    "endSeasonNote": "Ya se jugaron todos los partidos: termina la temporada {season} para ver su resumen, con los campeones y quién sube y quién baja.",
+    "seasonHeading": "La temporada {season}",
+    "seasonSelect": "Temporada",
+    "seasonCurrent": "{season} (esta temporada)",
+    "pastNote": "La temporada {season}: sus tablas finales y todos los resultados.",
+    "pastNoFixtures": "Los resultados de esta temporada no se guardaron (se jugó antes de que Mi mundo los guardara): aquí está su tabla final.",
+    "firstSeason": "Esta temporada empezó desde la real, con sus resultados hasta ahora: a partir de aquí, el mundo es tuyo. Cambia cualquier resultado, tira los dados o simula el resto, liga por liga.",
     "newSeason": "Una nueva temporada: todos los clubes empiezan con 0 puntos.",
     "tables": "Tablas",
+    "resetTitle": "¿Reiniciar la temporada de esta liga?",
+    "resetConfirm": "Se borrarán todos los resultados escritos, tirados con los dados o simulados {in} esta temporada.",
+    "resetConfirmFirst": "Se borrarán todos los resultados escritos, tirados con los dados o simulados {in} esta temporada; los resultados reales con los que empezó la temporada se mantienen.",
+    "resetAction": "Reiniciar la liga",
     "review": {
       "title": "La temporada {season} terminó",
       "C": "¡Campeón! {club} ganó {league}.",
@@ -1265,18 +1290,19 @@
       "W": "¡Ascenso! {club} ganó la final de los playoffs {in} y sube a {to}.",
       "O": "{club} terminó {position} {in} y cayó en los playoffs.",
       "R": "Descenso: {club} terminó {position} {in} y baja a {to}.",
-      "out": "{club} terminó {position} {in} y salió de la Football League.",
+      "out": "{club} terminó {position} {in} y bajó a la National League: vuelve a la League Two después de una temporada allí.",
       "stay": "{club} terminó {position} {in}.",
       "champions": "Campeones",
       "up": "Suben",
       "down": "Bajan",
-      "out_": "Fuera de la Football League",
-      "in_": "Nuevos en la League Two",
+      "out_": "Bajan a la National League",
+      "in_": "Suben de la National League",
       "final": "Final de los playoffs: {winner} {score} {loser}",
       "penalties": "{score}, en penaltis",
-      "next": "Empezar la temporada {season}"
+      "next": "Empezar próxima temporada"
     },
-    "outNotice": "{club} salió de la Football League en {season}. Mi mundo aún no tiene la National League: puedes seguir jugando las temporadas o empezar un mundo nuevo.",
+    "outNotice": "{club} está en la National League esta temporada, tras bajar de la League Two en {season}: vuelve a la League Two al final de ella.",
+    "goneNotice": "{club} salió de la Football League en {season}, antes de que Mi mundo tuviera la National League: empieza un mundo nuevo para seguir jugando.",
     "newClub": "Nuevo",
     "newClubHint": "Un club nuevo, llegado de fuera de la Football League",
     "columns": {
@@ -1287,7 +1313,8 @@
       "drawn": "E",
       "lost": "P",
       "goalDifference": "DG",
-      "points": "Pts"
+      "points": "Pts",
+      "note": "Desenlace"
     },
     "notes": {
       "C": "Campeón",
@@ -1295,23 +1322,22 @@
       "W": "Ganador de los playoffs",
       "O": "Playoffs",
       "R": "Descenso",
-      "out": "Fuera de la liga"
-    },
-    "history": {
-      "title": "Temporadas anteriores",
-      "season": "Temporada",
-      "empty": "Aún no hay temporadas jugadas: juega la temporada {season} para ver aquí sus tablas finales.",
-      "ago": "{count, plural, one {la temporada pasada} other {hace # temporadas}}",
-      "league": "Liga"
+      "out": "Bajó a la National League"
     },
     "path": {
       "title": "Las temporadas de {club}",
       "empty": "Aún no hay temporadas jugadas.",
-      "up": "Ascenso",
-      "down": "Descenso",
-      "stay": "Se quedó",
       "champions": "Campeón",
-      "out": "Salió de la liga"
+      "promoted": "Ascenso",
+      "playoffWinners": "Ganó los playoffs",
+      "playoffs": "Playoffs",
+      "relegated": "Descenso",
+      "out": "Descenso",
+      "championsLeague": "Champions League",
+      "europaLeague": "Europa League",
+      "conferenceLeague": "Conference League",
+      "neutral": "Zona neutral",
+      "nationalLeague": "Ascenso"
     },
     "newWorld": {
       "button": "Nuevo mundo",

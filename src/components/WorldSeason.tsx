@@ -1,0 +1,272 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
+import type { Fixture, Score, Team, TeamId } from "../engine/types.ts";
+import {
+  divisionConfig,
+  ENGLAND,
+  pastDivision,
+  resetDivision,
+  rollScore,
+  seasonLabel,
+  setScore,
+  simulateMatchday,
+  simulatePlayoffs,
+  simulateRest,
+  tableRows,
+  type DivisionCode,
+  type DivisionState,
+  type World,
+} from "../lib/myWorld.ts";
+import { ConfirmDialog } from "./ConfirmDialog.tsx";
+import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
+import { Icon } from "./Icon.tsx";
+import { PromotedClubs } from "./PromotedClubs.tsx";
+import { WorldTable } from "./WorldTable.tsx";
+
+/** A division picker: one button per league, as tabs. */
+export function DivisionTabs({ value, onChange, label, testId }: { value: DivisionCode; onChange: (code: DivisionCode) => void; label: string; testId: string }) {
+  const t = useTranslations("World");
+  return (
+    <div role="tablist" aria-label={label} className="grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 sm:grid-cols-4 dark:bg-zinc-800" data-testid={testId}>
+      {ENGLAND.map((code) => (
+        <button
+          key={code}
+          type="button"
+          role="tab"
+          aria-selected={value === code}
+          onClick={() => onChange(code)}
+          className={`min-h-9 rounded-md px-2 text-sm font-semibold ${value === code ? "bg-white shadow-sm dark:bg-zinc-900" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300"}`}
+          data-league={code}
+        >
+          {t(`leagues.${code}.name`)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** The matchday a division's fixtures open on: its next round, the play-off once the league is complete, else its last matchday. */
+export function openingMatchday(state: DivisionState): number {
+  if (state.nextRound !== null) return state.leagueComplete ? PLAYOFF_MATCHDAY : state.nextRound;
+  return state.league.playoff ? PLAYOFF_MATCHDAY : (state.fixtures.at(-1)?.matchday ?? 1);
+}
+
+/** The season picker: this season, then every finished one, newest first. */
+function SeasonPicker({ world, year, onYear }: { world: World; year: number; onYear: (year: number) => void }) {
+  const t = useTranslations("World");
+  return (
+    <label className="flex w-full items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold sm:w-auto dark:border-zinc-700 dark:bg-zinc-900">
+      <Icon name="calendar-days" size={16} className="shrink-0 text-zinc-500" />
+      <span className="sr-only">{t("seasonSelect")}</span>
+      <select
+        value={year}
+        onChange={(e) => onYear(Number(e.target.value))}
+        className="h-9 min-w-0 flex-1 cursor-pointer bg-transparent pr-1 font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100 dark:[color-scheme:dark]"
+        data-testid="world-season-select"
+      >
+        <option value={world.year} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+          {t("seasonCurrent", { season: seasonLabel(world.year) })}
+        </option>
+        {[...world.history].reverse().map((s) => (
+          <option key={s.year} value={s.year} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+            {seasonLabel(s.year)}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+/** A finished season's league, to look back at: its final table, its play-off final, and every result (nothing to change). */
+function PastSeason({ world, year, code }: { world: World; year: number; code: DivisionCode }) {
+  const t = useTranslations("World");
+  const past = useMemo(() => pastDivision(world, year, code), [world, year, code]);
+  const [matchday, setMatchday] = useState(1);
+  const teams = useMemo(() => new Map<TeamId, Team>((past?.teams ?? []).map((team) => [team.id, team])), [past]);
+  if (!past) return null;
+  const playoff = divisionConfig(code).playoff;
+  const matchdays = [...new Set((past.fixtures ?? []).map((f) => f.matchday))].sort((a, b) => a - b).concat(past.bracket.length ? [PLAYOFF_MATCHDAY] : []);
+  const final = past.final;
+  return (
+    <>
+      <div className="min-w-0 space-y-2 lg:col-span-2 lg:col-start-1 lg:row-start-2">
+        <WorldTable rows={past.rows} code={code} clubs={world.clubs} highlight={world.userClub} final testId="world-past-table" />
+        {final && (
+          <p className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400" data-testid="world-past-final">
+            <Icon name="trophy" size={16} className="shrink-0 text-amber-500" />
+            {t("review.final", {
+              winner: world.clubs[final[0]]!.name,
+              loser: world.clubs[final[1]]!.name,
+              score: final[4] ? t("review.penalties", { score: `${final[2]}–${final[3]}` }) : `${final[2]}–${final[3]}`,
+            })}
+          </p>
+        )}
+      </div>
+      <div className="min-w-0 lg:col-start-3 lg:row-start-2" data-testid="world-fixtures">
+        {past.fixtures ? (
+          <FixtureList
+            matchday={matchday}
+            matchdays={matchdays}
+            onMatchdayChange={setMatchday}
+            fixtures={past.fixtures.filter((f) => f.matchday === matchday)}
+            teams={teams}
+            predictions={{}}
+            onScore={() => {}}
+            onSimulate={() => {}}
+            kickOff={false}
+            readOnly
+            {...(playoff && past.bracket.length
+              ? { playoff: { bracket: past.bracket, seasonComplete: true, ...(playoff.promotedTo ? { promotedTo: playoff.promotedTo } : {}) } }
+              : {})}
+          />
+        ) : (
+          <p className="rounded-xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300" data-testid="world-past-no-fixtures">
+            {t("pastNoFixtures")}
+          </p>
+        )}
+      </div>
+    </>
+  );
+}
+
+/**
+ * One league's season, as on the league pages: its table and its fixtures
+ * matchday by matchday, every score open to typing in or rolling with the
+ * dice, and the same buttons (simulate the matchday, the rest of the season,
+ * undo, reset). No match previews: the games are the world's own. The season
+ * picker beside the buttons shows a finished season instead, to look back at.
+ */
+export function WorldSeason({
+  world,
+  state,
+  year,
+  onYear,
+  matchday,
+  onMatchday,
+  onChange,
+  canUndo,
+  onUndo,
+}: {
+  world: World;
+  state: DivisionState;
+  /** The season shown: the one in progress (world.year) or a finished one. */
+  year: number;
+  onYear: (year: number) => void;
+  matchday: number;
+  onMatchday: (matchday: number) => void;
+  onChange: (world: World) => void;
+  canUndo: boolean;
+  onUndo: () => void;
+}) {
+  const t = useTranslations("World");
+  const sim = useTranslations("Simulator");
+  const [confirmReset, setConfirmReset] = useState(false);
+  const { code, league, picks } = state;
+  const playoff = league.playoff;
+  const teams = useMemo(() => new Map<TeamId, Team>(state.teams.map((team) => [team.id, team])), [state.teams]);
+  const matchdays = useMemo(
+    () => [...new Set(state.fixtures.map((f) => f.matchday))].sort((a, b) => a - b).concat(playoff ? [PLAYOFF_MATCHDAY] : []),
+    [state.fixtures, playoff],
+  );
+  const onPlayoff = matchday === PLAYOFF_MATCHDAY;
+  const games = useMemo(() => state.fixtures.filter((f) => f.matchday === matchday), [state.fixtures, matchday]);
+  const picked = Object.keys(picks).length > 0;
+
+  const onScore = (fixture: Fixture, score: Score | null) => onChange(setScore(world, code, fixture, score));
+  const actionButton =
+    "grow rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 disabled:opacity-40 lg:grow-0 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800";
+
+  // Phones: the season picker, table, buttons, fixtures. Desktop, as on the league pages: the picker
+  // and the buttons on one row above the table and fixtures columns.
+  const grid = "grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[auto_minmax(0,1fr)_400px] lg:items-start";
+  const picker = (
+    <div className="min-w-0 lg:col-start-1 lg:row-start-1 lg:self-center">
+      <SeasonPicker world={world} year={year} onYear={onYear} />
+    </div>
+  );
+  if (year !== world.year) {
+    return (
+      <div className={grid}>
+        {picker}
+        <PastSeason key={`${year}-${code}`} world={world} year={year} code={code} />
+      </div>
+    );
+  }
+  return (
+    <div className={grid}>
+      {picker}
+      <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2">
+        <WorldTable rows={tableRows(state.rows)} code={code} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-table" />
+        {playoff?.promotedTo && (
+          <PromotedClubs
+            bracket={state.bracket}
+            rows={state.rows}
+            teams={teams}
+            predictions={picks}
+            seasonComplete={state.leagueComplete}
+            directPromotion={playoff.directPromotion ?? []}
+            promotedTo={playoff.promotedTo}
+            nextSeason={seasonLabel(world.year + 1)}
+          />
+        )}
+      </div>
+      <div className="flex flex-wrap gap-2 lg:col-span-2 lg:col-start-2 lg:row-start-1 lg:justify-end" data-testid="world-actions">
+        <button
+          type="button"
+          className="grow rounded-lg bg-pitch-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-pitch-700 disabled:opacity-40 lg:grow-0"
+          onClick={() => onChange(onPlayoff ? simulatePlayoffs(world, code) : simulateMatchday(world, code, matchday))}
+          disabled={(onPlayoff && !state.leagueComplete) || state.done}
+          data-testid="world-simulate-matchday"
+        >
+          {sim("simulateMatchday")}
+        </button>
+        <button type="button" className={actionButton} onClick={() => onChange(simulateRest(world, code))} disabled={state.done} data-testid="world-simulate-rest">
+          {sim("simulateRest")}
+        </button>
+        <button type="button" className={actionButton} onClick={onUndo} disabled={!canUndo} data-testid="world-undo">
+          {sim("undo")}
+        </button>
+        <button type="button" className={actionButton} onClick={() => setConfirmReset(true)} disabled={!picked} data-testid="world-reset-league">
+          {sim("reset")}
+        </button>
+      </div>
+      <div className="min-w-0 lg:col-start-3 lg:row-start-2" data-testid="world-fixtures">
+        <FixtureList
+          matchday={matchday}
+          matchdays={matchdays}
+          onMatchdayChange={onMatchday}
+          fixtures={games}
+          teams={teams}
+          predictions={picks}
+          onScore={onScore}
+          onSimulate={(fixture) => onChange(rollScore(world, code, fixture))}
+          kickOff={false}
+          {...(playoff
+            ? {
+                playoff: {
+                  bracket: state.bracket,
+                  seasonComplete: state.leagueComplete,
+                  ...(playoff.promotedTo ? { promotedTo: playoff.promotedTo } : {}),
+                },
+              }
+            : {})}
+        />
+      </div>
+      <ConfirmDialog
+        open={confirmReset}
+        danger
+        title={t("resetTitle", { league: t(`leagues.${code}.name`) })}
+        message={t(world.divisions.some((d) => d.code === code && d.games) ? "resetConfirmFirst" : "resetConfirm", { in: t(`leagues.${code}.in`) })}
+        confirmLabel={t("resetAction")}
+        cancelLabel={sim("cancel")}
+        onCancel={() => setConfirmReset(false)}
+        onConfirm={() => {
+          onChange(resetDivision(world, code));
+          setConfirmReset(false);
+        }}
+      />
+    </div>
+  );
+}

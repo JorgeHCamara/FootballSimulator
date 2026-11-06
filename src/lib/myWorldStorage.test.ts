@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { before, describe, it } from "node:test";
-import { createWorld, playSeason, savedTable, startNextSeason, WORLD_VERSION, type StartPack, type World } from "./myWorld.ts";
+import { createRng } from "../engine/rng.ts";
+import { createWorld, divisionState, pastDivision, playSeason, savedTable, setScore, simulateMatchday, simulateRest, startNextSeason, WORLD_VERSION, type StartPack, type World } from "./myWorld.ts";
 import { worldStartPack } from "./myWorldStart.ts";
 import { clearWorld, isWorld, loadWorld, saveWorld, WORLD_KEY } from "./myWorldStorage.ts";
 
@@ -38,7 +39,7 @@ describe("My World: the save", () => {
     assert.ok(store.items.get(WORLD_KEY)!.length < 60_000, "a new world is small");
   });
 
-  it("after seasons are played, a reload finds every season's tables (history lookup)", () => {
+  it("after seasons are played, a reload finds every season's tables and results (history lookup)", () => {
     const store = memoryStore();
     let w = world;
     for (let i = 0; i < 3; i++) {
@@ -50,13 +51,57 @@ describe("My World: the save", () => {
     const loaded = loadWorld(store).world!;
     assert.deepEqual(loaded, w);
     assert.equal(loaded.history.length, 3);
-    for (const season of w.history) for (const code of ["PL", "ELC", "EL1", "EL2"] as const) assert.deepEqual(savedTable(loaded, season.year, code), savedTable(w, season.year, code));
+    for (const season of w.history) {
+      for (const code of ["PL", "ELC", "EL1", "EL2"] as const) {
+        assert.deepEqual(savedTable(loaded, season.year, code), savedTable(w, season.year, code));
+        assert.deepEqual(pastDivision(loaded, season.year, code), pastDivision(w, season.year, code), "every result too");
+      }
+    }
     // A season's review survives a refresh.
     const mid = playSeason(loaded);
     saveWorld(store, mid);
     assert.equal(loadWorld(store).world!.review, true);
-    // The save stays small: a few kilobytes a season.
-    assert.ok(store.items.get(WORLD_KEY)!.length < 60_000);
+    // The save stays small: about 14 KB a season, every result included.
+    assert.ok(store.items.get(WORLD_KEY)!.length < 15_000 * (mid.history.length + 1));
+  });
+
+  it("a season in progress keeps every score through a reload: a matchday simulated, scores typed in, a league simulated", () => {
+    const store = memoryStore();
+    let w = simulateMatchday(world, "PL", divisionState(world, "PL").nextRound!, createRng(1));
+    const game = divisionState(w, "PL").fixtures.find((f) => !divisionState(w, "PL").results[f.id])!;
+    w = setScore(w, "PL", game, { home: 3, away: 3 });
+    w = simulateRest(w, "EL2", createRng(2));
+    assert.equal(saveWorld(store, w), true);
+    const loaded = loadWorld(store).world!;
+    assert.deepEqual(loaded, w);
+    assert.deepEqual(divisionState(loaded, "PL").results[game.id], { home: 3, away: 3 });
+    assert.equal(divisionState(loaded, "EL2").done, true);
+    // A whole season's scores still fit easily.
+    assert.ok(store.items.get(WORLD_KEY)!.length < 120_000);
+    // A past season's results that can't be read make the save unreadable too.
+    const finished = playSeason(w);
+    for (const games of ["1zz00", "123", 5]) {
+      const broken = memoryStore();
+      broken.setItem(WORLD_KEY, JSON.stringify({ ...finished, history: finished.history.map((s) => ({ ...s, divisions: s.divisions.map((d, i) => (i === 0 ? { ...d, games } : d)) })) }));
+      assert.deepEqual(loadWorld(broken), { world: null, reason: "unreadable" }, String(games));
+    }
+    // Scores that can't be scores make the save unreadable.
+    for (const scores of [{ 1: [1] }, { 1: [1, -2] }, { 1: "2-1" }, [[1, 2]]]) {
+      const broken = memoryStore();
+      broken.setItem(WORLD_KEY, JSON.stringify({ ...w, divisions: w.divisions.map((d, i) => (i === 0 ? { ...d, scores } : d)) }));
+      assert.deepEqual(loadWorld(broken), { world: null, reason: "unreadable" }, JSON.stringify(scores));
+    }
+  });
+
+  it("a save from before the realistic calendar: a season not yet being played takes it on load; a bad calendar is unreadable", () => {
+    const after = startNextSeason(playSeason(world));
+    const old = { ...after, divisions: after.divisions.map(({ calendar: _c, ...d }) => d) };
+    const store = memoryStore();
+    store.setItem(WORLD_KEY, JSON.stringify(old));
+    assert.deepEqual(loadWorld(store).world!.divisions.map((d) => d.calendar), [2, 2, 2, 2]);
+    const broken = memoryStore();
+    broken.setItem(WORLD_KEY, JSON.stringify({ ...after, divisions: after.divisions.map((d) => ({ ...d, calendar: 3 })) }));
+    assert.deepEqual(loadWorld(broken), { world: null, reason: "unreadable" });
   });
 
   it("a new world replaces the old one (after the reset)", () => {
@@ -75,7 +120,7 @@ describe("My World: the save", () => {
     old.setItem(WORLD_KEY, JSON.stringify({ ...world, version: WORLD_VERSION - 1 }));
     assert.deepEqual(loadWorld(old), { world: null, reason: "incompatible" });
     assert.equal(old.items.has(WORLD_KEY), false, "removed");
-    for (const text of ["{not json", "null", "[]", JSON.stringify({ ...world, divisions: [] }), JSON.stringify({ ...world, userClub: 123456789 }), JSON.stringify({ ...world, history: [{ year: 2026, divisions: [{ code: "PL", rows: [[1, 2]] }] }] })]) {
+    for (const text of ["{not json", "null", "[]", JSON.stringify({ ...world, divisions: [] }), JSON.stringify({ ...world, userClub: 123456789 }), JSON.stringify({ ...world, nationalLeague: [123456789] }), JSON.stringify({ ...world, history: [{ year: 2026, divisions: [{ code: "PL", rows: [[1, 2]] }] }] })]) {
       const broken = memoryStore();
       broken.setItem(WORLD_KEY, text);
       assert.deepEqual(loadWorld(broken), { world: null, reason: "unreadable" }, text.slice(0, 40));
