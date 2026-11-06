@@ -14,7 +14,7 @@ export async function oddsCardImage(locale: string, leagueSlug: string, round?: 
   const lang = (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
   const generic = async () => {
     const ts = await getTranslations({ locale: lang, namespace: "ShareCard" });
-    return renderGenericShareCard({ title: getLeagueBySlug(leagueSlug)?.name ?? "Foot Simu", subtitle: ts("genericSubtitle"), cta: ts("cta") });
+    return renderGenericShareCard({ title: getLeagueBySlug(leagueSlug)?.name ?? "FootSimu", subtitle: ts("genericSubtitle"), cta: ts("cta") });
   };
   const loaded = await loadReport(leagueSlug, round).catch(() => undefined);
   if (!loaded) return firstCardThatRenders([generic]);

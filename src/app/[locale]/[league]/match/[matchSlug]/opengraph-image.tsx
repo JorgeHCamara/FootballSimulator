@@ -5,7 +5,7 @@ import { loadMatch } from "../../../../../lib/matchPreview.ts";
 import { OG_SIZE } from "../../../../../lib/ogImage.tsx";
 import { crestDataUri, renderGenericShareCard, renderMatchCard } from "../../../../../lib/shareCard.tsx";
 
-export const alt = "Foot Simu match prediction";
+export const alt = "FootSimu match prediction";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
@@ -17,7 +17,7 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   const loaded = await loadMatch(slug, matchSlug).catch(() => undefined);
   if (!loaded || "moved" in loaded) {
     const league = getLeagueBySlug(slug);
-    return renderGenericShareCard({ title: league?.name ?? "Foot Simu", subtitle: ts("genericSubtitle"), cta: ts("cta") });
+    return renderGenericShareCard({ title: league?.name ?? "FootSimu", subtitle: ts("genericSubtitle"), cta: ts("cta") });
   }
   const { league, match, odds, result, state, season, timeZone } = loaded;
   const { home, away, fixture } = match;

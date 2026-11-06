@@ -1,6 +1,6 @@
 import { routing } from "../i18n/routing.ts";
 
-export const SITE_NAME = "Foot Simu";
+export const SITE_NAME = "FootSimu";
 /** Google Search Console HTML-tag verification for https://footsimu.com (public by design). */
 export const GOOGLE_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "NNYCQH90rIGoWobSE23pk7USI5FSAfXfFxO2-Y_Jzr0";

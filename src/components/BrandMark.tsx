@@ -1,4 +1,4 @@
-// The Foot Simu logo mark: a stylised ball on a pitch-green tile. Also used to
+// The FootSimu logo mark: a stylised ball on a pitch-green tile. Also used to
 // render the favicon and social images.
 export function BrandMark({ size = 28 }: { size?: number }) {
   return (

@@ -7,6 +7,7 @@ import Script from "next/script";
 import type { ReactNode } from "react";
 import { SiteFooter } from "../../components/SiteFooter.tsx";
 import { SiteHeader } from "../../components/SiteHeader.tsx";
+import { COMPETITIONS } from "../../config/competitions.ts";
 import { routing } from "../../i18n/routing.ts";
 import { ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION, HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../lib/site.ts";
 import "../globals.css";
@@ -24,10 +25,11 @@ export const viewport: Viewport = {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Metadata" });
+  const description = t("homeDescription", { count: COMPETITIONS.length });
   return {
     metadataBase: new URL(SITE_URL),
-    title: { default: t("homeTitle"), template: `%s | ${SITE_NAME}` },
-    description: t("homeDescription"),
+    title: { default: `${t("homeTitle")} | ${SITE_NAME}`, template: `%s | ${SITE_NAME}` },
+    description,
     applicationName: SITE_NAME,
     alternates: alternates(locale, ""),
     openGraph: {
@@ -36,10 +38,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       locale: OG_LOCALE[locale],
       alternateLocale: routing.locales.filter((l) => l !== locale).map((l) => OG_LOCALE[l]!),
       title: t("homeTitle"),
-      description: t("homeDescription"),
+      description,
       url: `/${locale}`,
     },
-    twitter: { card: "summary_large_image", title: t("homeTitle"), description: t("homeDescription") },
+    twitter: { card: "summary_large_image", title: t("homeTitle"), description },
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
     verification: { google: GOOGLE_SITE_VERIFICATION },
     // AdSense's site ownership tag, once a publisher id is set.

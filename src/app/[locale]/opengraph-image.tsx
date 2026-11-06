@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { OG_SIZE, renderOgImage } from "../../lib/ogImage.tsx";
 
-export const alt = "Foot Simu – Football Simulator";
+export const alt = "FootSimu – Football Simulator";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

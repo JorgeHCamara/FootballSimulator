@@ -7,7 +7,7 @@ import { cardRows, scenarioOutcome, SCENARIO_ITERATIONS } from "../../../../../l
 import { crestDataUri, renderGenericShareCard, renderShareCard } from "../../../../../lib/shareCard.tsx";
 import { loadSharedScenario } from "../../../../../lib/sharedScenario.ts";
 
-export const alt = "Foot Simu prediction";
+export const alt = "FootSimu prediction";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
@@ -26,7 +26,7 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   const outcome = shared?.predictions ? scenarioOutcome(shared.league, shared.data, shared.predictions) : null;
   const generic = () =>
     renderGenericShareCard({
-      title: league ? t("genericTitle", { league: league.name, season }).trim() : "Foot Simu",
+      title: league ? t("genericTitle", { league: league.name, season }).trim() : "FootSimu",
       subtitle: t("genericSubtitle"),
       cta: t("cta"),
     });
