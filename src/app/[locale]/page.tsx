@@ -63,8 +63,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       />
 
       <section className="pt-4 text-center">
-        <h1 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">{t("heading")}</h1>
-        <p className="mt-2 text-lg font-semibold text-pitch-700 dark:text-pitch-100">{t("tagline")}</p>
+        {/* Not shown (the header already says FootSimu), but kept as the page's H1 for search engines and screen readers. */}
+        <h1 className="sr-only">{t("heading")}</h1>
+        <p className="text-lg font-semibold text-pitch-700 dark:text-pitch-100">{t("tagline")}</p>
         <p className="mx-auto mt-3 max-w-2xl text-zinc-600 text-pretty dark:text-zinc-400">{t("subheading")}</p>
       </section>
 
