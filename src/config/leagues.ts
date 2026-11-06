@@ -42,8 +42,8 @@ export interface Zone {
   to: number;
 }
 
-/** Competition codes (football-data.org codes, plus BSB for Brasileirão Série B and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL" | "ABL";
+/** Competition codes (football-data.org codes, plus BSB and BSC for Brasileirão Séries B and C, and MLS). */
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "BSC" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL" | "ABL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -156,14 +156,22 @@ export interface LeagueConfig {
     /** The first phase's tab once split ("Regular season" by default), and on phones. */
     firstPhaseName?: Record<SiteLocale, string>;
     firstPhaseShortName?: Record<SiteLocale, string>;
+    /** The groups' own tiebreakers, when they differ from the first phase's (Série C: head-to-head in the groups only). */
+    groupTiebreakers?: readonly Tiebreaker[];
   };
   /**
    * Real data comes from ESPN and falls back to football-data.org (with `code`
    * as the competition code); leagues outside football-data.org's free tier set
-   * `espnOnly`.
+   * `espnOnly`. A first-party league has no feed.
    */
-  espn: EspnFeed;
+  espn?: EspnFeed;
   espnOnly?: boolean;
+  /**
+   * The league's data is the site's own, committed in src/data (Série C:
+   * imported once from the CBF, which ESPN doesn't cover): no feed is ever
+   * called for it (see src/lib/firstParty.ts).
+   */
+  firstParty?: FirstPartySource;
   /**
    * Reserve sides, which can't be promoted or play the play-off, by the start of
    * their name (Eerste Divisie: "Jong "; Segunda División: "Real Sociedad II").
@@ -197,6 +205,15 @@ export interface LeagueConfig {
     includePostseason?: boolean;
   };
 }
+
+/** A first-party league's committed season (see LeagueConfig.firstParty). */
+export interface FirstPartySource {
+  /** The season's year, which names its data file. */
+  season: number;
+}
+
+/** "split" (August–May) or "calendar" seasons: the feed's, or a calendar year for a first-party league. */
+export const seasonsOf = (league: Pick<LeagueConfig, "espn">): EspnFeed["seasons"] => league.espn?.seasons ?? "calendar";
 
 export interface ContinentalConfig {
   /**
@@ -913,6 +930,73 @@ export const LEAGUES: readonly LeagueConfig[] = [
       { kind: "promotionPlayoff", from: 3, to: 6 },
       { kind: "relegation", from: 17, to: 20 },
     ],
+  },
+  {
+    code: "BSC",
+    slug: "brasileirao-serie-c",
+    name: "Brasileirão Série C",
+    country: "Brazil",
+    flag: "br",
+    simulatorName: { en: "Série C Simulator", pt: "Simulador da Série C", es: "Simulador de la Serie C" },
+    aka: { en: "Brazilian Série C", pt: "Brasileirão Série C", es: "Brasileirão Serie C" },
+    teams: 20,
+    // Série C 2026 (CBF, REC 2026): a first phase of one round robin (19
+    // games); its top 8 play two groups of 4, home and away, from zero points
+    // (the CBF's groups B and C: 1st, 4th, 5th and 8th, and 2nd, 3rd, 6th and
+    // 7th); each group's top 2 go up to Série B 2027 and the group winners
+    // play a two-legged final, the better campaign over both phases hosting
+    // the second leg, level on aggregate: penalties. The bottom 2 of the first
+    // phase go down to Série D (two only: Série C has 24 clubs in 2027). ESPN
+    // has no 2026 Série C: the season is the site's own data, imported once
+    // from the CBF (scripts/import-serie-c.ts).
+    gamesPerTeam: 19,
+    firstParty: { season: 2026 },
+    // First phase: wins, goal difference, goals scored, then fewer red and
+    // yellow cards and a draw (cards: the data's own order, LeagueData.fallbackOrder).
+    tiebreakers: ["points", "wins", "goalDifference", "goalsFor"],
+    split: {
+      afterRound: 19,
+      groups: [
+        { size: 4, legs: 2, carryOver: 0, places: [1, 4, 5, 8] },
+        { size: 4, legs: 2, carryOver: 0, places: [2, 3, 6, 7] },
+      ],
+      // In the groups the head-to-head (both games) comes after goals scored.
+      groupTiebreakers: ["points", "wins", "goalDifference", "goalsFor", "headToHeadGoalDifference"],
+      // The final classification (champion, promoted, relegated), over every club.
+      finalZones: [
+        { kind: "title", from: 1, to: 1 },
+        { kind: "promotion", from: 1, to: 4 },
+        { kind: "relegation", from: 19, to: 20 },
+      ],
+      firstPhaseName: { en: "First stage", pt: "1ª fase", es: "Primera fase" },
+      firstPhaseShortName: { en: "1st stage", pt: "1ª fase", es: "1ª fase" },
+    },
+    // The first phase: the top 8 to the promotion groups, the bottom 2 down.
+    zones: [
+      { kind: "promotionPlayoff", from: 1, to: 8 },
+      { kind: "relegation", from: 19, to: 20 },
+    ],
+    groups: [
+      {
+        id: "B",
+        espnName: "",
+        name: { en: "Group B", pt: "Grupo B", es: "Grupo B" },
+        shortName: { en: "Group B", pt: "Grupo B", es: "Grupo B" },
+        zones: [{ kind: "promotion", from: 1, to: 2 }],
+      },
+      {
+        id: "C",
+        espnName: "",
+        name: { en: "Group C", pt: "Grupo C", es: "Grupo C" },
+        shortName: { en: "Group C", pt: "Grupo C", es: "Grupo C" },
+        zones: [{ kind: "promotion", from: 1, to: 2 }],
+      },
+    ],
+    playoff: {
+      seedFromGroups: { places: 1, campaign: true },
+      rounds: [{ key: "final", legs: 2, levelTie: "penalties", noExtraTime: true, pairs: [[1, 2]] }],
+      title: "Série C",
+    },
   },
   {
     code: "MLS",

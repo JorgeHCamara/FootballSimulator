@@ -113,11 +113,52 @@ export interface PlayoffConfig {
      * 1B v 8A…). Positions then also name the slot: zone = (p − 1) mod groups.
      */
     interleave?: boolean;
+    /**
+     * Rank the clubs of each place by their record over the whole competition
+     * (the first phase's table, given with the group tables, plus the group's):
+     * points, then wins, then goal difference (Série C: the better campaign
+     * hosts the final's second leg).
+     */
+    campaign?: boolean;
   };
 }
 
 const byRecord = (a: StandingRow, b: StandingRow) =>
   b.points - a.points || b.goalDifference - a.goalDifference || b.goalsFor - a.goalsFor || a.teamId - b.teamId;
+
+/** A club's record over two phases: an earlier phase's row added to this one's. */
+export function addRecords(row: StandingRow, earlier: StandingRow | undefined): StandingRow {
+  if (!earlier) return row;
+  return {
+    ...row,
+    played: row.played + earlier.played,
+    won: row.won + earlier.won,
+    drawn: row.drawn + earlier.drawn,
+    lost: row.lost + earlier.lost,
+    goalsFor: row.goalsFor + earlier.goalsFor,
+    goalsAgainst: row.goalsAgainst + earlier.goalsAgainst,
+    goalDifference: row.goalDifference + earlier.goalDifference,
+    points: row.points + earlier.points,
+  };
+}
+
+/** The better campaign (Série C): points, wins, goal difference, goals scored, then the earlier phase's place. */
+export function byCampaign(earlier: readonly StandingRow[]) {
+  const before = new Map(earlier.map((r) => [r.teamId, r]));
+  const total = (r: StandingRow) => addRecords(r, before.get(r.teamId));
+  return (a: StandingRow, b: StandingRow) => {
+    const x = total(a);
+    const y = total(b);
+    return (
+      y.points - x.points ||
+      y.won - x.won ||
+      y.goalDifference - x.goalDifference ||
+      y.goalsFor - x.goalsFor ||
+      (before.get(a.teamId)?.position ?? Infinity) - (before.get(b.teamId)?.position ?? Infinity) ||
+      a.teamId - b.teamId
+    );
+  };
+}
 
 /**
  * One ranking from several group tables: every group's 1st (best record first),
@@ -130,13 +171,16 @@ export function seedByGroupPlace(
   external: readonly StandingRow[] = [],
   places = Infinity,
   interleave = false,
+  /** Rank each place by the whole competition's record (`seedFromGroups.campaign`): the earlier phase's table. */
+  campaign?: readonly StandingRow[],
 ): StandingRow[] {
   const deepest = Math.max(0, ...groups.map((g) => g.length));
   const ranked: StandingRow[] = [];
+  const order = campaign ? byCampaign(campaign) : byRecord;
   for (let place = 1; place <= deepest; place++) {
     if (place === places + 1) ranked.push(...[...external].sort(byRecord));
     const atPlace = groups.flatMap((g) => g.filter((row) => row.position === place));
-    ranked.push(...(interleave ? atPlace : atPlace.sort(byRecord)));
+    ranked.push(...(interleave ? atPlace : atPlace.sort(order)));
   }
   if (places >= deepest) ranked.push(...[...external].sort(byRecord));
   return ranked.map((row, i) => ({ ...row, position: i + 1 }));

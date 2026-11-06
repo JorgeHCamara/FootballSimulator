@@ -260,10 +260,18 @@ export async function renderClubCard(text: ClubCardText) {
 export async function crestDataUri(url: string | undefined): Promise<string | undefined> {
   if (!url) return undefined;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(2500), next: { revalidate: 604800 } });
-    const type = res.headers.get("content-type")?.split(";")[0]?.trim() ?? "";
-    if (!res.ok || !["image/png", "image/jpeg"].includes(type)) return undefined;
-    const bytes = Buffer.from(await res.arrayBuffer());
+    let type: string;
+    let bytes: Buffer;
+    if (/^\/crests\/serie-c\/\d+\.jpg$/.test(url)) {
+      // The site's own crest (Série C): read from the deployment, no request.
+      type = "image/jpeg";
+      bytes = await readFile(join(process.cwd(), "public", url));
+    } else {
+      const res = await fetch(url, { signal: AbortSignal.timeout(2500), next: { revalidate: 604800 } });
+      type = res.headers.get("content-type")?.split(";")[0]?.trim() ?? "";
+      if (!res.ok || !["image/png", "image/jpeg"].includes(type)) return undefined;
+      bytes = Buffer.from(await res.arrayBuffer());
+    }
     // Only what it says it is: a PNG or JPEG by its first bytes (a broken image would break the card).
     const png = bytes.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
     const jpeg = bytes[0] === 0xff && bytes[1] === 0xd8;

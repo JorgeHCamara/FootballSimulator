@@ -274,7 +274,8 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
       offset,
       places: facts.places,
       scope: "table",
-      title: !league.playoff?.title,
+      // A final classification (Série C) puts the play-off's champion 1st.
+      title: !league.playoff?.title || Boolean(input.classification),
       fixtures: played.filter((f) => real.has(f.id)),
       zoneCounts: false,
       complete: played.every((f) => fixed[f.id]) && !input.project,
@@ -389,7 +390,8 @@ export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: Outloo
       tableSize,
       distribution,
       zones,
-      headline: withPlayoff(headlineChances(zones, share, passedDown.has(row.teamId)), zones, playoff),
+      // A final classification (Série C) already has the final's winner as champion: no second title chance.
+      headline: withPlayoff(headlineChances(zones, share, passedDown.has(row.teamId)), zones, s.input.classification ? undefined : playoff),
       ...(playoff ? { playoff } : {}),
       likeliest,
       likelyRange: likelyFinishRange(distribution),

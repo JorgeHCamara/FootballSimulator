@@ -16,6 +16,7 @@
     "continentalGroupsDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the group stage, see the eight group tables live, then play the knockout phase to the final, with every club's chance of the round of 16 and the trophy.",
     "leagueDescriptionAmericas": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Copa Libertadores and relegation chances.",
     "zonesDescription": "Free {simulator} for the {season} tournament ({aka}). Enter your scores or simulate the remaining matches, watch both zone tables update live, then play the play-offs to the final, with every club's chance of the play-offs and the title.",
+    "stagesDescription": "Free {simulator} for the {season} season ({aka}). Replay the first stage, the promotion groups and the final, change any result and see who goes up, who wins the title and who goes down.",
     "tournamentsDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate each tournament of the year, play its play-offs where it has them, and see the annual table with the Copa Libertadores and Sudamericana places.",
     "liguillaDescription": "Free {simulator} for the {season} tournament ({aka}). Enter your scores or simulate the remaining matches, watch the table update live, then play the Liguilla to the final, with every club's chance of the Liguilla and the title.",
     "leagueDescriptionAsia": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, AFC Champions League and relegation chances."
@@ -65,6 +66,8 @@
     "simulateMatch": "Simulate this match",
     "simulateMatchday": "Simulate matchday",
     "simulateRest": "Simulate rest of season",
+    "replaySeason": "Replay season",
+    "replaySeasonNote": "The real season is over: play it all again from the first game, the groups and the final included. Every real result is replaced by a simulated one (Undo brings them back).",
     "reset": "Reset",
     "resetTitle": "Reset this league?",
     "resetConfirm": "All your predictions and simulated results for this league will be cleared. Real results stay as they are.",
@@ -74,6 +77,7 @@
     "share": "Share",
     "linkCopied": "Link copied",
     "liveSource": "Real fixtures and results, updated hourly",
+    "firstPartySource": "Official results from the CBF (Brazilian Football Confederation), kept on Foot Simu",
     "editResult": "Change this result",
     "position": "#",
     "team": "Team",
@@ -257,7 +261,9 @@
     },
     "step3Americas": "Open the Chances tab to see every team's chances of the title, the Copa Libertadores and relegation.",
     "introZones": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the remaining matches: both zone tables update instantly with the official tiebreakers. The top 8 of each zone go to the play-offs, played across the zones (1st in Zone A v 8th in Zone B…) in single matches down to the final. Switch between the Apertura, the Clausura and the annual table, which decides the continental places and relegation.",
+    "introStages": "Use the {simulator} to play the {league} {season} season again ({aka}). Every real result is there to change: the first stage's table, the two promotion groups (each group's top 2 go up) and the two-legged final update instantly with the official tiebreakers. Change who finishes where and the groups and the final change with it.",
     "step3Zones": "Open the Chances tab to see every club's chance of finishing first in its zone, of reaching the play-offs and of winning the title.",
+    "step3Stages": "Open the Chances tab to see each club's chances in its promotion group and of winning the final.",
     "introTournaments": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). The year has several tournaments, each with its own table and champion: switch between them and the annual table, which adds them all up and decides the Copa Libertadores and Sudamericana places. Type your own scores or simulate the remaining matches, and the tables update instantly.",
     "step3Tournaments": "Open the Chances tab to see every club's chance of winning the tournament and, in the annual table, of the Copa Libertadores and the Sudamericana.",
     "introLiguilla": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the remaining matches: the table updates instantly with the official tiebreakers. The top 8 go to the Liguilla, played over two legs down to the final.",
@@ -317,7 +323,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Belgian Pro League, Greek Super League, Austrian Bundesliga, Brasileirão Série A and Série B, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the Saudi Pro League, the J1 League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
+        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Belgian Pro League, Greek Super League, Austrian Bundesliga, Brasileirão Série A, Série B and Série C, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the Saudi Pro League, the J1 League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",
@@ -638,6 +644,8 @@
     "tournaments": "The season has {count, plural, =2 {two} =3 {three} other {#}} tournaments ({names}), each with its own champion.",
     "split": "{hasRound, select, yes {After {round} rounds} other {After the {phase}}} the table splits into separate tables: {groups}. Each is a new table of its own games ({legs, select, one {once} other {home and away}}), and the clubs start it with their {phase} points{carry}.",
     "carryHalved": " (the {group} start from half of them, rounded up)",
+    "splitPlaced": "After {round} rounds the top {count} go into two groups ({groups}), each a new table of its own games, home and away, starting from zero points. The other clubs' season is over.",
+    "placesList": "{list}: {group}",
     "splitHalves": "After {round} rounds the table splits into the top {top} and the bottom {bottom}, who play each other once more; clubs stay in their half whatever their points.",
     "tables": "The clubs are split into {count, plural, =2 {two} other {#}} tables: {names}.",
     "titlePlayoff": "A play-off after the regular phase decides the champion.",

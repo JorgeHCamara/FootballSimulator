@@ -1,12 +1,13 @@
 // The file itself (".js"): these modules also run outside Next (scripts, tests), whose Node needs the extension.
 import { unstable_cache } from "next/cache.js";
-import { gamesPerTeam, isStage, type EspnStages, type LeagueConfig } from "../config/leagues.ts";
+import { gamesPerTeam, isStage, seasonsOf, type EspnStages, type LeagueConfig } from "../config/leagues.ts";
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
 import { EspnError, espnFixtures, espnSplitSeason, espnTeams, espnVenues, fetchEspnDeductions, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
+import { firstPartyData } from "./firstParty.ts";
 import { withClubPages } from "./clubs.ts";
 import { ratingXgWeight } from "../engine/ratings.ts";
 import { readXg } from "./xgStore.ts";
@@ -35,8 +36,13 @@ export interface LeagueData {
   deductions?: Record<number, number>;
   /** A split league: the first phase's games by ESPN's stage tag (see `split.espnStage`). */
   firstPhaseIds?: number[];
-  /** Where the data came from (ESPN's game ids differ from football-data.org's). */
-  provider?: "espn" | "football-data";
+  /** Where the data came from (ESPN's game ids differ from football-data.org's; "first-party": the site's own committed data). */
+  provider?: "espn" | "football-data" | "first-party";
+  /**
+   * Order of clubs level on every criterion the site counts, by the league's
+   * next ones (Série C: fewer red, then yellow cards), for the table.
+   */
+  fallbackOrder?: number[];
   /** Each game's ground, by fixture id, when the feed names it (match pages). */
   venues?: Record<number, string>;
   /**
@@ -135,7 +141,7 @@ async function loadLive(league: LeagueConfig, apiKey: string): Promise<LeagueDat
 export function currentSeasonYear(league: LeagueConfig, now = new Date()): number {
   const year = now.getUTCFullYear();
   // Split seasons start in August; from June on, try the new season first.
-  return league.espn.seasons === "split" && now.getUTCMonth() < 5 ? year - 1 : year;
+  return seasonsOf(league) === "split" && now.getUTCMonth() < 5 ? year - 1 : year;
 }
 
 /**
@@ -145,7 +151,9 @@ export function currentSeasonYear(league: LeagueConfig, now = new Date()): numbe
  * season is shown.
  */
 async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh = false): Promise<LeagueData> {
-  const { slug, seasons, weeklyRounds } = league.espn;
+  const feed = league.espn;
+  if (!feed) throw new Error(`${league.code} has no ESPN feed`);
+  const { slug, seasons, weeklyRounds } = feed;
   // `fresh`: straight from ESPN, past the data cache (see freshLeagueData).
   const init: RequestInit = fresh ? { cache: "no-store" } : { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
   const perTeam = gamesPerTeam(league);
@@ -161,7 +169,7 @@ async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh =
       : undefined;
     // The tournament to show: the first listed (latest) with at least half its
     // table published; a single tournament is always used.
-    const stageSets = league.espn.stages === undefined ? [] : "table" in league.espn.stages ? [league.espn.stages] : [...league.espn.stages];
+    const stageSets = feed.stages === undefined ? [] : "table" in feed.stages ? [feed.stages] : [...feed.stages];
     const tableGames = (set: EspnStages) => all.filter((e) => isStage(e.season?.slug, set.table)).length;
     const stages = stageSets.find((set) => stageSets.length === 1 || tableGames(set) >= (league.teams * perTeam) / 4) ?? stageSets.at(-1);
     if (groups) {
@@ -214,7 +222,7 @@ async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh =
       }
     }
     // Deductions in ESPN's current standings: the current tournament's table.
-    const deductions = league.espn.deductions
+    const deductions = feed.deductions
       ? await fetchEspnDeductions(slug, year, init).catch((error) => {
           console.warn(`${league.code}: no ESPN standings for deductions:`, error);
           return {};
@@ -280,7 +288,7 @@ async function keptEspnGroups(league: LeagueConfig, year: number, init: RequestI
 
 /** The league's groups (conferences) with their clubs, matched to the config by ESPN's group names. */
 async function loadEspnGroups(league: LeagueConfig, year: number, init: RequestInit) {
-  const espnGroups = await fetchEspnGroups(league.espn.slug, year, init);
+  const espnGroups = await fetchEspnGroups(league.espn!.slug, year, init);
   return league.groups!.map((group) => {
     const found = espnGroups.find((g) => g.name.includes(group.espnName));
     if (!found || found.teamIds.length === 0) throw new Error(`${league.code}: no "${group.espnName}" group in ESPN standings for ${year}`);
@@ -297,7 +305,7 @@ function loadSample(league: LeagueConfig): LeagueData {
   const groups = league.split && league.groupsOptional ? undefined : league.groups?.map((g, i) => ({ id: g.id, teamIds: teams.slice(i * size, (i + 1) * size).map((t) => t.id) }));
   // Several tournaments a season (Argentina): the current one as above, and an
   // earlier one fully played, its fixture ids and dates moved clear of it.
-  const sets = league.espn.stages && !("table" in league.espn.stages) ? league.espn.stages : [];
+  const sets = league.espn?.stages && !("table" in league.espn.stages) ? league.espn.stages : [];
   let tournaments: Tournament[] | undefined;
   if (sets.length > 1) {
     // Earlier tournaments: fully played, each with its own fixture ids and
@@ -377,7 +385,8 @@ async function withXg(league: LeagueConfig, data: LeagueData): Promise<LeagueDat
  * when ESPN fails; the cached copy itself with sample data.
  */
 export async function freshLeagueData(league: LeagueConfig): Promise<LeagueData | undefined> {
-  if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return getLeagueData(league);
+  // Sample data, or a first-party league's committed season: nothing fresher to fetch.
+  if (process.env.FOOTSIMU_SAMPLE_DATA === "1" || league.firstParty) return getLeagueData(league);
   try {
     const data = await loadEspn(league, undefined, true);
     return await withXg(league, { ...data, teams: withClubPages(league, data.teams) });
@@ -395,7 +404,8 @@ const pastInflight = new Map<string, Promise<LeagueData | undefined>>();
  * loaded (or with sample data). Cached like the current season's.
  */
 export function getPastSeasonData(league: LeagueConfig, year: number): Promise<LeagueData | undefined> {
-  if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return Promise.resolve(undefined);
+  // A first-party league has only its committed season (no feed to ask for another).
+  if (process.env.FOOTSIMU_SAMPLE_DATA === "1" || league.firstParty) return Promise.resolve(undefined);
   const key = `${league.code}:${year}`;
   const pending = pastInflight.get(key);
   if (pending) return pending;
@@ -414,6 +424,8 @@ export function getPastSeasonData(league: LeagueConfig, year: number): Promise<L
 }
 
 async function loadLeagueData(league: LeagueConfig): Promise<LeagueData> {
+  // The site's own data (Série C): real clubs and results, sample data or not, and never a feed.
+  if (league.firstParty) return firstPartyData(league);
   if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return loadSample(league);
 
   const sources: { name: string; load: () => Promise<LeagueData> }[] = [{ name: "ESPN", load: () => loadEspn(league) }];

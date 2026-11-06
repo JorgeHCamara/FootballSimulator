@@ -56,4 +56,4 @@ export function annualFixtures(league: LeagueConfig & { annual: NonNullable<Leag
 
 /** The season's tournament stages (Argentina: Clausura, Apertura), latest first. */
 export const tournamentStages = (league: LeagueConfig): readonly EspnStages[] =>
-  league.espn.stages && !("table" in league.espn.stages) ? league.espn.stages : [];
+  league.espn?.stages && !("table" in league.espn.stages) ? league.espn.stages : [];

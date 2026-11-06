@@ -33,6 +33,14 @@ export async function LeagueFactsSection({ league, locale }: { league: LeagueCon
           carry: halved.length ? t("carryHalved", { group: halved.map((g) => g.name[locale]).join(", ") }) : "",
         });
       }
+      case "splitPlaced": {
+        const list = (places: number[]) => places.map(place).join(", ");
+        return t("splitPlaced", {
+          round: fact.afterRound,
+          count: fact.groups.reduce((n, g) => n + g.places.length, 0),
+          groups: fact.groups.map((g) => t("placesList", { group: g.name[locale], list: list(g.places) })).join("; "),
+        });
+      }
       case "splitHalves":
         return t("splitHalves", { round: fact.afterRound, top: fact.top, bottom: fact.bottom });
       case "tables":

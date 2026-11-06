@@ -39,8 +39,8 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
   const lang = useLocale() as SiteLocale;
   const [view, setView] = useState<string>(current);
   const stages = useMemo(
-    () => (league.espn.stages && !("table" in league.espn.stages) ? league.espn.stages : []),
-    [league.espn.stages],
+    () => (league.espn?.stages && !("table" in league.espn.stages) ? league.espn.stages : []),
+    [league.espn?.stages],
   );
   const configOf = (tournament: Tournament) => tournamentConfig(league, stages.find((s) => s.table === tournament.id));
   // Oldest first in the switch, then the annual table.
