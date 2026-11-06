@@ -18,6 +18,7 @@
     "backtest:season": "NODE_USE_ENV_PROXY=1 node scripts/backtest-season.ts",
     "backtest:season:tune": "node scripts/backtest-season-tune.ts",
     "snapshots": "NODE_USE_ENV_PROXY=1 node scripts/snapshot-odds.ts",
+    "snapshots:check": "NODE_USE_ENV_PROXY=1 node scripts/check-snapshots.ts",
     "xg": "NODE_USE_ENV_PROXY=1 node scripts/fetch-xg.ts"
   },
   "devDependencies": {

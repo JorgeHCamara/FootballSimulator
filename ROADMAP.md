@@ -28,8 +28,8 @@ reliability (item 5) comes next, then growth, engagement and monetisation
 | 2 | Club page Likely finish range | done | `roadmap/2-likely-finish-range` |
 | 3 | Rating noise: offline tune | done | `roadmap/3-rating-noise-tune` |
 | 4 | Rating noise: live (gated on item 3) | done | `roadmap/4-rating-noise-live` |
-| 5 | Club page reliability: MLS 500s and consistent odds | in-pr | `roadmap/5-club-page-reliability` |
-| 6 | Snapshot integrity | todo | `roadmap/6-snapshot-integrity` |
+| 5 | Club page reliability: MLS 500s and consistent odds | done | `roadmap/5-club-page-reliability` |
+| 6 | Snapshot integrity | in-pr | `roadmap/6-snapshot-integrity` |
 | 7 | Play-offs and MLS Cup on club pages | todo | `roadmap/7-club-playoffs` |
 | 8 | Quiz with historical data | todo | `roadmap/8-quiz-historical` |
 | 9 | Prediction league | todo | `roadmap/9-prediction-league` |
@@ -192,9 +192,9 @@ the live engine still reproduces every league's latest stored snapshot.
 
 Since item 4: the Championship's snapshots were rebuilt with the rating-noise
 model (`npm run snapshots -- ELC --rebuild`), and every snapshot carries the
-model it was taken with (`modelVersion`; none: model "1"). The drift check can
-only reproduce a snapshot of today's model (`SIM_VERSION`); a league whose
-latest snapshot is older is checked once its next round is taken (or rebuilt).
+model it was taken with (`modelVersion`; none: model "1"). The drift check
+retakes a snapshot with its own model: today's (`SIM_VERSION`), or model "1"
+as today's engine without rating noise (`REPRODUCIBLE_MODELS`).
 
 ## 7. Play-offs and MLS Cup on club pages
 

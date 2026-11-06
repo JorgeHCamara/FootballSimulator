@@ -1,7 +1,7 @@
 import type { CompetitionCode, LeagueConfig, ZoneKind } from "../config/leagues.ts";
 import { leagueTimeZone } from "../config/timezones.ts";
 import type { Fixture } from "../engine/types.ts";
-import { dataAsOf, leagueOutlook } from "./clubOutlook.ts";
+import { dataAsOf, leagueOutlook, outlookSetup, type OutlookSetup } from "./clubOutlook.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { localDate } from "./matches.ts";
 import { SIM_VERSION } from "./simVersion.ts";
@@ -106,12 +106,43 @@ export function completedRounds(fixtures: readonly Fixture[], now = Date.now()):
 
 const round4 = (x: number) => Math.round(x * 10_000) / 10_000;
 
-/** Every club's chances just after a round: the league's Monte Carlo from the results up to its last game. */
-export function snapshotAfter(league: LeagueConfig, data: LeagueData, round: number, lastKickoff: string, takenAt = new Date(), iterations?: number): OddsSnapshot | null {
+/**
+ * The models a snapshot can be taken with today: the current one (SIM_VERSION)
+ * and earlier ones today's engine still reproduces, each as a change to the
+ * league's setup, so the drift check (scripts/check-snapshots.ts) can retake a
+ * snapshot stored with an older model. "1": today's engine without rating noise
+ * (model "2", roadmap item 4, changed nothing else). A model missing here can't
+ * be retaken: its snapshots are left alone.
+ */
+export const REPRODUCIBLE_MODELS: Readonly<Record<string, (setup: OutlookSetup) => OutlookSetup>> = {
+  [SIM_VERSION]: (setup) => setup,
+  "1": (setup) => {
+    const { ratingNoise: _, ...input } = setup.input;
+    return { ...setup, input };
+  },
+};
+
+/**
+ * Every club's chances just after a round: the league's Monte Carlo from the
+ * results up to its last game. `model`: one of REPRODUCIBLE_MODELS (today's by
+ * default), recorded as the snapshot's modelVersion.
+ */
+export function snapshotAfter(
+  league: LeagueConfig,
+  data: LeagueData,
+  round: number,
+  lastKickoff: string,
+  takenAt = new Date(),
+  iterations?: number,
+  model: string = SIM_VERSION,
+): OddsSnapshot | null {
+  const withModel = REPRODUCIBLE_MODELS[model];
+  if (!withModel) throw new Error(`model ${model} can't be reproduced (see REPRODUCIBLE_MODELS)`);
   // Just after the last kick-off: that game counts, any later one doesn't.
   const asOf = new Date(Date.parse(lastKickoff) + 60_000).toISOString();
   const then = dataAsOf(data, asOf);
-  const outlook = leagueOutlook(league, then, iterations);
+  const setup = outlookSetup(league, then);
+  const outlook = setup ? leagueOutlook(league, then, iterations, undefined, withModel(setup)) : null;
   if (!outlook) return null;
   const teams: Record<string, TeamSnapshot> = {};
   for (const club of outlook.clubs.values()) {
@@ -133,7 +164,7 @@ export function snapshotAfter(league: LeagueConfig, data: LeagueData, round: num
     takenAt: takenAt.toISOString(),
     played: then.fixtures.filter((f) => f.result).length,
     iterations: outlook.iterations,
-    modelVersion: SIM_VERSION,
+    modelVersion: model,
     scope: outlook.scope,
     teams,
   };
@@ -149,6 +180,56 @@ export function pendingRounds(file: LeagueSnapshots | undefined, seasonKey: stri
   if (!stored.length) return completed.slice(-1);
   const last = Math.max(...stored.map((s) => s.round));
   return completed.filter((r) => r.round > last);
+}
+
+/** How far a retaken snapshot may be from the stored one: none (both are rounded to 4 decimals from the same seeded run). */
+export const DRIFT_EPSILON = 0;
+
+/** A club's figure that differs between a stored snapshot and the same snapshot taken again. */
+export interface Drift {
+  teamId: string;
+  /** "chances.title", "projected", "expectedPosition", "points"…, or "club" for a club in one and not the other. */
+  field: string;
+  stored?: number;
+  again?: number;
+}
+
+/**
+ * The figures that differ between a stored snapshot and the same round taken
+ * again (same moment, iterations and model): every club's table row, its
+ * chance of each place, its expected place and points, and its projected place,
+ * by more than `epsilon`. Empty when the live engine reproduces it.
+ */
+export function snapshotDrift(stored: OddsSnapshot, again: OddsSnapshot, epsilon = DRIFT_EPSILON): Drift[] {
+  const out: Drift[] = [];
+  const ids = [...new Set([...Object.keys(stored.teams), ...Object.keys(again.teams)])].sort((a, b) => Number(a) - Number(b));
+  for (const teamId of ids) {
+    const a = stored.teams[teamId];
+    const b = again.teams[teamId];
+    if (!a || !b) {
+      out.push({ teamId, field: "club" });
+      continue;
+    }
+    const figures = (t: TeamSnapshot): Record<string, number | undefined> => ({
+      position: t.position,
+      points: t.points,
+      played: t.played,
+      expectedPosition: t.expectedPosition,
+      averagePoints: t.averagePoints,
+      projected: t.projected,
+      projectedChance: t.projectedChance,
+      ...Object.fromEntries(Object.entries(t.chances).map(([kind, chance]) => [`chances.${kind}`, chance])),
+    });
+    const fa = figures(a);
+    const fb = figures(b);
+    for (const field of [...new Set([...Object.keys(fa), ...Object.keys(fb)])]) {
+      const x = fa[field];
+      const y = fb[field];
+      if (x === undefined && y === undefined) continue;
+      if (x === undefined || y === undefined || Math.abs(x - y) > epsilon + 1e-12) out.push({ teamId, field, ...(x !== undefined ? { stored: x } : {}), ...(y !== undefined ? { again: y } : {}) });
+    }
+  }
+  return out;
 }
 
 /**
