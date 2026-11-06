@@ -5,7 +5,7 @@ import { probabilityInRange, runMonteCarlo } from "./montecarlo.ts";
 import { buildLeagueModel, type LeagueModel } from "./ratings.ts";
 import { effectiveResults } from "./results.ts";
 import { createRng } from "./rng.ts";
-import { doubleRoundRobin } from "./schedule.ts";
+import { balancedDoubleRoundRobin, doubleRoundRobin, longestVenueRun } from "./schedule.ts";
 import { computeStandings } from "./standings.ts";
 import type { ResultMap, Team } from "./types.ts";
 
@@ -169,6 +169,36 @@ describe("doubleRoundRobin", () => {
   it("handles an odd number of teams with byes", () => {
     const fixtures = doubleRoundRobin([1, 2, 3, 4, 5]);
     assert.equal(fixtures.length, 20);
+  });
+});
+
+describe("balancedDoubleRoundRobin", () => {
+  it("never has a club play three in a row at home or away, in either half or across them", () => {
+    for (let n = 4; n <= 30; n += 2) {
+      const ids = Array.from({ length: n }, (_, i) => 100 + i);
+      const fixtures = balancedDoubleRoundRobin(ids);
+      assert.equal(longestVenueRun(fixtures), 2, `${n} clubs`);
+      // A full double round robin: every pairing once each way, every club once a matchday.
+      assert.equal(fixtures.length, n * (n - 1));
+      assert.equal(new Set(fixtures.map((f) => `${f.homeId}-${f.awayId}`)).size, n * (n - 1));
+      for (let md = 1; md <= 2 * (n - 1); md++) {
+        assert.equal(new Set(fixtures.filter((f) => f.matchday === md).flatMap((f) => [f.homeId, f.awayId])).size, n, `${n} clubs, matchday ${md}`);
+      }
+      for (const id of ids) assert.equal(fixtures.filter((f) => f.homeId === id).length, n - 1);
+      // At most one home-home or away-away pair per club in each half: the fewest a round robin allows.
+      for (const id of ids) {
+        for (const [from, to] of [[1, n - 1], [n, 2 * (n - 1)]] as const) {
+          const venues = fixtures.filter((f) => (f.homeId === id || f.awayId === id) && f.matchday >= from && f.matchday <= to).sort((a, b) => a.matchday - b.matchday).map((f) => f.homeId === id);
+          assert.ok(venues.filter((home, i) => i > 0 && home === venues[i - 1]).length <= 1, `${n} clubs: club ${id}`);
+        }
+      }
+    }
+  });
+
+  it("is a real change from the circle method kept for the sample leagues and split rounds (long runs there)", () => {
+    const ids = Array.from({ length: 20 }, (_, i) => i + 1);
+    assert.ok(longestVenueRun(doubleRoundRobin(ids)) > 2);
+    assert.equal(longestVenueRun(balancedDoubleRoundRobin(ids)), 2);
   });
 });
 

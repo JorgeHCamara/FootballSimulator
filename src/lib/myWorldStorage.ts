@@ -1,4 +1,4 @@
-import { ENGLAND, WORLD_VERSION, type World } from "./myWorld.ts";
+import { ENGLAND, upgradeWorld, WORLD_VERSION, type World } from "./myWorld.ts";
 
 /*
  * My World's save: one world per browser, in localStorage (no account, no
@@ -40,7 +40,7 @@ export function isWorld(value: unknown): value is World {
   if (!isNumber(value.year) || !isNumber(value.seed) || !isNumber(value.userClub) || !isNumber(value.newClubs) || typeof value.review !== "boolean") return false;
   if (!isRecord(clubs) || !isRecord(ratings) || !isRecord(params) || !Array.isArray(divisions) || !Array.isArray(history)) return false;
   if (!isRecord(clubs[String(value.userClub)])) return false;
-  if (divisions.length !== ENGLAND.length || !divisions.every((d, i) => isRecord(d) && d.code === ENGLAND[i] && Array.isArray(d.clubs) && d.clubs.every((id) => isRecord(clubs[String(id)])) && isScores(d.scores))) return false;
+  if (divisions.length !== ENGLAND.length || !divisions.every((d, i) => isRecord(d) && d.code === ENGLAND[i] && Array.isArray(d.clubs) && d.clubs.every((id) => isRecord(clubs[String(id)])) && isScores(d.scores) && (d.calendar === undefined || d.calendar === 2))) return false;
   if (!ENGLAND.every((code) => isRecord(params[code]) && isNumber(params[code].avgHomeGoals) && isNumber(params[code].avgAwayGoals))) return false;
   return history.every(
     (s) =>
@@ -59,7 +59,7 @@ export function isWorld(value: unknown): value is World {
   );
 }
 
-/** The saved world, if there is a usable one; a save that can't be used is removed. */
+/** The saved world, if there is a usable one (brought up to date, see upgradeWorld); a save that can't be used is removed. */
 export function loadWorld(store: Store | undefined): LoadResult {
   if (!store) return { world: null, reason: "unavailable" };
   let text: string | null;
@@ -84,7 +84,8 @@ export function loadWorld(store: Store | undefined): LoadResult {
     clearWorld(store);
     return { world: null, reason: "unreadable" };
   }
-  return { world: value };
+  // Brought up to date: a season not yet being played takes the realistic calendar (see upgradeWorld).
+  return { world: upgradeWorld(value) };
 }
 
 /** Saves the world; false when the browser won't keep it (private browsing, storage full): the world goes on, unsaved. */

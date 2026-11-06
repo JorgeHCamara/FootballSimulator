@@ -434,9 +434,13 @@ look back at past seasons from a season picker.
 - A season picker, on the left of the league's buttons, shows any finished
   season's final tables and fixtures (every result, the play-off ties), read
   only; it replaces the past seasons' tables below the current one.
+- Generated seasons have a real league's home-and-away rhythm: no club plays
+  three games in a row at home or away (a season already being played keeps
+  its calendar).
 - Every score is saved in the browser and survives a reload, and each finished
   season keeps its results (the last 50 seasons); older saves keep working (no
   version change).
+- Listed again: the menu, the home page and the sitemap, and indexed.
 - Unit tests for the games left, picked scores standing, play-off scores tied
   to their pairing, finishing a season from its scores, the kept results, and
   the save; e2e on desktop and phones, EN/PT/ES.

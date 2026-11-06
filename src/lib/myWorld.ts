@@ -18,7 +18,7 @@ import {
 import type { LeagueModel, TeamStrength } from "../engine/ratings.ts";
 import { effectiveResults, isValidScore } from "../engine/results.ts";
 import { createRng, randomSeed, type Rng } from "../engine/rng.ts";
-import { doubleRoundRobin } from "../engine/schedule.ts";
+import { balancedDoubleRoundRobin, doubleRoundRobin } from "../engine/schedule.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
 import type { Fixture, ResultMap, Score, StandingRow, Team, TeamId } from "../engine/types.ts";
 import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
@@ -114,6 +114,14 @@ export interface DivisionSeason {
    * here replaces it.
    */
   scores?: Record<number, [number, number]>;
+  /**
+   * A generated season's calendar: 2, a real league's home-and-away rhythm
+   * (balancedDoubleRoundRobin: never three home or three away games in a row).
+   * Without it, the first calendar (doubleRoundRobin), kept only for a season
+   * that was already being played when calendar 2 came (its scores belong to
+   * those games; see upgradeWorld).
+   */
+  calendar?: 2;
 }
 
 /**
@@ -224,6 +232,16 @@ export interface StartPack {
   missing: DivisionCode[];
 }
 
+/**
+ * A saved world brought up to date when it loads: a generated season not yet
+ * being played (no scores) takes calendar 2, the realistic home-and-away
+ * rhythm; one already being played keeps the calendar its scores belong to.
+ */
+export function upgradeWorld(world: World): World {
+  if (!world.divisions.some((d) => !d.games && d.calendar !== 2 && !d.scores)) return world;
+  return { ...world, divisions: world.divisions.map((d) => (!d.games && d.calendar !== 2 && !d.scores ? { ...d, calendar: 2 as const } : d)) };
+}
+
 /** Can a world start from this pack: all four leagues, with full clubs lists, in the same season. */
 export function packReady(pack: StartPack): boolean {
   if (pack.missing.length) return false;
@@ -330,7 +348,8 @@ export function divisionFixtures(world: World, d: DivisionSeason): { fixtures: F
     return { fixtures, results: effectiveResults(fixtures) };
   }
   const order = shuffled(d.clubs, seasonRng(world, 100 + ENGLAND.indexOf(d.code)));
-  return { fixtures: doubleRoundRobin(order, gameDate(world.year, 1)), results: {} };
+  const schedule = d.calendar === 2 ? balancedDoubleRoundRobin : doubleRoundRobin;
+  return { fixtures: schedule(order, gameDate(world.year, 1)), results: {} };
 }
 
 /** Places of a league's table: its promotion and relegation places, and whether a play-off sends one more club up. */
@@ -773,7 +792,7 @@ export function playSeason(world: World): World {
     year: world.year + 1,
     clubs,
     ratings,
-    divisions: nextClubs.map((ids, i) => ({ code: ENGLAND[i]!, clubs: ids })),
+    divisions: nextClubs.map((ids, i) => ({ code: ENGLAND[i]!, clubs: ids, calendar: 2 as const })),
     // Every result of the last FIXTURE_SEASONS seasons; older ones keep their final tables.
     history: [...world.history, record].map((season, i, all) =>
       i < all.length - FIXTURE_SEASONS ? { ...season, divisions: season.divisions.map(({ games: _g, playoff: _p, ...rest }) => rest) } : season,
