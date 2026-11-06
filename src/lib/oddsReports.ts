@@ -172,6 +172,56 @@ export interface OddsReport {
   race: { rounds: number[]; series: { teamId: TeamId; values: number[] }[]; modelChanges: number[] };
 }
 
+/** Each club's place in the table of a report's rows (for breaking ties between movers). */
+const positionOf = (rows: readonly ReportRow[]) => {
+  const at = new Map(rows.map((r) => [r.teamId, r.position]));
+  return (id: TeamId) => at.get(id) ?? Number.MAX_SAFE_INTEGER;
+};
+
+/**
+ * The `n` biggest moves one way (1: up, −1: down), by the size of the change in
+ * points. A tie goes to the higher chance now, then the higher place in the
+ * table, then the lower club id: the same order every time.
+ */
+export function topMovers(changes: readonly Change[], dir: 1 | -1, n: number, position: (id: TeamId) => number): Change[] {
+  return changes
+    .filter((c) => c.delta !== undefined && Math.sign(c.delta) === dir)
+    .sort((a, b) => Math.abs(b.delta!) - Math.abs(a.delta!) || b.now - a.now || position(a.teamId) - position(b.teamId) || a.teamId - b.teamId)
+    .slice(0, n);
+}
+
+/** How much the biggest-movers card holds: up to three categories, two risers and two fallers in each. */
+export const MOVERS_CARD = { categories: 3, perSide: 2 } as const;
+
+/** The categories the card picks first: the title, promotion and relegation, then the continental places and the play-offs. */
+const CARD_PRIORITY: readonly CategoryKind[] = ["title", "promotion", "relegation", "continental", "playoffs"];
+
+export interface MoversCardSection {
+  category: Category;
+  up: Change[];
+  down: Change[];
+}
+
+/**
+ * The biggest-movers card of a report: up to `categories` of its categories
+ * with a change (picked in CARD_PRIORITY order, shown in the report's), each
+ * with its `perSide` biggest risers and fallers (topMovers). None when the
+ * report has no changes: the season's first, or the first after a model change.
+ */
+export function moversCardSections(report: OddsReport, { categories = MOVERS_CARD.categories, perSide = MOVERS_CARD.perSide }: { categories?: number; perSide?: number } = {}): MoversCardSection[] {
+  if (!report.previous || report.modelChange) return [];
+  const position = positionOf(report.rows);
+  const sections = report.categories
+    .map((category) => {
+      const changes = report.rows.flatMap((r) => r.values[category.kind] ?? []);
+      return { category, up: topMovers(changes, 1, perSide, position), down: topMovers(changes, -1, perSide, position) };
+    })
+    .filter((s) => s.up.length || s.down.length);
+  const rank = (s: MoversCardSection) => CARD_PRIORITY.indexOf(s.category.kind);
+  const chosen = new Set([...sections].sort((a, b) => rank(a) - rank(b)).slice(0, categories));
+  return sections.filter((s) => chosen.has(s));
+}
+
 /** The report for a round (the season's latest when `round` is undefined), or undefined for no such round. */
 export function buildReport(league: LeagueConfig, season: SeasonReports, round?: number): OddsReport | undefined {
   const index = round === undefined ? season.snapshots.length - 1 : season.snapshots.findIndex((s) => s.round === round);
@@ -197,14 +247,10 @@ export function buildReport(league: LeagueConfig, season: SeasonReports, round?:
       ),
     }))
     .sort((a, b) => a.position - b.position || a.teamId - b.teamId);
+  const position = positionOf(rows);
   const movers = categories.map((category) => {
-    const changes = rows.map((r) => r.values[category.kind]!).filter((c) => c.delta !== undefined && c.delta !== 0);
-    const by = (dir: 1 | -1) =>
-      changes
-        .filter((c) => Math.sign(c.delta!) === dir)
-        .sort((a, b) => dir * (b.delta! - a.delta!) || b.now - a.now)
-        .slice(0, 3);
-    return { category, up: by(1), down: by(-1) };
+    const changes = rows.map((r) => r.values[category.kind]!);
+    return { category, up: topMovers(changes, 1, 3, position), down: topMovers(changes, -1, 3, position) };
   });
   const lead = categories[0] ?? { kind: "title" as const, zone: "title" as const };
   const history = season.snapshots.slice(0, index + 1);

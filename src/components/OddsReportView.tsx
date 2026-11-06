@@ -5,13 +5,14 @@ import { Link } from "../i18n/navigation.ts";
 import { percent } from "../lib/clubText.ts";
 import { matchPath, matchSlug } from "../lib/matchSlug.ts";
 import type { LoadedReport } from "../lib/oddsPage.ts";
-import { clubGames, latestReportPath, reportGames, reportPath, resultOfRound, type Category, type Change } from "../lib/oddsReports.ts";
+import { clubGames, latestReportPath, moversCardSections, reportGames, reportPath, resultOfRound, type Category, type Change } from "../lib/oddsReports.ts";
 import { dateLocale, reportText, type Translate } from "../lib/oddsText.ts";
 import { HREFLANG, SITE_NAME, SITE_URL } from "../lib/site.ts";
 import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
 import { JsonLd } from "./JsonLd.tsx";
 import { RaceChart } from "./RaceChart.tsx";
+import { ShareCardBlock } from "./ShareCardBlock.tsx";
 import { ShareMenu } from "./ShareMenu.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { zoneHex } from "./zones.ts";
@@ -102,7 +103,22 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
     title: t("shareTitle", { h1 }),
     text: t("shareText", { round }),
     league: league.code,
+    imageName: `footsimu-${league.slug}-matchday-${report.snapshot.round}.png`,
+    content: "report",
   };
+
+  const roundPath = `/${locale}${reportPath(league, report.snapshot.round)}`;
+  const moversShare = moversCardSections(report).length
+    ? {
+        path: roundPath,
+        imagePath: `${roundPath}/movers-image`,
+        title: t("moversCardAlt", { league: league.name, round }),
+        text: t("shareText", { round }),
+        league: league.code,
+        imageName: `footsimu-${league.slug}-matchday-${report.snapshot.round}-movers.png`,
+        content: "movers",
+      }
+    : undefined;
 
   return (
     <div className="space-y-6" data-testid="odds-report" data-round={report.snapshot.round}>
@@ -249,6 +265,16 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
               })}
             </div>
             {previousRound && <p className="text-xs text-zinc-500">{t("moversNote", { round: previousRound })}</p>}
+            {/* The round's biggest-movers card (cached by its round), to share or download. */}
+            {moversShare && (
+              <ShareCardBlock
+                title={t("moversShareTitle")}
+                body={t("moversShareBody")}
+                alt={t("moversCardAlt", { league: league.name, round })}
+                share={moversShare}
+                testId="odds-movers-share"
+              />
+            )}
           </>
         )}
       </section>

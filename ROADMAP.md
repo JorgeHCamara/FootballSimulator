@@ -4,7 +4,8 @@ Worked **in order**, one branch and one pull request per item (see the
 "Roadmap PR workflow" in [CLAUDE.md](CLAUDE.md)). The next item starts only
 after the previous item's PR is merged.
 
-Status: `todo` → `in-pr` (its PR is open) → `done` (merged), or `cancelled`.
+Status: `todo` → `in-pr` (its PR is open) → `done` (merged), or `cancelled`;
+`skipped` is left for later, and the next item starts without it.
 
 Every item also has to meet these:
 
@@ -31,9 +32,9 @@ reliability (item 5) comes next, then growth, engagement and monetisation
 | 5 | Club page reliability: MLS 500s and consistent odds | done | `roadmap/5-club-page-reliability` |
 | 6 | Snapshot integrity | done | `roadmap/6-snapshot-integrity` |
 | 7 | Play-offs and MLS Cup on club pages | done | `roadmap/7-club-playoffs` |
-| 8 | Quiz with historical data | in-pr | `roadmap/8-quiz-historical` |
-| 9 | Prediction league | todo | `roadmap/9-prediction-league` |
-| 10 | Shareable content: club outlook and biggest movers cards | todo | `roadmap/10-shareable-content` |
+| 8 | Quiz with historical data | done | `roadmap/8-quiz-historical` |
+| 9 | Prediction league | skipped | `roadmap/9-prediction-league` |
+| 10 | Shareable content: club outlook and biggest movers cards | in-pr | `roadmap/10-shareable-content` |
 | 11 | SEO: programmatic chance landing pages | todo | `roadmap/11-seo-chance-pages` |
 | 12 | Ad-slot readiness (placeholders behind a flag) | todo | `roadmap/12-ad-slot-readiness` |
 | 13 | Neutral venues (backlog) | todo | `roadmap/13-neutral-venues` |
@@ -236,6 +237,8 @@ live-model "who is likelier" questions, for traffic and return visits.
 - PR: "[Roadmap 8] Quiz with historical data".
 
 ## 9. Prediction league
+
+**Skipped for now** (6 November 2026): work moved on to item 10 after item 8.
 
 **Goal:** a light weekly 1X2 prediction league with leaderboards, for
 retention, next to the match previews and the quiz (item 8); no payments.

@@ -873,6 +873,9 @@
     "simulate": "Simule o resto da temporada de {club}",
     "shareTitle": "{club} {season}: chances na temporada",
     "shareText": "As chances de {club} em {league} {season} no Foot Simu",
+    "shareCardTitle": "Compartilhe as chances de {club}",
+    "shareCardBody": "Um card com a posição atual, a posição provável e as chances, pronto para postar no X, WhatsApp ou Instagram.",
+    "shareCardAlt": "Card das chances de {club} na temporada",
     "otherClubs": "Outros clubes – {league}",
     "card": {
       "likeliest": "Posição provável: {range}",
@@ -965,6 +968,9 @@
       "relegation": "Rebaixamento"
     },
     "moversTitle": "Quem mais subiu e quem mais caiu",
+    "moversShareTitle": "Compartilhe quem mais subiu e caiu",
+    "moversShareBody": "Um card com quem mais subiu e quem mais caiu nesta rodada, pronto para postar no X, WhatsApp ou Instagram.",
+    "moversCardAlt": "{league}: altas e baixas após a {round}",
     "moversNote": "Mudanças desde a {round}, em pontos percentuais.",
     "up": "Subiram",
     "down": "Caíram",
@@ -1008,7 +1014,8 @@
     "card": {
       "title": "{race} após a {round}",
       "basedOn": "Em {count} temporadas simuladas",
-      "cta": "Relatórios em footsimu.com"
+      "cta": "Relatórios em footsimu.com",
+      "moversTitle": "Altas e baixas após a {round}"
     },
     "hubTitle": "Últimas probabilidades: o que mudou após cada rodada",
     "hubDescription": "Após cada rodada completa: quem subiu e quem caiu nas disputas por título, vagas continentais e contra o rebaixamento em cada liga do Foot Simu, em 10.000 temporadas simuladas.",
