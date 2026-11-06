@@ -5,7 +5,7 @@ import { Icon } from "../../../components/Icon.tsx";
 import { MyWorld } from "../../../components/MyWorld.tsx";
 import type { SiteLocale } from "../../../config/leagues.ts";
 import { worldStartPack } from "../../../lib/myWorldStart.ts";
-import { OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
+import { MY_WORLD_LISTED, OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
 
 /** The live data a new world starts from, refreshed as the league pages are (hourly). A saved world needs none of it. */
 export const revalidate = 3600;
@@ -24,6 +24,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title,
     description,
     alternates: alternates(locale, "/my-world"),
+    // Unlisted while it is reworked: not indexed either.
+    ...(MY_WORLD_LISTED ? {} : { robots: { index: false, follow: true } }),
     openGraph: { type: "website", siteName: SITE_NAME, title, description, url: `/${locale}/my-world`, locale: OG_LOCALE[locale] },
     twitter: { card: "summary_large_image", title, description },
   };
