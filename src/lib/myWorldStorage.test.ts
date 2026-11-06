@@ -120,7 +120,7 @@ describe("My World: the save", () => {
     old.setItem(WORLD_KEY, JSON.stringify({ ...world, version: WORLD_VERSION - 1 }));
     assert.deepEqual(loadWorld(old), { world: null, reason: "incompatible" });
     assert.equal(old.items.has(WORLD_KEY), false, "removed");
-    for (const text of ["{not json", "null", "[]", JSON.stringify({ ...world, divisions: [] }), JSON.stringify({ ...world, userClub: 123456789 }), JSON.stringify({ ...world, history: [{ year: 2026, divisions: [{ code: "PL", rows: [[1, 2]] }] }] })]) {
+    for (const text of ["{not json", "null", "[]", JSON.stringify({ ...world, divisions: [] }), JSON.stringify({ ...world, userClub: 123456789 }), JSON.stringify({ ...world, nationalLeague: [123456789] }), JSON.stringify({ ...world, history: [{ year: 2026, divisions: [{ code: "PL", rows: [[1, 2]] }] }] })]) {
       const broken = memoryStore();
       broken.setItem(WORLD_KEY, text);
       assert.deepEqual(loadWorld(broken), { world: null, reason: "unreadable" }, text.slice(0, 40));
