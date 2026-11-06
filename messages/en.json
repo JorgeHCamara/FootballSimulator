@@ -1237,6 +1237,11 @@
         "name": "League Two",
         "the": "League Two",
         "in": "in League Two"
+      },
+      "NL": {
+        "name": "National League",
+        "the": "the National League",
+        "in": "in the National League"
       }
     },
     "setup": {
@@ -1277,18 +1282,19 @@
       "W": "Promoted! {club} won the {league} play-off final and go up to {to}.",
       "O": "{club} finished {position} {in} and lost in the play-offs.",
       "R": "Relegated: {club} finished {position} {in} and go down to {to}.",
-      "out": "{club} finished {position} {in} and dropped out of the Football League.",
+      "out": "{club} finished {position} {in} and go down to the National League: they come back up to League Two after a season there.",
       "stay": "{club} finished {position} {in}.",
       "champions": "Champions",
       "up": "Up",
       "down": "Down",
-      "out_": "Out of the Football League",
-      "in_": "New in League Two",
+      "out_": "Down to the National League",
+      "in_": "Up from the National League",
       "final": "Play-off final: {winner} {score} {loser}",
       "penalties": "{score}, on penalties",
       "next": "Start next season"
     },
-    "outNotice": "{club} dropped out of the Football League in {season}. My World has no National League yet: you can keep playing the seasons, or start a new world.",
+    "outNotice": "{club} are in the National League this season, after going down from League Two in {season}: they come back up to League Two at the end of it.",
+    "goneNotice": "{club} dropped out of the Football League in {season}, before My World had a National League: start a new world to play on.",
     "newClub": "New",
     "newClubHint": "A new club, up from outside the Football League",
     "columns": {
@@ -1308,16 +1314,22 @@
       "W": "Play-off winners",
       "O": "Play-offs",
       "R": "Relegated",
-      "out": "Out of the League"
+      "out": "Down to the National League"
     },
     "path": {
       "title": "{club}'s seasons",
       "empty": "No seasons played yet.",
-      "up": "Promoted",
-      "down": "Relegated",
-      "stay": "Stayed",
       "champions": "Champions",
-      "out": "Dropped out"
+      "promoted": "Promoted",
+      "playoffWinners": "Play-off winners",
+      "playoffs": "Play-offs",
+      "relegated": "Relegated",
+      "out": "Relegated",
+      "championsLeague": "Champions League",
+      "europaLeague": "Europa League",
+      "conferenceLeague": "Conference League",
+      "neutral": "Neutral zone",
+      "nationalLeague": "Promoted"
     },
     "newWorld": {
       "button": "New world",

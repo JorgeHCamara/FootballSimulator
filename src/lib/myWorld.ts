@@ -1,4 +1,5 @@
 import { getLeagueByCode, type LeagueConfig } from "../config/leagues.ts";
+import { NATIONAL_LEAGUE_CLUBS } from "../config/nationalLeague.ts";
 import { expectedGoals, expectedGoalsNeutral, sampleDixonColes, sampleLikelyScore, sampleNormal, simulateFixtures } from "../engine/match.ts";
 import { ratingNoiseSd } from "../engine/montecarlo.ts";
 import { clubPriors, seasonRatings, type SeasonRatings } from "../engine/offseason.ts";
@@ -33,8 +34,9 @@ import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
  * its season rating noise), the table with the league's tiebreakers, and the
  * league's own play-off. Promotion and relegation come from the league configs
  * (their promotion and relegation places, and the play-off winner), applied to
- * all four at once. League Two's relegated clubs leave the pyramid (kept in the
- * save, for a National League later) and as many new clubs come up from below.
+ * all four at once. League Two's relegated clubs drop into the National League
+ * for a season, and the National League's clubs (Boreham Wood and Harrogate
+ * Town, the first time) come up in their place.
  *
  * Between seasons each club's rating carries over through the site's own
  * between-season rule (src/engine/offseason.ts, the one the real starting
@@ -182,9 +184,9 @@ export function unpackGames(packed: string, rows: readonly SavedRow[]): { matchd
 export interface SeasonRecord {
   year: number;
   divisions: SavedDivision[];
-  /** Clubs relegated out of the bottom division. */
+  /** Clubs relegated out of the bottom division (into the National League). */
   out: TeamId[];
-  /** New clubs that came up into it for the next season. */
+  /** Clubs that came up into it for the next season: the National League's (they spent this season there). */
   in: TeamId[];
 }
 
@@ -210,9 +212,22 @@ export interface World {
   history: SeasonRecord[];
   /** The last season has just ended: its review shows, and the next season's tables and fixtures wait until it's started. */
   review: boolean;
-  /** How many new clubs have come up so far (their ids and names). */
+  /**
+   * The National League's clubs this season, outside the Football League:
+   * at the season's end they come up to League Two in place of its relegated
+   * clubs, who take their place. Boreham Wood and Harrogate Town to begin with.
+   */
+  nationalLeague: TeamId[];
+  /** How many fictional new clubs have come up so far (worlds from before the National League; else only when it's short of clubs). */
   newClubs: number;
 }
+
+/** The National League clubs' world ids: clear of the real clubs' (numbered from 1) and the fictional ones'. */
+export const NATIONAL_LEAGUE_ID_BASE = 90_000;
+
+/** The National League's clubs a world starts with (src/config/nationalLeague.ts), as world clubs. */
+export const nationalLeagueClubs = (): WorldClub[] =>
+  NATIONAL_LEAGUE_CLUBS.map((c, i) => ({ id: NATIONAL_LEAGUE_ID_BASE + i + 1, name: c.name, shortName: c.shortName, tla: c.tla, crest: c.crest, origin: "real" }));
 
 /** One league as the live data has it (src/lib/myWorldStart.ts builds these on the server). */
 export interface StartLeague {
@@ -238,8 +253,24 @@ export interface StartPack {
  * rhythm; one already being played keeps the calendar its scores belong to.
  */
 export function upgradeWorld(world: World): World {
-  if (!world.divisions.some((d) => !d.games && d.calendar !== 2 && !d.scores)) return world;
-  return { ...world, divisions: world.divisions.map((d) => (!d.games && d.calendar !== 2 && !d.scores ? { ...d, calendar: 2 as const } : d)) };
+  let upgraded = world;
+  if (world.divisions.some((d) => !d.games && d.calendar !== 2 && !d.scores)) {
+    upgraded = { ...upgraded, divisions: upgraded.divisions.map((d) => (!d.games && d.calendar !== 2 && !d.scores ? { ...d, calendar: 2 as const } : d)) };
+  }
+  // A world from before the National League: the clubs relegated from League Two last season are in it now (they come
+  // back up after this season); in a first season, Boreham Wood and Harrogate Town.
+  if (!Array.isArray((upgraded as Partial<World>).nationalLeague)) {
+    const clubs = { ...upgraded.clubs };
+    const last = upgraded.history.at(-1)?.out ?? [];
+    const playing = new Set(upgraded.divisions.flatMap((d) => d.clubs));
+    let nationalLeague = last.filter((id) => clubs[id] && !playing.has(id));
+    if (!nationalLeague.length) {
+      for (const club of nationalLeagueClubs()) clubs[club.id] = club;
+      nationalLeague = nationalLeagueClubs().map((c) => c.id);
+    }
+    upgraded = { ...upgraded, clubs, nationalLeague };
+  }
+  return upgraded;
 }
 
 /** Can a world start from this pack: all four leagues, with full clubs lists, in the same season. */
@@ -291,6 +322,9 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
     });
   }
   if (userClub === undefined) throw new Error("The chosen club isn't in that league");
+  // The National League, below League Two: its clubs come up after the first season.
+  const nationalLeague = nationalLeagueClubs();
+  for (const club of nationalLeague) clubs[club.id] = club;
   return {
     version: WORLD_VERSION,
     pyramid: "ENG",
@@ -305,6 +339,7 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
     divisions,
     history: [],
     review: false,
+    nationalLeague: nationalLeague.map((c) => c.id),
     newClubs: 0,
   };
 }
@@ -739,18 +774,20 @@ export function playSeason(world: World): World {
   }
 
   const clubs = { ...world.clubs };
+  // League Two's relegated clubs swap places with the National League's: they come up, the relegated go down there.
   const out = down.at(-1)!;
   for (const id of out) clubs[id] = { ...clubs[id]!, left: world.year };
-  // As many new clubs come up into the bottom division as left it.
-  const arrivals: TeamId[] = [];
+  const arrivals: TeamId[] = world.nationalLeague.slice(0, out.length);
+  // A National League short of clubs (more relegated than it has) is made up with fictional new ones.
   let newClubs = world.newClubs;
-  for (let k = 0; k < out.length; k++) {
+  while (arrivals.length < out.length) {
     const id = NEW_CLUB_ID_BASE + newClubs + 1;
     const { name, shortName } = newClubName({ ...world, clubs }, newClubs);
     clubs[id] = { id, name, shortName, tla: shortName.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase(), origin: "new", joined: world.year + 1 };
     arrivals.push(id);
     newClubs++;
   }
+  const nationalLeague = [...world.nationalLeague.slice(out.length), ...out];
 
   const nextClubs = played.map((p, i) => {
     const leaving = new Set([...up[i]!, ...down[i]!]);
@@ -798,6 +835,7 @@ export function playSeason(world: World): World {
       i < all.length - FIXTURE_SEASONS ? { ...season, divisions: season.divisions.map(({ games: _g, playoff: _p, ...rest }) => rest) } : season,
     ),
     review: true,
+    nationalLeague,
     newClubs,
   };
 }
@@ -893,30 +931,67 @@ export function pastDivision(world: World, year: number, code: DivisionCode): Pa
   return { code, rows: table.rows, ...(table.final ? { final: table.final } : {}), teams: saved.rows.map((r) => teamOf(world, r[0])), fixtures, bracket };
 }
 
-/** Where a club plays in the season in progress (undefined once it has left the pyramid). */
+/** Where a club plays in the season in progress (undefined in the National League, or once it has left the pyramid). */
 export const clubDivision = (world: World, id: TeamId): DivisionCode | undefined => world.divisions.find((d) => d.clubs.includes(id))?.code;
 
-/** A club's season: its division and place, and what came of it. */
+/**
+ * How a club's season ended: champions, promoted (automatically or as the
+ * play-off's winners), out in the play-offs, relegated (from League Two: into
+ * the National League), a European place (the Premier League's zones), or
+ * none of those ("neutral"); "nationalLeague": a season there, then back up.
+ */
+export type PathOutcome =
+  | "champions"
+  | "promoted"
+  | "playoffWinners"
+  | "playoffs"
+  | "relegated"
+  | "out"
+  | "championsLeague"
+  | "europaLeague"
+  | "conferenceLeague"
+  | "neutral"
+  | "nationalLeague";
+
+const EUROPE = new Set<PathOutcome>(["championsLeague", "europaLeague", "conferenceLeague"]);
+
+/** A club's season: its division ("NL": the National League) and place, and what came of it. */
 export interface PathStep {
   year: number;
-  code: DivisionCode;
-  position: number;
-  /** "up" promoted (as champions, automatically or through the play-off), "down" relegated (from the bottom: out), "stay". */
+  code: DivisionCode | "NL";
+  /** Its final place (none for a National League season). */
+  position: number | null;
+  /** "up" promoted (as champions, automatically or through the play-off, or from the National League), "down" relegated, "stay". */
   move: "up" | "down" | "stay";
   note: RowNote;
+  outcome: PathOutcome;
 }
 
-/** A club's path through the world's finished seasons, oldest first. */
+/** What a final place in a division means: its note, or the league's zone for that place (a European place), or nothing. */
+export function placeOutcome(code: DivisionCode, position: number, note: RowNote): PathOutcome {
+  if (note === "C") return "champions";
+  if (note === "P") return "promoted";
+  if (note === "W") return "playoffWinners";
+  if (note === "O") return "playoffs";
+  if (note === "R") return code === ENGLAND.at(-1) ? "out" : "relegated";
+  const zone = divisionConfig(code).zones.find((z) => position >= z.from && position <= z.to)?.kind as PathOutcome | undefined;
+  return zone && EUROPE.has(zone) ? zone : "neutral";
+}
+
+/** A club's path through the world's finished seasons, oldest first: each season's division, place and outcome, its National League seasons too. */
 export function clubPath(world: World, id: TeamId): PathStep[] {
-  return world.history.flatMap((season) =>
-    season.divisions.flatMap((d, i) => {
+  return world.history.flatMap((season): PathStep[] => {
+    const steps = season.divisions.flatMap((d, i): PathStep[] => {
       const at = d.rows.findIndex((r) => r[0] === id);
       if (at < 0) return [];
       const note = d.rows[at]![8];
       const move = note === "R" ? "down" : i > 0 && (note === "C" || note === "P" || note === "W") ? "up" : "stay";
-      return [{ year: season.year, code: d.code, position: at + 1, move, note }];
-    }),
-  );
+      return [{ year: season.year, code: d.code, position: at + 1, move, note, outcome: placeOutcome(d.code, at + 1, note) }];
+    });
+    // Not in the Football League this season, and up from the National League at its end: a season there.
+    if (!steps.length && season.in.includes(id)) return [{ year: season.year, code: "NL", position: null, move: "up", note: "", outcome: "nationalLeague" }];
+    return steps;
+  });
 }
 
 /** A finished season's moves between two divisions (and out of and into the bottom one), for its review. */

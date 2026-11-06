@@ -2388,11 +2388,13 @@ async function step(name, fn) {
       assert.equal(await p.getByTestId("world-left-card").count(), 0);
       assert.equal(Number(await world.getAttribute("data-year")), year + 1);
       assert.ok((await p.getByTestId("world-review-headline").innerText()).includes(name));
-      // Who went up and down: 3, 3, 4 between the leagues, 2 out of League Two and 2 new clubs in.
+      // Who went up and down: 3, 3, 4 between the leagues, 2 from League Two down to the National League and its 2 clubs up.
       for (const [upper, n] of [["PL", 3], ["ELC", 3], ["EL1", 4], ["EL2", 2]]) {
         assert.equal(await p.locator(`[data-testid="world-moves"][data-upper="${upper}"] li`).count(), 2 * n, upper);
       }
-      assert.ok((await p.locator('[data-testid="world-moves"][data-upper="EL2"]').innerText()).includes("NEW"));
+      const nationalLeague = await p.locator('[data-testid="world-moves"][data-upper="EL2"]').innerText();
+      assert.ok(nationalLeague.includes("Boreham Wood") && nationalLeague.includes("Harrogate"), "Boreham Wood and Harrogate Town up from the National League");
+      assert.ok(nationalLeague.includes("UP FROM THE NATIONAL LEAGUE") && !nationalLeague.includes("NEW"), "real clubs, not new ones");
       // "Start next season", in the review's bottom-right corner.
       const start = p.getByTestId("world-start-season");
       assert.equal((await start.innerText()).trim(), "Start next season");
@@ -2441,10 +2443,14 @@ async function step(name, fn) {
       await picker.selectOption(String(year));
       await p.locator('[data-testid="world-tabs"] [data-league="PL"]').click();
       assert.deepEqual(await past.evaluateAll((r) => r.map((x) => x.innerText)), firstPl, "the Premier League two seasons ago, unchanged");
-      // The club's path: two seasons, starting in League Two.
+      // The club's path: two seasons, the latest first (the first in League Two), each with what came of it.
       const path = p.getByTestId("world-path-step");
       assert.equal(await path.count(), 2);
-      assert.equal(await path.first().getAttribute("data-league"), "EL2");
+      assert.equal(await path.last().getAttribute("data-league"), "EL2");
+      assert.ok((await path.first().innerText()).startsWith(label(year + 1)), "the latest season first");
+      const outcomes = ["champions", "promoted", "playoffWinners", "playoffs", "relegated", "out", "championsLeague", "europaLeague", "conferenceLeague", "neutral", "nationalLeague"];
+      for (const o of await path.evaluateAll((rows) => rows.map((r) => r.dataset.outcome))) assert.ok(outcomes.includes(o), o);
+      assert.ok(!(await p.getByTestId("world-path").innerText()).includes("Stayed"));
       // A new world: asked first; cancelling keeps this one, confirming deletes it (for good, after a refresh too).
       await p.getByTestId("world-new-button").click();
       await p.getByTestId("world-new-cancel").click();

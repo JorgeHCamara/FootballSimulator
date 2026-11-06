@@ -16,7 +16,7 @@ import {
   FIXTURE_SEASONS,
   gamesLeft,
   movementCounts,
-  NEW_CLUB_ID_BASE,
+  NATIONAL_LEAGUE_ID_BASE,
   packReady,
   pastDivision,
   playSeason,
@@ -150,23 +150,23 @@ describe("My World: a season", () => {
         if (["C", "P", "W"].includes(note) && i > 0) assert.equal(next.get(id), ENGLAND[i - 1]);
       }
     }
-    // League Two's two relegated clubs left but stay in the save; two new, labelled clubs came up instead.
+    // League Two's two relegated clubs drop into the National League; its clubs, Boreham Wood and Harrogate Town, come up instead.
     assert.equal(season.out.length, 2);
     for (const id of season.out) {
       assert.equal(after.clubs[id]!.left, year);
       assert.equal(after.clubs[id]!.origin, "real");
       assert.equal(next.get(id), undefined);
     }
-    assert.equal(season.in.length, 2);
+    assert.deepEqual(after.nationalLeague, season.out);
+    assert.deepEqual(season.in, [NATIONAL_LEAGUE_ID_BASE + 1, NATIONAL_LEAGUE_ID_BASE + 2]);
+    assert.deepEqual(season.in.map((id) => after.clubs[id]!.name), ["Boreham Wood", "Harrogate Town"]);
     for (const id of season.in) {
-      const club = after.clubs[id]!;
-      assert.equal(club.origin, "new");
-      assert.equal(club.joined, year + 1);
-      assert.ok(id > NEW_CLUB_ID_BASE);
+      assert.equal(after.clubs[id]!.origin, "real");
+      assert.match(after.clubs[id]!.crest!, /^https:\/\/a\.espncdn\.com\/i\/teamlogos\/soccer\/500\/\d+\.png$/);
       assert.equal(next.get(id), "EL2");
     }
-    assert.equal(new Set(season.in.map((id) => after.clubs[id]!.name)).size, 2);
-    assert.equal(Object.keys(after.clubs).length, 94, "92 in the pyramid, 2 out");
+    assert.equal(Object.keys(after.clubs).length, 94, "92 in the pyramid, 2 in the National League");
+    assert.equal(after.newClubs, 0, "no fictional clubs");
     // The review's moves.
     const moves = seasonMoves(season);
     assert.deepEqual(moves.map((m) => [m.upper, m.lower, m.up.length, m.down.length]), [["PL", "ELC", 3, 3], ["ELC", "EL1", 3, 3], ["EL1", "EL2", 4, 4], ["EL2", null, 2, 2]]);
@@ -186,7 +186,7 @@ describe("My World: a season", () => {
     const relegated = season.divisions[0]!.rows.filter((r) => r[8] === "R").map((r) => r[0]);
     assert.ok(mean(promoted, 0) < 1 && mean(promoted, 1) > 1, "promoted: below average");
     assert.ok(mean(relegated, 0) > 1 && mean(relegated, 1) < 1, "relegated: above average");
-    // New clubs: the below-average default for a club without data.
+    // Up from the National League: the below-average default for a club without data.
     for (const id of season.in) {
       const [attack, defence] = after.ratings[id]!;
       assert.ok(attack < 1 && defence > 1);
@@ -253,6 +253,71 @@ describe("My World: a season", () => {
     assert.equal(upgradeWorld(loaded), loaded, "nothing more to change");
     // The next season it plays is on calendar 2.
     assert.equal(playSeason(loaded).divisions[0]!.calendar, 2);
+  });
+
+  it("the National League: Boreham Wood and Harrogate Town come up after the first season, then each season's relegated clubs swap places with the last season's", () => {
+    let world = start();
+    assert.deepEqual(world.nationalLeague, [NATIONAL_LEAGUE_ID_BASE + 1, NATIONAL_LEAGUE_ID_BASE + 2], "a world starts with them in the National League");
+    for (let i = 0; i < 4; i++) {
+      const pool = world.nationalLeague;
+      world = startNextSeason(playSeason(world));
+      const season = world.history.at(-1)!;
+      // Up: the clubs that spent the season in the National League; down there: League Two's relegated clubs.
+      assert.deepEqual(season.in, pool);
+      assert.deepEqual(world.nationalLeague, season.out);
+      assert.deepEqual(world.divisions[3]!.clubs.filter((id) => pool.includes(id)).sort(), [...pool].sort(), "back in League Two");
+      for (const id of season.out) assert.equal(clubDivision(world, id), undefined);
+    }
+    // Always the same 94 clubs: 92 in the Football League, 2 in the National League; no fictional ones.
+    assert.equal(Object.keys(world.clubs).length, 94);
+    assert.equal(world.newClubs, 0);
+    assert.equal(world.divisions.flatMap((d) => d.clubs).length + world.nationalLeague.length, 94);
+  });
+
+  it("a club's path: each season's outcome (European places, the play-offs, a neutral place), and a season in the National League", () => {
+    let world = startNextSeason(playSeason(start()));
+    const year = world.history[0]!.year;
+    // Every Premier League place has its outcome: the champions, the European places, the neutral zone, the relegated.
+    const pl = savedTable(world, year, "PL")!.rows;
+    const outcome = (id: number) => clubPath(world, id).find((s) => s.year === year)!.outcome;
+    assert.equal(outcome(pl[0]!.clubId), "champions");
+    for (const r of pl.slice(1, 4)) assert.equal(outcome(r.clubId), "championsLeague");
+    assert.equal(outcome(pl[4]!.clubId), "europaLeague");
+    assert.equal(outcome(pl[5]!.clubId), "conferenceLeague");
+    for (const r of pl.slice(6, 17)) assert.equal(outcome(r.clubId), "neutral");
+    for (const r of pl.slice(17)) assert.equal(outcome(r.clubId), "relegated");
+    // Below: promoted, the play-offs' winners and losers, out of League Two.
+    const el2 = savedTable(world, year, "EL2")!.rows;
+    assert.deepEqual(el2.map((r) => outcome(r.clubId)).filter((o) => o !== "neutral").sort(), [
+      ...Array(1).fill("champions"), ...Array(2).fill("promoted"), "out", "out", ...Array(3).fill("playoffs"), "playoffWinners",
+    ].sort());
+    // A League Two club that goes down: a season in the National League, then back up.
+    const me = world.divisions[3]!.clubs[0]!;
+    const hopeless = (w: World): World => ({ ...w, ratings: { ...w.ratings, [me]: [0.05, 9] } });
+    world = startNextSeason(playSeason(hopeless(world)));
+    assert.equal(clubDivision(world, me), undefined);
+    assert.ok(world.nationalLeague.includes(me));
+    world = startNextSeason(playSeason(world));
+    assert.equal(clubDivision(world, me), "EL2", "back up after a season");
+    const steps = clubPath(world, me).slice(-2);
+    assert.deepEqual(steps.map((s) => [s.code, s.position, s.outcome]), [["EL2", 24, "out"], ["NL", null, "nationalLeague"]]);
+  });
+
+  it("a save from before the National League: last season's relegated clubs are in it now, or Boreham Wood and Harrogate Town in a first season", () => {
+    const old = (w: World): World => {
+      const { nationalLeague: _n, ...rest } = w;
+      const clubs = { ...w.clubs };
+      delete clubs[NATIONAL_LEAGUE_ID_BASE + 1];
+      delete clubs[NATIONAL_LEAGUE_ID_BASE + 2];
+      return { ...rest, clubs } as World;
+    };
+    const first = upgradeWorld(old(start()));
+    assert.deepEqual(first.nationalLeague, [NATIONAL_LEAGUE_ID_BASE + 1, NATIONAL_LEAGUE_ID_BASE + 2]);
+    assert.equal(first.clubs[NATIONAL_LEAGUE_ID_BASE + 1]!.name, "Boreham Wood");
+    const later = startNextSeason(playSeason(start()));
+    const upgraded = upgradeWorld({ ...old(later), clubs: later.clubs });
+    assert.deepEqual(upgraded.nationalLeague, later.history.at(-1)!.out);
+    assert.equal(upgradeWorld(upgraded), upgraded, "nothing more to change");
   });
 
   it("past seasons' tables stay as they were after later seasons are played", () => {
