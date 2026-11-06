@@ -23,7 +23,9 @@ import { createRng, randomSeed } from "../engine/rng.ts";
 import {
   buildSplitPhase,
   groupOfRound,
+  groupPlaces,
   isSlotTeamId,
+  placedGroups,
   slotTeamId,
   splitFixtures,
   splitGroupTable,
@@ -78,6 +80,8 @@ interface Props {
   scenario?: ResultMap;
   /** The league's match parameters (rho, home splits), from the priors. */
   matchParams?: MatchParams;
+  /** Order of clubs level on every criterion the site counts (Série C: by cards), for the table. */
+  fallbackOrder?: number[];
 }
 
 type Tab = "table" | "chances";
@@ -110,6 +114,7 @@ export function LeagueSimulator({
   firstPhaseIds,
   scenario,
   matchParams,
+  fallbackOrder,
 }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
@@ -147,7 +152,10 @@ export function LeagueSimulator({
       }),
     [teams, fixtures, real, priorStrengths, league, matchParams], // eslint-disable-line react-hooks/exhaustive-deps
   );
-  const baseOptions = useMemo(() => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}) }), [league.tiebreakers, deductions]);
+  const baseOptions = useMemo(
+    () => ({ tiebreakers: league.tiebreakers, ...(deductions ? { deductions } : {}), ...(fallbackOrder ? { fallbackOrder } : {}) }),
+    [league.tiebreakers, deductions, fallbackOrder],
+  );
 
   // A split league (Greece's play-offs, Ecuador's final stage, Scotland's last
   // five rounds). Until the split's real games are published they're
@@ -215,9 +223,11 @@ export function LeagueSimulator({
   // until the first phase is complete.
   const groupTabs = useMemo(() => {
     let place = 0;
+    // Named places (Série C: 1st, 4th, 5th and 8th…) stand in as themselves.
+    const named = splitConfig && placedGroups(splitConfig.groups) ? groupPlaces(splitConfig.groups, teams.length) : null;
     return (league.groups ?? []).flatMap((g, i) => {
       const size = splitConfig?.groups[i]?.size ?? 0;
-      const slots = Array.from({ length: i === (league.groups ?? []).length - 1 ? teams.length - place : size }, () => slotTeamId(++place));
+      const slots = named ? (named[i] ?? []).map(slotTeamId) : Array.from({ length: i === (league.groups ?? []).length - 1 ? teams.length - place : size }, () => slotTeamId(++place));
       const teamIds = phase ? (phase.members?.[i] ?? slots) : groups?.find((m) => m.id === g.id)?.teamIds;
       return teamIds ? [{ id: g.id, index: i, name: g.name[lang], shortName: g.shortName[lang], teamIds, ...(g.zones ? { zones: g.zones } : {}) }] : [];
     });
@@ -248,7 +258,7 @@ export function LeagueSimulator({
     () => (overallChances && splitConfig?.finalZones ? { ...league, zones: splitConfig.finalZones, groups: undefined } : tableLeague),
     [overallChances, splitConfig, league, tableLeague],
   );
-  const groupTableOptions = useMemo(() => ({ tiebreakers: league.tiebreakers }), [league.tiebreakers]);
+  const groupTableOptions = useMemo(() => ({ tiebreakers: splitConfig?.groupTiebreakers ?? league.tiebreakers }), [splitConfig, league.tiebreakers]);
 
   const effective = useMemo(() => effectiveResults(allFixtures, season.predictions), [allFixtures, season.predictions]);
   const tableTeams = useMemo(
@@ -269,7 +279,8 @@ export function LeagueSimulator({
    * postponed games were played after the cut).
    */
   const zoneByTeam = useMemo(() => {
-    if (!phase?.members || !showRegular) return undefined;
+    // Named places (Série C): the groups are the table's own places, its zones say where they lead.
+    if (!phase?.members || !showRegular || placedGroups(splitConfig?.groups ?? [])) return undefined;
     return new Map(phase.members.flatMap((ids, g) => (league.zones[g] ? ids.map((id) => [id, league.zones[g]!] as const) : [])));
   }, [phase, showRegular, league.zones]);
   /** A group's points carried over from the first phase, shown beside the total. */
@@ -293,15 +304,20 @@ export function LeagueSimulator({
 
   // Play-offs across separate tables (MLS Cup) are seeded from every group's
   // table, plus the overall table for games between the groups' winners.
-  const tablesFor = (results: ResultMap) => {
+  const tablesFor = (results: ResultMap, split = phase) => {
     const overall = firstTeams(computeStandings(teams, ordered, results, standingsOptions));
     if (!groupTabs.length) return { overall, groups: undefined };
-    const groupTables = groupTabs.map((g) =>
-      computeStandings(g.teamIds.flatMap((id) => teamMap.get(id) ?? []), ordered, results, standingsOptions),
-    );
-    // A knockout seeded from the group places (Libertadores): one ranking, winners first.
+    // A split's groups (Série C): each its own table of its own games.
+    const groupTables = split?.members
+      ? split.members.map((_, g) => splitGroupTable(split, g, teams, results, groupTableOptions))
+      : groupTabs.map((g) => computeStandings(g.teamIds.flatMap((id) => teamMap.get(id) ?? []), ordered, results, standingsOptions));
+    // A knockout seeded from the group places (Libertadores): one ranking, winners first
+    // (Série C: by campaign, the first phase's record too).
     const seeding = league.playoff?.seedFromGroups;
-    if (seeding) return { overall: seedByGroupPlace(groupTables, externalSeeds, seeding.places, seeding.interleave), groups: undefined };
+    if (seeding) {
+      const campaign = seeding.campaign && split ? computeStandings(teams, split.firstPhase, results, baseOptions) : undefined;
+      return { overall: seedByGroupPlace(groupTables, externalSeeds, seeding.places, seeding.interleave, campaign), groups: undefined };
+    }
     return { overall, groups: groupTables };
   };
 
@@ -451,6 +467,47 @@ export function LeagueSimulator({
     applyResults(seasonKey, { ...leagueResults, ...playoffResults });
   };
 
+  // The real season is over (Série C 2026): it can be played again from the
+  // first game, its real results the starting point no more. Every game gets a
+  // likely roll from the ratings (which stay those of the real results), then
+  // a split's groups and the play-off follow from the new table, real games or
+  // not. One step, undoable; any score can still be changed by hand after.
+  const seasonOver = !league.continental && !league.annual && fixtures.length > 0 && fixtures.every((f) => f.result) && (!splitConfig || Boolean(phase));
+  const replaySeason = () => {
+    const rng = createRng(randomSeed());
+    const results = simulateFixtures(phase ? phase.firstPhase : fixtures, {}, model, rng, { likely: true });
+    let replayed = phase;
+    if (phase && splitConfig) {
+      replayed = buildSplitPhase({
+        teams,
+        fixtures,
+        results,
+        groups: splitConfig.groups,
+        afterRound: splitRound,
+        ...(realGroups ? { realGroups: (league.groups ?? []).map((g) => realGroups.find((m) => m.id === g.id)?.teamIds ?? []) } : {}),
+        ...(firstPhaseIds ? { firstPhaseIds } : {}),
+        options: baseOptions,
+      });
+      Object.assign(results, simulateFixtures(replayed.groupFixtures.flat(), results, model, rng, { likely: true }));
+    }
+    if (playoff) {
+      const { overall, groups: groupTables } = tablesFor(results, replayed);
+      // Without the real play-off games: they are played again too.
+      Object.assign(
+        results,
+        simulatePlayoff(overall, playoff, results, model, rng, {
+          afterMatchday: bracketOptions.afterMatchday,
+          afterDate: bracketOptions.afterDate,
+          ...(groupTables ? { groups: groupTables } : {}),
+          likely: true,
+        }),
+      );
+    }
+    // The play-off's new pairings come with their own scores: none to drop as stale.
+    lastPairings.current = null;
+    replace(seasonKey, fixtures, results);
+  };
+
   const simulateWholePlayoff = () => {
     if (!playoff) return;
     const { overall, groups: groupTables } = groupTabs.length ? tablesFor(effective) : { overall: playoffRows, groups: undefined };
@@ -545,11 +602,22 @@ export function LeagueSimulator({
             // Also a title play-off seeded from groups (Argentina): the chance of winning the tournament.
             // and a title play-off of a single table (Colombia).
             ...((league.continental || playoff?.seedFromGroups || (playoff?.title && !league.groups)) && playoff
-              ? { playoff: { config: playoff, options: bracketOptions, ...(externalSeeds ? { external: externalSeeds } : {}) } }
+              ? {
+                  playoff: {
+                    config: playoff,
+                    options: bracketOptions,
+                    ...(externalSeeds ? { external: externalSeeds } : {}),
+                    ...(playoff.seedFromGroups?.campaign && phase?.members ? { campaign: phase.firstTable } : {}),
+                    // A split's groups all played (Série C): the final's clubs are settled, so its predicted legs stand.
+                    ...(phase?.members && seasonComplete
+                      ? { known: Object.fromEntries(legIds.flatMap((id) => (season.predictions[id] ? [[id, season.predictions[id]!]] : []))) }
+                      : {}),
+                  },
+                }
               : {}),
           }
         : null,
-    [tab, hydrated, teams, allFixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere, canGenerate, phase, extraRounds, splitConfig, lastReal, splitRound, groupTableOptions, ratingNoise], // eslint-disable-line react-hooks/exhaustive-deps
+    [tab, hydrated, teams, allFixtures, effective, model, standingsOptions, groupTabs, league.continental, playoff, bracketOptions, externalSeeds, qualifiedElsewhere, canGenerate, phase, extraRounds, splitConfig, lastReal, splitRound, groupTableOptions, ratingNoise, seasonComplete, legIds, season.predictions], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const actionButton =
@@ -686,6 +754,11 @@ export function LeagueSimulator({
           <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={simulateRest}>
             {t("simulateRest")}
           </button>
+          {seasonOver && (
+            <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={replaySeason} title={t("replaySeasonNote")} data-testid="replay-season">
+              {t("replaySeason")}
+            </button>
+          )}
           <button type="button" className={`${actionButton} grow lg:grow-0`} onClick={() => undo(seasonKey)} disabled={!canUndo}>
             {t("undo")}
           </button>

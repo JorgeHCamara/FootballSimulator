@@ -111,7 +111,7 @@ export const locateMatch = cache(async (leagueSlug: string, slug: string): Promi
   // Match day: the game's own state, fresher than the league's hourly data.
   let result = fixture.result;
   let state: MatchState = result ? "played" : "upcoming";
-  if (!result && data.provider === "espn" && isMatchDay(fixture.utcDate)) {
+  if (!result && data.provider === "espn" && league.espn && isMatchDay(fixture.utcDate)) {
     const live = await fetchEspnGameState(league.espn.slug, fixture.id, fixture.utcDate, MATCH_DAY_REVALIDATE).catch((error: unknown) => {
       console.warn(`${league.code} ${fixture.id}: no match-day state:`, error);
       return null;

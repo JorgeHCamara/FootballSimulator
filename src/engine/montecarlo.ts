@@ -1,6 +1,7 @@
 import { clampRate, expectedGoals, sampleDixonColes, sampleNormal, sampleScore, scoreSampler, venueFactor, type ScoreSampler } from "./match.ts";
 import { playoffCancelled, seedByGroupPlace, simulatePlayoff, tieOutcome, type BracketOptions, type PlayoffConfig, type PlayoffTie } from "./playoffs.ts";
 import type { LeagueModel } from "./ratings.ts";
+import { stagedClassification } from "./classification.ts";
 import { createRng } from "./rng.ts";
 import { splitFixtures, splitGroupsFrom, type SplitGroupConfig } from "./split.ts";
 import { computeStandings, splitStandings, standingsBuilder, type StandingsOptions } from "./standings.ts";
@@ -62,7 +63,17 @@ export interface MonteCarloInput {
     options: Omit<BracketOptions, "seasonComplete">;
     /** Clubs joining the knockout phase from another competition (see `seedFromGroups.external`). */
     external?: readonly StandingRow[];
+    /** The first phase's table, for a knockout seeded by campaign (`seedFromGroups.campaign`). */
+    campaign?: readonly StandingRow[];
+    /** Knockout scores set beforehand (a shared prediction's, for pairings that can't change), by leg id. */
+    known?: ResultMap;
   };
+  /**
+   * Count each run's places over the whole league instead of within each
+   * group (Série C): the final classification (stagedClassification) from
+   * this first-phase table, the groups' tables and the final (`playoff`).
+   */
+  classification?: { firstTable: readonly StandingRow[] };
 }
 
 export interface MonteCarloResult {
@@ -169,7 +180,7 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
     const pointsTotal: Record<TeamId, number> = {};
     const zonePositionCounts: Record<TeamId, number[]> = {};
     for (const t of teams) {
-      const size = tables.find((table) => table.includes(t))?.length ?? teams.length;
+      const size = input.classification ? teams.length : (tables.find((table) => table.includes(t))?.length ?? teams.length);
       positionCounts[t.id] = new Array<number>(size).fill(0);
       pointsTotal[t.id] = 0;
       if (passDown.size) zonePositionCounts[t.id] = new Array<number>(teams.length).fill(0);
@@ -268,21 +279,28 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
         const build = builders[g];
         const rows = splitRows ?? (build ? build(results) : computeStandings(group, input.groupFixtures?.[g] ?? played, results, groupOptions[g]!));
         let zonePosition = 0;
-        for (const row of rows) {
-          count.positionCounts[row.teamId]![row.position - 1]!++;
-          count.pointsTotal[row.teamId]! += row.points;
-          if (passDown.size && !passDown.has(row.teamId)) count.zonePositionCounts[row.teamId]![zonePosition++]!++;
+        if (!input.classification) {
+          for (const row of rows) {
+            count.positionCounts[row.teamId]![row.position - 1]!++;
+            count.pointsTotal[row.teamId]! += row.points;
+            if (passDown.size && !passDown.has(row.teamId)) count.zonePositionCounts[row.teamId]![zonePosition++]!++;
+          }
         }
         groupRows.push(rows);
       }
+      let finalTie: { winner: TeamId; loser: TeamId } | null = null;
       if (playoff) {
         const seeding = playoff.config.seedFromGroups;
-        const rows = groupStage ? overallTable!(results) : grouped ? seedByGroupPlace(groupRows, playoff.external, seeding?.places, seeding?.interleave) : groupRows[0]!;
+        const rows = groupStage
+          ? overallTable!(results)
+          : grouped
+            ? seedByGroupPlace(groupRows, playoff.external, seeding?.places, seeding?.interleave, seeding?.campaign ? playoff.campaign : undefined)
+            : groupRows[0]!;
         const options = groupStage ? { ...playoff.options, groups: groupRows } : playoff.options;
         // The bracket only needs the table and knockout results (real ones come with the options).
         const roundCount = playoff.config.rounds.length;
         let final: PlayoffTie | undefined;
-        const played = simulatePlayoff(rows, playoff.config, {}, season, knockout, options, (r, ties) => {
+        const played = simulatePlayoff(rows, playoff.config, playoff.known ?? {}, season, knockout, options, (r, ties) => {
           for (const tie of ties) {
             for (const id of [tie.higher.teamId, tie.lower.teamId]) {
               if (id !== null) (count.playoffReached[id] ??= new Array<number>(roundCount).fill(0))[r]!++;
@@ -290,13 +308,24 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
           }
           if (r === roundCount - 1) final = ties[0];
         });
-        const winner = final ? tieOutcome(final, played)?.winner : undefined;
+        const decided: PlayoffTie | undefined = final;
+        const winner = decided ? tieOutcome(decided, playoff.known ? { ...playoff.known, ...played } : played)?.winner : undefined;
         if (winner !== undefined) count.playoffWins[winner] = (count.playoffWins[winner] ?? 0) + 1;
+        if (decided && winner !== undefined) {
+          const loser = winner === decided.higher.teamId ? decided.lower.teamId : decided.higher.teamId;
+          if (loser !== null) finalTie = { winner, loser };
+        }
         // Not held (Serie B: 3rd far enough clear of 4th): that club goes up directly instead.
         const clear = playoff.config.directIfClear;
         if (clear && playoffCancelled(playoff.config, rows)) {
           const id = rows.find((r) => r.position === clear.position)?.teamId;
           if (id !== undefined) count.playoffSkips[id] = (count.playoffSkips[id] ?? 0) + 1;
+        }
+      }
+      if (input.classification) {
+        for (const row of stagedClassification(input.classification.firstTable, groupRows, finalTie)) {
+          count.positionCounts[row.teamId]![row.position - 1]!++;
+          count.pointsTotal[row.teamId]! += row.points;
         }
       }
     }

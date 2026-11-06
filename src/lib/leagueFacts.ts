@@ -1,4 +1,5 @@
 import { gamesPerTeam, type LeagueConfig, type SiteLocale, type Zone } from "../config/leagues.ts";
+import { groupPlaces, placedGroups } from "../engine/split.ts";
 
 /**
  * What a domestic league's page says about its format, built from the same
@@ -25,6 +26,8 @@ export type LeagueFact =
       afterRound?: number;
       groups: { from: number; to: number; name: Record<SiteLocale, string>; carryOver: number; legs: 1 | 2 }[];
     }
+  /** A split into groups of named places (Série C: 1st, 4th, 5th and 8th…), from zero points; the other clubs are out. */
+  | { kind: "splitPlaced"; afterRound: number; groups: { places: number[]; name: Record<SiteLocale, string> }[] }
   /** Scotland: the halves play once more and stay apart. */
   | { kind: "splitHalves"; afterRound: number; top: number; bottom: number }
   | { kind: "tables"; names: Record<SiteLocale, string>[] }
@@ -61,7 +64,7 @@ export const CONTINENTAL: ReadonlySet<string> = new Set([
 export function leagueFacts(league: LeagueConfig): LeagueFacts | null {
   if (league.continental) return null;
   const facts: LeagueFact[] = [{ kind: "clubs", clubs: league.teams }];
-  const tournaments = league.espn.stages && !("table" in league.espn.stages) ? [...league.espn.stages].reverse() : [];
+  const tournaments = league.espn?.stages && !("table" in league.espn.stages) ? [...league.espn.stages].reverse() : [];
   const split = league.split;
   // Games in the round robin: a split's first phase only.
   const roundRobin = split ? (split.afterRound ?? 2 * (league.teams - 1)) : gamesPerTeam(league);
@@ -81,7 +84,12 @@ export function leagueFacts(league: LeagueConfig): LeagueFacts | null {
 
   let places: readonly Zone[] = league.zones;
   let placesScope: LeagueFacts["placesScope"] = "table";
-  if (split && league.groups) {
+  if (split && league.groups && placedGroups(split.groups)) {
+    // Groups of named places, then a final (Série C): the places over every club are its final classification.
+    const named = groupPlaces(split.groups, league.teams);
+    facts.push({ kind: "splitPlaced", afterRound: split.afterRound ?? roundRobin, groups: named.map((places, i) => ({ places, name: league.groups![i]!.name })) });
+    places = split.finalZones ?? league.zones;
+  } else if (split && league.groups) {
     // Each group's own places, after the groups before it.
     let start = 0;
     const groups = split.groups.map((g, i) => {

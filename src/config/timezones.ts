@@ -28,6 +28,7 @@ export const LEAGUE_TIME_ZONES: Partial<Record<CompetitionCode, string>> = {
   ABL: "Europe/Vienna",
   BSA: "America/Sao_Paulo",
   BSB: "America/Sao_Paulo",
+  BSC: "America/Sao_Paulo",
   MLS: "America/New_York",
   ARG: "America/Argentina/Buenos_Aires",
   CHI: "America/Santiago",

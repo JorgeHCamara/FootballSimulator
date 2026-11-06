@@ -29,7 +29,8 @@ if (!Number.isInteger(year) || year < 2000) {
 }
 
 const entries: string[] = [];
-for (const league of LEAGUES.filter((l) => !l.continental)) {
+// First-party leagues (Série C) have no ESPN feed to build priors from: their clubs start from NO_DATA_PRIOR.
+for (const league of LEAGUES.filter((l) => !l.continental && !l.firstParty)) {
   try {
     // Last season's later games count a bit more when recency weighting is on.
     const priors = await buildLeaguePriors(league, year, { halfLife: ratingHalfLife(league) });

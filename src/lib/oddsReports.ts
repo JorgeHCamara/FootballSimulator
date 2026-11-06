@@ -44,7 +44,8 @@ async function sampleSnapshots(code: string): Promise<LeagueSnapshots | undefine
   const { getLeagueData } = await import("./leagueData.ts");
   const { addSnapshots, completedRounds, snapshotAfter } = await import("./snapshots.ts");
   const league = getLeagueByCode(code);
-  if (!league) return undefined;
+  // A first-party league (Série C) has no snapshots on the live site either (scripts/snapshot-odds.ts skips it).
+  if (!league || league.firstParty) return undefined;
   const data = await getLeagueData(league);
   const snapshots = completedRounds(data.fixtures).slice(-SAMPLE_ROUNDS).flatMap((r) => snapshotAfter(league, data, r.round, r.lastKickoff, new Date(), SAMPLE_ITERATIONS) ?? []);
   return snapshots.length ? addSnapshots(undefined, league.code, data.seasonKey, data.season, snapshots) : undefined;

@@ -16,6 +16,7 @@
     "continentalGroupsDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula la fase de grupos, mira las ocho clasificaciones en directo y juega las eliminatorias hasta la final, con las probabilidades de cada club de llegar a octavos y de ganar el título.",
     "leagueDescriptionAmericas": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Copa Libertadores y descenso.",
     "zonesDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira las dos zonas en directo y juega los playoffs hasta la final, con las probabilidades de cada club de llegar a los playoffs y de ser campeón.",
+    "stagesDescription": "{simulator} gratis de la temporada {season} ({aka}). Vuelve a jugar la primera fase, los grupos del ascenso y la final, cambia cualquier resultado y mira quién sube, quién es campeón y quién desciende.",
     "tournamentsDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula cada torneo del año, juega sus playoffs cuando los tenga y mira la tabla anual con los cupos a la Copa Libertadores y la Sudamericana.",
     "liguillaDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la tabla en directo y juega la Liguilla hasta la final, con las probabilidades de cada club de llegar a la Liguilla y de ser campeón.",
     "leagueDescriptionAsia": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Liga de Campeones de la AFC y descenso."
@@ -65,6 +66,8 @@
     "simulateMatch": "Simular este partido",
     "simulateMatchday": "Simular jornada",
     "simulateRest": "Simular resto de temporada",
+    "replaySeason": "Rejugar la temporada",
+    "replaySeasonNote": "La temporada real terminó: juégala entera otra vez desde el primer partido, con los grupos y la final. Cada resultado real se cambia por uno simulado (Deshacer los recupera).",
     "reset": "Reiniciar",
     "resetTitle": "¿Reiniciar esta liga?",
     "resetConfirm": "Se borrarán todos tus pronósticos y resultados simulados de esta liga. Los resultados reales se mantienen.",
@@ -74,6 +77,7 @@
     "share": "Compartir",
     "linkCopied": "Enlace copiado",
     "liveSource": "Partidos y resultados reales, actualizados cada hora",
+    "firstPartySource": "Resultados oficiales de la CBF (Confederación Brasileña de Fútbol), guardados en Foot Simu",
     "editResult": "Cambiar este resultado",
     "position": "#",
     "team": "Equipo",
@@ -257,7 +261,9 @@
     },
     "step3Americas": "Abre la pestaña Probabilidades para ver las opciones de cada equipo de título, Copa Libertadores y descenso.",
     "introZones": "Usa el {simulator} para predecir el resto de la {league} {season} ({aka}). Escribe tus marcadores o simula los partidos restantes: las clasificaciones de las dos zonas se actualizan al instante con los criterios oficiales. Los 8 primeros de cada zona van a los playoffs, cruzando las zonas (1.º de la Zona A vs. 8.º de la Zona B…) a partido único hasta la final. Cambia entre el Apertura, el Clausura y la tabla anual, que define los cupos continentales y el descenso.",
+    "introStages": "Usa el {simulator} para volver a jugar el {league} {season} ({aka}). Cada resultado real se puede cambiar: la tabla de la primera fase, los dos grupos del ascenso (los 2 primeros de cada grupo suben) y la final de ida y vuelta se actualizan al instante con los criterios de desempate oficiales. Cambia quién termina dónde y los grupos y la final cambian con ello.",
     "step3Zones": "Abre la pestaña Probabilidades para ver las opciones de cada club de terminar primero en su zona, de llegar a los playoffs y de ser campeón.",
+    "step3Stages": "Abre la pestaña Probabilidades para ver las opciones de cada club en su grupo del ascenso y de ganar la final.",
     "introTournaments": "Usa el {simulator} para predecir el resto de la {league} {season} ({aka}). El año tiene varios torneos, cada uno con su tabla y su campeón: cambia entre ellos y la tabla anual, que los suma todos y define los cupos a la Copa Libertadores y la Sudamericana. Escribe tus marcadores o simula los partidos restantes, y las tablas se actualizan al instante.",
     "step3Tournaments": "Abre la pestaña Probabilidades para ver las opciones de cada club de ganar el torneo y, en la tabla anual, de ir a la Copa Libertadores y a la Sudamericana.",
     "introLiguilla": "Usa el {simulator} para predecir el resto de la {league} {season} ({aka}). Escribe tus marcadores o simula los partidos restantes: la tabla se actualiza al instante con los criterios oficiales. Los 8 primeros van a la Liguilla, a ida y vuelta hasta la final.",
@@ -317,7 +323,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Bundesliga austriaca, Brasileirão Série A y Série B, la Liga Profesional Argentina, la Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Bundesliga austriaca, Brasileirão Série A, Série B y Série C, la Liga Profesional Argentina, la Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",
@@ -638,6 +644,8 @@
     "tournaments": "La temporada tiene {count, plural, =2 {dos} =3 {tres} other {#}} torneos ({names}), cada uno con su campeón.",
     "split": "{hasRound, select, yes {Tras {round} jornadas} other {Tras la {phase}}} la tabla se divide en tablas separadas: {groups}. Cada una es una tabla nueva con sus propios partidos ({legs, select, one {a una vuelta} other {ida y vuelta}}), y los clubes empiezan con los puntos de la {phase}{carry}.",
     "carryHalved": " (en los {group}, con la mitad, redondeada hacia arriba)",
+    "splitPlaced": "Tras {round} jornadas los {count} primeros pasan a dos grupos ({groups}), cada uno una tabla nueva con sus propios partidos, de ida y vuelta, desde cero puntos. Para los demás clubes la temporada termina.",
+    "placesList": "{list}: {group}",
     "splitHalves": "Tras {round} jornadas la tabla se divide entre los {top} primeros y los {bottom} últimos, que se enfrentan una vez más; los clubes no cambian de mitad, sean cuales sean sus puntos.",
     "tables": "Los clubes se reparten en {count, plural, =2 {dos} other {#}} tablas: {names}.",
     "titlePlayoff": "Una eliminatoria tras la fase regular decide el campeón.",

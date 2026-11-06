@@ -45,7 +45,7 @@ const pageSeason = (data: { season: string; tournaments?: unknown[] }) => (data.
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
 /** Which set of texts a page uses: league, play-off league, continental competition, or cup. */
-type Wording = "league" | "leagueAmericas" | "leagueAsia" | "zones" | "tournaments" | "liguilla" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
+type Wording = "league" | "stages" | "leagueAmericas" | "leagueAsia" | "zones" | "tournaments" | "liguilla" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
 
 type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
@@ -62,7 +62,9 @@ async function load(slug: string): Promise<Loaded | undefined> {
     ? league.groups
       ? "continentalGroups"
       : "continental"
-    : league.playoff?.seedFromGroups
+    : league.split && league.playoff?.seedFromGroups
+      ? "stages" // Série C: a first stage, promotion groups and a final
+      : league.playoff?.seedFromGroups
       ? "zones" // Argentina: zone tables and a title play-off
       : league.annual
         ? "tournaments" // several tournaments a year and an annual table (Colombia, Uruguay, Paraguay)
@@ -88,6 +90,7 @@ const META_KEYS: Record<
       | "leagueDescriptionAmericas"
       | "leagueDescriptionAsia"
       | "zonesDescription"
+      | "stagesDescription"
       | "tournamentsDescription"
       | "liguillaDescription"
       | "continentalDescription"
@@ -100,6 +103,7 @@ const META_KEYS: Record<
   leagueAmericas: { title: "leagueTitle", description: "leagueDescriptionAmericas" },
   leagueAsia: { title: "leagueTitle", description: "leagueDescriptionAsia" },
   zones: { title: "leagueTitle", description: "zonesDescription" },
+  stages: { title: "leagueTitle", description: "stagesDescription" },
   tournaments: { title: "leagueTitle", description: "tournamentsDescription" },
   liguilla: { title: "leagueTitle", description: "liguillaDescription" },
   continental: { title: "continentalTitle", description: "continentalDescription" },
@@ -186,6 +190,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
             ? "introPlayoffs"
             : wording === "zones"
               ? "introZones"
+              : wording === "stages"
+                ? "introStages"
               : wording === "tournaments"
                 ? "introTournaments"
                 : wording === "liguilla"
@@ -222,6 +228,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
               ? (`step3ContinentalGroups.${config.code}` as "step3")
               : step === "step3" && wording === "zones"
                 ? "step3Zones"
+                : step === "step3" && wording === "stages"
+                  ? "step3Stages"
                 : step === "step3" && wording === "tournaments"
                   ? "step3Tournaments"
                   : step === "step3" && wording === "liguilla"
@@ -276,7 +284,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           </span>
         </h1>
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{seo(intro, values)}</p>
-        {data.source === "live" && <p className="text-xs text-zinc-500">{t("liveSource")}</p>}
+        {data.source === "live" && <p className="text-xs text-zinc-500">{t("provider" in data && data.provider === "first-party" ? "firstPartySource" : "liveSource")}</p>}
         {latestOdds && (
           <Link
             href={latestReportPath(config)}
@@ -333,6 +341,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(external ? { externalSeeds: external.rows } : {})}
           {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
           {...(loaded.data.firstPhaseIds ? { firstPhaseIds: loaded.data.firstPhaseIds } : {})}
+          {...(loaded.data.fallbackOrder ? { fallbackOrder: loaded.data.fallbackOrder } : {})}
         />
       )}
 
