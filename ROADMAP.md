@@ -39,7 +39,8 @@ reliability (item 5) comes next, then growth, engagement and monetisation
 | 12 | Ad-slot readiness (placeholders behind a flag) | done | `roadmap/12-ad-slot-readiness` |
 | 13 | Neutral venues (backlog) | skipped | `roadmap/13-neutral-venues` |
 | 14 | PL and EFL tiebreakers (backlog) | skipped | `roadmap/14-pl-efl-tiebreakers` |
-| 15 | My World (first version) | in-pr | `roadmap/15-my-world` |
+| 15 | My World (first version) | done | `roadmap/15-my-world` |
+| 16 | My World: a round at a time, or every result | in-pr | `roadmap/16-my-world-match-by-match` |
 
 ## 1. Match impact cache key and skeleton
 
@@ -408,3 +409,28 @@ season's final tables stay browsable.
   Premier League, past tables after later seasons, and persistence; e2e in
   EN/PT/ES on phones and desktops.
 - PR: "[Roadmap 15] My World (first version)".
+
+## 16. My World: a round at a time, or every result
+
+**Goal:** the player decides how each My World season is played: all at once
+(as in the first version), just the current round, or every result of every
+match, the same way the league simulators work. The world inherits the leagues
+as they are when it starts, then it's the player's: no real results are synced
+in. For the four English leagues.
+
+**Acceptance:**
+
+- All at once: unchanged, and from wherever the season is (the rest of it).
+- The next round: every league's next matchday at once, then each play-off a
+  round at a time, shoot-outs included; then the season is finished on request.
+  Drawn as the whole season is (the same engine and season form).
+- Every result, as on the league pages: each league's table and fixtures,
+  score boxes and the dice (likely rolls), Simulate matchday, Simulate rest of
+  season, Undo, Reset, the play-off ties and the promoted clubs; no match
+  previews. The first season's results can be changed too.
+- Every score is saved in the browser and survives a reload; older saves keep
+  working (no version change).
+- Unit tests for rounds, picked scores standing, play-off scores tied to their
+  pairing, finishing a season from its scores, and the save; e2e on desktop and
+  phones, EN/PT/ES.
+- PR: "[Roadmap 16] My World: a round at a time, or every result", to `uat`.

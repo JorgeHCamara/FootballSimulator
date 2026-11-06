@@ -52,10 +52,12 @@ interface Props {
   roundLabels?: Record<number, string>;
   /** Each game's preview page (odds, likely scores, what each result means), when it has one. */
   matchPage?: (fixture: Fixture) => string | undefined;
+  /** Each game's kick-off time (off for My World, whose calendar has no real dates). */
+  kickOff?: boolean;
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels, matchPage } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels, matchPage, kickOff = true } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -117,6 +119,7 @@ export function FixtureList(props: Props) {
               // Places standing in for clubs not known yet: nothing to predict.
               disabled={isSlotTeamId(f.homeId)}
               {...(matchPage?.(f) ? { preview: matchPage(f)! } : {})}
+              kickOff={kickOff}
             />
           ))}
         </ul>
@@ -126,7 +129,7 @@ export function FixtureList(props: Props) {
 }
 
 /** Two-legged play-off ties: both legs, the rule and the aggregate once decided. */
-function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props & { playoff: PlayoffView }) {
+function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff = true }: Props & { playoff: PlayoffView }) {
   const t = useTranslations("Simulator");
   const { bracket, seasonComplete } = playoff;
   const lastRound = bracket.length - 1;
@@ -197,6 +200,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
       prediction={predictions[fixture.id]}
       {...(label ? { label } : {})}
       {...layout}
+      kickOff={kickOff}
       onScore={(score) => onScore(fixture, score)}
       onSimulate={() => onSimulate(fixture)}
     />
@@ -273,7 +277,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                     ? Array.from({ length: tie.config.legs }, (_, i) => {
                         // Two legs: lower-placed side hosts the first.
                         const [home, away] = tie.config.legs === 2 && i === 0 ? [tie.lower, tie.higher] : [tie.higher, tie.lower];
-                        return <PlaceholderRow key={i} utcDate="" home={label(home)} away={label(away)} />;
+                        return <PlaceholderRow key={i} utcDate="" home={label(home)} away={label(away)} kickOff={kickOff} />;
                       })
                     : tie.config.bestOf
                       ? // A series: each game still needed, with its own shoot-out when drawn.
@@ -301,6 +305,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate }: Props
                       prediction={predictions[tie.shootout.id]}
                       label={t("penalties")}
                       attached
+                      kickOff={kickOff}
                       onScore={(score) => onScore(tie.shootout!, score)}
                       onSimulate={() => onSimulate(tie.shootout!)}
                     />
@@ -367,6 +372,8 @@ interface RowProps {
   inlineDice?: boolean;
   /** The game's preview page: a chart button next to the dice. */
   preview?: string;
+  /** The kick-off time above the game (else only its label, if it has one). */
+  kickOff?: boolean;
   fixture: Fixture;
   home: Team;
   away: Team;
@@ -398,7 +405,7 @@ function TeamName({ team }: { team: Team }) {
   );
 }
 
-export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false, preview }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false, preview, kickOff = true }: RowProps) {
   const side = (id: TeamId) => (winner == null ? "" : winner === id ? "font-bold" : "opacity-60");
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
@@ -434,26 +441,28 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
       data-fixture={fixture.id}
       {...(attached ? { "data-attached": "true" } : {})}
     >
-      <div className="mb-1 flex items-center justify-between text-[11px] text-zinc-500">
-        {attached ? (
-          <span className="font-semibold">{label}</span>
-        ) : (
-          <span>
-            <KickOff utcDate={fixture.utcDate} />
-            {label && <span className="font-semibold"> · {label}</span>}
-          </span>
-        )}
-        {inlineDice && showInputsFor(fixture, prediction, editing) && !disabled && (
-          <button
-            type="button"
-            onClick={onSimulate}
-            aria-label={t("simulateMatch")}
-            className="-my-1 rounded-md p-1 leading-none text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-          >
-            <Icon name="dices" size={16} />
-          </button>
-        )}
-      </div>
+      {(kickOff || label || inlineDice) && (
+        <div className="mb-1 flex items-center justify-between text-[11px] text-zinc-500">
+          {attached || !kickOff ? (
+            <span className="font-semibold">{label}</span>
+          ) : (
+            <span>
+              <KickOff utcDate={fixture.utcDate} />
+              {label && <span className="font-semibold"> · {label}</span>}
+            </span>
+          )}
+          {inlineDice && showInputsFor(fixture, prediction, editing) && !disabled && (
+            <button
+              type="button"
+              onClick={onSimulate}
+              aria-label={t("simulateMatch")}
+              className="-my-1 rounded-md p-1 leading-none text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            >
+              <Icon name="dices" size={16} />
+            </button>
+          )}
+        </div>
+      )}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <span className={`flex min-w-0 items-center justify-end gap-2 text-right text-sm font-medium ${side(home.id)}`}>
           <TeamName team={home} />
@@ -538,13 +547,15 @@ function Tag({ label }: { label: string }) {
 }
 
 /** A play-off leg whose clubs aren't decided yet, e.g. "6th place × 3rd place". */
-function PlaceholderRow({ utcDate, home, away }: { utcDate: string; home: string; away: string }) {
+function PlaceholderRow({ utcDate, home, away, kickOff = true }: { utcDate: string; home: string; away: string; kickOff?: boolean }) {
   const box = "h-9 w-10 rounded-md border border-dashed border-zinc-300 dark:border-zinc-700";
   return (
     <li className="px-3 py-2.5" data-testid="playoff-placeholder">
-      <div className="mb-1 text-[11px] text-zinc-500">
-        <KickOff utcDate={utcDate} />
-      </div>
+      {kickOff && (
+        <div className="mb-1 text-[11px] text-zinc-500">
+          <KickOff utcDate={utcDate} />
+        </div>
+      )}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm font-medium text-zinc-500">
         <span className="truncate text-right">{home}</span>
         <span className="flex items-center gap-1" aria-hidden>

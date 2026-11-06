@@ -1,13 +1,26 @@
 import { getLeagueByCode, type LeagueConfig } from "../config/leagues.ts";
-import { expectedGoals, sampleDixonColes, sampleNormal } from "../engine/match.ts";
+import { expectedGoals, expectedGoalsNeutral, sampleDixonColes, sampleLikelyScore, sampleNormal, simulateFixtures } from "../engine/match.ts";
 import { ratingNoiseSd } from "../engine/montecarlo.ts";
 import { clubPriors, seasonRatings, type SeasonRatings } from "../engine/offseason.ts";
-import { simulatePlayoff, tieOutcome, type PlayoffTie } from "../engine/playoffs.ts";
+import {
+  buildBracket,
+  isShootoutId,
+  needsShootout,
+  playoffIds,
+  seriesGames,
+  simulatePenalties,
+  simulatePlayoff,
+  tieIds,
+  tieOutcome,
+  type BracketOptions,
+  type PlayoffTie,
+} from "../engine/playoffs.ts";
 import type { LeagueModel, TeamStrength } from "../engine/ratings.ts";
+import { effectiveResults, isValidScore } from "../engine/results.ts";
 import { createRng, randomSeed, type Rng } from "../engine/rng.ts";
 import { doubleRoundRobin } from "../engine/schedule.ts";
-import { computeStandings } from "../engine/standings.ts";
-import type { Fixture, ResultMap, StandingRow, Team, TeamId } from "../engine/types.ts";
+import { computeStandings, sortFixtures } from "../engine/standings.ts";
+import type { Fixture, ResultMap, Score, StandingRow, Team, TeamId } from "../engine/types.ts";
 import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
 
 /*
@@ -29,6 +42,15 @@ import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
  * its difference from average, a promoted club becomes a below-average one in
  * its new league, a relegated club the reverse, and a new club starts below
  * average. Nothing here touches the live outlook, snapshots or SIM_VERSION.
+ *
+ * A season can be played three ways, mixed as the player likes: all at once
+ * (playSeason), a round at a time in all four leagues (playRound), or result
+ * by result as on the league pages: any score typed in, a dice roll for one
+ * game, a matchday or the rest of one league simulated (setScore, rollScore,
+ * simulateMatchday, simulateRest). The whole season and its rounds draw each
+ * score from the full distribution, as the season odds do; the dice and the
+ * league buttons make likely rolls, as on the league pages. Every score is
+ * kept in the save (DivisionSeason.scores) until the season is finished.
  */
 
 /** The save's format: a save of another version is set aside, not read (see myWorldStorage.ts). */
@@ -85,6 +107,13 @@ export interface DivisionSeason {
   deductions?: Record<number, number>;
   /** Real play-off games already played (a world started during the play-offs). */
   playoffGames?: WorldPlayoffGame[];
+  /**
+   * The season's scores so far beyond the ones it started with: typed in,
+   * rolled or simulated, by game id (league games, then play-off legs and
+   * shoot-outs). Over a game the world started with a result for, the score
+   * here replaces it.
+   */
+  scores?: Record<number, [number, number]>;
 }
 
 /**
@@ -246,13 +275,22 @@ function shuffled<T>(items: readonly T[], rng: Rng): T[] {
   return out;
 }
 
-/** A division's games this season: the first season's real calendar, or a new double round robin (in a new order every season). */
+/**
+ * A division's games this season: the first season's real calendar (each game
+ * the world started with a result for carries it), or a new double round
+ * robin (in a new order every season). `results`: those results.
+ */
 export function divisionFixtures(world: World, d: DivisionSeason): { fixtures: Fixture[]; results: ResultMap } {
   if (d.games) {
-    const fixtures = d.games.map((g): Fixture => ({ id: g[0], matchday: g[1], utcDate: gameDate(world.year, g[1]), homeId: g[2], awayId: g[3], result: null }));
-    const results: ResultMap = {};
-    for (const g of d.games) if (g[4] !== null && g[5] !== null) results[g[0]] = { home: g[4], away: g[5] };
-    return { fixtures, results };
+    const fixtures = d.games.map((g): Fixture => ({
+      id: g[0],
+      matchday: g[1],
+      utcDate: gameDate(world.year, g[1]),
+      homeId: g[2],
+      awayId: g[3],
+      result: g[4] !== null && g[5] !== null ? { home: g[4], away: g[5] } : null,
+    }));
+    return { fixtures, results: effectiveResults(fixtures) };
   }
   const order = shuffled(d.clubs, seasonRng(world, 100 + ENGLAND.indexOf(d.code)));
   return { fixtures: doubleRoundRobin(order, gameDate(world.year, 1)), results: {} };
@@ -296,6 +334,287 @@ function newClubName(world: World, n: number): { name: string; shortName: string
 /** New clubs' ids: well clear of the first season's (numbered from 1). */
 export const NEW_CLUB_ID_BASE = 100_000;
 
+/** The season's scores beyond the ones it started with (DivisionSeason.scores), as results. */
+export function seasonScores(d: DivisionSeason): ResultMap {
+  const out: ResultMap = {};
+  for (const [id, [home, away]] of Object.entries(d.scores ?? {})) out[Number(id)] = { home, away };
+  return out;
+}
+
+/**
+ * The season's form: each club's rating with the season outlook's rating noise
+ * (less for the games the season started with already played), drawn once
+ * from the season's own random stream, so it is the same however the season
+ * is played. `rng`: that stream, past the noise (playSeason draws the rest of
+ * the season's games from it).
+ */
+function seasonForm(world: World, d: DivisionSeason, index: number): { model: LeagueModel; rng: Rng } {
+  const rng = seasonRng(world, index);
+  const played = new Map<TeamId, number>();
+  for (const g of d.games ?? []) if (g[4] !== null && g[5] !== null) for (const id of [g[2], g[3]]) played.set(id, (played.get(id) ?? 0) + 1);
+  const strengths = new Map<TeamId, TeamStrength>();
+  for (const id of d.clubs) {
+    const [attack, defence] = world.ratings[id] ?? [1, 1];
+    const sd = ratingNoiseSd(SEASON_RATING_NOISE.sd, SEASON_RATING_NOISE.k, played.get(id) ?? 0);
+    strengths.set(id, { attack: attack * Math.exp(sd * sampleNormal(rng)), defence: defence * Math.exp(sd * sampleNormal(rng)) });
+  }
+  const p = world.params[d.code];
+  return { model: { avgHomeGoals: p.avgHomeGoals, avgAwayGoals: p.avgAwayGoals, strengths, ...(p.rho ? { rho: p.rho } : {}) }, rng };
+}
+
+const lastMatchday = (fixtures: readonly Fixture[]) => fixtures.reduce((m, f) => Math.max(m, f.matchday), 0);
+
+const standingsOf = (league: LeagueConfig, d: DivisionSeason, teams: readonly Team[], fixtures: readonly Fixture[], results: ResultMap) =>
+  computeStandings(teams, fixtures, results, { tiebreakers: league.tiebreakers, includeForm: false, ...(d.deductions ? { deductions: d.deductions } : {}) });
+
+/** The play-off after the league's last matchday, with the real games of a world started during the play-offs. */
+function playoffOptions(world: World, d: DivisionSeason, last: number): Omit<BracketOptions, "seasonComplete"> {
+  const real: Fixture[] = (d.playoffGames ?? []).map((g) => ({
+    id: g[0],
+    matchday: last + 1,
+    utcDate: g[3],
+    homeId: g[1],
+    awayId: g[2],
+    result: g[4] !== null && g[5] !== null ? { home: g[4], away: g[5] } : null,
+    ...(g[6] ? { neutral: true } : {}),
+    ...(g[7] !== null && g[8] !== null ? { penalties: { home: g[7], away: g[8] } } : {}),
+  }));
+  return { afterMatchday: last, afterDate: gameDate(world.year, last), ...(real.length ? { real } : {}) };
+}
+
+/**
+ * The matchday a division's rounds start from: the one after the last
+ * matchday whose games were mostly played when the world began (1 for a new
+ * season). Games left from earlier matchdays (postponed in the real season)
+ * are played with the first round.
+ */
+function startRound(d: DivisionSeason): number {
+  const counts = new Map<number, [number, number]>();
+  for (const g of d.games ?? []) {
+    const c = counts.get(g[1]) ?? [0, 0];
+    if (g[4] !== null && g[5] !== null) c[0]++;
+    c[1]++;
+    counts.set(g[1], c);
+  }
+  let last = 0;
+  for (const [matchday, [played, all]] of counts) if (played * 2 > all) last = Math.max(last, matchday);
+  return last + 1;
+}
+
+/** A division's season in progress, as the page shows it and plays it. */
+export interface DivisionState {
+  code: DivisionCode;
+  index: number;
+  league: LeagueConfig;
+  teams: Team[];
+  /** Its games, in order; a game the season started with a result for carries it (`result`). */
+  fixtures: Fixture[];
+  /** The scores beyond those (DivisionSeason.scores): league games, and the play-off's legs and shoot-outs. */
+  picks: ResultMap;
+  /** Every league game's score so far. */
+  results: ResultMap;
+  rows: StandingRow[];
+  /** Every league game has a score: the play-off's clubs are known. */
+  leagueComplete: boolean;
+  /** The play-off's ties (none in the Premier League): clubs placed once the league is complete. */
+  bracket: PlayoffTie[][];
+  playoffOptions: Omit<BracketOptions, "seasonComplete">;
+  /** The league and its play-off are decided. */
+  done: boolean;
+  /**
+   * The next round: the earliest matchday from the season's first round with
+   * a game to play; once the league is complete, the play-off's next legs (a
+   * matchday after the league's last), or a level tie's shoot-out. Null once done.
+   */
+  nextRound: number | null;
+  /** The season's form (seasonForm). */
+  model: LeagueModel;
+}
+
+function stateOf(world: World, index: number, picks: ResultMap = seasonScores(world.divisions[index]!)): DivisionState {
+  const d = world.divisions[index]!;
+  const league = divisionConfig(d.code);
+  const teams = d.clubs.map((id) => teamOf(world, id));
+  const fixtures = sortFixtures(divisionFixtures(world, d).fixtures);
+  const results = effectiveResults(fixtures, picks);
+  const rows = standingsOf(league, d, teams, fixtures, results);
+  const leagueComplete = fixtures.every((f) => results[f.id]);
+  const options = playoffOptions(world, d, lastMatchday(fixtures));
+  const bracket = league.playoff ? buildBracket(rows, league.playoff, picks, { ...options, seasonComplete: leagueComplete }) : [];
+  const done = leagueComplete && bracket.every((round) => round.every((tie) => tieOutcome(tie, picks) !== null));
+  let nextRound: number | null = null;
+  if (!leagueComplete) {
+    const open = fixtures.filter((f) => !results[f.id]);
+    const from = startRound(d);
+    nextRound = open.find((f) => f.matchday >= from)?.matchday ?? open.at(-1)!.matchday;
+  } else if (!done) {
+    // English play-offs are one- and two-legged ties (no series).
+    const ties = bracket.flat();
+    const legs = ties.flatMap((tie) => tie.legs.filter((leg) => !leg.result && !picks[leg.id]));
+    const level = ties.filter((tie) => tie.shootout && !tie.shootout.result && !picks[tie.shootout.id] && needsShootout(tie, picks));
+    nextRound = legs.length ? Math.min(...legs.map((leg) => leg.matchday)) : level.length ? Math.max(...level.map((tie) => tie.legs.at(-1)!.matchday)) : null;
+  }
+  return { code: d.code, index, league, teams, fixtures, picks, results, rows, leagueComplete, bracket, playoffOptions: options, done, nextRound, model: seasonForm(world, d, index).model };
+}
+
+const indexOf = (world: World, code: DivisionCode) => {
+  const index = world.divisions.findIndex((d) => d.code === code);
+  if (index < 0) throw new Error(`No ${code} in this world`);
+  return index;
+};
+
+/** A division's season in progress: its games, scores, table and play-off. */
+export const divisionState = (world: World, code: DivisionCode): DivisionState => stateOf(world, indexOf(world, code));
+
+/** All four divisions' seasons in progress, top first. */
+export const seasonStates = (world: World): DivisionState[] => world.divisions.map((_, i) => stateOf(world, i));
+
+/** Every game of the season in progress is decided, the play-offs too: it can be finished (playSeason draws nothing more). */
+export const seasonDone = (world: World) => seasonStates(world).every((s) => s.done);
+
+/**
+ * Play-off scores belong to one pairing, as on the league pages: once a
+ * league score or an earlier round's changes who meets whom, the scores that
+ * tie had go; they all go while the league isn't complete; and a shoot-out's
+ * score goes once its tie isn't level. Scores just added stay.
+ */
+function tidyPlayoff(world: World, index: number, before: ResultMap, after: ResultMap): ResultMap {
+  const config = divisionConfig(world.divisions[index]!.code).playoff;
+  if (!config) return after;
+  const out = { ...after };
+  const bracketWith = (picks: ResultMap) => {
+    const state = stateOf(world, index, picks);
+    return state.leagueComplete ? state.bracket : null;
+  };
+  if (!bracketWith(out)) {
+    for (const id of playoffIds(config)) delete out[id];
+    return out;
+  }
+  const pairing = (tie: PlayoffTie) => `${tie.higher.teamId}-${tie.lower.teamId}`;
+  const was = bracketWith(before);
+  if (was) {
+    const pairings = new Map(was.flat().map((tie) => [`${tie.round}-${tie.index}`, pairing(tie)]));
+    const unchanged = (id: number) => before[id] !== undefined && out[id] !== undefined && before[id]!.home === out[id]!.home && before[id]!.away === out[id]!.away;
+    for (let pass = 0; pass <= config.rounds.length; pass++) {
+      const stale = bracketWith(out)!
+        .flat()
+        .filter((tie) => pairings.get(`${tie.round}-${tie.index}`) !== pairing(tie))
+        .flatMap((tie) => tieIds(tie.round, tie.index, tie.config))
+        .filter(unchanged);
+      if (!stale.length) break;
+      for (const id of stale) delete out[id];
+    }
+  }
+  for (const tie of bracketWith(out)!.flat()) {
+    if (tie.config.bestOf) {
+      for (const game of seriesGames(tie, out)) if (out[game.shootout.id] && !game.needsPenalties) delete out[game.shootout.id];
+    } else if (tie.shootout && out[tie.shootout.id] && !needsShootout(tie, out)) delete out[tie.shootout.id];
+  }
+  return out;
+}
+
+/** The world with a division's new scores (`after`, from `before`), less the play-off scores they leave stale. */
+function withScores(world: World, index: number, before: ResultMap, after: ResultMap): World {
+  const scores = Object.fromEntries(Object.entries(tidyPlayoff(world, index, before, after)).map(([id, s]) => [id, [s.home, s.away] as [number, number]]));
+  return {
+    ...world,
+    divisions: world.divisions.map((d, i) => {
+      if (i !== index) return d;
+      const { scores: _old, ...rest } = d;
+      return Object.keys(scores).length ? { ...rest, scores } : rest;
+    }),
+  };
+}
+
+function putScore(world: World, index: number, id: number, score: Score | null): World {
+  const before = seasonScores(world.divisions[index]!);
+  const after = { ...before };
+  if (score) after[id] = score;
+  else delete after[id];
+  return withScores(world, index, before, after);
+}
+
+/**
+ * A score typed in for a game (a league game, a play-off leg or its
+ * shoot-out), or cleared (null). Typing in the score a game started with is
+ * the same as leaving it.
+ */
+export function setScore(world: World, code: DivisionCode, fixture: Fixture, score: Score | null): World {
+  if (score && !isValidScore(score)) return world;
+  const same = score && fixture.result && score.home === fixture.result.home && score.away === fixture.result.away;
+  return putScore(world, indexOf(world, code), fixture.id, same ? null : score);
+}
+
+/** The dice: a likely roll for one game, another score than the one it has (a shoot-out: a shoot-out score). */
+export function rollScore(world: World, code: DivisionCode, fixture: Fixture, rng: Rng = createRng(randomSeed())): World {
+  const index = indexOf(world, code);
+  const d = world.divisions[index]!;
+  const { model } = seasonForm(world, d, index);
+  const xg = () => (fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId));
+  const score = isShootoutId(fixture.id) ? simulatePenalties(rng) : sampleLikelyScore(xg(), rng, model.rho ?? 0, seasonScores(d)[fixture.id]);
+  return putScore(world, index, fixture.id, score);
+}
+
+/** Likely rolls for a matchday's games without a score ("Simulate matchday", as on the league pages). */
+export function simulateMatchday(world: World, code: DivisionCode, matchday: number, rng: Rng = createRng(randomSeed())): World {
+  const state = divisionState(world, code);
+  const added = simulateFixtures(state.fixtures.filter((f) => f.matchday === matchday), state.results, state.model, rng, { likely: true });
+  return withScores(world, state.index, state.picks, { ...state.picks, ...added });
+}
+
+/** Likely rolls for the play-off's games without a score, once the league is complete ("Simulate matchday" on the play-off). */
+export function simulatePlayoffs(world: World, code: DivisionCode, rng: Rng = createRng(randomSeed())): World {
+  const state = divisionState(world, code);
+  if (!state.league.playoff || !state.leagueComplete) return world;
+  const added = simulatePlayoff(state.rows, state.league.playoff, state.picks, state.model, rng, { ...state.playoffOptions, likely: true });
+  return withScores(world, state.index, state.picks, { ...state.picks, ...added });
+}
+
+/** Likely rolls for the rest of one league's season, its play-off included ("Simulate rest of season", as on the league pages). */
+export function simulateRest(world: World, code: DivisionCode, rng: Rng = createRng(randomSeed())): World {
+  const state = divisionState(world, code);
+  const league = simulateFixtures(state.fixtures, state.results, state.model, rng, { likely: true });
+  const picks = { ...state.picks, ...league };
+  if (state.league.playoff) {
+    const all = { ...state.results, ...league };
+    const d = world.divisions[state.index]!;
+    const rows = standingsOf(state.league, d, state.teams, state.fixtures, all);
+    Object.assign(picks, simulatePlayoff(rows, state.league.playoff, { ...state.picks, ...all }, state.model, rng, { ...state.playoffOptions, likely: true }));
+  }
+  return withScores(world, state.index, state.picks, picks);
+}
+
+/** One division's season back to how it started: every score typed in, rolled or simulated goes. */
+export function resetDivision(world: World, code: DivisionCode): World {
+  const index = indexOf(world, code);
+  return withScores(world, index, seasonScores(world.divisions[index]!), {});
+}
+
+/**
+ * The next round in all four leagues (DivisionState.nextRound): each league's
+ * next matchday (with any game left from before the matchday the season
+ * started on), then its play-off a round at a time, shoot-outs included.
+ * Each score is drawn from the season's form, as a whole season is.
+ */
+export function playRound(world: World, rng: Rng = createRng(randomSeed())): World {
+  return world.divisions.reduce((current, _, index) => {
+    const state = stateOf(current, index);
+    const round = state.nextRound;
+    if (round === null) return current;
+    const picks = { ...state.picks };
+    const draw = (f: Fixture) =>
+      sampleDixonColes(f.neutral ? expectedGoalsNeutral(state.model, f.homeId, f.awayId) : expectedGoals(state.model, f.homeId, f.awayId), state.model.rho ?? 0, rng);
+    if (!state.leagueComplete) {
+      for (const f of state.fixtures) if (!state.results[f.id] && f.matchday <= round) picks[f.id] = draw(f);
+    } else {
+      const ties = state.bracket.flat();
+      for (const tie of ties) for (const leg of tie.legs) if (leg.matchday === round && !leg.result && !picks[leg.id]) picks[leg.id] = draw(leg);
+      for (const tie of ties) if (tie.shootout && !tie.shootout.result && !picks[tie.shootout.id] && needsShootout(tie, picks)) picks[tie.shootout.id] = simulatePenalties(rng);
+    }
+    return withScores(current, index, state.picks, picks);
+  }, world);
+}
+
 interface PlayedDivision {
   code: DivisionCode;
   teams: Team[];
@@ -307,26 +626,16 @@ interface PlayedDivision {
   ratings: SeasonRatings;
 }
 
-/** Plays one division's season: the games left (from the season's noisy ratings), the table, the play-off. */
+/** Plays the rest of one division's season: every game without a score (from the season's form, on its own random stream), the table, the play-off. */
 function playDivision(world: World, d: DivisionSeason, index: number): PlayedDivision {
   const league = divisionConfig(d.code);
   const teams = d.clubs.map((id) => teamOf(world, id));
-  const { fixtures, results } = divisionFixtures(world, d);
-  const rng = seasonRng(world, index);
-  // This season's ratings: the club's own, with the season outlook's rating noise (less once games are in).
-  const played = new Map<TeamId, number>();
-  for (const f of fixtures) if (results[f.id]) for (const id of [f.homeId, f.awayId]) played.set(id, (played.get(id) ?? 0) + 1);
-  const strengths = new Map<TeamId, TeamStrength>();
-  for (const id of d.clubs) {
-    const [attack, defence] = world.ratings[id] ?? [1, 1];
-    const sd = ratingNoiseSd(SEASON_RATING_NOISE.sd, SEASON_RATING_NOISE.k, played.get(id) ?? 0);
-    strengths.set(id, { attack: attack * Math.exp(sd * sampleNormal(rng)), defence: defence * Math.exp(sd * sampleNormal(rng)) });
-  }
-  const p = world.params[d.code];
-  const model: LeagueModel = { avgHomeGoals: p.avgHomeGoals, avgAwayGoals: p.avgAwayGoals, strengths, ...(p.rho ? { rho: p.rho } : {}) };
-  const all: ResultMap = { ...results };
-  for (const f of fixtures) if (!all[f.id]) all[f.id] = sampleDixonColes(expectedGoals(model, f.homeId, f.awayId), p.rho, rng);
-  const rows = computeStandings(teams, fixtures, all, { tiebreakers: league.tiebreakers, includeForm: false, ...(d.deductions ? { deductions: d.deductions } : {}) });
+  const { fixtures } = divisionFixtures(world, d);
+  const picks = seasonScores(d);
+  const { model, rng } = seasonForm(world, d, index);
+  const all = effectiveResults(fixtures, picks);
+  for (const f of fixtures) if (!all[f.id]) all[f.id] = sampleDixonColes(expectedGoals(model, f.homeId, f.awayId), model.rho ?? 0, rng);
+  const rows = standingsOf(league, d, teams, fixtures, all);
 
   const places = movementPlaces(league);
   const notes = new Map<TeamId, RowNote>(rows.map((r) => [r.teamId, ""]));
@@ -338,24 +647,14 @@ function playDivision(world: World, d: DivisionSeason, index: number): PlayedDiv
   }
   let final: SavedDivision["final"];
   if (league.playoff) {
-    const last = fixtures.reduce((m, f) => Math.max(m, f.matchday), 0);
-    const real: Fixture[] = (d.playoffGames ?? []).map((g) => ({
-      id: g[0],
-      matchday: last + 1,
-      utcDate: g[3],
-      homeId: g[1],
-      awayId: g[2],
-      result: g[4] !== null && g[5] !== null ? { home: g[4], away: g[5] } : null,
-      ...(g[6] ? { neutral: true } : {}),
-      ...(g[7] !== null && g[8] !== null ? { penalties: { home: g[7], away: g[8] } } : {}),
-    }));
     let finalTie: PlayoffTie | undefined;
     const rounds = league.playoff.rounds.length;
     const knockout = seasonRng(world, 50 + index);
-    const added = simulatePlayoff(rows, league.playoff, {}, model, knockout, { afterMatchday: last, afterDate: gameDate(world.year, last), ...(real.length ? { real } : {}) }, (r, ties) => {
+    // The play-off's scores so far stand (there are none until the league is complete: see tidyPlayoff).
+    const added = simulatePlayoff(rows, league.playoff, picks, model, knockout, playoffOptions(world, d, lastMatchday(fixtures)), (r, ties) => {
       if (r === rounds - 1) finalTie = ties[0];
     });
-    const outcome = finalTie ? tieOutcome(finalTie, added) : null;
+    const outcome = finalTie ? tieOutcome(finalTie, { ...picks, ...added }) : null;
     if (finalTie && outcome) {
       const loser = outcome.winner === finalTie.higher.teamId ? finalTie.lower.teamId! : finalTie.higher.teamId!;
       const winnerGoals = outcome.winner === finalTie.higher.teamId ? outcome.higherGoals : outcome.lowerGoals;
@@ -459,18 +758,14 @@ export interface TableRow {
   note: RowNote;
 }
 
-/** A division's table in the season in progress: the first season's real one so far, or every club on nothing. */
+/** A table's rows as the page shows them (no notes until the season is over). */
+export const tableRows = (rows: readonly StandingRow[]): TableRow[] =>
+  rows.map((r) => ({ position: r.position, clubId: r.teamId, played: r.played, won: r.won, drawn: r.drawn, lost: r.lost, goalsFor: r.goalsFor, goalsAgainst: r.goalsAgainst, goalDifference: r.goalDifference, points: r.points, note: "" }));
+
+/** A division's table in the season in progress: the scores so far (the ones it started with, and the season's own). */
 export function currentTable(world: World, code: DivisionCode): TableRow[] {
-  const d = world.divisions.find((x) => x.code === code);
-  if (!d) return [];
-  const { fixtures, results } = divisionFixtures(world, d);
-  const rows = computeStandings(
-    d.clubs.map((id) => teamOf(world, id)),
-    fixtures,
-    results,
-    { tiebreakers: divisionConfig(code).tiebreakers, includeForm: false, ...(d.deductions ? { deductions: d.deductions } : {}) },
-  );
-  return rows.map((r) => ({ position: r.position, clubId: r.teamId, played: r.played, won: r.won, drawn: r.drawn, lost: r.lost, goalsFor: r.goalsFor, goalsAgainst: r.goalsAgainst, goalDifference: r.goalDifference, points: r.points, note: "" }));
+  if (!world.divisions.some((x) => x.code === code)) return [];
+  return tableRows(divisionState(world, code).rows);
 }
 
 /** A saved season's table of one division. */
