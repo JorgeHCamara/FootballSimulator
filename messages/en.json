@@ -832,13 +832,21 @@
       "continental": "finish in the {zone} places in {pct}",
       "promotion": "win promotion in {pct}",
       "playoffs": "reach the play-offs in {pct}",
-      "relegation": "go down in {pct}"
+      "relegation": "go down in {pct}",
+      "playoffWin": "win the {name} in {pct}"
     },
     "summaryLikeliest": "Their likely finish is {range} ({pct} of seasons), averaging {avgPoints} points.",
     "chancesTitle": "Season chances",
     "chancesNote": "From {count} simulations of the rest of the season, starting from the real results so far. Updated every few hours.",
     "likeliest": "Likely finish",
     "averagePoints": "Average points",
+    "playoff": {
+      "promotion": "Promoted via the play-offs",
+      "title": "Wins the {name}",
+      "qualifier": "Wins the play-offs (then a decider with a {name} club)",
+      "final": "Reaches the final: {pct}",
+      "promoted": "Promoted in all: {pct}"
+    },
     "distributionTitle": "Finishing position",
     "distributionNote": "Share of the simulated seasons {club} finish in each place.",
     "fixturesTitle": "Remaining fixtures",

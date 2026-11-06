@@ -344,6 +344,17 @@ export function playoffCancelled(config: PlayoffConfig, rows: readonly StandingR
   return leader !== undefined && next !== undefined && leader.points - next.points > rule.points;
 }
 
+/** A table's places by club and clubs by place, worked out once per table (a simulation builds a bracket round by round from the same tables). */
+const tableIndexes = new WeakMap<readonly StandingRow[], { positionOf: Map<TeamId, number>; atPosition: Map<number, TeamId> }>();
+function tableIndex(table: readonly StandingRow[]) {
+  let index = tableIndexes.get(table);
+  if (!index) {
+    index = { positionOf: new Map(table.map((row) => [row.teamId, row.position])), atPosition: new Map(table.map((row) => [row.position, row.teamId])) };
+    tableIndexes.set(table, index);
+  }
+  return index;
+}
+
 export function buildBracket(
   rows: readonly StandingRow[],
   config: PlayoffConfig,
@@ -376,8 +387,7 @@ export function buildBracket(
 
     const ties: PlayoffTie[] = [];
     for (const { group, table, previous } of sets) {
-      const positionOf = new Map(table.map((row) => [row.teamId, row.position]));
-      const atPosition = new Map(table.map((row) => [row.position, row.teamId]));
+      const { positionOf, atPosition } = tableIndex(table);
       const teamAt = (position: number) => (options.seasonComplete ? (atPosition.get(position) ?? null) : null);
       const bySlot = (position: number): PlayoffSide => ({ teamId: teamAt(position), position, ...(group !== undefined ? { group } : {}) });
 
@@ -548,6 +558,8 @@ export function simulatePlayoff(
   onRound?: (round: number, ties: readonly PlayoffTie[]) => void,
 ): ResultMap {
   const added: ResultMap = {};
+  // The chances (not likely rolls): each game drawn once, without building its score matrix.
+  const draw = { likely: options.likely ?? false, fast: !(options.likely ?? false) };
   // Known and simulated results together, kept up to date rather than copied for every look-up.
   const all: ResultMap = { ...known };
   const now = () => all;
@@ -563,14 +575,14 @@ export function simulatePlayoff(
         for (let i = 0; i < tie.legs.length; i++) {
           let state = seriesGames(tie, now())[i]!;
           if (!state.needed) break;
-          if (!scoreOf(state.game, now())) add(simulateFixtures([state.game], now(), model, rng, { likely: options.likely ?? false }));
+          if (!scoreOf(state.game, now())) add(simulateFixtures([state.game], now(), model, rng, draw));
           state = seriesGames(tie, now())[i]!;
           if (state.needsPenalties && !scoreOf(state.shootout, now())) add({ [state.shootout.id]: simulatePenalties(rng) });
         }
         continue;
       }
       const legs = tie.legs.filter((leg) => !leg.result);
-      add(simulateFixtures(legs, now(), model, rng, { likely: options.likely ?? false }));
+      add(simulateFixtures(legs, now(), model, rng, draw));
       if (tie.shootout && !now()[tie.shootout.id] && !tie.shootout.result && needsShootout(tie, now())) {
         add({ [tie.shootout.id]: simulatePenalties(rng) });
       }

@@ -4,7 +4,7 @@ import { expectedGoals, expectedGoalsNeutral, outcomeProbabilities } from "../en
 import { runMonteCarlo, runMonteCarloVariants, type MonteCarloInput, type MonteCarloResult } from "../engine/montecarlo.ts";
 import { buildLeagueModel, type LeagueModel } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
-import { computeStandings, type StandingsOptions } from "../engine/standings.ts";
+import { computeStandings, sortFixtures, type StandingsOptions } from "../engine/standings.ts";
 import type { Fixture, ResultMap, Score, StandingRow, Team, TeamId } from "../engine/types.ts";
 import { CONTINENTAL, leagueFacts } from "./leagueFacts.ts";
 import type { LeagueData } from "./leagueData.ts";
@@ -54,6 +54,8 @@ export interface ClubOutlook {
   averagePoints: number;
   /** Its games still to play, soonest first. */
   fixtures: ClubFixture[];
+  /** A league with a play-off after its table (EFL, MLS Cup, Liga MX…): its chances in it. */
+  playoff?: PlayoffOutlook;
   /** A conference (MLS): its name. */
   group?: Record<SiteLocale, string>;
 }
@@ -74,12 +76,31 @@ export interface LeagueOutlook {
 }
 
 /** The kinds a club's headline chances are about, in this order: the title, the top continental place, promotion, play-offs, relegation. */
-export type HeadlineKind = "title" | "continental" | "promotion" | "playoffs" | "relegation";
+export type HeadlineKind = "title" | "continental" | "promotion" | "playoffs" | "playoffWin" | "relegation";
 
 export interface HeadlineChance {
   kind: HeadlineKind;
   zone: ZoneKind;
   chance: number;
+  /** "playoffWin": what winning the play-off is ("MLS Cup", "Liga MX"). */
+  name?: string;
+}
+
+/**
+ * A club's chances in its league's play-off, simulated after the table in every
+ * season (the bracket in its config): what winning it means, and how often it
+ * reaches the final and wins it.
+ */
+export interface PlayoffOutlook {
+  /** Winning it is promotion (to `name`), the title (`name`: "MLS Cup"), or a decider with `name`'s club (Ligue 2 v Ligue 1's 16th). */
+  kind: "promotion" | "title" | "qualifier";
+  name?: string;
+  /** Share of simulated seasons it wins the play-off. */
+  win: number;
+  /** …it plays in the final. */
+  final: number;
+  /** Promotion by any route: the automatic places, the play-off, or going up directly when the play-off isn't held (Serie B). */
+  promoted?: number;
 }
 
 /** A continental place and its qualifying round count as one ("Champions League" = league phase or qualifying). */
@@ -120,6 +141,8 @@ export interface FeaturedChance {
   kind: HeadlineKind | "zone";
   zone: ZoneKind;
   chance: number;
+  /** "playoffWin": what winning the play-off is ("MLS Cup"). */
+  name?: string;
 }
 
 /** Another of the club's places makes its card from this chance (shown as 1% or more). */
@@ -213,6 +236,20 @@ export interface OutlookSetup {
   complete: boolean;
 }
 
+/**
+ * A domestic league's play-off after its table, as the season outlook plays it:
+ * a promotion play-off (EFL, Série B…) or a title play-off of one table (Liga
+ * MX) or of conferences (`grouped`: the MLS Cup), with the real play-off games
+ * once the feed lists them. None for a knockout seeded from groups (Argentina)
+ * or a table without one.
+ */
+function seasonPlayoff(league: LeagueConfig, data: LeagueData, fixtures: readonly Fixture[], grouped: boolean): MonteCarloInput["playoff"] {
+  const config = league.playoff;
+  if (!config || league.continental || config.seedFromGroups || grouped !== Boolean(config.groupStage)) return undefined;
+  const last = sortFixtures(fixtures).at(-1);
+  return { config, options: { afterMatchday: last?.matchday ?? 0, afterDate: last?.utcDate ?? "", ...(data.postseason?.length ? { real: data.postseason } : {}) } };
+}
+
 export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSetup | null {
   const facts = leagueFacts(league);
   if (!facts) return null;
@@ -224,7 +261,10 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
   // One table (or a split): as the share card sets it up.
   const simulation = scenarioSimulation(league, data, {});
   if (simulation) {
-    const { model, rows, played, input, offset } = simulation;
+    const { model, rows, played, offset } = simulation;
+    // One table: its play-off too (the share card's simulation doesn't need it).
+    const knockout = simulation.input.groups?.length || simulation.input.project ? undefined : seasonPlayoff(league, data, played, false);
+    const input = knockout ? { ...simulation.input, playoff: knockout } : simulation.input;
     const real = new Set(data.fixtures.map((f) => f.id));
     const fixed = input.fixed;
     return {
@@ -273,6 +313,7 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
 
   // Separate tables (MLS conferences): places within each.
   if (data.groups?.length) {
+    const cup = seasonPlayoff(league, data, data.fixtures, true);
     const fixed = realResults(data.fixtures);
     const model = buildLeagueModel(data.teams, data.fixtures, fixed, domesticModelOptions(league, data.seasonYear, data.xg));
     const byId = new Map(data.teams.map((t) => [t.id, t]));
@@ -285,7 +326,17 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
     return {
       model,
       rows,
-      input: { teams: data.teams, fixtures: data.fixtures, fixed, model, standings: base, groups: data.groups.map((g) => g.teamIds), ...noise },
+      input: {
+        teams: data.teams,
+        fixtures: data.fixtures,
+        fixed,
+        model,
+        standings: base,
+        groups: data.groups.map((g) => g.teamIds),
+        ...noise,
+        // The MLS Cup: each conference's first rounds, then the winners together.
+        ...(cup ? { playoff: cup } : {}),
+      },
       offset: new Map(),
       places: facts.places,
       scope: "eachTable",
@@ -331,13 +382,15 @@ export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: Outloo
     const likeliest = { position: row.position, chance: distribution[row.position - 1] ?? 0 };
     const expectedPosition = distribution.reduce((sum, chance, p) => sum + chance * (p + 1), 0);
     const group = s.groupOf?.get(row.teamId);
+    const playoff = playoffOutlook(s, result, row.teamId, distribution);
     clubs.set(row.teamId, {
       team,
       row,
       tableSize,
       distribution,
       zones,
-      headline: headlineChances(zones, share, passedDown.has(row.teamId)),
+      headline: withPlayoff(headlineChances(zones, share, passedDown.has(row.teamId)), zones, playoff),
+      ...(playoff ? { playoff } : {}),
       likeliest,
       likelyRange: likelyFinishRange(distribution),
       expectedPosition,
@@ -348,6 +401,39 @@ export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: Outloo
   }
   setLikeliestFinishes(clubs, s.scope === "eachTable" ? s.groupOf : undefined);
   return { league, season: data.season, iterations: result.iterations, complete: s.complete, scope: s.scope, clubs, order: s.rows.map((r) => r.teamId), model: s.model };
+}
+
+/** A club's play-off chances from a run that played the league's play-off (see seasonPlayoff), or undefined. */
+function playoffOutlook(s: OutlookSetup, result: MonteCarloResult, teamId: TeamId, distribution: readonly number[]): PlayoffOutlook | undefined {
+  const config = s.input.playoff?.config;
+  if (!config || !result.playoffWins || result.iterations === 0) return undefined;
+  const kind = config.title ? "title" : config.winnerPlays ? "qualifier" : config.promotedTo ? "promotion" : undefined;
+  if (!kind) return undefined;
+  const name = kind === "title" ? config.title : kind === "qualifier" ? config.winnerPlays!.league : config.promotedTo;
+  const win = (result.playoffWins[teamId] ?? 0) / result.iterations;
+  const final = (result.playoffReached?.[teamId]?.[config.rounds.length - 1] ?? 0) / result.iterations;
+  const out: PlayoffOutlook = { kind, ...(name ? { name } : {}), win, final };
+  if (kind === "promotion") {
+    // The automatic places, the play-off and (Serie B) going up directly when it isn't held: never two in one season.
+    const automatic = (config.directPromotion ?? []).reduce((sum, p) => sum + (distribution[p - 1] ?? 0), 0);
+    out.promoted = Math.min(1, automatic + win + (result.playoffSkips?.[teamId] ?? 0) / result.iterations);
+  }
+  return out;
+}
+
+/**
+ * The headline with the play-off: promotion counts every route (the automatic
+ * places and the play-off), and a title play-off adds the chance of winning it
+ * ("MLS Cup"), coloured as its play-off places.
+ */
+function withPlayoff(headline: HeadlineChance[], zones: readonly ZoneChance[], playoff: PlayoffOutlook | undefined): HeadlineChance[] {
+  if (!playoff) return headline;
+  if (playoff.kind === "promotion" && playoff.promoted !== undefined) return headline.map((h) => (h.kind === "promotion" ? { ...h, chance: playoff.promoted! } : h));
+  if (playoff.kind === "title") {
+    const zone = zones.find((z) => z.kind === "titlePlayoffs" || z.kind === "playoffs")?.kind ?? "title";
+    return [...headline, { kind: "playoffWin", zone, chance: playoff.win, ...(playoff.name ? { name: playoff.name } : {}) }];
+  }
+  return headline;
 }
 
 /**

@@ -832,13 +832,21 @@
       "continental": "termina en puestos de {zone} en el {pct}",
       "promotion": "asciende en el {pct}",
       "playoffs": "llega a los playoffs en el {pct}",
-      "relegation": "desciende en el {pct}"
+      "relegation": "desciende en el {pct}",
+      "playoffWin": "gana la {name} en el {pct}"
     },
     "summaryLikeliest": "Su puesto final probable es {range} ({pct} de las temporadas), con {avgPoints} puntos de media.",
     "chancesTitle": "Probabilidades de la temporada",
     "chancesNote": "En {count} simulaciones del resto de la temporada, a partir de los resultados reales hasta ahora. Se actualiza cada pocas horas.",
     "likeliest": "Puesto probable",
     "averagePoints": "Puntos de media",
+    "playoff": {
+      "promotion": "Ascenso por el playoff",
+      "title": "Gana la {name}",
+      "qualifier": "Gana el playoff (después, una final ante un club de la {name})",
+      "final": "Llega a la final: {pct}",
+      "promoted": "Asciende en total: {pct}"
+    },
     "distributionTitle": "Puesto final",
     "distributionNote": "En qué parte de las temporadas simuladas {club} termina en cada puesto.",
     "fixturesTitle": "Próximos partidos",

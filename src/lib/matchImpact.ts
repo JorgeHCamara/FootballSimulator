@@ -98,7 +98,7 @@ export function impactView(match: FoundMatch["match"], numbers: ImpactNumbers, l
         key: `${row.teamId}-${row.kind}`,
         kind: row.kind,
         ...(row.zone ? { zone: row.zone } : {}),
-        label: `${team.shortName}: ${row.kind === "continental" ? tz(row.zone!) : t(`impactKind.${row.kind}`)}`,
+        label: `${team.shortName}: ${row.kind === "continental" ? tz(row.zone!) : row.kind === "playoffWin" ? (row.name ?? t("impactKind.playoffs")) : t(`impactKind.${row.kind}`)}`,
         now: value(row, row.now),
         cells: (["home", "draw", "away"] as const).map((k) => ({ value: value(row, row[k]), change: change(row, row[k]) })),
       };
