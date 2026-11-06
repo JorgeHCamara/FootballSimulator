@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "homeTitle": "Football Simulator – Simulate the Premier League, La Liga, Brasileirão and more",
-    "homeDescription": "Free football simulator: predict or simulate every remaining match of the Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Belgian Pro League, Greek Super League, Austrian Bundesliga, Brasileirão, Argentina's Liga Profesional, Chile's Liga de Primera, Colombia's Liga BetPlay, Uruguay's, Paraguay's, Ecuador's and Peru's top divisions, Liga MX, MLS, the Saudi Pro League, the J1 League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana. Live table plus title, Europe and relegation chances.",
+    "homeTitle": "Football Simulator – Premier League, La Liga, Brasileirão",
+    "homeDescription": "FootSimu is a free football simulator for {count} competitions. Simulate the rest of the Premier League, La Liga or Brasileirão with title and relegation chances.",
     "leagueTitle": "{simulator} {season} – Predict the Table",
     "leagueDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, Europe and relegation chances.",
     "leagueDescriptionPlayoffs": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the conference tables update live and see every club's playoff chances.",
@@ -179,7 +179,7 @@
     "shareFacebook": "Facebook",
     "downloadImage": "Download image",
     "shareTitle": "My {league} {season} prediction",
-    "shareText": "My {league} {season} prediction on Foot Simu. Simulate yours:",
+    "shareText": "My {league} {season} prediction on FootSimu. Simulate yours:",
     "shareFailed": "Couldn't open the share sheet. Pick an option below.",
     "matchPreview": "Match preview"
   },
@@ -218,7 +218,7 @@
   },
   "Footer": {
     "attribution": "Data: football-data.org",
-    "disclaimer": "Foot Simu is not affiliated with any league or club. Simulations are for entertainment only.",
+    "disclaimer": "FootSimu is not affiliated with any league or club. Simulations are for entertainment only.",
     "crestCredit": "Some crests: TheSportsDB",
     "about": "About",
     "privacy": "Privacy",
@@ -284,8 +284,8 @@
         "a": "Yes. Click a final score to change it and see how the {league} table would look with a different result."
       },
       {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
       }
     ],
     "leaguePlayoffs": [
@@ -306,14 +306,14 @@
         "a": "Yes. Click a final score to change it and see how the {league} table would look with a different result."
       },
       {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
       }
     ],
     "home": [
       {
-        "q": "What is Foot Simu?",
-        "a": "Foot Simu is a free football simulator. Pick a league, predict or simulate the remaining matches and watch the table change live."
+        "q": "What is FootSimu?",
+        "a": "FootSimu is a free football simulator. Pick a league, predict or simulate the remaining matches and watch the table change live."
       },
       {
         "q": "Which leagues can I simulate?",
@@ -325,7 +325,7 @@
       },
       {
         "q": "Do I need an account?",
-        "a": "No. Foot Simu is free, your predictions are saved in your browser and you can share them with a link."
+        "a": "No. FootSimu is free, your predictions are saved in your browser and you can share them with a link."
       }
     ],
     "cup": [
@@ -346,8 +346,8 @@
         "a": "Yes. Your predictions are saved in your browser, so they are still there when you come back. Use Share to send a link that shows exactly your bracket."
       },
       {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
       }
     ],
     "cupBracket": [
@@ -368,8 +368,8 @@
         "a": "Yes. Your predictions are saved in your browser, so they are still there when you come back. Use Share to send a link that shows exactly your bracket."
       },
       {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
       }
     ],
     "continental": [
@@ -379,7 +379,7 @@
       },
       {
         "q": "How are the clubs rated?",
-        "a": "Clubs come from many leagues, so each club starts from its form in its own league this season, scaled by how strong that league is (clubs from leagues not on Foot Simu start from a default for the competition). Their results in the {league} then update the rating as the season goes on."
+        "a": "Clubs come from many leagues, so each club starts from its form in its own league this season, scaled by how strong that league is (clubs from leagues not on FootSimu start from a default for the competition). Their results in the {league} then update the rating as the season goes on."
       },
       {
         "q": "How is the knockout phase decided?",
@@ -390,8 +390,8 @@
         "a": "The Chances tab plays the rest of the league phase and the whole knockout phase 5,000 times from the current results, including your predictions on the league phase, and counts how often each club finishes in the top 8 and the top 24, reaches the final and wins the {league}."
       },
       {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
       }
     ],
     "continentalGroups": {
@@ -402,7 +402,7 @@
         },
         {
           "q": "How are the clubs rated?",
-          "a": "Clubs come from many countries, so Brazilian clubs start from their form in the Brasileirão this season, scaled by the division, and clubs from leagues not on Foot Simu start from a default for the competition. Their results in the {league} then update the rating as the season goes on."
+          "a": "Clubs come from many countries, so Brazilian clubs start from their form in the Brasileirão this season, scaled by the division, and clubs from leagues not on FootSimu start from a default for the competition. Their results in the {league} then update the rating as the season goes on."
         },
         {
           "q": "How is the knockout phase decided?",
@@ -413,8 +413,8 @@
           "a": "The Chances tab plays the rest of the group stage and the whole knockout phase 5,000 times from the current results, including your predictions on the group stage, and counts how often each club finishes in its group's top two, reaches the final and wins the {league}."
         },
         {
-          "q": "Is Foot Simu free?",
-          "a": "Yes. Foot Simu is completely free and you don't need an account."
+          "q": "Is FootSimu free?",
+          "a": "Yes. FootSimu is completely free and you don't need an account."
         }
       ],
       "SUD": [
@@ -424,7 +424,7 @@
         },
         {
           "q": "How are the clubs rated?",
-          "a": "Clubs come from many countries, so Brazilian clubs start from their form in the Brasileirão this season, scaled by the division, and clubs from leagues not on Foot Simu start from a default for the competition. Their results in the {league} then update the rating as the season goes on."
+          "a": "Clubs come from many countries, so Brazilian clubs start from their form in the Brasileirão this season, scaled by the division, and clubs from leagues not on FootSimu start from a default for the competition. Their results in the {league} then update the rating as the season goes on."
         },
         {
           "q": "How is the knockout phase decided?",
@@ -435,8 +435,8 @@
           "a": "The Chances tab plays the rest of the group stage and the whole knockout phase 5,000 times from the current results, including your predictions on the group stage, and counts how often each club wins its group, finishes in its group's top two, reaches the final and wins the {league}."
         },
         {
-          "q": "Is Foot Simu free?",
-          "a": "Yes. Foot Simu is completely free and you don't need an account."
+          "q": "Is FootSimu free?",
+          "a": "Yes. FootSimu is completely free and you don't need an account."
         }
       ]
     },
@@ -458,8 +458,8 @@
         "a": "The Chances tab plays out the rest of the tournament and the play-offs 5,000 times from the current results, including your predictions, and counts how often each club finishes first in its zone, reaches the play-offs and wins the title."
       },
       {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
       }
     ],
     "tournaments": [
@@ -480,8 +480,8 @@
         "a": "The Chances tab plays out the rest of the tournament (and its play-offs, where it has them) 10,000 times from the current results, including your predictions, and counts how often each club finishes in each position."
       },
       {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
       }
     ],
     "liguilla": [
@@ -502,8 +502,8 @@
         "a": "Yes. Your predictions are saved in your browser, so they are still there when you come back. Use Share to send a link that shows exactly your table."
       },
       {
-        "q": "Is Foot Simu free?",
-        "a": "Yes. Foot Simu is completely free and you don't need an account."
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
       }
     ]
   },
@@ -654,8 +654,8 @@
   },
   "Legal": {
     "about": {
-      "title": "About Foot Simu",
-      "description": "Foot Simu is a free football simulator: real tables and fixtures, your own predictions and every club's chances, for leagues and cups in Europe, the Americas and Asia.",
+      "title": "About FootSimu",
+      "description": "FootSimu is a free football simulator: real tables and fixtures, your own predictions and every club's chances, for leagues and cups in Europe, the Americas and Asia.",
       "sections": [
         {
           "h": "What Foot Simu is",
@@ -692,7 +692,7 @@
     },
     "privacy": {
       "title": "Privacy policy",
-      "description": "How Foot Simu handles your data: predictions saved in your browser, cookie-free analytics and, where shown, Google ads.",
+      "description": "How FootSimu handles your data: predictions saved in your browser, cookie-free analytics and, where shown, Google ads.",
       "updated": "Last updated: 4 November 2026",
       "sections": [
         {
@@ -755,7 +755,7 @@
     },
     "contact": {
       "title": "Contact",
-      "description": "Get in touch with Foot Simu: report a data mistake, suggest a league or ask about partnerships.",
+      "description": "Get in touch with FootSimu: report a data mistake, suggest a league or ask about partnerships.",
       "sections": [
         {
           "h": "Write to us",
@@ -796,7 +796,7 @@
   },
   "SharePage": {
     "title": "My {league} {season} prediction",
-    "description": "My predicted {league} {season} table on Foot Simu. Make your own prediction and see every club's chances.",
+    "description": "My predicted {league} {season} table on FootSimu. Make your own prediction and see every club's chances.",
     "eyebrow": "Shared prediction",
     "heading": "{league} {season}: my prediction",
     "note": "This is a shared prediction: the scores come from the link, and you can't change them here.",
@@ -873,7 +873,7 @@
     "opponentPosition": "{position} in the table",
     "simulate": "Simulate the rest of {club}'s season",
     "shareTitle": "{club} {season}: season chances",
-    "shareText": "{club}'s chances in the {league} {season} on Foot Simu",
+    "shareText": "{club}'s chances in the {league} {season} on FootSimu",
     "shareCardTitle": "Share {club}'s chances",
     "shareCardBody": "A card with where it stands, its likely finish and its chances, ready to post on X, WhatsApp or Instagram.",
     "shareCardAlt": "{club}'s season chances card",
@@ -1011,7 +1011,7 @@
     "archiveTitle": "All reports this season",
     "simulate": "Simulate the rest of the season",
     "shareTitle": "{h1}",
-    "shareText": "Who rose and who fell after {round} on Foot Simu",
+    "shareText": "Who rose and who fell after {round} on FootSimu",
     "card": {
       "title": "{race} after {round}",
       "basedOn": "Based on {count} simulated seasons",
@@ -1019,7 +1019,7 @@
       "moversTitle": "Biggest movers after {round}"
     },
     "hubTitle": "Latest odds: what changed after each round",
-    "hubDescription": "After every completed round: who rose and who fell in the title, European and relegation races of every league on Foot Simu, from 10,000 simulated seasons.",
+    "hubDescription": "After every completed round: who rose and who fell in the title, European and relegation races of every league on FootSimu, from 10,000 simulated seasons.",
     "hubIntro": "After every completed round, each league's report shows who rose and who fell, every club's chances, the game that moved them most and the race so far.",
     "hubLeader": "{club} {pct}",
     "leagueLink": "Latest odds: what changed after {round}",
@@ -1103,7 +1103,7 @@
     "tryAgain": "Tougher than it looks. Better luck tomorrow.",
     "tomorrow": "A new set of questions every day.",
     "share": "Share your score",
-    "shareText": "I got {score} of {total} in today's Foot Simu football quiz.",
+    "shareText": "I got {score} of {total} in today's FootSimu football quiz.",
     "copied": "Copied",
     "simulate": "Simulate the leagues",
     "playedElsewhere": "You've already played today's quiz in {language}: it's one quiz a day, whatever the language.",
@@ -1196,7 +1196,7 @@
     },
     "faq": {
       "howQ": "How are these chances worked out?",
-      "howA": "Foot Simu plays out the rest of the {league} season {count} times, starting from the real results so far. Each game's score is drawn from both clubs' attack and defence this season, with home advantage. A club's chance is the share of those seasons in which it {verb}.",
+      "howA": "FootSimu plays out the rest of the {league} season {count} times, starting from the real results so far. Each game's score is drawn from both clubs' attack and defence this season, with home advantage. A club's chance is the share of those seasons in which it {verb}.",
       "verb": {
         "title": "wins the title",
         "titlePlayoff": "wins the {name}",
@@ -1207,7 +1207,7 @@
       "updateQ": "How often are they updated?",
       "updateA": "Every few hours, from the latest results: each result changes the chances of every club in the race.",
       "oddsQ": "Are these bookmakers' odds?",
-      "oddsA": "No. They are the chances from Foot Simu's own simulated seasons, not betting odds."
+      "oddsA": "No. They are the chances from FootSimu's own simulated seasons, not betting odds."
     }
   },
   "World": {

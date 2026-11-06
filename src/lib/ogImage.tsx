@@ -23,7 +23,7 @@ export function renderOgImage({ title, subtitle, flag }: { title: string; subtit
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 44, fontWeight: 800 }}>
           <BrandMark size={72} />
-          <span>Foot Simu</span>
+          <span>FootSimu</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 28 }}>

@@ -1,7 +1,7 @@
 {
   "Metadata": {
-    "homeTitle": "Simulador de Futebol – Simule o Brasileirão, Premier League e mais",
-    "homeDescription": "Simulador de futebol grátis: dê seus palpites ou simule todos os jogos restantes do Brasileirão, Premier League, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Championship, League One, League Two, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana. Tabela ao vivo e chances de título, Libertadores e rebaixamento.",
+    "homeTitle": "Simulador de Futebol – Brasileirão, Premier League e mais",
+    "homeDescription": "FootSimu é um simulador de futebol grátis com {count} competições. Simule o resto do Brasileirão ou da Premier League, com chances de título e rebaixamento.",
     "leagueTitle": "{simulator} {season} – Tabela, Palpites e Chances",
     "leagueDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela atualizar ao vivo e as chances de título, vaga continental e rebaixamento.",
     "leagueDescriptionPlayoffs": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as tabelas das conferências atualizarem ao vivo e as chances de cada time chegar aos playoffs.",
@@ -179,7 +179,7 @@
     "shareFacebook": "Facebook",
     "downloadImage": "Baixar imagem",
     "shareTitle": "Meu palpite para {league} {season}",
-    "shareText": "Meu palpite para {league} {season} no Foot Simu. Simule o seu:",
+    "shareText": "Meu palpite para {league} {season} no FootSimu. Simule o seu:",
     "shareFailed": "Não deu para abrir o compartilhamento. Escolha uma opção abaixo.",
     "matchPreview": "Prévia"
   },
@@ -218,7 +218,7 @@
   },
   "Footer": {
     "attribution": "Dados: football-data.org",
-    "disclaimer": "O Foot Simu não tem vínculo com nenhuma liga ou clube. As simulações são apenas para entretenimento.",
+    "disclaimer": "O FootSimu não tem vínculo com nenhuma liga ou clube. As simulações são apenas para entretenimento.",
     "crestCredit": "Alguns escudos: TheSportsDB",
     "about": "Sobre",
     "privacy": "Privacidade",
@@ -284,8 +284,8 @@
         "a": "Sim. Clique em um placar final para alterá-lo e ver como a tabela ficaria com outro resultado."
       },
       {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de cadastro."
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de cadastro."
       }
     ],
     "leaguePlayoffs": [
@@ -306,14 +306,14 @@
         "a": "Sim. Clique em um placar final para alterá-lo e ver como a tabela ficaria com outro resultado."
       },
       {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de cadastro."
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de cadastro."
       }
     ],
     "home": [
       {
-        "q": "O que é o Foot Simu?",
-        "a": "O Foot Simu é um simulador de futebol grátis. Escolha um campeonato, dê seus palpites ou simule os jogos restantes e veja a tabela mudar ao vivo."
+        "q": "O que é o FootSimu?",
+        "a": "O FootSimu é um simulador de futebol grátis. Escolha um campeonato, dê seus palpites ou simule os jogos restantes e veja a tabela mudar ao vivo."
       },
       {
         "q": "Quais campeonatos posso simular?",
@@ -325,7 +325,7 @@
       },
       {
         "q": "Preciso criar uma conta?",
-        "a": "Não. O Foot Simu é grátis, seus palpites ficam salvos no navegador e você pode compartilhá-los com um link."
+        "a": "Não. O FootSimu é grátis, seus palpites ficam salvos no navegador e você pode compartilhá-los com um link."
       }
     ],
     "cup": [
@@ -346,8 +346,8 @@
         "a": "Sim. Seus palpites ficam salvos no navegador e continuam lá quando você voltar. Use Compartilhar para enviar um link que mostra exatamente o seu chaveamento."
       },
       {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
       }
     ],
     "cupBracket": [
@@ -368,8 +368,8 @@
         "a": "Sim. Seus palpites ficam salvos no navegador e continuam lá quando você voltar. Use Compartilhar para enviar um link que mostra exatamente o seu chaveamento."
       },
       {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
       }
     ],
     "continental": [
@@ -379,7 +379,7 @@
       },
       {
         "q": "Como os clubes são avaliados?",
-        "a": "Os clubes vêm de várias ligas, então cada clube começa com o seu desempenho no próprio campeonato nesta temporada, ajustado pela força dessa liga (clubes de ligas que não estão no Foot Simu começam com um valor padrão da competição). Os resultados na {league} atualizam a avaliação ao longo da temporada."
+        "a": "Os clubes vêm de várias ligas, então cada clube começa com o seu desempenho no próprio campeonato nesta temporada, ajustado pela força dessa liga (clubes de ligas que não estão no FootSimu começam com um valor padrão da competição). Os resultados na {league} atualizam a avaliação ao longo da temporada."
       },
       {
         "q": "Como funciona o mata-mata?",
@@ -390,8 +390,8 @@
         "a": "A aba Chances joga o resto da fase de liga e todo o mata-mata 5.000 vezes a partir dos resultados atuais, incluindo seus palpites na fase de liga, e conta quantas vezes cada clube termina no top 8 e no top 24, chega à final e ganha a {league}."
       },
       {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
       }
     ],
     "continentalGroups": {
@@ -402,7 +402,7 @@
         },
         {
           "q": "Como os clubes são avaliados?",
-          "a": "Os clubes vêm de vários países, então os brasileiros começam com o seu desempenho no Brasileirão nesta temporada, ajustado pela divisão, e os clubes de ligas que não estão no Foot Simu começam com um valor padrão da competição. Os resultados na {league} atualizam a avaliação ao longo da temporada."
+          "a": "Os clubes vêm de vários países, então os brasileiros começam com o seu desempenho no Brasileirão nesta temporada, ajustado pela divisão, e os clubes de ligas que não estão no FootSimu começam com um valor padrão da competição. Os resultados na {league} atualizam a avaliação ao longo da temporada."
         },
         {
           "q": "Como funciona o mata-mata?",
@@ -413,8 +413,8 @@
           "a": "A aba Chances joga o resto da fase de grupos e todo o mata-mata 5.000 vezes a partir dos resultados atuais, incluindo seus palpites na fase de grupos, e conta quantas vezes cada clube termina entre os dois primeiros do grupo, chega à final e ganha a {league}."
         },
         {
-          "q": "O Foot Simu é grátis?",
-          "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+          "q": "O FootSimu é grátis?",
+          "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
         }
       ],
       "SUD": [
@@ -424,7 +424,7 @@
         },
         {
           "q": "Como os clubes são avaliados?",
-          "a": "Os clubes vêm de vários países, então os brasileiros começam com o seu desempenho no Brasileirão nesta temporada, ajustado pela divisão, e os clubes de ligas que não estão no Foot Simu começam com um valor padrão da competição. Os resultados na {league} atualizam a avaliação ao longo da temporada."
+          "a": "Os clubes vêm de vários países, então os brasileiros começam com o seu desempenho no Brasileirão nesta temporada, ajustado pela divisão, e os clubes de ligas que não estão no FootSimu começam com um valor padrão da competição. Os resultados na {league} atualizam a avaliação ao longo da temporada."
         },
         {
           "q": "Como funciona o mata-mata?",
@@ -435,8 +435,8 @@
           "a": "A aba Chances joga o resto da fase de grupos e todo o mata-mata 5.000 vezes a partir dos resultados atuais, incluindo seus palpites na fase de grupos, e conta quantas vezes cada clube ganha o grupo, termina entre os dois primeiros, chega à final e ganha a {league}."
         },
         {
-          "q": "O Foot Simu é grátis?",
-          "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+          "q": "O FootSimu é grátis?",
+          "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
         }
       ]
     },
@@ -458,8 +458,8 @@
         "a": "A aba Chances joga o resto do torneio e os playoffs 5.000 vezes a partir dos resultados atuais, incluindo seus palpites, e conta quantas vezes cada clube termina em primeiro na zona, chega aos playoffs e é campeão."
       },
       {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
       }
     ],
     "tournaments": [
@@ -480,8 +480,8 @@
         "a": "A aba Chances joga o resto do torneio (e os playoffs, quando houver) 10.000 vezes a partir dos resultados atuais, incluindo seus palpites, e conta quantas vezes cada clube termina em cada posição."
       },
       {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
       }
     ],
     "liguilla": [
@@ -502,8 +502,8 @@
         "a": "Sim. Seus palpites ficam salvos no seu navegador, então continuam lá quando você voltar. Use Compartilhar para enviar um link que mostra exatamente a sua tabela."
       },
       {
-        "q": "O Foot Simu é grátis?",
-        "a": "Sim. O Foot Simu é totalmente grátis e não precisa de conta."
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
       }
     ]
   },
@@ -654,8 +654,8 @@
   },
   "Legal": {
     "about": {
-      "title": "Sobre o Foot Simu",
-      "description": "O Foot Simu é um simulador de futebol grátis: tabelas e jogos reais, seus palpites e as chances de cada clube, para ligas e copas da Europa, das Américas e da Ásia.",
+      "title": "Sobre o FootSimu",
+      "description": "O FootSimu é um simulador de futebol grátis: tabelas e jogos reais, seus palpites e as chances de cada clube, para ligas e copas da Europa, das Américas e da Ásia.",
       "sections": [
         {
           "h": "O que é o Foot Simu",
@@ -692,7 +692,7 @@
     },
     "privacy": {
       "title": "Política de privacidade",
-      "description": "Como o Foot Simu trata seus dados: palpites salvos no seu navegador, estatísticas sem cookies e, quando houver, anúncios do Google.",
+      "description": "Como o FootSimu trata seus dados: palpites salvos no seu navegador, estatísticas sem cookies e, quando houver, anúncios do Google.",
       "updated": "Última atualização: 4 de novembro de 2026",
       "sections": [
         {
@@ -755,7 +755,7 @@
     },
     "contact": {
       "title": "Contato",
-      "description": "Fale com o Foot Simu: avise sobre um erro nos dados, sugira um campeonato ou pergunte sobre parcerias.",
+      "description": "Fale com o FootSimu: avise sobre um erro nos dados, sugira um campeonato ou pergunte sobre parcerias.",
       "sections": [
         {
           "h": "Escreva para nós",
@@ -796,7 +796,7 @@
   },
   "SharePage": {
     "title": "Meu palpite para {league} {season}",
-    "description": "Minha tabela final de {league} {season} no Foot Simu. Faça o seu palpite e veja as chances de cada clube.",
+    "description": "Minha tabela final de {league} {season} no FootSimu. Faça o seu palpite e veja as chances de cada clube.",
     "eyebrow": "Palpite compartilhado",
     "heading": "{league} {season}: meu palpite",
     "note": "Este é um palpite compartilhado: os placares vêm do link e não podem ser alterados aqui.",
@@ -873,7 +873,7 @@
     "opponentPosition": "{position} na tabela",
     "simulate": "Simule o resto da temporada de {club}",
     "shareTitle": "{club} {season}: chances na temporada",
-    "shareText": "As chances de {club} em {league} {season} no Foot Simu",
+    "shareText": "As chances de {club} em {league} {season} no FootSimu",
     "shareCardTitle": "Compartilhe as chances de {club}",
     "shareCardBody": "Um card com a posição atual, a posição provável e as chances, pronto para postar no X, WhatsApp ou Instagram.",
     "shareCardAlt": "Card das chances de {club} na temporada",
@@ -1011,7 +1011,7 @@
     "archiveTitle": "Todos os relatórios da temporada",
     "simulate": "Simule o resto da temporada",
     "shareTitle": "{h1}",
-    "shareText": "Quem subiu e quem caiu após a {round} no Foot Simu",
+    "shareText": "Quem subiu e quem caiu após a {round} no FootSimu",
     "card": {
       "title": "{race} após a {round}",
       "basedOn": "Em {count} temporadas simuladas",
@@ -1019,7 +1019,7 @@
       "moversTitle": "Altas e baixas após a {round}"
     },
     "hubTitle": "Últimas probabilidades: o que mudou após cada rodada",
-    "hubDescription": "Após cada rodada completa: quem subiu e quem caiu nas disputas por título, vagas continentais e contra o rebaixamento em cada liga do Foot Simu, em 10.000 temporadas simuladas.",
+    "hubDescription": "Após cada rodada completa: quem subiu e quem caiu nas disputas por título, vagas continentais e contra o rebaixamento em cada liga do FootSimu, em 10.000 temporadas simuladas.",
     "hubIntro": "Após cada rodada completa, o relatório de cada liga mostra quem subiu e quem caiu, as chances de cada clube, o jogo que mais as mexeu e a disputa até agora.",
     "hubLeader": "{club} {pct}",
     "leagueLink": "Últimas probabilidades: o que mudou após a {round}",
@@ -1104,7 +1104,7 @@
     "tryAgain": "Mais difícil do que parece. Boa sorte amanhã.",
     "tomorrow": "Perguntas novas todos os dias.",
     "share": "Compartilhar o resultado",
-    "shareText": "Acertei {score} de {total} no quiz de futebol de hoje do Foot Simu.",
+    "shareText": "Acertei {score} de {total} no quiz de futebol de hoje do FootSimu.",
     "copied": "Copiado",
     "simulate": "Simular os campeonatos",
     "playedElsewhere": "Você já jogou o quiz de hoje em {language}: é um quiz por dia, em qualquer idioma.",
@@ -1197,7 +1197,7 @@
     },
     "faq": {
       "howQ": "Como essas chances são calculadas?",
-      "howA": "O Foot Simu simula o resto da temporada de {league} {count} vezes, a partir dos resultados reais até agora. O placar de cada jogo sai do ataque e da defesa dos dois clubes nesta temporada, com o fator casa. A chance de um clube é a parcela dessas temporadas em que ele {verb}.",
+      "howA": "O FootSimu simula o resto da temporada de {league} {count} vezes, a partir dos resultados reais até agora. O placar de cada jogo sai do ataque e da defesa dos dois clubes nesta temporada, com o fator casa. A chance de um clube é a parcela dessas temporadas em que ele {verb}.",
       "verb": {
         "title": "é campeão",
         "titlePlayoff": "conquista a {name}",
@@ -1208,7 +1208,7 @@
       "updateQ": "Com que frequência elas são atualizadas?",
       "updateA": "A cada poucas horas, a partir dos resultados mais recentes: cada resultado muda as chances de todos os clubes na disputa.",
       "oddsQ": "Essas são as odds das casas de apostas?",
-      "oddsA": "Não. São as chances das temporadas simuladas pelo próprio Foot Simu, não odds de apostas."
+      "oddsA": "Não. São as chances das temporadas simuladas pelo próprio FootSimu, não odds de apostas."
     }
   },
   "World": {

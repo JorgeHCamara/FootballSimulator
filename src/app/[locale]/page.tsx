@@ -3,6 +3,7 @@ import { Faq } from "../../components/Faq.tsx";
 import { Flag } from "../../components/Flag.tsx";
 import { Icon } from "../../components/Icon.tsx";
 import { JsonLd } from "../../components/JsonLd.tsx";
+import { COMPETITIONS } from "../../config/competitions.ts";
 import { LEAGUES, type CompetitionCode, type SiteLocale } from "../../config/leagues.ts";
 import { Link } from "../../i18n/navigation.ts";
 import { HREFLANG, MY_WORLD_LISTED, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem } from "../../lib/site.ts";
@@ -33,7 +34,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             "@type": "WebSite",
             "@id": `${SITE_URL}/#website`,
             name: SITE_NAME,
-            alternateName: ["FootSimu", "Football Simulator", "Simulador de Futebol", "Simulador de Fútbol"],
+            alternateName: ["Foot Simu", "Football Simulator"],
             url: `${SITE_URL}/${locale}`,
             inLanguage: HREFLANG[locale],
             publisher: { "@id": `${SITE_URL}/#organization` },
@@ -49,7 +50,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             "@type": "WebApplication",
             name: `${SITE_NAME} – ${t("heading")}`,
             url: `${SITE_URL}/${locale}`,
-            description: meta("homeDescription"),
+            description: meta("homeDescription", { count: COMPETITIONS.length }),
             applicationCategory: "GameApplication",
             applicationSubCategory: "Sports simulation",
             operatingSystem: "Web",

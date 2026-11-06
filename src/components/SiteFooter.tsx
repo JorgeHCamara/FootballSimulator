@@ -32,7 +32,7 @@ export function SiteFooter() {
         </ul>
         <p className="mt-4 text-center">{t("disclaimer")}</p>
         <p className="mt-1 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
-          © {new Date().getFullYear()} Foot Simu ·{" "}
+          © {new Date().getFullYear()} FootSimu ·{" "}
           <a href="https://www.football-data.org/" className="hover:text-zinc-600 hover:underline dark:hover:text-zinc-300" rel="noopener">
             {t("attribution")}
           </a>{" "}

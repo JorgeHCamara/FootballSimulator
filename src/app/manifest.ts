@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Foot Simu – Football Simulator",
-    short_name: "Foot Simu",
+    name: "FootSimu – Football Simulator",
+    short_name: "FootSimu",
     description: "Free football simulator for the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and Brasileirão.",
     start_url: "/",
     display: "standalone",
