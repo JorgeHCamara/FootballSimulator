@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { before, describe, it } from "node:test";
-import { createWorld, playSeason, savedTable, startNextSeason, WORLD_VERSION, type StartPack, type World } from "./myWorld.ts";
+import { createRng } from "../engine/rng.ts";
+import { createWorld, divisionState, playRound, playSeason, savedTable, setScore, simulateRest, startNextSeason, WORLD_VERSION, type StartPack, type World } from "./myWorld.ts";
 import { worldStartPack } from "./myWorldStart.ts";
 import { clearWorld, isWorld, loadWorld, saveWorld, WORLD_KEY } from "./myWorldStorage.ts";
 
@@ -57,6 +58,27 @@ describe("My World: the save", () => {
     assert.equal(loadWorld(store).world!.review, true);
     // The save stays small: a few kilobytes a season.
     assert.ok(store.items.get(WORLD_KEY)!.length < 60_000);
+  });
+
+  it("a season in progress keeps every score through a reload: rounds played, scores typed in, a league simulated", () => {
+    const store = memoryStore();
+    let w = playRound(world, createRng(1));
+    const game = divisionState(w, "PL").fixtures.find((f) => !divisionState(w, "PL").results[f.id])!;
+    w = setScore(w, "PL", game, { home: 3, away: 3 });
+    w = simulateRest(w, "EL2", createRng(2));
+    assert.equal(saveWorld(store, w), true);
+    const loaded = loadWorld(store).world!;
+    assert.deepEqual(loaded, w);
+    assert.deepEqual(divisionState(loaded, "PL").results[game.id], { home: 3, away: 3 });
+    assert.equal(divisionState(loaded, "EL2").done, true);
+    // A whole season's scores still fit easily.
+    assert.ok(store.items.get(WORLD_KEY)!.length < 120_000);
+    // Scores that can't be scores make the save unreadable.
+    for (const scores of [{ 1: [1] }, { 1: [1, -2] }, { 1: "2-1" }, [[1, 2]]]) {
+      const broken = memoryStore();
+      broken.setItem(WORLD_KEY, JSON.stringify({ ...w, divisions: w.divisions.map((d, i) => (i === 0 ? { ...d, scores } : d)) }));
+      assert.deepEqual(loadWorld(broken), { world: null, reason: "unreadable" }, JSON.stringify(scores));
+    }
   });
 
   it("a new world replaces the old one (after the reset)", () => {

@@ -9,28 +9,35 @@ import {
   clubDivision,
   clubPath,
   createWorld,
-  currentTable,
   divisionConfig,
   ENGLAND,
   packReady,
+  playRound,
   playSeason,
   savedTable,
   seasonLabel,
   seasonMoves,
+  seasonStates,
   startNextSeason,
   type DivisionCode,
+  type DivisionState,
   type SeasonRecord,
   type StartPack,
   type World,
   type WorldClub,
 } from "../lib/myWorld.ts";
 import { browserStore, clearWorld, loadWorld, saveWorld } from "../lib/myWorldStorage.ts";
+import { PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
 import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { WorldTable } from "./WorldTable.tsx";
+import { DivisionTabs, openingMatchday, WorldSeason } from "./WorldSeason.tsx";
 
 type View = { kind: "loading" } | { kind: "setup"; reset?: "incompatible" | "unreadable" } | { kind: "world"; world: World; saved: boolean };
+
+/** Changes within a season that Undo can take back (in this visit only). */
+const UNDO_STEPS = 50;
 
 const card = "rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900";
 const primary = "flex h-11 items-center justify-center gap-2 rounded-lg bg-pitch-600 px-4 text-sm font-semibold text-white hover:bg-pitch-700 disabled:opacity-60";
@@ -38,11 +45,14 @@ const secondary = "flex h-11 items-center justify-center gap-2 rounded-lg border
 
 /**
  * My World (see src/lib/myWorld.ts): set up a world from the live data, then
- * play it season by season. Everything happens in the browser and is saved
- * there after every step (src/lib/myWorldStorage.ts).
+ * play it season by season, a round at a time or result by result. Everything
+ * happens in the browser and is saved there after every step
+ * (src/lib/myWorldStorage.ts).
  */
 export function MyWorld({ pack, locale }: { pack: StartPack; locale: SiteLocale }) {
   const [view, setView] = useState<View>({ kind: "loading" });
+  // The worlds before each change in the season in progress, for Undo.
+  const [past, setPast] = useState<World[]>([]);
 
   // The saved world, once in the browser (the server has none).
   useEffect(() => {
@@ -51,17 +61,47 @@ export function MyWorld({ pack, locale }: { pack: StartPack; locale: SiteLocale 
   }, []);
 
   const keep = (world: World) => setView({ kind: "world", world, saved: saveWorld(browserStore(), world) });
+  /** A change in the season in progress: Undo can take it back. */
+  const change = (world: World) => {
+    if (view.kind === "world") {
+      const current = view.world;
+      setPast((list) => [...list.slice(-(UNDO_STEPS - 1)), current]);
+    }
+    keep(world);
+  };
+  /** A season finished or started, or a new world: nothing to undo before it. */
+  const commit = (world: World) => {
+    setPast([]);
+    keep(world);
+  };
+  const undo = () => {
+    const previous = past.at(-1);
+    if (!previous) return;
+    setPast((list) => list.slice(0, -1));
+    keep(previous);
+  };
 
   if (view.kind === "loading") return <Loading />;
-  if (view.kind === "setup") return <Setup pack={pack} locale={locale} reset={view.reset} onCreate={(league, club) => keep(createWorld(pack, { league, club }))} />;
+  if (view.kind === "setup") {
+    const onCreate = (league: DivisionCode, club: number) => {
+      commit(createWorld(pack, { league, club }));
+      // The world opens at the top: the club, its season and the ways to play it.
+      requestAnimationFrame(() => document.querySelector('[data-testid="my-world"]')?.scrollIntoView({ block: "start" }));
+    };
+    return <Setup pack={pack} locale={locale} reset={view.reset} onCreate={onCreate} />;
+  }
   return (
     <WorldScreen
       world={view.world}
       saved={view.saved}
       locale={locale}
-      onChange={keep}
+      onChange={change}
+      onCommit={commit}
+      canUndo={past.length > 0}
+      onUndo={undo}
       onReset={() => {
         clearWorld(browserStore());
+        setPast([]);
         setView({ kind: "setup" });
       }}
     />
@@ -185,56 +225,78 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
   );
 }
 
-/** A division picker: one button per league, as tabs. */
-function DivisionTabs({ value, onChange, label, testId }: { value: DivisionCode; onChange: (code: DivisionCode) => void; label: string; testId: string }) {
-  const t = useTranslations("World");
-  return (
-    <div role="tablist" aria-label={label} className="grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 sm:grid-cols-4 dark:bg-zinc-800" data-testid={testId}>
-      {ENGLAND.map((code) => (
-        <button
-          key={code}
-          type="button"
-          role="tab"
-          aria-selected={value === code}
-          onClick={() => onChange(code)}
-          className={`min-h-9 rounded-md px-2 text-sm font-semibold ${value === code ? "bg-white shadow-sm dark:bg-zinc-900" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300"}`}
-          data-league={code}
-        >
-          {t(`leagues.${code}.name`)}
-        </button>
-      ))}
-    </div>
-  );
+interface ScreenProps {
+  world: World;
+  saved: boolean;
+  locale: SiteLocale;
+  /** A change in the season in progress (Undo can take it back). */
+  onChange: (world: World) => void;
+  /** A season finished or the next one started. */
+  onCommit: (world: World) => void;
+  canUndo: boolean;
+  onUndo: () => void;
+  onReset: () => void;
 }
 
-function WorldScreen({ world, saved, locale, onChange, onReset }: { world: World; saved: boolean; locale: SiteLocale; onChange: (world: World) => void; onReset: () => void }) {
+function WorldScreen({ world, saved, locale, onChange, onCommit, canUndo, onUndo, onReset }: ScreenProps) {
   const t = useTranslations("World");
+  const sim = useTranslations("Simulator");
   const me = world.clubs[world.userClub]!;
   const myDivision = clubDivision(world, world.userClub);
   const [viewed, setViewed] = useState<DivisionCode>(myDivision ?? "EL2");
+  // The matchday each league's fixtures show (else its next round).
+  const [matchdays, setMatchdays] = useState<Partial<Record<DivisionCode, number>>>({});
   const [playing, setPlaying] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const last = world.history.at(-1);
-  // Where the visitor's club is when the season changes: its own division's table.
-  useEffect(() => setViewed(clubDivision(world, world.userClub) ?? "EL2"), [world.year, world.userClub]);
-  const table = useMemo(() => currentTable(world, viewed), [world, viewed]);
-  const myRow = myDivision ? currentTable(world, myDivision).find((r) => r.clubId === world.userClub) : undefined;
+  // Where the visitor's club is when the season changes: its own division, on its next round.
+  useEffect(() => {
+    setViewed(clubDivision(world, world.userClub) ?? "EL2");
+    setMatchdays({});
+  }, [world.year, world.userClub]); // eslint-disable-line react-hooks/exhaustive-deps
+  const states = useMemo(() => seasonStates(world), [world]);
+  const state = states.find((s) => s.code === viewed)!;
+  const mine = states.find((s) => s.code === myDivision);
+  const myRow = mine?.rows.find((r) => r.teamId === world.userClub);
   const firstSeason = world.divisions.some((d) => d.games);
   const season = seasonLabel(world.year);
+  const done = states.every((s) => s.done);
+  // The visitor has played some of this season (a round, a result): the rest of it is left.
+  const started = states.some((s) => Object.keys(s.picks).length > 0);
 
+  /** The rest of the season at once (or, with every game decided, just its end): the review. */
   const play = () => {
     setPlaying(true);
     // Let the button show it's working before the season is played (a few milliseconds).
     setTimeout(() => {
-      onChange(playSeason(world));
+      onCommit(playSeason(world));
       setPlaying(false);
     }, 30);
+  };
+  /** The next round in all four leagues; each league's fixtures show the round it played. */
+  const round = () => {
+    setMatchdays(Object.fromEntries(states.flatMap((s) => (s.nextRound === null ? [] : [[s.code, s.leagueComplete ? PLAYOFF_MATCHDAY : s.nextRound]]))));
+    onChange(playRound(world));
+  };
+  /** What the visitor's league plays next: a matchday, or a play-off round. */
+  const nextOf = (s: DivisionState) => {
+    if (s.nextRound === null) return null;
+    if (!s.leagueComplete) return sim("matchday", { number: s.nextRound });
+    const tie = s.bracket.flat().find((x) => x.legs.some((leg) => leg.matchday === s.nextRound)) ?? s.bracket.flat().find((x) => x.shootout);
+    return tie ? sim("playoffRound", { round: tie.config.key }) : sim("playoffs");
+  };
+  const next = mine ? nextOf(mine) : null;
+  // The fixtures stay on the matchday shown while its scores change (as on the league pages), even once it's complete.
+  const shown = matchdays[viewed] ?? openingMatchday(state);
+  const changeShown = (changed: World) => {
+    setMatchdays((m) => (m[viewed] === undefined ? { ...m, [viewed]: shown } : m));
+    onChange(changed);
   };
 
   return (
     <div className="space-y-6" data-testid="world" data-year={world.year}>
       {/* The visitor's club and the season in progress. */}
-      <section className={`${card} flex flex-col gap-4 sm:flex-row sm:items-center`} data-testid="world-club-card">
+      <section className={`${card} flex flex-col gap-4 lg:flex-row lg:items-center`} data-testid="world-club-card">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <TeamBadge team={me} size={44} textless />
           <div className="min-w-0">
@@ -247,15 +309,35 @@ function WorldScreen({ world, saved, locale, onChange, onReset }: { world: World
               {myDivision ? ` · ${t(`leagues.${myDivision}.name`)}` : ""}
               {myRow && myRow.played > 0 ? ` · ${t("standing", { position: ordinal(myRow.position, locale), points: myRow.points })}` : ""}
             </p>
+            {!world.review && mine && (
+              <p className="text-xs text-zinc-500" data-testid="world-next-round">
+                {next ? t("next", { in: t(`leagues.${mine.code}.in`), round: next }) : t("leagueOver", { league: t(`leagues.${mine.code}.name`) })}
+              </p>
+            )}
           </div>
         </div>
         {!world.review && (
-          <div className="space-y-1 sm:text-right">
-            <button type="button" className={`${primary} w-full sm:w-auto`} onClick={play} disabled={playing} data-testid="world-play">
-              <Icon name={playing ? "loader-circle" : "dices"} size={18} className={playing ? "animate-spin" : ""} />
-              {playing ? t("playing") : t("play", { season })}
-            </button>
-            <p className="text-xs text-zinc-500">{t("playNote")}</p>
+          <div className="space-y-1 lg:max-w-lg lg:text-right">
+            <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+              {done ? (
+                <button type="button" className={`${primary} w-full whitespace-nowrap sm:w-auto`} onClick={play} disabled={playing} data-testid="world-finish">
+                  <Icon name={playing ? "loader-circle" : "trophy"} size={18} className={playing ? "animate-spin" : ""} />
+                  {t("finish", { season })}
+                </button>
+              ) : (
+                <>
+                  <button type="button" className={`${secondary} w-full whitespace-nowrap sm:w-auto`} onClick={round} disabled={playing} data-testid="world-round">
+                    <Icon name="chevron-right" size={18} />
+                    {t("playRound")}
+                  </button>
+                  <button type="button" className={`${primary} w-full whitespace-nowrap sm:w-auto`} onClick={play} disabled={playing} data-testid="world-play">
+                    <Icon name={playing ? "loader-circle" : "dices"} size={18} className={playing ? "animate-spin" : ""} />
+                    {playing ? t("playing") : started ? t("playRest") : t("play", { season })}
+                  </button>
+                </>
+              )}
+            </div>
+            <p className="text-xs text-zinc-500">{done ? t("finishNote") : t("playNote")}</p>
           </div>
         )}
       </section>
@@ -273,16 +355,23 @@ function WorldScreen({ world, saved, locale, onChange, onReset }: { world: World
         </p>
       )}
 
-      {world.review && last && <Review record={last} world={world} locale={locale} onNext={() => onChange(startNextSeason(world))} />}
+      {world.review && last && <Review record={last} world={world} locale={locale} onNext={() => onCommit(startNextSeason(world))} />}
 
-      {/* The season in progress, league by league. */}
+      {/* The season in progress, league by league: as on the league pages. */}
       <section className="space-y-3" data-testid="world-tables">
-        <h2 className="text-xl font-bold tracking-tight">
-          {t("tables")} <span className="font-semibold text-zinc-500">{season}</span>
-        </h2>
+        <h2 className="text-xl font-bold tracking-tight">{t("seasonHeading", { season })}</h2>
         <DivisionTabs value={viewed} onChange={setViewed} label={t("tables")} testId="world-tabs" />
         <p className="text-xs text-zinc-500">{firstSeason ? t("firstSeason") : t("newSeason")}</p>
-        <WorldTable rows={table} code={viewed} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-table" />
+        <WorldSeason
+          world={world}
+          state={state}
+          matchday={shown}
+          onMatchday={(md) => setMatchdays((m) => ({ ...m, [viewed]: md }))}
+          onChange={changeShown}
+          canUndo={canUndo}
+          onUndo={onUndo}
+          editable={!world.review}
+        />
       </section>
 
       <History world={world} locale={locale} />

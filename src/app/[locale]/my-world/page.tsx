@@ -37,7 +37,7 @@ export default async function Page({ params }: { params: Params }) {
   setRequestLocale(locale);
   const [t, messages, pack] = await Promise.all([getTranslations("World"), getMessages(), worldStartPack()]);
   return (
-    <div className="mx-auto max-w-4xl space-y-6" data-testid="my-world">
+    <div className="space-y-6" data-testid="my-world">
       <header className="space-y-2">
         <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-pitch-700 dark:text-pitch-100">
           <Icon name="globe" size={16} />
@@ -46,8 +46,8 @@ export default async function Page({ params }: { params: Params }) {
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("title")}</h1>
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("intro")}</p>
       </header>
-      {/* The game's own words only: the rest of the site's client messages aren't needed inside it. */}
-      <NextIntlClientProvider locale={locale} messages={{ World: messages.World }}>
+      {/* The game's own words, and the league simulator's (its fixtures and dice): the rest of the site's client messages aren't needed inside it. */}
+      <NextIntlClientProvider locale={locale} messages={{ World: messages.World, Simulator: messages.Simulator }}>
         <MyWorld pack={pack} locale={langOf(locale)} />
       </NextIntlClientProvider>
     </div>
