@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
+import sharp from "sharp";
 import { getLeagueByCode, getLeagueBySlug } from "../config/leagues.ts";
 import { stagedClassification } from "../engine/classification.ts";
 import { buildBracket, seedByGroupPlace, tieOutcome } from "../engine/playoffs.ts";
@@ -52,7 +53,7 @@ describe("Série C 2026 (first-party data)", () => {
     assert.equal(data.seasonKey, "BSC:2026");
   });
 
-  it("has every club with its official name and its own local crest", () => {
+  it("has every club with its official name and its own local crest, cut out of its background", async () => {
     assert.equal(data.teams.length, 20);
     assert.deepEqual(
       [...names(data.teams.map((t) => t.id))].sort((a, b) => a.localeCompare(b, "pt")),
@@ -60,13 +61,20 @@ describe("Série C 2026 (first-party data)", () => {
     );
     const hashes = new Set<string>();
     for (const team of data.teams) {
-      assert.equal(team.crest, `/crests/serie-c/${team.id}.jpg`, team.name);
+      assert.equal(team.crest, `/crests/serie-c/${team.id}.png`, team.name);
       const file = join(ROOT, "public", team.crest!);
       assert.ok(existsSync(file), `${team.name}: ${file}`);
       const bytes = readFileSync(file);
-      // A real JPEG of some size, not an empty or placeholder file, and every club's its own.
-      assert.deepEqual([...bytes.subarray(0, 3)], [0xff, 0xd8, 0xff], team.name);
-      assert.ok(bytes.length > 1000, team.name);
+      // A real PNG with transparency (no square background: its corners are clear), not a placeholder, and every club's its own.
+      assert.deepEqual([...bytes.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47], team.name);
+      assert.ok(bytes.length > 2000, team.name);
+      const { data: px, info } = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      assert.equal(info.channels, 4, team.name);
+      const alphaAt = (x: number, y: number) => px[(y * info.width + x) * 4 + 3]!;
+      for (const [x, y] of [[0, 0], [info.width - 1, 0], [0, info.height - 1], [info.width - 1, info.height - 1]]) assert.equal(alphaAt(x!, y!), 0, `${team.name} corner`);
+      let opaque = 0;
+      for (let i = 3; i < px.length; i += 4) if (px[i]! > 200) opaque++;
+      assert.ok(opaque > info.width * info.height * 0.15, `${team.name}: the crest is there`);
       hashes.add(createHash("sha256").update(bytes).digest("hex"));
     }
     assert.equal(hashes.size, 20);

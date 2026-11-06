@@ -69,7 +69,7 @@ function watchRequests(page) {
         assert.equal(crests.length, 20, locale);
         assert.equal(new Set(crests.map((c) => c.src)).size, 20, locale);
         for (const c of crests) {
-          assert.match(c.src, /^\/crests\/serie-c\/\d+\.jpg$/, locale);
+          assert.match(c.src, /^\/crests\/serie-c\/\d+\.png$/, locale);
           if (!c.ok) {
             await page.locator(`img[src="${c.src}"]`).first().scrollIntoViewIfNeeded();
             await page.waitForFunction((src) => [...document.querySelectorAll(`img[src="${src}"]`)].some((i) => i.complete && i.naturalWidth > 0), c.src);
