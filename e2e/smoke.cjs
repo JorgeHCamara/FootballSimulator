@@ -1405,8 +1405,7 @@ async function step(name, fn) {
       assert.equal(await mobile.locator('a:not([data-testid="mobile-latest-odds"]):not([data-testid="mobile-quiz"]):not([data-testid="mobile-my-world"])').count(), 0, "continents start closed");
       assert.equal(await mobile.getByTestId("mobile-latest-odds").getAttribute("href"), "/en/odds");
       assert.equal(await mobile.getByTestId("mobile-quiz").getAttribute("href"), "/en/quiz");
-      // My World is unlisted for now (MY_WORLD_LISTED in src/lib/site.ts).
-      assert.equal(await mobile.getByTestId("mobile-my-world").count(), 0);
+      assert.equal(await mobile.getByTestId("mobile-my-world").getAttribute("href"), "/en/my-world");
       const countriesShown = async () => (await mobile.locator("li > div > p").allInnerTexts()).map((x) => x.trim().toLowerCase());
       // Asia: only its countries.
       await rows.nth(3).tap();
@@ -2319,17 +2318,20 @@ async function step(name, fn) {
       }
     });
 
-    await step("My World: unlisted (no links, noindex), set up a world, every league played by its own buttons, the games left in each, End season (promotion and relegation, the review), Start next season, saved on reload, past seasons' tables and results in the season picker, a new world; EN/PT/ES on phones and desktops", async () => {
+    await step("My World: from the home page and the menu (in the sitemap, indexed), set up a world, every league played by its own buttons, the games left in each, End season (promotion and relegation, the review), Start next season, saved on reload, past seasons' tables and results in the season picker, a new world; EN/PT/ES on phones and desktops", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-      // Unlisted for now (MY_WORLD_LISTED in src/lib/site.ts): no link from the home page, the menu or the
-      // sitemap, and not indexed; the page still works at its address.
+      // Entry points: the home page (by the main features, on the first screen) and the menu; in the sitemap, and indexed.
       await p.goto(`${BASE_URL}/en`);
-      assert.equal(await p.getByTestId("home-my-world").count(), 0);
-      assert.equal(await p.getByTestId("nav-my-world").count(), 0);
-      assert.doesNotMatch(await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text(), /my-world/);
-      await p.goto(`${BASE_URL}/en/my-world`);
+      const card = p.getByTestId("home-my-world");
+      assert.equal(await card.getAttribute("href"), "/en/my-world");
+      assert.ok((await card.boundingBox()).y < 900, "on the first screen");
+      assert.equal(await p.getByTestId("nav-my-world").getAttribute("href"), "/en/my-world");
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/my-world<`));
+      await card.click();
+      await p.waitForURL(/\/en\/my-world$/);
       await p.getByTestId("world-setup").waitFor();
-      assert.match(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex/);
+      assert.doesNotMatch(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex/);
       assert.equal(await p.locator("h1").innerText(), "My World");
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/my-world");
       assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/my-world");

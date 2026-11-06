@@ -14,10 +14,11 @@ export const CONTACT_EMAIL = "contact@footsimu.com";
 
 /**
  * My World is linked from the menus, the home page and the sitemap (and
- * indexed). Off while it is reworked: the page still works at its address,
- * but nothing links to it and search engines are asked not to index it.
+ * indexed). Off (false) unlists it, for while it is reworked: the page still
+ * works at its address, but nothing links to it and search engines are asked
+ * not to index it.
  */
-export const MY_WORLD_LISTED = false;
+export const MY_WORLD_LISTED = true;
 
 /**
  * Google AdSense publisher id ("ca-pub-…"), set in the deployment once the
