@@ -59,7 +59,7 @@ export function WorldTable({ rows, code, clubs, highlight, final, testId }: { ro
               <th scope="col" className={`${cell} w-12 pr-3 font-semibold sm:w-14`}>
                 {t("columns.points")}
               </th>
-              {final && <th scope="col" className="w-8 pr-3" aria-label={t("history.title")} />}
+              {final && <th scope="col" className="w-8 pr-3" aria-label={t("columns.note")} />}
             </tr>
           </thead>
           <tbody>

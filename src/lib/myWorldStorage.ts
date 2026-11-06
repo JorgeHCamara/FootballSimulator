@@ -19,8 +19,19 @@ export type LoadResult = { world: World; reason?: undefined } | { world: null; r
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 const isNumber = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
 const isGoals = (value: unknown) => Number.isInteger(value) && (value as number) >= 0 && (value as number) <= 99;
-/** A season's scores so far (DivisionSeason.scores): game id to [home goals, away goals]. */
+/** A season's scores so far (DivisionSeason.scores), or a past play-off's: game id to [home goals, away goals]. */
 const isScores = (value: unknown) => value === undefined || (isRecord(value) && Object.values(value).every((s) => Array.isArray(s) && s.length === 2 && s.every(isGoals)));
+/** A finished season's packed games (SavedDivision.games): five characters a game, its clubs among the table's. */
+const isPackedGames = (value: unknown, clubs: number) => {
+  if (value === undefined) return true;
+  if (typeof value !== "string" || value.length % 5 !== 0) return false;
+  for (let i = 0; i < value.length; i += 5) {
+    const home = value.charCodeAt(i + 1) - 48;
+    const away = value.charCodeAt(i + 2) - 48;
+    if (home < 0 || home >= clubs || away < 0 || away >= clubs) return false;
+  }
+  return true;
+};
 
 /** The parts a page needs to show a world, checked: anything else counts as unreadable. */
 export function isWorld(value: unknown): value is World {
@@ -36,7 +47,15 @@ export function isWorld(value: unknown): value is World {
       isRecord(s) &&
       isNumber(s.year) &&
       Array.isArray(s.divisions) &&
-      s.divisions.every((d) => isRecord(d) && typeof d.code === "string" && Array.isArray(d.rows) && d.rows.every((r) => Array.isArray(r) && r.length === 9 && isRecord(clubs[String(r[0])]))),
+      s.divisions.every(
+        (d) =>
+          isRecord(d) &&
+          typeof d.code === "string" &&
+          Array.isArray(d.rows) &&
+          d.rows.every((r) => Array.isArray(r) && r.length === 9 && isRecord(clubs[String(r[0])])) &&
+          isPackedGames(d.games, d.rows.length) &&
+          isScores(d.playoff),
+      ),
   );
 }
 

@@ -43,14 +43,14 @@ import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
  * its new league, a relegated club the reverse, and a new club starts below
  * average. Nothing here touches the live outlook, snapshots or SIM_VERSION.
  *
- * A season can be played three ways, mixed as the player likes: all at once
- * (playSeason), a round at a time in all four leagues (playRound), or result
- * by result as on the league pages: any score typed in, a dice roll for one
- * game, a matchday or the rest of one league simulated (setScore, rollScore,
- * simulateMatchday, simulateRest). The whole season and its rounds draw each
- * score from the full distribution, as the season odds do; the dice and the
- * league buttons make likely rolls, as on the league pages. Every score is
- * kept in the save (DivisionSeason.scores) until the season is finished.
+ * A season is played league by league as on the league pages: any score typed
+ * in, a dice roll for one game, a matchday or the rest of a league simulated
+ * (setScore, rollScore, simulateMatchday, simulateRest), all likely rolls as
+ * there. Every score is kept in the save (DivisionSeason.scores); once every
+ * game of the four leagues is decided, playSeason finishes the season (it
+ * would draw any game left from the season's form) and the next one starts.
+ * Each finished season keeps its final tables and every result
+ * (SavedDivision.games and .playoff), to look back at.
  */
 
 /** The save's format: a save of another version is set aside, not read (see myWorldStorage.ts). */
@@ -131,6 +131,43 @@ export interface SavedDivision {
   rows: SavedRow[];
   /** The play-off final: [winner, runner-up, winner's goals, runner-up's goals, decided on penalties]. */
   final?: [TeamId, TeamId, number, number, boolean];
+  /**
+   * Every league game with its score, packed five characters a game (see
+   * packGames): its matchday, its clubs (by their place in `rows`) and the
+   * goals. Kept for the last FIXTURE_SEASONS seasons (and absent from seasons
+   * finished before results were kept).
+   */
+  games?: string;
+  /** The play-off's scores, by game id (legs and shoot-outs, as the bracket numbers them). */
+  playoff?: Record<number, [number, number]>;
+}
+
+/** Finished seasons whose every result is kept (older ones keep their final tables only). */
+export const FIXTURE_SEASONS = 50;
+
+const packChar = (n: number) => String.fromCharCode(48 + n);
+
+/** A season's league games and scores in five characters a game: matchday, home and away club (place in `rows`), home and away goals. */
+export function packGames(fixtures: readonly Fixture[], results: ResultMap, rows: readonly { teamId: TeamId }[]): string {
+  const place = new Map(rows.map((r, i) => [r.teamId, i]));
+  return sortFixtures(fixtures)
+    .map((f) => {
+      const score = results[f.id]!;
+      return packChar(f.matchday) + packChar(place.get(f.homeId)!) + packChar(place.get(f.awayId)!) + packChar(score.home) + packChar(score.away);
+    })
+    .join("");
+}
+
+/** The games packGames packed, with their clubs' ids. */
+export function unpackGames(packed: string, rows: readonly SavedRow[]): { matchday: number; homeId: TeamId; awayId: TeamId; home: number; away: number }[] {
+  const at = (i: number) => packed.charCodeAt(i) - 48;
+  return Array.from({ length: Math.floor(packed.length / 5) }, (_, g) => ({
+    matchday: at(g * 5),
+    homeId: rows[at(g * 5 + 1)]![0],
+    awayId: rows[at(g * 5 + 2)]![0],
+    home: at(g * 5 + 3),
+    away: at(g * 5 + 4),
+  }));
 }
 
 /** A finished season, as saved: every division's final table, who left the pyramid and who joined it. */
@@ -383,10 +420,10 @@ function playoffOptions(world: World, d: DivisionSeason, last: number): Omit<Bra
 }
 
 /**
- * The matchday a division's rounds start from: the one after the last
- * matchday whose games were mostly played when the world began (1 for a new
- * season). Games left from earlier matchdays (postponed in the real season)
- * are played with the first round.
+ * The real season's current matchday when the world began: the one after the
+ * last matchday whose games were mostly played (1 for a new season). A game
+ * left from an earlier matchday (postponed in the real season) doesn't make
+ * the fixtures open back there.
  */
 function startRound(d: DivisionSeason): number {
   const counts = new Map<number, [number, number]>();
@@ -422,9 +459,10 @@ export interface DivisionState {
   /** The league and its play-off are decided. */
   done: boolean;
   /**
-   * The next round: the earliest matchday from the season's first round with
-   * a game to play; once the league is complete, the play-off's next legs (a
-   * matchday after the league's last), or a level tie's shoot-out. Null once done.
+   * The next round, where the fixtures open: the earliest matchday from the
+   * season's current one (see startRound) with a game to play; once the league
+   * is complete, the play-off's next legs (a matchday after the league's last),
+   * or a level tie's shoot-out. Null once done.
    */
   nextRound: number | null;
   /** The season's form (seasonForm). */
@@ -590,29 +628,17 @@ export function resetDivision(world: World, code: DivisionCode): World {
   return withScores(world, index, seasonScores(world.divisions[index]!), {});
 }
 
-/**
- * The next round in all four leagues (DivisionState.nextRound): each league's
- * next matchday (with any game left from before the matchday the season
- * started on), then its play-off a round at a time, shoot-outs included.
- * Each score is drawn from the season's form, as a whole season is.
- */
-export function playRound(world: World, rng: Rng = createRng(randomSeed())): World {
-  return world.divisions.reduce((current, _, index) => {
-    const state = stateOf(current, index);
-    const round = state.nextRound;
-    if (round === null) return current;
-    const picks = { ...state.picks };
-    const draw = (f: Fixture) =>
-      sampleDixonColes(f.neutral ? expectedGoalsNeutral(state.model, f.homeId, f.awayId) : expectedGoals(state.model, f.homeId, f.awayId), state.model.rho ?? 0, rng);
-    if (!state.leagueComplete) {
-      for (const f of state.fixtures) if (!state.results[f.id] && f.matchday <= round) picks[f.id] = draw(f);
-    } else {
-      const ties = state.bracket.flat();
-      for (const tie of ties) for (const leg of tie.legs) if (leg.matchday === round && !leg.result && !picks[leg.id]) picks[leg.id] = draw(leg);
-      for (const tie of ties) if (tie.shootout && !tie.shootout.result && !picks[tie.shootout.id] && needsShootout(tie, picks)) picks[tie.shootout.id] = simulatePenalties(rng);
-    }
-    return withScores(current, index, state.picks, picks);
-  }, world);
+/** Games still to play in a division's season: league games, play-off games, and a level tie's shoot-out. */
+export function gamesLeft(state: DivisionState): number {
+  const league = state.fixtures.filter((f) => !state.results[f.id]).length;
+  const config = state.league.playoff;
+  if (!config) return league;
+  // English play-offs are one- and two-legged ties (no series): every leg is played.
+  const legs = playoffIds(config).filter((id) => !isShootoutId(id)).length;
+  const ties = state.bracket.flat();
+  const played = ties.flatMap((tie) => tie.legs).filter((leg) => leg.result || state.picks[leg.id]).length;
+  const shootouts = ties.filter((tie) => tie.shootout && !tie.shootout.result && !state.picks[tie.shootout.id] && needsShootout(tie, state.picks)).length;
+  return league + legs - played + shootouts;
 }
 
 interface PlayedDivision {
@@ -623,6 +649,8 @@ interface PlayedDivision {
   rows: StandingRow[];
   notes: Map<TeamId, RowNote>;
   final?: SavedDivision["final"];
+  /** The play-off's scores, by game id. */
+  playoff: ResultMap;
   ratings: SeasonRatings;
 }
 
@@ -646,15 +674,25 @@ function playDivision(world: World, d: DivisionSeason, index: number): PlayedDiv
     if (r.position === 1) notes.set(r.teamId, "C");
   }
   let final: SavedDivision["final"];
+  const playoff: ResultMap = {};
   if (league.playoff) {
     let finalTie: PlayoffTie | undefined;
     const rounds = league.playoff.rounds.length;
     const knockout = seasonRng(world, 50 + index);
+    const options = playoffOptions(world, d, lastMatchday(fixtures));
     // The play-off's scores so far stand (there are none until the league is complete: see tidyPlayoff).
-    const added = simulatePlayoff(rows, league.playoff, picks, model, knockout, playoffOptions(world, d, lastMatchday(fixtures)), (r, ties) => {
+    const added = simulatePlayoff(rows, league.playoff, picks, model, knockout, options, (r, ties) => {
       if (r === rounds - 1) finalTie = ties[0];
     });
-    const outcome = finalTie ? tieOutcome(finalTie, { ...picks, ...added }) : null;
+    const scores = { ...picks, ...added };
+    // Every play-off score, real ones included, by game id: the season's saved play-off.
+    for (const tie of buildBracket(rows, league.playoff, scores, { ...options, seasonComplete: true }).flat()) {
+      for (const game of [...tie.legs, ...(tie.shootout ? [tie.shootout] : []), ...tie.gameShootouts]) {
+        const score = scores[game.id] ?? game.result;
+        if (score) playoff[game.id] = score;
+      }
+    }
+    const outcome = finalTie ? tieOutcome(finalTie, scores) : null;
     if (finalTie && outcome) {
       const loser = outcome.winner === finalTie.higher.teamId ? finalTie.lower.teamId! : finalTie.higher.teamId!;
       const winnerGoals = outcome.winner === finalTie.higher.teamId ? outcome.higherGoals : outcome.lowerGoals;
@@ -663,7 +701,7 @@ function playDivision(world: World, d: DivisionSeason, index: number): PlayedDiv
       if (places.playoffPromotes) notes.set(outcome.winner, "W");
     }
   }
-  return { code: d.code, teams, fixtures, results: all, rows, notes, ...(final ? { final } : {}), ratings: seasonRatings({ teams, fixtures, results: all }) };
+  return { code: d.code, teams, fixtures, results: all, rows, notes, ...(final ? { final } : {}), playoff, ratings: seasonRatings({ teams, fixtures, results: all }) };
 }
 
 /**
@@ -724,6 +762,8 @@ export function playSeason(world: World): World {
       code: p.code,
       rows: p.rows.map((r): SavedRow => [r.teamId, r.played, r.won, r.drawn, r.lost, r.goalsFor, r.goalsAgainst, r.points, p.notes.get(r.teamId) ?? ""]),
       ...(p.final ? { final: p.final } : {}),
+      games: packGames(p.fixtures, p.results, p.rows),
+      ...(Object.keys(p.playoff).length ? { playoff: Object.fromEntries(Object.entries(p.playoff).map(([id, s]) => [id, [s.home, s.away] as [number, number]])) } : {}),
     })),
     out,
     in: arrivals,
@@ -734,13 +774,16 @@ export function playSeason(world: World): World {
     clubs,
     ratings,
     divisions: nextClubs.map((ids, i) => ({ code: ENGLAND[i]!, clubs: ids })),
-    history: [...world.history, record],
+    // Every result of the last FIXTURE_SEASONS seasons; older ones keep their final tables.
+    history: [...world.history, record].map((season, i, all) =>
+      i < all.length - FIXTURE_SEASONS ? { ...season, divisions: season.divisions.map(({ games: _g, playoff: _p, ...rest }) => rest) } : season,
+    ),
     review: true,
     newClubs,
   };
 }
 
-/** The review's been seen: the next season shows. */
+/** The last season's review has been seen (closed). */
 export const startNextSeason = (world: World): World => ({ ...world, review: false });
 
 /** A row of a table as the page shows it. */
@@ -788,6 +831,47 @@ export function savedTable(world: World, year: number, code: DivisionCode): { ro
     })),
     ...(division.final ? { final: division.final } : {}),
   };
+}
+
+/** A finished season's division, to look back at: its final table, every result and its play-off. */
+export interface PastDivision {
+  code: DivisionCode;
+  rows: TableRow[];
+  final?: SavedDivision["final"];
+  teams: Team[];
+  /** Its league games with their scores (`result`), or null for a season whose results weren't kept. */
+  fixtures: Fixture[] | null;
+  /** The play-off's ties, each game carrying its score (`result`). */
+  bracket: PlayoffTie[][];
+}
+
+export function pastDivision(world: World, year: number, code: DivisionCode): PastDivision | undefined {
+  const saved = world.history.find((s) => s.year === year)?.divisions.find((d) => d.code === code);
+  const table = savedTable(world, year, code);
+  if (!saved || !table) return undefined;
+  const fixtures = saved.games
+    ? unpackGames(saved.games, saved.rows).map((g, i): Fixture => ({
+        id: i + 1,
+        matchday: g.matchday,
+        utcDate: gameDate(year, g.matchday),
+        homeId: g.homeId,
+        awayId: g.awayId,
+        result: { home: g.home, away: g.away },
+      }))
+    : null;
+  const config = divisionConfig(code).playoff;
+  let bracket: PlayoffTie[][] = [];
+  if (config && saved.playoff) {
+    const scores: ResultMap = {};
+    for (const [id, [home, away]] of Object.entries(saved.playoff)) scores[Number(id)] = { home, away };
+    const rows: StandingRow[] = table.rows.map((r) => ({ position: r.position, teamId: r.clubId, played: r.played, won: r.won, drawn: r.drawn, lost: r.lost, goalsFor: r.goalsFor, goalsAgainst: r.goalsAgainst, goalDifference: r.goalDifference, points: r.points, form: [] }));
+    const last = fixtures ? lastMatchday(fixtures) : (divisionConfig(code).teams - 1) * 2;
+    const scored = (f: Fixture): Fixture => ({ ...f, result: scores[f.id] ?? f.result });
+    bracket = buildBracket(rows, config, scores, { seasonComplete: true, afterMatchday: last, afterDate: gameDate(year, last) }).map((round) =>
+      round.map((tie) => ({ ...tie, legs: tie.legs.map(scored), shootout: tie.shootout && scored(tie.shootout), gameShootouts: tie.gameShootouts.map(scored) })),
+    );
+  }
+  return { code, rows: table.rows, ...(table.final ? { final: table.final } : {}), teams: saved.rows.map((r) => teamOf(world, r[0])), fixtures, bracket };
 }
 
 /** Where a club plays in the season in progress (undefined once it has left the pyramid). */
