@@ -44,6 +44,33 @@ const tuple = (r: { position: number; points: number; played: number; won: numbe
   r.goalsAgainst,
 ];
 
+/** Share of a crest's outer shape (its silhouette, holes filled) that is transparent. */
+function seeThrough(rgba: Uint8Array, w: number, h: number): number {
+  const clear = (p: number) => rgba[p * 4 + 3]! <= 40;
+  const outside = new Uint8Array(w * h);
+  const stack: number[] = [];
+  for (let x = 0; x < w; x++) stack.push(x, (h - 1) * w + x);
+  for (let y = 0; y < h; y++) stack.push(y * w, y * w + w - 1);
+  while (stack.length) {
+    const p = stack.pop()!;
+    if (outside[p] || !clear(p)) continue;
+    outside[p] = 1;
+    const x = p % w;
+    if (x > 0) stack.push(p - 1);
+    if (x < w - 1) stack.push(p + 1);
+    if (p >= w) stack.push(p - w);
+    if (p < w * (h - 1)) stack.push(p + w);
+  }
+  let inside = 0;
+  let holes = 0;
+  for (let p = 0; p < w * h; p++) {
+    if (outside[p]) continue;
+    inside++;
+    if (clear(p)) holes++;
+  }
+  return holes / inside;
+}
+
 describe("Série C 2026 (first-party data)", () => {
   it("is registered as a first-party league with no feed", () => {
     assert.equal(getLeagueBySlug("brasileirao-serie-c"), league);
@@ -75,6 +102,10 @@ describe("Série C 2026 (first-party data)", () => {
       let opaque = 0;
       for (let i = 3; i < px.length; i += 4) if (px[i]! > 200) opaque++;
       assert.ok(opaque > info.width * info.height * 0.15, `${team.name}: the crest is there`);
+      // Only the background went: inside the crest's outer shape nothing is see-through (Santa
+      // Cruz's white band between its outlines once was, 9% of it). Maringá's monogram, a line
+      // mark with no shield, has real gaps.
+      if (team.name !== "Maringá") assert.ok(seeThrough(px, info.width, info.height) < 0.01, `${team.name}: holes in the crest`);
       hashes.add(createHash("sha256").update(bytes).digest("hex"));
     }
     assert.equal(hashes.size, 20);
