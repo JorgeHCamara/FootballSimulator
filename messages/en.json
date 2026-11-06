@@ -1263,8 +1263,8 @@
       "count": "{count, plural, =0 {All played} one {# game left} other {# games left}}",
       "note": "Play each league's games by its fixtures below: the dice, Simulate matchday or Simulate rest of season, play-offs included. Then go to the next season here."
     },
-    "nextSeason": "Go to next season",
-    "nextSeasonNote": "Every game has been played: promotion and relegation, then the {season} season.",
+    "endSeason": "End season",
+    "endSeasonNote": "Every game has been played: end the {season} season to see its review, with the champions and who goes up and down.",
     "seasonHeading": "The {season} season",
     "seasonSelect": "Season",
     "seasonCurrent": "{season} (this season)",
@@ -1294,7 +1294,7 @@
       "in_": "New in League Two",
       "final": "Play-off final: {winner} {score} {loser}",
       "penalties": "{score}, on penalties",
-      "close": "Close"
+      "next": "Start next season"
     },
     "outNotice": "{club} dropped out of the Football League in {season}. My World has no National League yet: you can keep playing the seasons, or start a new world.",
     "newClub": "New",

@@ -284,7 +284,7 @@ describe("My World: a season played your way", () => {
       }
     }
     assert.ok(after.divisions.every((d) => d.scores === undefined), "the next season starts with no scores");
-    // The new season is open at once (its review is a summary on top, closed when seen).
+    // The next season is set up (its games ready); the page shows it once it's started from the review.
     assert.deepEqual(seasonStates(after).map(gamesLeft), [380, 559, 557, 557]);
     assert.equal(startNextSeason(after).review, false);
   });

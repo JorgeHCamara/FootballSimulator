@@ -1264,8 +1264,8 @@
       "count": "{count, plural, =0 {Todos disputados} one {Falta # jogo} other {Faltam # jogos}}",
       "note": "Jogue os jogos de cada liga nos jogos abaixo: os dados, Simular rodada ou Simular resto da temporada, com os playoffs. Depois, vá para a próxima temporada aqui."
     },
-    "nextSeason": "Ir para a próxima temporada",
-    "nextSeasonNote": "Todos os jogos foram disputados: acesso e rebaixamento, e então a temporada {season}.",
+    "endSeason": "Encerrar temporada",
+    "endSeasonNote": "Todos os jogos foram disputados: encerre a temporada {season} para ver o resumo, com os campeões e quem sobe e quem cai.",
     "seasonHeading": "A temporada {season}",
     "seasonSelect": "Temporada",
     "seasonCurrent": "{season} (esta temporada)",
@@ -1295,7 +1295,7 @@
       "in_": "Novos na League Two",
       "final": "Final dos playoffs: {winner} {score} {loser}",
       "penalties": "{score}, nos pênaltis",
-      "close": "Fechar"
+      "next": "Iniciar próxima temporada"
     },
     "outNotice": "{club} saiu da Football League em {season}. O Meu mundo ainda não tem a National League: você pode continuar jogando as temporadas ou começar um novo mundo.",
     "newClub": "Novo",
