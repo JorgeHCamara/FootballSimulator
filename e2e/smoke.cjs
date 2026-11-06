@@ -2277,6 +2277,46 @@ async function step(name, fn) {
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/quiz<`));
     });
 
+    await step("ad slots: none by default (no box, no <ins>, no AdSense script); with the flag (E2E_ADS=1 build), a box at its ad's size that an ad fills without moving the page", async () => {
+      // The default build (the site as it is during the AdSense review) has no slots. A build with
+      // NEXT_PUBLIC_ADS_SLOTS=1 (and the debug flag) is checked with E2E_ADS=1.
+      const flagged = process.env.E2E_ADS === "1";
+      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const club = sitemap.match(/https:\/\/footsimu\.com(\/en\/premier-league\/team\/[a-z0-9-]+)</)[1];
+      for (const [width, height, phone] of [[1280, 900, false], [390, 844, true]]) {
+        const ctx = await browser.newContext({ viewport: { width, height }, ...(phone ? { isMobile: true, hasTouch: true } : {}) });
+        const p = await ctx.newPage();
+        for (const path of ["/en/premier-league", club]) {
+          await p.goto(`${BASE_URL}${path}`);
+          if (!flagged) {
+            assert.equal(await p.locator('[data-testid="ad-slot"]').count(), 0, `${path}: no slot`);
+            assert.equal(await p.locator("ins.adsbygoogle").count(), 0, `${path}: no ad unit`);
+            assert.equal(await p.locator('script[src*="adsbygoogle"]').count(), 0, `${path}: no AdSense script without a publisher id`);
+            continue;
+          }
+          const slot = p.getByTestId("ad-slot");
+          assert.equal(await slot.count(), 1, `${path}: one slot`);
+          await slot.scrollIntoViewIfNeeded();
+          const box = await p.getByTestId("ad-box").boundingBox();
+          // The ad's own size: a medium rectangle on phones, a leaderboard from 768px up.
+          assert.deepEqual([Math.round(box.width), Math.round(box.height)], phone ? [300, 250] : [728, 90], path);
+          // An ad of that size in its unit (or its box): nothing below it moves, nothing scrolls sideways.
+          const below = () => p.evaluate(() => { const next = document.querySelector('[data-testid="ad-slot"]').nextElementSibling; return next ? Math.round(next.getBoundingClientRect().top + window.scrollY) : null; });
+          const before = await below();
+          await p.evaluate(([w, h]) => {
+            const into = document.querySelector('[data-testid="ad-unit"]') ?? document.querySelector('[data-testid="ad-box"]');
+            const creative = document.createElement("div");
+            creative.style.width = `${w}px`;
+            creative.style.height = `${h}px`;
+            into.appendChild(creative);
+          }, phone ? [300, 250] : [728, 90]);
+          assert.equal(await below(), before, `${path}: no layout shift when the ad fills`);
+          assert.ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${path}: no sideways scroll`);
+        }
+        await ctx.close();
+      }
+    });
+
     await step("unknown league returns 404", async () => {
       const res = await page.goto(`${BASE_URL}/en/not-a-league`);
       assert.equal(res.status(), 404);
