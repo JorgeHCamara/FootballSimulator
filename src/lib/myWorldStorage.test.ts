@@ -93,6 +93,17 @@ describe("My World: the save", () => {
     }
   });
 
+  it("a save from before the realistic calendar: a season not yet being played takes it on load; a bad calendar is unreadable", () => {
+    const after = startNextSeason(playSeason(world));
+    const old = { ...after, divisions: after.divisions.map(({ calendar: _c, ...d }) => d) };
+    const store = memoryStore();
+    store.setItem(WORLD_KEY, JSON.stringify(old));
+    assert.deepEqual(loadWorld(store).world!.divisions.map((d) => d.calendar), [2, 2, 2, 2]);
+    const broken = memoryStore();
+    broken.setItem(WORLD_KEY, JSON.stringify({ ...after, divisions: after.divisions.map((d) => ({ ...d, calendar: 3 })) }));
+    assert.deepEqual(loadWorld(broken), { world: null, reason: "unreadable" });
+  });
+
   it("a new world replaces the old one (after the reset)", () => {
     const store = memoryStore();
     saveWorld(store, playSeason(world));

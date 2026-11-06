@@ -4,6 +4,7 @@ import { expectedGoals, likelyScoreSet } from "../engine/match.ts";
 import { isShootoutId, playoffIds, tieIds, tieOutcome } from "../engine/playoffs.ts";
 import { NO_DATA_PRIOR } from "../engine/ratings.ts";
 import { createRng } from "../engine/rng.ts";
+import { longestVenueRun } from "../engine/schedule.ts";
 import {
   clubDivision,
   clubPath,
@@ -31,6 +32,7 @@ import {
   simulatePlayoffs,
   simulateRest,
   startNextSeason,
+  upgradeWorld,
   type DivisionCode,
   type StartPack,
   type World,
@@ -220,6 +222,37 @@ describe("My World: a season", () => {
     assert.equal(pl.rows[0]!.clubId, me);
     assert.equal(pl.rows[0]!.note, "C");
     assert.equal(clubDivision(world, me), "PL");
+  });
+
+  it("a generated season has a real league's home-and-away rhythm: no club plays three in a row at home or away", () => {
+    let world = start();
+    for (let i = 0; i < 3; i++) {
+      world = startNextSeason(playSeason(world));
+      for (const d of world.divisions) {
+        assert.equal(d.calendar, 2);
+        assert.equal(longestVenueRun(divisionState(world, d.code).fixtures), 2, `${world.year} ${d.code}`);
+      }
+    }
+  });
+
+  it("a season already being played on the first calendar keeps it (its scores stay with their games); one not yet played takes the new one", () => {
+    const after = startNextSeason(playSeason(start()));
+    // A save from before calendar 2: no calendar on its generated season.
+    const old: World = { ...after, divisions: after.divisions.map(({ calendar: _c, ...d }) => d) };
+    assert.ok(longestVenueRun(divisionState(old, "PL").fixtures) > 2, "the first calendar's long runs");
+    // Nothing played yet: it takes calendar 2 when it loads.
+    assert.deepEqual(upgradeWorld(old).divisions.map((d) => d.calendar), [2, 2, 2, 2]);
+    // The Premier League already being played: it keeps its calendar, and the score stays with its game.
+    const game = divisionState(old, "PL").fixtures.find((f) => f.matchday === 1)!;
+    const playing = setScore(old, "PL", game, { home: 4, away: 4 });
+    const loaded = upgradeWorld(playing);
+    assert.deepEqual(loaded.divisions.map((d) => d.calendar), [undefined, 2, 2, 2]);
+    const same = divisionState(loaded, "PL").fixtures.find((f) => f.id === game.id)!;
+    assert.deepEqual([same.homeId, same.awayId], [game.homeId, game.awayId]);
+    assert.deepEqual(divisionState(loaded, "PL").results[game.id], { home: 4, away: 4 });
+    assert.equal(upgradeWorld(loaded), loaded, "nothing more to change");
+    // The next season it plays is on calendar 2.
+    assert.equal(playSeason(loaded).divisions[0]!.calendar, 2);
   });
 
   it("past seasons' tables stay as they were after later seasons are played", () => {
