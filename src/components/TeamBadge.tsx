@@ -11,16 +11,7 @@ export function TeamBadge({ team, size = 20, textless = false }: { team: Team; s
   if (SHOW_CRESTS && team.crest) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- remote crests, tiny and already optimised
-      <img
-        src={team.crest}
-        alt=""
-        width={size}
-        height={size}
-        loading="lazy"
-        // The site's own JPEG crests (Série C) have a white square behind them: rounded, it sits like a tile in dark mode.
-        className={`shrink-0 object-contain${team.crest.endsWith(".jpg") ? " rounded-[3px]" : ""}`}
-        style={{ width: size, height: size }}
-      />
+      <img src={team.crest} alt="" width={size} height={size} loading="lazy" className="shrink-0 object-contain" style={{ width: size, height: size }} />
     );
   }
   const hue = HUES[Math.abs(team.id) % HUES.length];

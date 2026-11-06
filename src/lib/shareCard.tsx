@@ -262,9 +262,9 @@ export async function crestDataUri(url: string | undefined): Promise<string | un
   try {
     let type: string;
     let bytes: Buffer;
-    if (/^\/crests\/serie-c\/\d+\.jpg$/.test(url)) {
+    if (/^\/crests\/serie-c\/\d+\.png$/.test(url)) {
       // The site's own crest (Série C): read from the deployment, no request.
-      type = "image/jpeg";
+      type = "image/png";
       bytes = await readFile(join(process.cwd(), "public", url));
     } else {
       const res = await fetch(url, { signal: AbortSignal.timeout(2500), next: { revalidate: 604800 } });

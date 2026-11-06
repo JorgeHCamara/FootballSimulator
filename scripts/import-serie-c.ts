@@ -7,7 +7,8 @@
 //
 // It writes src/data/serie-c/2026.json (the clubs, every game of the three
 // phases and the CBF's official tables, to check the data against) and each
-// club's crest to public/crests/serie-c/{CBF club id}.jpg. Run it again only to
+// club's crest to public/crests/serie-c/{CBF club id}.png (cut out of the CBF's
+// JPEG, kept in scripts/data/serie-c-crests: see scripts/serieCCrests.ts). Run it again only to
 // correct the data (the 2026 season is over).
 //
 // Where it reads from:
@@ -18,15 +19,16 @@
 //   lists every phase's games of that round number, so rounds 1–19 hold the
 //   whole season (190 + 12 + 12 + 2 games).
 // - The crests, as the phase pages show them (the site's image route over
-//   conteudo.cbf.com.br/clubes/{id}/escudo.jpg), saved as the original JPEG.
+//   conteudo.cbf.com.br/clubes/{id}/escudo.jpg), saved as the original JPEG,
+//   then cut out of its square background as a transparent PNG.
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { ORIGINALS, OUT as CRESTS, writeCrests } from "./serieCCrests.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "src/data/serie-c/2026.json");
-const CRESTS = join(ROOT, "public/crests/serie-c");
 const SITE = "https://www.cbf.com.br";
 const PAGE = `${SITE}/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-c/2026`;
 /** The CBF's ids: the competition (games API) and its three phases (pages). */
@@ -194,13 +196,16 @@ async function main() {
   }
 
   // Crests: the original JPEG, as the phase pages load it.
+  await mkdir(ORIGINALS, { recursive: true });
   await mkdir(CRESTS, { recursive: true });
   for (const id of Object.keys(CLUBS)) {
     const url = `${SITE}/_next/image?url=${encodeURIComponent(`https://conteudo.cbf.com.br/clubes/${id}/escudo.jpg`)}&w=256&q=70`;
     const res = await get(url);
     if (!res.headers.get("content-type")?.startsWith("image/")) throw new Error(`Crest ${id}: not an image`);
-    await writeFile(join(CRESTS, `${id}.jpg`), Buffer.from(await res.arrayBuffer()));
+    await writeFile(join(ORIGINALS, `${id}.jpg`), Buffer.from(await res.arrayBuffer()));
   }
+
+  await writeCrests();
 
   const cbfNames = new Map(firstTable.map((r) => [r.clubId, r.cbfName]));
   const data = {
@@ -209,7 +214,7 @@ async function main() {
     season: "2026",
     cbf: { competition: COMPETITION, phases: PHASES },
     clubs: Object.entries(CLUBS)
-      .map(([id, club]) => ({ id: Number(id), ...club, cbfName: cbfNames.get(Number(id)) ?? "", crest: `/crests/serie-c/${id}.jpg` }))
+      .map(([id, club]) => ({ id: Number(id), ...club, cbfName: cbfNames.get(Number(id)) ?? "", crest: `/crests/serie-c/${id}.png` }))
       .sort((a, b) => a.name.localeCompare(b.name, "pt")),
     games: out,
     official: { firstPhase: firstTable, secondPhase: secondTables },
