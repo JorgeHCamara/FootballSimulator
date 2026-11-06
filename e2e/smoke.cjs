@@ -2110,6 +2110,105 @@ async function step(name, fn) {
       await ctx.close();
     });
 
+    await step("chance pages: a league's title odds, a club's relegation chances, links both ways, SEO, settled pages, 404s, sitemap", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const jsonLd = async () => (await p.locator('script[type="application/ld+json"]').allTextContents()).flatMap((x) => { const d = JSON.parse(x); return d["@graph"] ?? [d]; });
+      const noindex = async () => (await p.locator('meta[name="robots"][content*="noindex"]').count()) > 0;
+      // From the league page: one link per outcome the league has.
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      const chips = p.locator('[data-testid="league-chances"] a');
+      assert.deepEqual(await chips.evaluateAll((a) => a.map((x) => x.getAttribute("href"))), ["/en/premier-league/chances/title", "/en/premier-league/chances/relegation"]);
+      assert.deepEqual(await chips.allInnerTexts(), ["Title chances", "Relegation chances"]);
+      await chips.first().click();
+      await p.waitForURL(/\/en\/premier-league\/chances\/title$/);
+      await p.getByTestId("chance-page").waitFor();
+      assert.match(await p.locator("h1").innerText(), /^Premier League \d{4}(\/\d{2})? title odds$/);
+      await p.waitForFunction(() => /title odds: every club's chances \| Foot Simu$/.test(document.title));
+      assert.match(await p.getByTestId("chance-lead").innerText(), /^.+ win the title in (\d+|<1)% of 10,000 simulated seasons\. Next: .+ \((\d+|<1)%\)/);
+      // Every club with a chance, likeliest first, each linking to its own title page.
+      const rows = p.getByTestId("chance-row");
+      assert.ok((await rows.count()) >= 2);
+      const pcts = (await rows.locator("span.tabular-nums.font-extrabold").allInnerTexts()).map((x) => (x.startsWith("<") ? 0.5 : Number.parseInt(x, 10)));
+      for (let i = 1; i < pcts.length; i++) assert.ok(pcts[i - 1] >= pcts[i], "likeliest first");
+      for (const href of await rows.locator("a").evaluateAll((a) => a.map((x) => x.getAttribute("href")))) assert.match(href, /^\/en\/premier-league\/team\/[a-z0-9-]+\/chances\/title$/);
+      assert.equal(await p.getByTestId("chance-simulate").getAttribute("href"), "/en/premier-league");
+      assert.equal(await p.getByTestId("chance-report").getAttribute("href"), "/en/premier-league/odds");
+      assert.deepEqual(await p.locator('[data-testid="chance-more"] a').evaluateAll((a) => a.map((x) => x.getAttribute("href"))), ["/en/premier-league/chances/relegation"]);
+      // SEO: canonical, hreflang, FAQ and breadcrumb structured data, indexable.
+      assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/premier-league/chances/title");
+      assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/premier-league/chances/title");
+      const ld = await jsonLd();
+      const faq = ld.find((d) => d["@type"] === "FAQPage");
+      assert.deepEqual(faq.mainEntity.map((q) => q.name).slice(1), ["How are these chances worked out?", "How often are they updated?", "Are these bookmakers' odds?"]);
+      assert.match(faq.mainEntity[0].name, /^Who will win the Premier League \d{4}/);
+      assert.equal(ld.find((d) => d["@type"] === "BreadcrumbList").itemListElement.length, 3);
+      assert.equal(await p.locator("details").count(), 4, "the FAQ on the page");
+      assert.equal(await noindex(), false);
+      assert.ok((await p.locator('meta[property="og:image"]').count()) > 0, "a card for link previews");
+
+      // A club's relegation page: the likeliest club to go down.
+      await p.goto(`${BASE_URL}/en/premier-league/chances/relegation`);
+      assert.match(await p.locator("h1").innerText(), /relegation odds$/);
+      const clubPath = await p.getByTestId("chance-row").first().locator("a").getAttribute("href");
+      const club = clubPath.replace(/\/chances\/relegation$/, "");
+      await p.goto(`${BASE_URL}${clubPath}`);
+      await p.getByTestId("club-chance-page").waitFor();
+      const h1 = await p.locator("h1").innerText();
+      assert.match(h1, /^.+'s relegation chances: Premier League \d{4}/);
+      const value = await p.getByTestId("club-chance-value").innerText();
+      assert.match(value, /^(\d+|<1|>99)%$/);
+      assert.match(await p.getByTestId("club-chance-lead").innerText(), / are \d+(st|nd|rd|th) in the Premier League table/);
+      // The race around the club, the club marked; links to its page, the league's race, the simulator.
+      assert.equal(await p.locator('[data-testid="club-chance-race"] [aria-current="true"]').count(), 1);
+      assert.equal(await p.getByTestId("club-chance-club").getAttribute("href"), club);
+      assert.equal(await p.getByTestId("club-chance-league").getAttribute("href"), "/en/premier-league/chances/relegation");
+      assert.equal(await p.getByTestId("club-chance-simulate").getAttribute("href"), "/en/premier-league");
+      assert.equal(await p.locator('[data-testid="club-chance-more"] a').first().getAttribute("href"), `${club}/chances/title`);
+      const clubFaq = (await jsonLd()).find((d) => d["@type"] === "FAQPage");
+      assert.match(clubFaq.mainEntity[0].name, /^Will .+ be relegated\?$/);
+      assert.equal((await jsonLd()).find((d) => d["@type"] === "BreadcrumbList").itemListElement.length, 4);
+      const pct = value.startsWith("<") ? 0.5 : value.startsWith(">") ? 99.5 : Number.parseInt(value, 10);
+      assert.equal(await noindex(), !(pct >= 1 && pct <= 99), "indexed while open");
+      // The club page links to its chance pages.
+      await p.goto(`${BASE_URL}${club}`);
+      assert.deepEqual(await p.locator('[data-testid="club-chance-links"] a').evaluateAll((a) => a.map((x) => x.getAttribute("href"))), [`${club}/chances/title`, `${club}/chances/relegation`]);
+      // Settled: the title favourite's relegation (0%) stays out of search results, but the page works.
+      await p.goto(`${BASE_URL}/en/premier-league/chances/title`);
+      const favourite = (await p.getByTestId("chance-row").first().locator("a").getAttribute("href")).replace(/\/chances\/title$/, "");
+      assert.equal((await p.goto(`${BASE_URL}${favourite}/chances/relegation`)).status(), 200);
+      assert.equal(await p.getByTestId("club-chance-value").innerText(), "0%");
+      assert.equal(await noindex(), true);
+      // Other leagues: a second division's promotion, the MLS Cup (its play-off) and the MLS play-offs.
+      await p.goto(`${BASE_URL}/en/championship/chances/promotion`);
+      assert.match(await p.locator("h1").innerText(), /^Championship .+ promotion odds$/);
+      await p.goto(`${BASE_URL}/en/mls/chances/title`);
+      assert.match(await p.locator("h1").innerText(), /^MLS Cup \d{4} odds$/);
+      assert.match(await p.getByTestId("chance-lead").innerText(), /win the MLS Cup in/);
+      assert.equal((await p.goto(`${BASE_URL}/en/mls/chances/playoffs`)).status(), 200);
+      // Portuguese and Spanish.
+      await p.goto(`${BASE_URL}/pt/premier-league/chances/title`);
+      assert.match(await p.locator("h1").innerText(), /^Premier League \d{4}(\/\d{2})?: chances de título$/);
+      await p.goto(`${BASE_URL}/es${clubPath.slice(3)}`);
+      assert.match(await p.locator("h1").innerText(), /: probabilidades de descenso en Premier League/);
+      // Not an outcome of the league, not an outcome, not a domestic league, not a club: 404.
+      for (const path of ["/en/premier-league/chances/promotion", "/en/premier-league/chances/europe", "/en/champions-league/chances/title", `${club}/chances/promotion`, "/en/premier-league/team/no-such-club/chances/title"]) {
+        assert.equal((await p.request.get(`${BASE_URL}${path}`)).status(), 404, path);
+      }
+      // The sitemap: the league's pages, and clubs' while open.
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      assert.match(sitemap, /footsimu\.com\/en\/premier-league\/chances\/title</);
+      assert.match(sitemap, /footsimu\.com\/es\/premier-league\/team\/[a-z0-9-]+\/chances\/relegation</);
+      assert.ok(!sitemap.includes(`footsimu.com${favourite}/chances/relegation<`), "a settled club page isn't listed");
+      await p.close();
+      // Phones: the club page fits.
+      const phone = await (await browser.newContext({ viewport: { width: 360, height: 760 }, isMobile: true, hasTouch: true })).newPage();
+      await phone.goto(`${BASE_URL}${clubPath}`);
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 360, "no sideways scroll");
+      await phone.goto(`${BASE_URL}/en/premier-league/chances/title`);
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 360, "no sideways scroll");
+      await phone.close();
+    });
+
     await step("daily quiz: six questions, right or wrong at once, the score, kept for the day, the same set on a reload, nav, home, sitemap", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en`);

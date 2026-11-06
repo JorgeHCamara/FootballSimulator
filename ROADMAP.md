@@ -34,8 +34,8 @@ reliability (item 5) comes next, then growth, engagement and monetisation
 | 7 | Play-offs and MLS Cup on club pages | done | `roadmap/7-club-playoffs` |
 | 8 | Quiz with historical data | done | `roadmap/8-quiz-historical` |
 | 9 | Prediction league | skipped | `roadmap/9-prediction-league` |
-| 10 | Shareable content: club outlook and biggest movers cards | in-pr | `roadmap/10-shareable-content` |
-| 11 | SEO: programmatic chance landing pages | todo | `roadmap/11-seo-chance-pages` |
+| 10 | Shareable content: club outlook and biggest movers cards | done | `roadmap/10-shareable-content` |
+| 11 | SEO: programmatic chance landing pages | in-pr | `roadmap/11-seo-chance-pages` |
 | 12 | Ad-slot readiness (placeholders behind a flag) | todo | `roadmap/12-ad-slot-readiness` |
 | 13 | Neutral venues (backlog) | todo | `roadmap/13-neutral-venues` |
 | 14 | PL and EFL tiebreakers (backlog) | todo | `roadmap/14-pl-efl-tiebreakers` |

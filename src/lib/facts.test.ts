@@ -113,7 +113,7 @@ describe("the sitemap", () => {
 
   it("lists every club page of every domestic league, in every language, with its alternates", async () => {
     const entries = await sitemap();
-    const clubs = entries.filter((e) => e.url.includes("/team/"));
+    const clubs = entries.filter((e) => e.url.includes("/team/") && !e.url.includes("/chances/"));
     for (const code of ["PL", "BSA", "MLS", "ARG", "GSL"]) {
       const l = league(code);
       const own = clubs.filter((e) => e.url.includes(`/en/${l.slug}/team/`));
@@ -124,6 +124,26 @@ describe("the sitemap", () => {
     const first = clubs[0]!;
     assert.deepEqual(Object.keys(first.alternates!.languages!).sort(), ["en", "es", "pt-BR"]);
     assert.equal(new Set(clubs.map((e) => e.url)).size, clubs.length, "no duplicates");
+  });
+
+  it("lists the chance pages: each league's outcomes, and each club's only while still open for it", async () => {
+    const entries = await sitemap();
+    const urls = entries.map((e) => e.url);
+    for (const locale of ["en", "pt", "es"]) {
+      assert.ok(urls.includes(`https://footsimu.com/${locale}/premier-league/chances/title`), locale);
+      assert.ok(urls.includes(`https://footsimu.com/${locale}/premier-league/chances/relegation`), locale);
+      assert.ok(urls.includes(`https://footsimu.com/${locale}/championship/chances/promotion`), locale);
+    }
+    assert.ok(!urls.some((u) => /\/premier-league\/chances\/(promotion|playoffs)$/.test(u)), "only the outcomes a league has");
+    assert.ok(!urls.some((u) => /\/champions-league\/.*chances/.test(u)), "domestic leagues only");
+    const clubChances = urls.filter((u) => /\/en\/premier-league\/team\/[a-z0-9-]+\/chances\/(title|relegation)$/.test(u));
+    assert.ok(clubChances.length > 0, "club chance pages");
+    // Not every club's every outcome: only those still open for it in the latest snapshot.
+    assert.ok(clubChances.length < 2 * league("PL").teams, `${clubChances.length} of ${2 * league("PL").teams}`);
+    const entry = entries.find((e) => e.url.endsWith("/en/premier-league/chances/title"))!;
+    assert.equal(entry.changeFrequency, "daily");
+    assert.deepEqual(Object.keys(entry.alternates!.languages!).sort(), ["en", "es", "pt-BR"]);
+    assert.equal(new Set(urls).size, urls.length, "no duplicates");
   });
 
   it("lists every league game from the past 30 days to the next 14, in every language", async () => {

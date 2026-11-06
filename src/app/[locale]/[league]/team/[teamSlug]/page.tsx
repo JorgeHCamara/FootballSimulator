@@ -12,7 +12,9 @@ import type { SiteLocale, ZoneKind } from "../../../../../config/leagues.ts";
 import type { FormResult, Team, TeamId } from "../../../../../engine/types.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
 import { mustWinGames, toughestGames, type ClubFixture } from "../../../../../lib/clubOutlook.ts";
-import { clubDescription, clubHeading, clubSubtitle, loadClub } from "../../../../../lib/clubPage.ts";
+import { clubChancePath, OUTCOMES, outcomeChance } from "../../../../../lib/chancePages.ts";
+import { outcomeKey } from "../../../../../lib/chanceText.ts";
+import { clubDescription, clubHeading, clubStanding, clubSubtitle, loadClub } from "../../../../../lib/clubPage.ts";
 import { listOf, ordinal, percent, placeRange } from "../../../../../lib/clubText.ts";
 import { inIndexWindow, matchPath, matchSlug } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
@@ -68,7 +70,7 @@ export default async function ClubPage({ params }: { params: Params }) {
   const loaded = await loadClub(slug, teamSlug);
   if (!loaded) notFound();
   const lang = langOf(locale);
-  const [t, tz, seo] = await Promise.all([getTranslations("Club"), getTranslations("Zones"), getTranslations("Seo")]);
+  const [t, tz, seo, chancesT] = await Promise.all([getTranslations("Club"), getTranslations("Zones"), getTranslations("Seo"), getTranslations("Chances")]);
   const { league, data, outlook, club, team, season } = loaded;
   const teams = new Map<TeamId, Team>(data.teams.map((x) => [x.id, x]));
   const pct = (share: number) => percent(share, lang);
@@ -77,22 +79,12 @@ export default async function ClubPage({ params }: { params: Params }) {
   const leaguePath = `/${league.slug}`;
   const pageUrl = `${SITE_URL}/${locale}${team.page}`;
   const { row } = club;
-  const table =
-    outlook.scope === "eachTable" && club.group
-      ? t("tableGroup", { group: club.group[lang] })
-      : outlook.scope === "annual"
-        ? t("tableAnnual", { league: league.name })
-        : t("tableLeague", { league: league.name });
   const tableName = outlook.scope === "eachTable" && club.group ? club.group[lang] : outlook.scope === "annual" && league.annual ? league.annual.name[lang] : league.name;
 
   // The summary: where the club stands, its chances, its likeliest finish.
   const position = ordinal(row.position, lang);
   const summary = [
-    row.played === 0
-      ? t("summaryStart", { club: team.name })
-      : outlook.complete
-        ? t("summaryFinal", { club: team.name, position, table, points: row.points })
-        : t("summaryPosition", { club: team.name, position, table, points: row.points, played: row.played }),
+    clubStanding(loaded, lang, t as never),
     ...(!outlook.complete && club.headline.length
       ? [
           t("summaryChances", {
@@ -126,6 +118,12 @@ export default async function ClubPage({ params }: { params: Params }) {
     imageName: `footsimu-${league.slug}-${teamSlug}.png`,
     content: "club",
   };
+  const chanceLinks = team.page
+    ? OUTCOMES.flatMap((o) => {
+        const h = outcomeChance(club, o);
+        return h ? [{ outcome: o, zone: h.zone, ...outcomeKey(o, h) }] : [];
+      })
+    : [];
   const others = data.teams.filter((x) => x.id !== team.id && outlook.clubs.has(x.id)).sort((a, b) => a.name.localeCompare(b.name, lang));
 
   const venue = (f: ClubFixture) => (
@@ -365,6 +363,23 @@ export default async function ClubPage({ params }: { params: Params }) {
           </div>
         </div>
         <p className="text-xs text-zinc-500">{t("chancesNote", { count })}</p>
+        {/* Each headline chance on its own page (the race around the club, an FAQ). */}
+        {chanceLinks.length > 0 && (
+          <ul className="flex flex-wrap gap-2" data-testid="club-chance-links">
+            {chanceLinks.map((c) => (
+              <li key={c.outcome}>
+                <Link
+                  href={clubChancePath(team.page!, c.outcome)}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold hover:border-pitch-500 hover:bg-pitch-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-pitch-900/30"
+                >
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: zoneHex(c.zone) }} />
+                  {chancesT("chip", { Topic: chancesT(`Topic.${c.key}`, { name: c.name }), topic: chancesT(`topic.${c.key}`, { name: c.name }) })}
+                  <Icon name="chevron-right" size={16} className="shrink-0 text-zinc-400" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
         {/* The club's card, as it's shared: one tap to share it or its link. */}
         <ShareCardBlock
           title={t("shareCardTitle", { club: team.shortName })}

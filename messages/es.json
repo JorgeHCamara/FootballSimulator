@@ -1105,5 +1105,100 @@
     "shareText": "Acerté {score} de {total} en el quiz de fútbol de hoy de Foot Simu.",
     "copied": "Copiado",
     "simulate": "Simular las ligas"
+  },
+  "Chances": {
+    "topic": {
+      "title": "título",
+      "titlePlayoff": "{name}",
+      "promotion": "ascenso",
+      "playoffs": "playoffs",
+      "relegation": "descenso"
+    },
+    "Topic": {
+      "title": "Título",
+      "titlePlayoff": "{name}",
+      "promotion": "Ascenso",
+      "playoffs": "Playoffs",
+      "relegation": "Descenso"
+    },
+    "chanceLabel": {
+      "title": "Probabilidad de título",
+      "titlePlayoff": "Probabilidad de ganar la {name}",
+      "promotion": "Probabilidad de ascenso",
+      "playoffs": "Probabilidad de playoffs",
+      "relegation": "Probabilidad de descenso"
+    },
+    "chip": "Probabilidades de {topic}",
+    "columns": {
+      "club": "Club",
+      "position": "Pos.",
+      "points": "Pts",
+      "chance": "Prob."
+    },
+    "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
+    "pointsPlayed": "{points, plural, one {# pt} other {# pts}} · {played, plural, one {# partido} other {# partidos}}",
+    "simulate": "Abrir el {simulator}",
+    "latestReport": "Último informe de probabilidades",
+    "league": {
+      "h1": {
+        "title": "{league} {season}: probabilidades de título",
+        "titlePlayoff": "{name} {season}: probabilidades de título",
+        "promotion": "{league} {season}: probabilidades de ascenso",
+        "playoffs": "{league} {season}: probabilidades de playoffs",
+        "relegation": "{league} {season}: probabilidades de descenso"
+      },
+      "metaTitle": "{h1} de todos los clubes",
+      "question": {
+        "title": "{league} {season}: ¿quién será campeón?",
+        "titlePlayoff": "{name} {season}: ¿quién será campeón?",
+        "promotion": "{league} {season}: ¿quién ascenderá?",
+        "playoffs": "{league} {season}: ¿quién llegará a los playoffs?",
+        "relegation": "{league} {season}: ¿quién descenderá?"
+      },
+      "next": "Después: {list}.",
+      "metaTail": "Probabilidades de {topic} de cada club, actualizadas tras los resultados.",
+      "tableTitle": "Probabilidades de {topic} de cada club",
+      "rest": "{count, plural, one {# club más} other {# clubes más}}: 0% (ninguna vez en {iterations} temporadas simuladas).",
+      "complete": "La temporada {season} terminó: estos son los resultados finales.",
+      "more": "Más probabilidades en {league}"
+    },
+    "club": {
+      "h1": {
+        "title": "{club}: probabilidades de título en {league} {season}",
+        "titlePlayoff": "{club}: probabilidades de ganar la {name} {season}",
+        "promotion": "{club}: probabilidades de ascenso en {league} {season}",
+        "playoffs": "{club}: probabilidades de playoffs en {league} {season}",
+        "relegation": "{club}: probabilidades de descenso en {league} {season}"
+      },
+      "metaDescription": "{label}: {pct}. {club} en {league} {season}, en {count} temporadas simuladas: su posición, su puesto probable y la pelea.",
+      "question": {
+        "title": "¿Qué probabilidades de título tiene {club}?",
+        "titlePlayoff": "¿Qué probabilidades tiene {club} de ganar la {name}?",
+        "promotion": "¿Qué probabilidades de ascenso tiene {club}?",
+        "playoffs": "¿Qué probabilidades tiene {club} de llegar a los playoffs?",
+        "relegation": "¿Descenderá {club}?"
+      },
+      "finishQuestion": "¿En qué puesto terminará {club}?",
+      "raceTitle": "{Topic}: los clubes con más opciones",
+      "raceNote": "Los {count} clubes con más opciones, en las mismas temporadas simuladas.",
+      "fullPage": "Todas las probabilidades y partidos de {club}",
+      "allClubs": "Probabilidades de {topic} de cada club",
+      "more": "Más sobre {club}"
+    },
+    "faq": {
+      "howQ": "¿Cómo se calculan estas probabilidades?",
+      "howA": "Foot Simu simula el resto de la temporada de {league} {count} veces, a partir de los resultados reales hasta ahora. El marcador de cada partido sale del ataque y la defensa de ambos clubes esta temporada, con la ventaja de jugar en casa. La probabilidad de un club es la proporción de esas temporadas en las que {verb}.",
+      "verb": {
+        "title": "es campeón",
+        "titlePlayoff": "gana la {name}",
+        "promotion": "asciende",
+        "playoffs": "llega a los playoffs",
+        "relegation": "desciende"
+      },
+      "updateQ": "¿Cada cuánto se actualizan?",
+      "updateA": "Cada pocas horas, a partir de los últimos resultados: cada resultado cambia las probabilidades de todos los clubes en la pelea.",
+      "oddsQ": "¿Son las cuotas de las casas de apuestas?",
+      "oddsA": "No. Son las probabilidades de las temporadas simuladas por Foot Simu, no cuotas de apuestas."
+    }
   }
 }
