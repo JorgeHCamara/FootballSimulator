@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { Fixture, Score, Team, TeamId } from "../engine/types.ts";
 import {
   divisionConfig,
@@ -53,29 +53,57 @@ export function openingMatchday(state: DivisionState): number {
   return state.league.playoff ? PLAYOFF_MATCHDAY : (state.fixtures.at(-1)?.matchday ?? 1);
 }
 
-/** The season picker: this season, then every finished one, newest first. */
-function SeasonPicker({ world, year, onYear }: { world: World; year: number; onYear: (year: number) => void }) {
-  const t = useTranslations("World");
+/** A picker in the style of the page's buttons: an icon, then a select (labelled for screen readers). */
+export function Picker({
+  icon,
+  label,
+  value,
+  options,
+  onChange,
+  testId,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+  testId: string;
+}) {
   return (
     <label className="flex w-full items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold sm:w-auto dark:border-zinc-700 dark:bg-zinc-900">
-      <Icon name="calendar-days" size={16} className="shrink-0 text-zinc-500" />
-      <span className="sr-only">{t("seasonSelect")}</span>
+      {icon}
+      <span className="sr-only">{label}</span>
       <select
-        value={year}
-        onChange={(e) => onYear(Number(e.target.value))}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="h-9 min-w-0 flex-1 cursor-pointer bg-transparent pr-1 font-semibold text-zinc-900 focus:outline-none dark:text-zinc-100 dark:[color-scheme:dark]"
-        data-testid="world-season-select"
+        data-testid={testId}
       >
-        <option value={world.year} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
-          {t("seasonCurrent", { season: seasonLabel(world.year) })}
-        </option>
-        {[...world.history].reverse().map((s) => (
-          <option key={s.year} value={s.year} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
-            {seasonLabel(s.year)}
+        {options.map((o) => (
+          <option key={o.value} value={o.value} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+            {o.label}
           </option>
         ))}
       </select>
     </label>
+  );
+}
+
+/** The season picker: this season, then every finished one, newest first. */
+function SeasonPicker({ world, year, onYear }: { world: World; year: number; onYear: (year: number) => void }) {
+  const t = useTranslations("World");
+  return (
+    <Picker
+      icon={<Icon name="calendar-days" size={16} className="shrink-0 text-zinc-500" />}
+      label={t("seasonSelect")}
+      value={String(year)}
+      options={[
+        { value: String(world.year), label: t("seasonCurrent", { season: seasonLabel(world.year) }) },
+        ...[...world.history].reverse().map((s) => ({ value: String(s.year), label: seasonLabel(s.year) })),
+      ]}
+      onChange={(y) => onYear(Number(y))}
+      testId="world-season-select"
+    />
   );
 }
 
