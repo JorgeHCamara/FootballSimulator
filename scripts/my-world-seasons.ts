@@ -1,12 +1,13 @@
 // Plays My World seasons from the live data, many worlds over, and reports how realistic the years turn out: who wins
 // the top divisions' titles, where the best-known clubs finish (and how often they miss the top six or ten, or go
 // down), the tables' points, how often promoted clubs go straight back down, and how the ratings' spread moves season
-// by season. This is how the between-season rule's values (src/lib/worldLevels.ts) were chosen.
+// by season; and who wins each cup (from which division, how often one of the top division's best-rated clubs at the
+// start). This is how the between-season rule's values (src/lib/worldLevels.ts) were chosen.
 // Usage: npm run world:seasons -- [worlds] [seasons]  (default 60 worlds of 10 seasons; STATS_SEASONS=10 limits the
 // finishes and titles to the first seasons of a longer run, the spread showing every season).
 import { createWorld, playSeason, startNextSeason, type World } from "../src/lib/myWorld.ts";
 import { worldStartPack } from "../src/lib/myWorldStart.ts";
-import { COUNTRY_LEAGUES, divisionCountry } from "../src/lib/worldCountries.ts";
+import { COUNTRY_LEAGUES, cupCountry, divisionCountry, pyramidPlayoffOf, WORLD_COUNTRIES } from "../src/lib/worldCountries.ts";
 
 const WORLDS = Number(process.argv[2] ?? 60);
 const SEASONS = Number(process.argv[3] ?? 10);
@@ -29,14 +30,19 @@ const titles = new Map<string, { initialTop3: number; total: number; champions: 
 const points = new Map<string, { champion: number[]; bottom: number[]; sd: number[] }>();
 const spread = new Map<string, number[][]>();
 const promoted = { seasons: 0, down: 0 };
+/** Each cup's winners: from which tier of its country (0 the top division, 1 the second…, -1 outside the leagues), and how many from the top division's initial top six. */
+const cupWinners = new Map<string, { tiers: number[]; topSix: number; total: number; winners: Set<number>[] }>();
+/** The pyramid play-off (the Bundesliga's 16th v the 2. Bundesliga's 3rd): how often the upper division's club stays up. */
+const pyramid = { upperStayed: 0, total: 0 };
 
 const t0 = Date.now();
 for (let seed = 1; seed <= WORLDS; seed++) {
   const club = pack.leagues.find((l) => l.code === "PL")!.teams[0]!.id;
-  let world = createWorld(pack, { league: "PL", club, countries: ["ENG", "ESP", "GER"] }, seed * 7919);
+  let world = createWorld(pack, { league: "PL", club, countries: [...WORLD_COUNTRIES] }, seed * 7919);
   const byReal = new Map<number, number>();
   for (const c of Object.values(world.clubs)) if (c.origin === "real" && c.realId !== undefined) byReal.set(c.realId, c.id);
   const initialTop3 = new Map(world.divisions.map((d) => [d.code, new Set([...d.clubs].sort((a, b) => logQuality(world, b) - logQuality(world, a)).slice(0, 3))]));
+  const initialTop6 = new Map(world.divisions.map((d) => [d.code, new Set([...d.clubs].sort((a, b) => logQuality(world, b) - logQuality(world, a)).slice(0, 6))]));
   let promotedLast = new Set<number>();
   for (let s = 0; s < SEASONS; s++) {
     for (const d of world.divisions) {
@@ -45,6 +51,23 @@ for (let seed = 1; seed <= WORLDS; seed++) {
     }
     world = playSeason(world);
     const record = world.history.at(-1)!;
+    for (const d of record.divisions) {
+      const tie = pyramidPlayoffOf(d.code);
+      if (!tie || tie.lower !== d.code || !d.final || s >= STATS_SEASONS) continue;
+      pyramid.total++;
+      if (record.divisions.find((x) => x.code === tie.upper)!.rows.some((r) => r[0] === d.final![0])) pyramid.upperStayed++;
+    }
+    for (const cup of record.cups ?? []) {
+      if (s >= STATS_SEASONS) continue;
+      if (!cupWinners.has(cup.code)) cupWinners.set(cup.code, { tiers: [], topSix: 0, total: 0, winners: [] });
+      const c = cupWinners.get(cup.code)!;
+      const leagues = COUNTRY_LEAGUES[cupCountry(cup.code)];
+      const tier = record.divisions.findIndex((d) => (leagues as readonly string[]).includes(d.code) && d.rows.some((r) => r[0] === cup.final[0]));
+      c.tiers.push(tier < 0 ? -1 : leagues.indexOf(record.divisions[tier]!.code));
+      if (initialTop6.get(leagues[0]!)!.has(cup.final[0])) c.topSix++;
+      c.total++;
+      (c.winners[seed] ??= new Set()).add(cup.final[0]);
+    }
     const promotedNow = new Set<number>();
     for (const d of record.divisions) {
       const { rows, code } = d;
@@ -100,6 +123,13 @@ for (const [code, t] of titles) {
   console.log(`  spread of log(attack/defence) at the start of seasons 1..${SEASONS}: ${spread.get(code)!.map((xs) => mean(xs).toFixed(2)).join(" ")}`);
 }
 console.log(`promoted clubs relegated straight back: ${pct(promoted.down, promoted.seasons)}\n`);
+for (const [code, c] of cupWinners) {
+  const from = (tier: number) => pct(c.tiers.filter((t) => t === tier).length, c.total);
+  const distinct = c.winners.filter(Boolean).map((w) => w.size);
+  console.log(`${code}: winners from the top division ${from(0)}, the second ${from(1)}, lower ${pct(c.tiers.filter((t) => t > 1 || t < 0).length, c.total)}; from the top division's initial top six ${pct(c.topSix, c.total)}; distinct winners per world: ${mean(distinct).toFixed(1)}`);
+}
+if (pyramid.total) console.log(`the pyramid play-off: the upper division's club stays up ${pct(pyramid.upperStayed, pyramid.total)}`);
+console.log("");
 for (const [key, st] of named) {
   const [code, realId] = key.split(":");
   const name = pack.leagues.find((l) => l.code === code)!.teams.find((t) => t.id === Number(realId))?.shortName ?? realId!;

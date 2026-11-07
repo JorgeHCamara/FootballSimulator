@@ -1,7 +1,6 @@
 import type { CupRoundKey } from "../config/cups.ts";
 import type { LeagueConfig } from "../config/leagues.ts";
 import { expectedGoals, expectedGoalsNeutral, sampleDixonColes, sampleLikelyScore, simulateFixtures } from "../engine/match.ts";
-import { tierStrength } from "../engine/cupModel.ts";
 import { seasonRatings, type SeasonRatings } from "../engine/offseason.ts";
 import {
   buildBracket,
@@ -48,7 +47,7 @@ import {
   type WorldCupCode,
 } from "./worldCountries.ts";
 import { cupConfig, cupPlayable, finishCups, generateCup, outsidersNeeded, type SavedCup, type WorldCupSeason, type WorldCupTie } from "./worldCups.ts";
-import { divisionForm, seasonRng, shuffled, teamOf } from "./worldForm.ts";
+import { divisionForm, seasonRng, shuffled, teamOf, worldTierStrength } from "./worldForm.ts";
 import { nextSeason } from "./worldLevels.ts";
 
 export {
@@ -722,11 +721,11 @@ function pyramidRows(tie: PyramidPlayoff, upperRows: readonly StandingRow[], low
   return [upperRows.find((r) => r.position === tie.upperPlace), lowerRows.find((r) => r.position === tie.lowerPlace)].filter((r): r is StandingRow => r !== undefined);
 }
 
-/** The lower division's form with the upper division's club in the tie on its scale: a club from the division above rates one tier stronger (as the cups rate clubs). */
+/** The lower division's form with the upper division's club in the tie on its scale: a club from the division above rates one tier stronger (as the cups rate clubs, worldTierStrength). */
 function tieModel(lower: LeagueModel, upper: LeagueModel, upperClub: TeamId | undefined): LeagueModel {
   const strength = upperClub !== undefined ? upper.strengths.get(upperClub) : undefined;
   if (upperClub === undefined || !strength) return lower;
-  const scale = tierStrength(-1);
+  const scale = worldTierStrength(-1);
   return { ...lower, strengths: new Map(lower.strengths).set(upperClub, { attack: strength.attack * scale.attack, defence: strength.defence * scale.defence }) };
 }
 
