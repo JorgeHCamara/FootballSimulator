@@ -2807,6 +2807,10 @@ async function step(name, fn) {
       // One total for the season, every competition's games left added up.
       const sum = (await p.getByTestId("world-left").evaluateAll((els) => els.map((e) => Number(e.dataset.left)))).reduce((a, b) => a + b, 0);
       assert.equal(Number(await p.getByTestId("world-left-total").getAttribute("data-left")), sum);
+      // On a desktop the countries sit in two columns, side by side.
+      assert.deepEqual(await p.getByTestId("world-left-column").evaluateAll((els) => els.map((e) => [...e.querySelectorAll('[data-testid="world-left-country"]')].map((c) => c.dataset.country))), [["ENG"], ["ESP"]]);
+      const [engBox, espBox] = await Promise.all(["ENG", "ESP"].map((c) => p.locator(`[data-testid="world-left-country"][data-country="${c}"]`).boundingBox()));
+      assert.ok(espBox.x > engBox.x + engBox.width - 1 && Math.abs(espBox.y - engBox.y) < 2, "England and Spain side by side");
       await picker.selectOption("ESP");
       // The games left, by country: England's six, Spain's three.
       assert.deepEqual(await p.getByTestId("world-left-country").evaluateAll((els) => els.map((e) => [e.dataset.country, e.querySelectorAll('[data-testid="world-left"]').length])), [["ENG", 6], ["ESP", 3]]);
