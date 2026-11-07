@@ -29,12 +29,13 @@ input[type="number"] {
 }
 
 /*
- * The home page's hero (src/components/HomeHero.tsx): near-black, an emerald
+ * The dark heroes (the home page's, src/components/HomeHero.tsx, and My
+ * World's, src/components/WorldHero.tsx): near-black, an emerald
  * glow behind the headline, and faint pitch lines (the halfway line, the
  * centre circle and a grid), all CSS: no image and nothing fixed. Phones get a
  * softer glow and no circle; small screens keep the text clear of the notch.
  */
-.home-hero {
+.site-hero {
   background-color: #09090b;
   background-image:
     radial-gradient(60% 50% at 30% 0%, rgb(22 163 74 / 0.32), transparent 70%),
@@ -50,7 +51,7 @@ input[type="number"] {
   padding-right: env(safe-area-inset-right);
 }
 @media (min-width: 640px) {
-  .home-hero {
+  .site-hero {
     background-image:
       radial-gradient(55% 60% at 35% 0%, rgb(22 163 74 / 0.4), transparent 70%),
       radial-gradient(35% 45% at 95% 100%, rgb(22 163 74 / 0.16), transparent 70%),
@@ -69,7 +70,7 @@ input[type="number"] {
 }
 
 /* The H1: about 32px on a 360px phone, 52px on a desktop, fluid in between. */
-.home-hero-title {
+.site-hero-title {
   font-size: clamp(2rem, 1.2rem + 3.6vw, 3.25rem);
   line-height: 1.12;
   letter-spacing: -0.03em;

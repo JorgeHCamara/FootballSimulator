@@ -38,6 +38,7 @@ import {
   worldDivisions,
 } from "../lib/myWorld.ts";
 import { browserStore, clearWorld, loadWorld, saveWorld } from "../lib/myWorldStorage.ts";
+import { PLAY_ANCHOR } from "../lib/worldHero.ts";
 import { cupGamesInSeason, cupGamesLeft, cupStates, isWorldCup, outsidersNeeded, type WorldCupCode } from "../lib/worldCups.ts";
 import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
@@ -97,8 +98,8 @@ export function MyWorld({ pack, locale }: { pack: StartPack; locale: SiteLocale 
   if (view.kind === "setup") {
     const onCreate = (league: DivisionCode, club: number, countries: WorldCountry[]) => {
       commit(createWorld(pack, { league, club, countries }));
-      // The world opens at the top: the club, its season and the ways to play it.
-      requestAnimationFrame(() => document.querySelector('[data-testid="my-world"]')?.scrollIntoView({ block: "start" }));
+      // The world opens at its top (below the hero): the club, its season and the ways to play it.
+      requestAnimationFrame(() => (document.getElementById(PLAY_ANCHOR) ?? document.querySelector('[data-testid="my-world"]'))?.scrollIntoView({ block: "start" }));
     };
     return <Setup pack={pack} locale={locale} reset={view.reset} onCreate={onCreate} />;
   }

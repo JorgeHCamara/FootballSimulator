@@ -1270,8 +1270,25 @@
   "World": {
     "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol ou alemão",
     "metaDescription": "Escolha um clube da Inglaterra, da Espanha ou da Alemanha e jogue temporada após temporada de suas ligas e copas, com playoffs, acesso e rebaixamento. Salvo no seu navegador, com as tabelas de todas as temporadas.",
+    "hero": {
+      "badge": "Modo de jogo",
+      "start": "Começar seu mundo",
+      "continue": "Continuar seu mundo",
+      "countries": "{count} países",
+      "leagues": "{count} ligas",
+      "cups": "{count} copas",
+      "saved": "Salvo no seu navegador",
+      "noSignup": "Sem cadastro"
+    },
+    "how": {
+      "title": "Como funciona",
+      "pick": "Escolha um ou mais países e o seu clube: todas as ligas e copas de cada um são jogadas por inteiro.",
+      "play": "Digite qualquer placar, role os dados ou simule uma rodada ou o resto da temporada.",
+      "season": "Encerre a temporada: campeões, copas, playoffs, acesso e rebaixamento, e depois a retrospectiva.",
+      "again": "Inicie a próxima temporada e siga em frente, ano após ano; as tabelas de todas as temporadas ficam no seu navegador."
+    },
     "title": "Meu mundo",
-    "intro": "Escolha seus países e um clube e jogue temporada após temporada da pirâmide inglesa (da Premier League à League Two, a FA Cup e a Copa da Liga), da espanhola (La Liga, Segunda División e Copa del Rey), da alemã (Bundesliga, 2. Bundesliga e DFB-Pokal) ou de todas juntas, cada resultado do seu jeito, como nas páginas das ligas: com os playoffs, o acesso e o rebaixamento. Você consegue levar um clube da League Two até a Premier League?",
+    "intro": "Escolha seus países e um clube e jogue temporada após temporada de suas ligas e copas, cada resultado do seu jeito, como nas páginas das ligas: com os playoffs, o acesso e o rebaixamento. Até onde você leva o seu clube?",
     "savedNote": "Seu mundo fica salvo só neste navegador.",
     "notSaved": "Este navegador não está salvando seu mundo (navegação privada ou armazenamento cheio): ele será perdido quando você sair da página.",
     "reset": {
@@ -1481,7 +1498,7 @@
       "no": "Manter este mundo"
     },
     "homeTitle": "Meu mundo",
-    "homeBody": "Leve um clube da League Two até a Premier League, temporada após temporada, com acesso, rebaixamento e playoffs.",
+    "homeBody": "Escolha um clube e jogue temporada após temporada, cada resultado do seu jeito: ligas, copas, playoffs, acesso e rebaixamento.",
     "homeCta": "Começar seu mundo"
   }
 }

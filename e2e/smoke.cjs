@@ -3229,6 +3229,72 @@ async function step(name, fn) {
       await phone.context().close();
     });
 
+    await step("My World hero: one H1 per language, the badge, the button to the game (Start, then Continue once a world is saved), the facts counted from the config, the how-it-works card; 390px phone and desktop, no league named", async () => {
+      const expected = {
+        en: { h1: "My World", badge: "Game mode", start: "Start your world", resume: "Continue your world", how: "How it works", facts: /^\d+ countries · \d+ leagues · \d+ cups (· )?Saved in your browser · No sign-up$/ },
+        pt: { h1: "Meu mundo", badge: "Modo de jogo", start: "Começar seu mundo", resume: "Continuar seu mundo", how: "Como funciona", facts: /^\d+ países · \d+ ligas · \d+ copas (· )?Salvo no seu navegador · Sem cadastro$/ },
+        es: { h1: "Mi mundo", badge: "Modo de juego", start: "Empezar tu mundo", resume: "Continuar tu mundo", how: "Cómo funciona", facts: /^\d+ países · \d+ ligas · \d+ copas (· )?Guardado en tu navegador · Sin registro$/ },
+      };
+      const named = /Premier League|League Two|Bundesliga|La ?Liga|FA Cup|Copa del Rey|DFB/;
+      for (const [locale, x] of Object.entries(expected)) {
+        for (const phone of [true, false]) {
+          const width = phone ? 390 : 1280;
+          const ctx = await browser.newContext(phone ? { viewport: { width, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width, height: 900 } });
+          const p = await ctx.newPage();
+          await p.goto(`${BASE_URL}/${locale}/my-world`);
+          const tag = `${locale} ${phone ? "phone" : "desktop"}`;
+          assert.equal(await p.locator("h1").count(), 1, tag);
+          assert.equal(await p.locator("h1").innerText(), x.h1, tag);
+          assert.equal(await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, `${tag}: no horizontal scroll`);
+          assert.equal((await p.getByTestId("world-hero-badge").innerText()).trim(), x.badge, tag);
+          const intro = await p.getByTestId("world-hero-intro").innerText();
+          assert.ok(intro.length > 80 && !named.test(intro), `${tag}: the intro names no league: ${intro}`);
+          const facts = (await p.getByTestId("world-hero-facts").innerText()).replace(/\s+/g, " ").trim();
+          assert.match(facts, x.facts, tag);
+          const how = p.getByTestId("world-hero-how");
+          assert.equal((await how.locator("h2").innerText()).trim(), x.how, tag);
+          assert.equal(await how.getByTestId("world-hero-step").count(), 4, tag);
+          assert.ok(!named.test(await how.innerText()), `${tag}: the steps name no league`);
+          // The button: "Start your world" with no saved world, on the first screen, scrolling to the set-up.
+          const cta = p.getByTestId("world-hero-cta");
+          assert.equal((await cta.innerText()).trim(), x.start, tag);
+          assert.equal(await cta.getAttribute("href"), "#play", tag);
+          const box = await cta.boundingBox();
+          assert.ok(box.y + box.height <= (phone ? 844 : 900), `${tag}: the button on the first screen`);
+          if (phone) {
+            assert.ok(box.height >= 48 && box.width >= width - 48, `${tag}: full width, 48px`);
+            const [titleBox, howBox] = await Promise.all([p.locator("h1").boundingBox(), how.boundingBox()]);
+            assert.ok(howBox.y > titleBox.y + titleBox.height, `${tag}: the card under the words`);
+          } else {
+            const [titleBox, howBox] = await Promise.all([p.locator("h1").boundingBox(), how.boundingBox()]);
+            assert.ok(howBox.x > titleBox.x + titleBox.width && howBox.y < titleBox.y + titleBox.height + 200, `${tag}: the card beside the words`);
+          }
+          await p.getByTestId("world-setup").waitFor();
+          await cta.click();
+          // Scrolled to the game (as far as the page allows: a short page can't bring it to the very top).
+          await p.waitForFunction(() => scrollY > 200 && document.querySelector('[data-testid="world-setup"]').getBoundingClientRect().top < innerHeight / 2);
+          await ctx.close();
+        }
+      }
+      // A saved world: the button says Continue (the server still renders Start, the browser's save decides after loading).
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
+      await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
+      await p.getByTestId("world-club").first().click();
+      await p.getByTestId("world-create").click();
+      await p.getByTestId("world").waitFor();
+      await p.reload();
+      await p.getByTestId("world").waitFor();
+      await p.waitForFunction(() => document.querySelector('[data-testid="world-hero-cta"]')?.dataset.state === "continue");
+      assert.equal((await p.getByTestId("world-hero-cta").innerText()).trim(), expected.en.resume);
+      await p.getByTestId("world-hero-cta").click();
+      await p.waitForFunction(() => scrollY > 200 && document.querySelector("#play").getBoundingClientRect().top < innerHeight / 2);
+      await p.evaluate(() => localStorage.removeItem("footsimu:my-world"));
+      await p.close();
+    });
+
     console.log("\nAll e2e checks passed.");
   } finally {
     await browser.close();
