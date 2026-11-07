@@ -353,6 +353,20 @@ describe("the 2. Bundesliga's past winners", () => {
   });
 });
 
+describe("the Brasileirão Série B's past winners", () => {
+  const rows = leagueWinners("brasileirao-serie-b")!;
+
+  it("runs from 1971 to 2025, with the years no Série B was played", () => {
+    assert.equal(rows.length, 55);
+    assert.equal(rows[0]!.season, "2025");
+    assert.equal(rows[0]!.champion!.name, "Coritiba");
+    assert.equal(rows.at(-1)!.season, "1971");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 11);
+    assert.deepEqual(eras(rows), [{ name: "Campeonato Brasileiro Série B", from: 1971, to: null }]);
+    assert.deepEqual(mostTitles(rows, 1).map((c) => [c.name, c.titles]), [["Coritiba", 3]]);
+  });
+});
+
 describe("parseLeagueHistory", () => {
   const placing = (id: number, name: string) => ({ name, currentName: name, footsimuId: id, footsimuSlug: name.toLowerCase(), footsimuPath: `/x/team/${name.toLowerCase()}`, points: 40 });
   const season = (over: Partial<HistorySeason> = {}): HistorySeason => ({
