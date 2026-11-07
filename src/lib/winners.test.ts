@@ -268,6 +268,36 @@ describe("the Brasileirão's past winners", () => {
   });
 });
 
+describe("Ligue 1's past winners", () => {
+  const rows = leagueWinners("ligue-1")!;
+
+  it("runs from 1932-33 to 2025-26, the war years not held, 1992-93's title withdrawn", () => {
+    assert.equal(rows.length, 94);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows.at(-1)!.season, "1932-33");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 6);
+    const revoked = rows.find((r) => r.season === "1992-93")!;
+    assert.equal(revoked.champion, null);
+    assert.equal(revoked.stripped!.name, "Marseille");
+    assert.deepEqual(
+      mostTitles(rows, 5).map((c) => [c.name, c.titles]),
+      [
+        ["Paris Saint-Germain", 14],
+        ["Saint-Étienne", 10],
+        ["Marseille", 9],
+        ["Monaco", 8],
+        ["Nantes", 8],
+      ],
+    );
+  });
+
+  it("keeps the war years in the era around them, though the file names them differently", () => {
+    const list = eras(rows);
+    assert.deepEqual(list, [{ name: "French championship", from: 1932, to: null }]);
+    assert.equal(filterRows(rows, { era: list[0] }).length, 94);
+  });
+});
+
 describe("parseLeagueHistory", () => {
   const placing = (id: number, name: string) => ({ name, currentName: name, footsimuId: id, footsimuSlug: name.toLowerCase(), footsimuPath: `/x/team/${name.toLowerCase()}`, points: 40 });
   const season = (over: Partial<HistorySeason> = {}): HistorySeason => ({

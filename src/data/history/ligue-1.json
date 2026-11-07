@@ -1,0 +1,3039 @@
+{
+  "league": "Ligue 1",
+  "footsimuSlug": "ligue-1",
+  "footsimuCode": "FL1",
+  "country": "France",
+  "scope": "French professional champions (Division 1 / Ligue 1) from 1932-33. Amateur-era championships (1893-1929, USFSA and others) are not included, so title counts here start at 1932-33 (e.g. Marseille 9, not the 10 the Wikipedia list shows including the 1929 amateur title). Wartime seasons 1939-40 to 1944-45 are not_held with the unofficial competitions described in notes. 1992-93 has no champion (Marseille stripped, see strippedChampion)",
+  "source": [
+    "https://en.wikipedia.org/wiki/List_of_French_football_champions (revision 1377770995; champion, runner-up, third)",
+    "https://www.rsssf.org/tablesf/franchamp.html (RSSSF champions with W-D-L and points, every season; wartime competitions)",
+    "https://www.rsssf.org/tablesf/franYY.html / franYYYY.html (RSSSF final tables 1997-98 to 2025-26: top three and points)",
+    "Wikipedia season articles (YYYY–YY French Division 1 / Ligue 1) league tables and results grids (cross-check, points)",
+    "https://site.api.espn.com/apis/v2/sports/soccer/fra.1/standings?season=YYYY (2002-03 to 2025-26, cross-check)"
+  ],
+  "retrievedAt": "2026-11-07T01:56:53+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id (the id FootSimu uses); present for some clubs not in FootSimu leagues",
+    "footsimuSlug": "club page slug on footsimu.com, only for clubs in a FootSimu league in 2026-27",
+    "footsimuPath": "club page path under the league the club plays in now, without locale",
+    "points": "final points (2 per win until 1993-94, 3 from 1994-95; 1973-76 include bonus points); null for 1932-33 (two groups + final)",
+    "name": "club name used in the source for that season",
+    "currentName": "club as known today (FootSimu name where available); historic/defunct clubs are annotated",
+    "tournament": "always null (kept for schema consistency)",
+    "tiedWith": "not used",
+    "strippedChampion": "1992-93 Marseille (title withdrawn, not awarded); champion is null in that season"
+  },
+  "seasons": [
+    {
+      "season": "1932-33",
+      "startYear": 1932,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "final",
+      "champion": {
+        "name": "Olympique Lillois",
+        "currentName": "Olympique Lillois (merged into Lille OSC 1944)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Cannes",
+        "currentName": "Cannes",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Inaugural professional season: two groups of 10, group winners Olympique Lillois and Cannes met in the final (Lille won 4-3). Third place as listed by the source (RC Paris); no third-place match was played. Points are not comparable across the two groups and are omitted"
+      ]
+    },
+    {
+      "season": "1933-34",
+      "startYear": 1933,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Sète",
+        "currentName": "Sète",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 34
+      },
+      "runnerUp": {
+        "name": "Fives",
+        "currentName": "SC Fives (merged into Lille OSC 1944)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 33
+      },
+      "third": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 33
+      },
+      "notes": []
+    },
+    {
+      "season": "1934-35",
+      "startYear": 1934,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Strasbourg",
+        "currentName": "Strasbourg",
+        "footsimuId": 180,
+        "footsimuSlug": "strasbourg",
+        "footsimuPath": "/ligue-1/team/strasbourg",
+        "points": 47
+      },
+      "third": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1935-36",
+      "startYear": 1935,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Olympique Lillois",
+        "currentName": "Olympique Lillois (merged into Lille OSC 1944)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "third": {
+        "name": "Strasbourg",
+        "currentName": "Strasbourg",
+        "footsimuId": 180,
+        "footsimuSlug": "strasbourg",
+        "footsimuPath": "/ligue-1/team/strasbourg",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1936-37",
+      "startYear": 1936,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 38
+      },
+      "runnerUp": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 38
+      },
+      "third": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1937-38",
+      "startYear": 1937,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 42
+      },
+      "third": {
+        "name": "Sète",
+        "currentName": "Sète",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1938-39",
+      "startYear": 1938,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Sète",
+        "currentName": "Sète",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 40
+      },
+      "third": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1939-40",
+      "startYear": 1939,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Division 1",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Official championship suspended due to the Second World War; unofficial wartime championships (regional/zone competitions, and the 1943-44 federal-team championship) were played but are not counted by the LFP. Unofficial wartime competition (not counted): 1939-40: regional groups; Rouen (North) and Girondins ASP (South) won their sections, the national final was never played (German invasion)"
+      ]
+    },
+    {
+      "season": "1940-41",
+      "startYear": 1940,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Division 1",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Official championship suspended due to the Second World War; unofficial wartime championships (regional/zone competitions, and the 1943-44 federal-team championship) were played but are not counted by the LFP. Unofficial wartime competition (not counted): 1940-41: zone championships, Red Star (occupied North) and Marseille (free South)"
+      ]
+    },
+    {
+      "season": "1941-42",
+      "startYear": 1941,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Division 1",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Official championship suspended due to the Second World War; unofficial wartime championships (regional/zone competitions, and the 1943-44 federal-team championship) were played but are not counted by the LFP. Unofficial wartime competition (not counted): 1941-42: zone championships, Reims (North) and Sète (South)"
+      ]
+    },
+    {
+      "season": "1942-43",
+      "startYear": 1942,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Division 1",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Official championship suspended due to the Second World War; unofficial wartime championships (regional/zone competitions, and the 1943-44 federal-team championship) were played but are not counted by the LFP. Unofficial wartime competition (not counted): 1942-43: zone championships, Lens (North) and Toulouse FC (1937) (South)"
+      ]
+    },
+    {
+      "season": "1943-44",
+      "startYear": 1943,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Division 1",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Official championship suspended due to the Second World War; unofficial wartime championships (regional/zone competitions, and the 1943-44 federal-team championship) were played but are not counted by the LFP. Unofficial wartime competition (not counted): 1943-44: Federal Championship of 16 regional teams (professional clubs dissolved by the Vichy government); won by Lens-Artois, partly unfinished"
+      ]
+    },
+    {
+      "season": "1944-45",
+      "startYear": 1944,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Division 1",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Official championship suspended due to the Second World War; unofficial wartime championships (regional/zone competitions, and the 1943-44 federal-team championship) were played but are not counted by the LFP. Unofficial wartime competition (not counted): 1944-45: post-Liberation league of 2 groups and a final, won by Rouen"
+      ]
+    },
+    {
+      "season": "1945-46",
+      "startYear": 1945,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 44
+      },
+      "third": {
+        "name": "CO Roubaix-Tourcoing",
+        "currentName": "CO Roubaix-Tourcoing (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1946-47",
+      "startYear": 1946,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Roubaix–Tourcoing",
+        "currentName": "CO Roubaix-Tourcoing (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 49
+      },
+      "third": {
+        "name": "Strasbourg",
+        "currentName": "Strasbourg",
+        "footsimuId": 180,
+        "footsimuSlug": "strasbourg",
+        "footsimuPath": "/ligue-1/team/strasbourg",
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1947-48",
+      "startYear": 1947,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 47
+      },
+      "third": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1948-49",
+      "startYear": 1948,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 47
+      },
+      "third": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 42
+      },
+      "notes": []
+    },
+    {
+      "season": "1949-50",
+      "startYear": 1949,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 45
+      },
+      "third": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1950-51",
+      "startYear": 1950,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nice",
+        "currentName": "Nice",
+        "footsimuId": 2502,
+        "footsimuSlug": "nice",
+        "footsimuPath": "/ligue-1/team/nice",
+        "points": 41
+      },
+      "runnerUp": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 41
+      },
+      "third": {
+        "name": "Le Havre",
+        "currentName": "Le Havre",
+        "footsimuId": 3236,
+        "footsimuSlug": "le-havre",
+        "footsimuPath": "/ligue-1/team/le-havre",
+        "points": 40
+      },
+      "notes": []
+    },
+    {
+      "season": "1951-52",
+      "startYear": 1951,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nice",
+        "currentName": "Nice",
+        "footsimuId": 2502,
+        "footsimuSlug": "nice",
+        "footsimuPath": "/ligue-1/team/nice",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 45
+      },
+      "third": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1952-53",
+      "startYear": 1952,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 44
+      },
+      "third": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1953-54",
+      "startYear": 1953,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 46
+      },
+      "third": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1954-55",
+      "startYear": 1954,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Toulouse FC (1937)",
+        "currentName": "Toulouse FC (1937) (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 40
+      },
+      "third": {
+        "name": "Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 38
+      },
+      "notes": [
+        "Toulouse FC (1937) is a different club from today's Toulouse FC (founded 1970); it merged into Red Star in 1967"
+      ]
+    },
+    {
+      "season": "1955-56",
+      "startYear": 1955,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nice",
+        "currentName": "Nice",
+        "footsimuId": 2502,
+        "footsimuSlug": "nice",
+        "footsimuPath": "/ligue-1/team/nice",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 42
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1956-57",
+      "startYear": 1956,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 45
+      },
+      "third": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1957-58",
+      "startYear": 1957,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Nîmes",
+        "currentName": "Nîmes",
+        "footsimuId": 7730,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1958-59",
+      "startYear": 1958,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nice",
+        "currentName": "Nice",
+        "footsimuId": 2502,
+        "footsimuSlug": "nice",
+        "footsimuPath": "/ligue-1/team/nice",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Nîmes",
+        "currentName": "Nîmes",
+        "footsimuId": 7730,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "third": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1959-60",
+      "startYear": 1959,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Nîmes",
+        "currentName": "Nîmes",
+        "footsimuId": 7730,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "third": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1960-61",
+      "startYear": 1960,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 56
+      },
+      "third": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 50
+      },
+      "notes": []
+    },
+    {
+      "season": "1961-62",
+      "startYear": 1961,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "RC Paris",
+        "currentName": "Racing Club de France",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "third": {
+        "name": "Nîmes",
+        "currentName": "Nîmes",
+        "footsimuId": 7730,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "notes": []
+    },
+    {
+      "season": "1962-63",
+      "startYear": 1962,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Reims",
+        "currentName": "Stade de Reims",
+        "footsimuId": 3243,
+        "footsimuSlug": "stade-de-reims",
+        "footsimuPath": "/ligue-2/team/stade-de-reims",
+        "points": 47
+      },
+      "third": {
+        "name": "Sedan",
+        "currentName": "Sedan",
+        "footsimuId": 168,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1963-64",
+      "startYear": 1963,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 41
+      },
+      "third": {
+        "name": "RC Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 40
+      },
+      "notes": []
+    },
+    {
+      "season": "1964-65",
+      "startYear": 1964,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "third": {
+        "name": "Valenciennes",
+        "currentName": "Valenciennes",
+        "footsimuId": 6732,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 40
+      },
+      "notes": []
+    },
+    {
+      "season": "1965-66",
+      "startYear": 1965,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "third": {
+        "name": "Valenciennes",
+        "currentName": "Valenciennes",
+        "footsimuId": 6732,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 52
+      },
+      "notes": []
+    },
+    {
+      "season": "1966-67",
+      "startYear": 1966,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 50
+      },
+      "third": {
+        "name": "Angers",
+        "currentName": "Angers",
+        "footsimuId": 7868,
+        "footsimuSlug": "angers",
+        "footsimuPath": "/ligue-1/team/angers",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1967-68",
+      "startYear": 1967,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Nice",
+        "currentName": "Nice",
+        "footsimuId": 2502,
+        "footsimuSlug": "nice",
+        "footsimuPath": "/ligue-1/team/nice",
+        "points": 46
+      },
+      "third": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1968-69",
+      "startYear": 1968,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "third": {
+        "name": "Metz",
+        "currentName": "Metz",
+        "footsimuId": 177,
+        "footsimuSlug": "metz",
+        "footsimuPath": "/ligue-2/team/metz",
+        "points": 42
+      },
+      "notes": []
+    },
+    {
+      "season": "1969-70",
+      "startYear": 1969,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 45
+      },
+      "third": {
+        "name": "RC Paris-Sedan",
+        "currentName": "Sedan",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 42
+      },
+      "notes": [
+        "RC Paris-Sedan was the 1966-70 merger of Racing Club de Paris and UA Sedan-Torcy (today CS Sedan Ardennes)"
+      ]
+    },
+    {
+      "season": "1970-71",
+      "startYear": 1970,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 51
+      },
+      "third": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1971-72",
+      "startYear": 1971,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Nîmes",
+        "currentName": "Nîmes",
+        "footsimuId": 7730,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "third": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 47
+      },
+      "notes": []
+    },
+    {
+      "season": "1972-73",
+      "startYear": 1972,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Nice",
+        "currentName": "Nice",
+        "footsimuId": 2502,
+        "footsimuSlug": "nice",
+        "footsimuPath": "/ligue-1/team/nice",
+        "points": 50
+      },
+      "third": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 48
+      },
+      "notes": []
+    },
+    {
+      "season": "1973-74",
+      "startYear": 1973,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 58
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 55
+      },
+      "notes": [
+        "Points include bonus points awarded for matches with 3+ goals (1973-76 experiment)"
+      ]
+    },
+    {
+      "season": "1974-75",
+      "startYear": 1974,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 49
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 48
+      },
+      "notes": [
+        "Points include bonus points awarded for matches with 3+ goals (1973-76 experiment)"
+      ]
+    },
+    {
+      "season": "1975-76",
+      "startYear": 1975,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Nice",
+        "currentName": "Nice",
+        "footsimuId": 2502,
+        "footsimuSlug": "nice",
+        "footsimuPath": "/ligue-1/team/nice",
+        "points": 54
+      },
+      "third": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 52
+      },
+      "notes": [
+        "Points include bonus points awarded for matches with 3+ goals (1973-76 experiment)"
+      ]
+    },
+    {
+      "season": "1976-77",
+      "startYear": 1976,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 49
+      },
+      "third": {
+        "name": "Bastia",
+        "currentName": "Bastia",
+        "footsimuId": 173,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "notes": []
+    },
+    {
+      "season": "1977-78",
+      "startYear": 1977,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 52
+      },
+      "third": {
+        "name": "Strasbourg",
+        "currentName": "Strasbourg",
+        "footsimuId": 180,
+        "footsimuSlug": "strasbourg",
+        "footsimuPath": "/ligue-1/team/strasbourg",
+        "points": 50
+      },
+      "notes": []
+    },
+    {
+      "season": "1978-79",
+      "startYear": 1978,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Strasbourg",
+        "currentName": "Strasbourg",
+        "footsimuId": 180,
+        "footsimuSlug": "strasbourg",
+        "footsimuPath": "/ligue-1/team/strasbourg",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 54
+      },
+      "third": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 54
+      },
+      "notes": []
+    },
+    {
+      "season": "1979-80",
+      "startYear": 1979,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 54
+      },
+      "third": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 54
+      },
+      "notes": []
+    },
+    {
+      "season": "1980-81",
+      "startYear": 1980,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 55
+      },
+      "third": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1981-82",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Saint-Étienne",
+        "currentName": "Saint-Étienne",
+        "footsimuId": 178,
+        "footsimuSlug": "saint-etienne",
+        "footsimuPath": "/ligue-2/team/saint-etienne",
+        "points": 54
+      },
+      "third": {
+        "name": "Sochaux",
+        "currentName": "Sochaux",
+        "footsimuId": 272,
+        "footsimuSlug": "sochaux",
+        "footsimuPath": "/ligue-2/team/sochaux",
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1982-83",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "third": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 47
+      },
+      "notes": []
+    },
+    {
+      "season": "1983-84",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 54
+      },
+      "third": {
+        "name": "Auxerre",
+        "currentName": "Auxerre",
+        "footsimuId": 172,
+        "footsimuSlug": "auxerre",
+        "footsimuPath": "/ligue-1/team/auxerre",
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1984-85",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 56
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 48
+      },
+      "notes": []
+    },
+    {
+      "season": "1985-86",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 53
+      },
+      "third": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1986-87",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 49
+      },
+      "third": {
+        "name": "Toulouse",
+        "currentName": "Toulouse",
+        "footsimuId": 179,
+        "footsimuSlug": "toulouse",
+        "footsimuPath": "/ligue-1/team/toulouse",
+        "points": 48
+      },
+      "notes": []
+    },
+    {
+      "season": "1987-88",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "third": {
+        "name": "Montpellier",
+        "currentName": "Montpellier",
+        "footsimuId": 274,
+        "footsimuSlug": "montpellier",
+        "footsimuPath": "/ligue-2/team/montpellier",
+        "points": 45
+      },
+      "notes": []
+    },
+    {
+      "season": "1988-89",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 73
+      },
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 70
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 68
+      },
+      "notes": []
+    },
+    {
+      "season": "1989-90",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1990-91",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 51
+      },
+      "third": {
+        "name": "Auxerre",
+        "currentName": "Auxerre",
+        "footsimuId": 172,
+        "footsimuSlug": "auxerre",
+        "footsimuPath": "/ligue-1/team/auxerre",
+        "points": 48
+      },
+      "notes": []
+    },
+    {
+      "season": "1991-92",
+      "startYear": 1991,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 52
+      },
+      "third": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 47
+      },
+      "notes": [
+        "Points computed from the full results grid in the season article (2 points per win); champion total matches RSSSF (58)"
+      ]
+    },
+    {
+      "season": "1992-93",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": null,
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 51
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 51
+      },
+      "notes": [
+        "Marseille finished first but the title was withdrawn in 1993 over the VA-OM match-fixing affair (bribery of Valenciennes players); it was offered to runners-up Paris Saint-Germain, who declined, so the title was not awarded. Runner-up and third are the on-pitch places"
+      ],
+      "strippedChampion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 53
+      }
+    },
+    {
+      "season": "1993-94",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 51
+      },
+      "third": {
+        "name": "Auxerre",
+        "currentName": "Auxerre",
+        "footsimuId": 172,
+        "footsimuSlug": "auxerre",
+        "footsimuPath": "/ligue-1/team/auxerre",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1994-95",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 69
+      },
+      "third": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 67
+      },
+      "notes": [
+        "First season with 3 points for a win"
+      ]
+    },
+    {
+      "season": "1995-96",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Auxerre",
+        "currentName": "Auxerre",
+        "footsimuId": 172,
+        "footsimuSlug": "auxerre",
+        "footsimuPath": "/ligue-1/team/auxerre",
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 68
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 68
+      },
+      "notes": []
+    },
+    {
+      "season": "1996-97",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 67
+      },
+      "third": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 64
+      },
+      "notes": []
+    },
+    {
+      "season": "1997-98",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Metz",
+        "currentName": "Metz",
+        "footsimuId": 177,
+        "footsimuSlug": "metz",
+        "footsimuPath": "/ligue-2/team/metz",
+        "points": 68
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 59
+      },
+      "notes": [
+        "Lens 68 pts (21-5-8) per the season article and RSSSF final table; the RSSSF champions list misprints 58"
+      ]
+    },
+    {
+      "season": "1998-99",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 71
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "1999-00",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 58
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 56
+      },
+      "notes": []
+    },
+    {
+      "season": "2000-01",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Nantes",
+        "currentName": "Nantes",
+        "footsimuId": 165,
+        "footsimuSlug": "nantes",
+        "footsimuPath": "/ligue-2/team/nantes",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 64
+      },
+      "third": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 59
+      },
+      "notes": []
+    },
+    {
+      "season": "2001-02",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 64
+      },
+      "third": {
+        "name": "Auxerre",
+        "currentName": "Auxerre",
+        "footsimuId": 172,
+        "footsimuSlug": "auxerre",
+        "footsimuPath": "/ligue-1/team/auxerre",
+        "points": 59
+      },
+      "notes": []
+    },
+    {
+      "season": "2002-03",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 67
+      },
+      "third": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 65
+      },
+      "notes": []
+    },
+    {
+      "season": "2003-04",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 76
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 75
+      },
+      "notes": []
+    },
+    {
+      "season": "2004-05",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 67
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "2005-06",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 69
+      },
+      "third": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 62
+      },
+      "notes": []
+    },
+    {
+      "season": "2006-07",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 81
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 64
+      },
+      "third": {
+        "name": "Toulouse",
+        "currentName": "Toulouse",
+        "footsimuId": 179,
+        "footsimuSlug": "toulouse",
+        "footsimuPath": "/ligue-1/team/toulouse",
+        "points": 58
+      },
+      "notes": []
+    },
+    {
+      "season": "2007-08",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 75
+      },
+      "third": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 62
+      },
+      "notes": []
+    },
+    {
+      "season": "2008-09",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Bordeaux",
+        "currentName": "Bordeaux",
+        "footsimuId": 159,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 77
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2009-10",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 78
+      },
+      "runnerUp": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 72
+      },
+      "third": {
+        "name": "Auxerre",
+        "currentName": "Auxerre",
+        "footsimuId": 172,
+        "footsimuSlug": "auxerre",
+        "footsimuPath": "/ligue-1/team/auxerre",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2010-11",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 68
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 64
+      },
+      "notes": []
+    },
+    {
+      "season": "2011-12",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Montpellier",
+        "currentName": "Montpellier",
+        "footsimuId": 274,
+        "footsimuSlug": "montpellier",
+        "footsimuPath": "/ligue-2/team/montpellier",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 79
+      },
+      "third": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 74
+      },
+      "notes": []
+    },
+    {
+      "season": "2012-13",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 83
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 71
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 67
+      },
+      "notes": []
+    },
+    {
+      "season": "2013-14",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 89
+      },
+      "runnerUp": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 80
+      },
+      "third": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2014-15",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 83
+      },
+      "runnerUp": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 75
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2015-16",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 96
+      },
+      "runnerUp": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 65
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 65
+      },
+      "notes": []
+    },
+    {
+      "season": "2016-17",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 95
+      },
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 87
+      },
+      "third": {
+        "name": "Nice",
+        "currentName": "Nice",
+        "footsimuId": 2502,
+        "footsimuSlug": "nice",
+        "footsimuPath": "/ligue-1/team/nice",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2017-18",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 93
+      },
+      "runnerUp": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 80
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2018-19",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 75
+      },
+      "third": {
+        "name": "Lyon",
+        "currentName": "Lyon",
+        "footsimuId": 167,
+        "footsimuSlug": "lyon",
+        "footsimuPath": "/ligue-1/team/lyon",
+        "points": 72
+      },
+      "notes": []
+    },
+    {
+      "season": "2019-20",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 56
+      },
+      "third": {
+        "name": "Rennes",
+        "currentName": "Rennes",
+        "footsimuId": 169,
+        "footsimuSlug": "rennes",
+        "footsimuPath": "/ligue-1/team/rennes",
+        "points": 50
+      },
+      "notes": [
+        "Season stopped in April 2020 (COVID-19); final ranking by points per game (PSG 68 pts from 27 matches, Marseille 56 and Rennes 50 from 28)"
+      ]
+    },
+    {
+      "season": "2020-21",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 83
+      },
+      "runnerUp": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 82
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2021-22",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 86
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 71
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2022-23",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 85
+      },
+      "runnerUp": {
+        "name": "Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 84
+      },
+      "third": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 73
+      },
+      "notes": []
+    },
+    {
+      "season": "2023-24",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 67
+      },
+      "third": {
+        "name": "Brest",
+        "currentName": "Brest",
+        "footsimuId": 6997,
+        "footsimuSlug": "brest",
+        "footsimuPath": "/ligue-1/team/brest",
+        "points": 61
+      },
+      "notes": []
+    },
+    {
+      "season": "2024-25",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Marseille",
+        "currentName": "Marseille",
+        "footsimuId": 176,
+        "footsimuSlug": "marseille",
+        "footsimuPath": "/ligue-1/team/marseille",
+        "points": 65
+      },
+      "third": {
+        "name": "Monaco",
+        "currentName": "Monaco",
+        "footsimuId": 174,
+        "footsimuSlug": "monaco",
+        "footsimuPath": "/ligue-1/team/monaco",
+        "points": 61
+      },
+      "notes": []
+    },
+    {
+      "season": "2025-26",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "French championship",
+      "format": "league",
+      "champion": {
+        "name": "Paris Saint-Germain",
+        "currentName": "Paris Saint-Germain",
+        "footsimuId": 160,
+        "footsimuSlug": "paris-saint-germain",
+        "footsimuPath": "/ligue-1/team/paris-saint-germain",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Lens",
+        "currentName": "Lens",
+        "footsimuId": 175,
+        "footsimuSlug": "lens",
+        "footsimuPath": "/ligue-1/team/lens",
+        "points": 70
+      },
+      "third": {
+        "name": "Lille",
+        "currentName": "Lille",
+        "footsimuId": 166,
+        "footsimuSlug": "lille",
+        "footsimuPath": "/ligue-1/team/lille",
+        "points": 61
+      },
+      "notes": []
+    }
+  ]
+}

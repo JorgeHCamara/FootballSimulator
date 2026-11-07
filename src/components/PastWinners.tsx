@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
-import { decadeOf, decades, eras, filterRows, mostTitles, type Era, type WinnerClub, type WinnerRow } from "../lib/winners.ts";
+import { decadeOf, decades, eras, filterRows, inEra, mostTitles, type Era, type WinnerClub, type WinnerRow } from "../lib/winners.ts";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 
@@ -156,7 +156,7 @@ export function PastWinners({ rows, comingSoon = false, testId = "past-winners" 
   const shown = useMemo(() => filterRows(rows, { era, decade, query }), [rows, era, decade, query]);
   const eraLabel = (e: Era) =>
     e.to === null ? t("eraOpen", { name: e.name, from: String(e.from) }) : e.to === e.from ? t("eraYear", { name: e.name, year: String(e.from) }) : t("era", { name: e.name, from: String(e.from), to: String(e.to) });
-  const eraOf = (row: WinnerRow) => eraList.find((e) => row.competition === e.name && row.startYear >= e.from && (e.to === null || row.endYear <= e.to));
+  const eraOf = (row: WinnerRow) => eraList.find((e) => inEra(row, e));
   // The rows in their eras, newest first; a season's parallel championships stay together, each named by its tournament.
   const groups: { label: string; rows: WinnerRow[] }[] = [];
   for (const row of shown) {

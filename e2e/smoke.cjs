@@ -1644,10 +1644,10 @@ async function step(name, fn) {
       await p.waitForURL(/\/en\/premier-league#chances$/);
       await p.locator('[data-testid="chances"]').waitFor({ timeout: 20_000 });
       // A league without a history file: no tab, no page.
-      await p.goto(`${BASE_URL}/en/ligue-1`);
+      await p.goto(`${BASE_URL}/en/primeira-liga`);
       await p.locator('[role="tablist"]').first().waitFor();
       assert.equal(await p.getByTestId("past-winners-tab").count(), 0);
-      assert.equal((await p.request.get(`${BASE_URL}/en/ligue-1/past-winners`)).status(), 404);
+      assert.equal((await p.request.get(`${BASE_URL}/en/primeira-liga/past-winners`)).status(), 404);
       // The sitemap lists the page in every language.
       const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/premier-league/past-winners<`));
@@ -1743,6 +1743,20 @@ async function step(name, fn) {
       assert.equal(eras.filter((e) => e.startsWith("Torneio Roberto Gomes Pedrosa")).length, 1, "the Robertão's heading once");
       await p.goto(`${BASE_URL}/es/brasileirao/past-winners`);
       assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores del Brasileirão Série A");
+      await p.close();
+    });
+
+    await step("Past Winners: Ligue 1's history (1932-33 on), the war years in their place and 1992-93's title withdrawn", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/en/ligue-1/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Ligue 1 past winners");
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 94);
+      assert.deepEqual(await p.getByTestId("past-winners-era").allInnerTexts(), ["French championship (1932–)"], "one era, the war years in it");
+      assert.equal(await p.locator('[data-testid="past-winners-row"][data-status="not_held"]').count(), 6);
+      assert.match(await rows.filter({ hasText: "1992-93" }).locator('[data-place="champion"]').innerText(), /Marseille[\s\S]*Title revoked/i);
+      assert.deepEqual(await p.getByTestId("past-winners-title").evaluateAll((els) => els.map((e) => e.dataset.titles)), ["14", "10", "9", "8", "8"]);
       await p.close();
     });
 
