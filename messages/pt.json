@@ -1268,10 +1268,10 @@
     "comingSoon": "Histórico real em breve"
   },
   "World": {
-    "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês ou espanhol",
-    "metaDescription": "Escolha um clube da Inglaterra ou da Espanha e jogue temporada após temporada de suas ligas e copas, com playoffs, acesso e rebaixamento. Salvo no seu navegador, com as tabelas de todas as temporadas.",
+    "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol ou alemão",
+    "metaDescription": "Escolha um clube da Inglaterra, da Espanha ou da Alemanha e jogue temporada após temporada de suas ligas e copas, com playoffs, acesso e rebaixamento. Salvo no seu navegador, com as tabelas de todas as temporadas.",
     "title": "Meu mundo",
-    "intro": "Escolha seus países e um clube e jogue temporada após temporada da pirâmide inglesa (da Premier League à League Two, a FA Cup e a Copa da Liga), da espanhola (La Liga, Segunda División e Copa del Rey) ou das duas, cada resultado do seu jeito, como nas páginas das ligas: com os playoffs, o acesso e o rebaixamento. Você consegue levar um clube da League Two até a Premier League?",
+    "intro": "Escolha seus países e um clube e jogue temporada após temporada da pirâmide inglesa (da Premier League à League Two, a FA Cup e a Copa da Liga), da espanhola (La Liga, Segunda División e Copa del Rey), da alemã (Bundesliga, 2. Bundesliga e DFB-Pokal) ou de todas juntas, cada resultado do seu jeito, como nas páginas das ligas: com os playoffs, o acesso e o rebaixamento. Você consegue levar um clube da League Two até a Premier League?",
     "savedNote": "Seu mundo fica salvo só neste navegador.",
     "notSaved": "Este navegador não está salvando seu mundo (navegação privada ou armazenamento cheio): ele será perdido quando você sair da página.",
     "reset": {
@@ -1313,6 +1313,16 @@
         "the": "a Segunda División",
         "in": "na Segunda División"
       },
+      "BL1": {
+        "name": "Bundesliga",
+        "the": "a Bundesliga",
+        "in": "na Bundesliga"
+      },
+      "BL2": {
+        "name": "2. Bundesliga",
+        "the": "a 2. Bundesliga",
+        "in": "na 2. Bundesliga"
+      },
       "NL": {
         "name": "National League",
         "the": "a National League",
@@ -1322,6 +1332,11 @@
         "name": "Primera Federación",
         "the": "a Primera Federación",
         "in": "na Primera Federación"
+      },
+      "L3": {
+        "name": "3. Liga",
+        "the": "a 3. Liga",
+        "in": "na 3. Liga"
       }
     },
     "cups": {
@@ -1339,11 +1354,17 @@
         "name": "Copa del Rey",
         "the": "a Copa del Rey",
         "in": "na Copa del Rey"
+      },
+      "DFB": {
+        "name": "DFB-Pokal",
+        "the": "a DFB-Pokal",
+        "in": "na DFB-Pokal"
       }
     },
     "countries": {
       "ENG": "Inglaterra",
-      "ESP": "Espanha"
+      "ESP": "Espanha",
+      "GER": "Alemanha"
     },
     "setup": {
       "title": "Crie seu mundo",
@@ -1351,7 +1372,8 @@
       "countriesHint": "Cada país escolhido é jogado por inteiro, com suas ligas e copas, temporada após temporada.",
       "countryLeagues": {
         "ENG": "Da Premier League à League Two, a FA Cup e a Copa da Liga",
-        "ESP": "La Liga e Segunda División, a Copa del Rey"
+        "ESP": "La Liga e Segunda División, a Copa del Rey",
+        "GER": "Bundesliga e 2. Bundesliga, a DFB-Pokal"
       },
       "unavailable": "Os dados ao vivo não carregaram ({leagues}): tente de novo mais tarde.",
       "and": " e ",

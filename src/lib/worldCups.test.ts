@@ -96,7 +96,7 @@ function liveFaCup(pack: StartPack, { played = 10, outsiders = 32, ties = 40, ye
   const league = (code: string) => pack.leagues.find((l) => l.code === code)!.teams;
   const teams = pack.leagues.flatMap((l) => l.teams);
   const divisions = Object.fromEntries(pack.leagues.flatMap((l) => l.teams.map((t) => [t.id, l.code])));
-  const extra = ids(7001, outsiders).map((id) => ({ id, name: `Outsider ${id}`, shortName: `Out ${id}`, tla: "OUT" }));
+  const extra = ids(90_001, outsiders).map((id) => ({ id, name: `Outsider ${id}`, shortName: `Out ${id}`, tla: "OUT" }));
   const first = [...league("EL1").map((t) => t.id), ...league("EL2").map((t) => t.id), ...extra.map((t) => t.id)];
   const real = Array.from({ length: ties }, (_, i): StartCup["real"][number] => ({
     round: "firstRound",
@@ -153,7 +153,7 @@ describe("My World: a new world's cups", () => {
   it("has both cups, the FA Cup's pool of 32 non-league sides from the real cup (clubs of the world that play no league), and every club of each cup in the world", () => {
     assert.ok(packReady(pack));
     assert.deepEqual(world.cups.map((c) => c.code), ["FAC", "EFC"], "England's cups, of the three a world can play");
-    assert.deepEqual([...WORLD_CUPS], ["FAC", "EFC", "CDR"]);
+    assert.deepEqual([...WORLD_CUPS], ["FAC", "EFC", "CDR", "DFB"]);
     assert.equal(world.cupPool.length, 32);
     const pool = world.cupPool.map((id) => world.clubs[id]!);
     assert.ok(pool.every((c) => c.origin === "real" && c.realId !== undefined && c.id > CUP_POOL_ID_BASE && c.id < NATIONAL_LEAGUE_ID_BASE), "real clubs, with the pool's ids");

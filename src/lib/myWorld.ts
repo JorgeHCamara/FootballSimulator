@@ -2,6 +2,7 @@ import type { CupRoundKey } from "../config/cups.ts";
 import type { LeagueConfig } from "../config/leagues.ts";
 import { NATIONAL_LEAGUE_CLUBS } from "../config/nationalLeague.ts";
 import { expectedGoals, expectedGoalsNeutral, sampleDixonColes, sampleLikelyScore, simulateFixtures } from "../engine/match.ts";
+import { tierStrength } from "../engine/cupModel.ts";
 import { clubPriors, seasonRatings, type SeasonRatings } from "../engine/offseason.ts";
 import {
   buildBracket,
@@ -14,6 +15,7 @@ import {
   tieIds,
   tieOutcome,
   type BracketOptions,
+  type PlayoffConfig,
   type PlayoffTie,
 } from "../engine/playoffs.ts";
 import type { LeagueModel } from "../engine/ratings.ts";
@@ -30,6 +32,7 @@ import {
   divisionCountry,
   LOWER_LEAGUE,
   neighbours,
+  pyramidPlayoffOf,
   WORLD_COUNTRIES,
   WORLD_CUPS,
   WORLD_LEAGUES,
@@ -37,6 +40,7 @@ import {
   worldDivisions,
   type DivisionCode,
   type LowerCode,
+  type PyramidPlayoff,
   type WorldCountry,
   type WorldCupCode,
 } from "./worldCountries.ts";
@@ -51,10 +55,13 @@ export {
   divisionConfig,
   divisionCountry,
   ENGLAND,
+  GERMANY,
   isDivision,
   isWorldCountry,
   LOWER_LEAGUE,
   neighbours,
+  PYRAMID_PLAYOFFS,
+  pyramidPlayoffOf,
   SPAIN,
   WORLD_COUNTRIES,
   WORLD_LEAGUES,
@@ -62,13 +69,15 @@ export {
   worldDivisions,
   type DivisionCode,
   type LowerCode,
+  type PyramidPlayoff,
   type WorldCountry,
 } from "./worldCountries.ts";
 
 /*
  * My World: a fictional timeline of one or more countries' football pyramids
  * (England's, Premier League to League Two; Spain's, La Liga and the Segunda
- * División; src/lib/worldCountries.ts), started from the site's live data and
+ * División; Germany's, the Bundesliga and the 2. Bundesliga;
+ * src/lib/worldCountries.ts), started from the site's live data and
  * played on season by season in the visitor's browser (saved by
  * src/lib/myWorldStorage.ts). A world is set up with its countries
  * (World.countries) and plays every league and cup of each.
@@ -79,7 +88,9 @@ export {
  * league's own play-off. Promotion and relegation come from the league configs
  * (their promotion and relegation places, and the play-off winner), applied to
  * a country's leagues at once; a reserve side (the Segunda División's B teams)
- * is never promoted, its place passing down. The bottom division's relegated
+ * is never promoted, its place passing down; a play-off between two divisions
+ * (the Bundesliga's 16th v the 2. Bundesliga's 3rd) decides one more place
+ * either way. The bottom division's relegated
  * clubs drop into the league below (England's National League, Spain's
  * Primera Federación) for a season, and its clubs come up in their place
  * (Boreham Wood and Harrogate Town the first time in England; in Spain, clubs
@@ -647,11 +658,46 @@ export function divisionFixtures(world: World, d: DivisionSeason): { fixtures: F
 export function movementPlaces(league: LeagueConfig): { promotion: number[]; relegation: number[]; playoff: number[]; playoffPromotes: boolean } {
   const places = (kind: string) => league.zones.filter((z) => z.kind === kind).flatMap((z) => Array.from({ length: z.to - z.from + 1 }, (_, i) => z.from + i));
   const rounds = league.playoff?.rounds ?? [];
-  const playoff = [...new Set(rounds.flatMap((r) => [...(r.pairs ?? []).flat(), ...(r.entrants ?? [])]))].sort((a, b) => a - b);
-  return { promotion: places("promotion"), relegation: places("relegation"), playoff, playoffPromotes: Boolean(league.playoff?.promotedTo) };
+  const own = [...new Set(rounds.flatMap((r) => [...(r.pairs ?? []).flat(), ...(r.entrants ?? [])]))].sort((a, b) => a - b);
+  // The lower division of a pyramid play-off (the 2. Bundesliga): its club in the tie is in a play-off, and goes up by winning it.
+  const tie = pyramidPlayoffOf(league.code);
+  const lower = tie !== undefined && tie.lower === league.code;
+  return { promotion: places("promotion"), relegation: places("relegation"), playoff: lower ? [tie.lowerPlace] : own, playoffPromotes: Boolean(league.playoff?.promotedTo) || lower };
 }
 
-/** Clubs each division of a country sends up and down: the counts its leagues must agree on (3, 3 and 4 between the four English leagues; 3 between Spain's two). */
+/**
+ * A division's play-off as the world plays it: the league's own (the English
+ * play-offs, the Segunda División's), or, for the lower division of a pyramid
+ * play-off, that tie as a bracket of one two-legged tie pairing the two
+ * divisions' places (the better place hosts the second leg: the 2. Bundesliga's
+ * 3rd, after the Bundesliga's 16th hosts the first).
+ */
+export function playoffConfigOf(code: DivisionCode): PlayoffConfig | undefined {
+  const own = divisionConfig(code).playoff;
+  if (own) return own;
+  const tie = pyramidPlayoffOf(code);
+  if (!tie || tie.lower !== code) return undefined;
+  return {
+    rounds: [{ key: "final", legs: 2, levelTie: "penalties", pairs: [[tie.upperPlace, tie.lowerPlace]] }],
+    directPromotion: movementPlaces(divisionConfig(code)).promotion,
+    promotedTo: divisionConfig(tie.upper).name,
+  };
+}
+
+/** The two-row table a pyramid play-off's bracket is built from: the upper division's club at its place, the lower's at its (clubs only once both leagues are complete). */
+function pyramidRows(tie: PyramidPlayoff, upperRows: readonly StandingRow[], lowerRows: readonly StandingRow[]): StandingRow[] {
+  return [upperRows.find((r) => r.position === tie.upperPlace), lowerRows.find((r) => r.position === tie.lowerPlace)].filter((r): r is StandingRow => r !== undefined);
+}
+
+/** The lower division's form with the upper division's club in the tie on its scale: a club from the division above rates one tier stronger (as the cups rate clubs). */
+function tieModel(lower: LeagueModel, upper: LeagueModel, upperClub: TeamId | undefined): LeagueModel {
+  const strength = upperClub !== undefined ? upper.strengths.get(upperClub) : undefined;
+  if (upperClub === undefined || !strength) return lower;
+  const scale = tierStrength(-1);
+  return { ...lower, strengths: new Map(lower.strengths).set(upperClub, { attack: strength.attack * scale.attack, defence: strength.defence * scale.defence }) };
+}
+
+/** Clubs each division of a country sends up and down: the counts its leagues must agree on (3, 3 and 4 between the four English leagues; 3 between Spain's two; 2 between Germany's, the pyramid play-off adding one to both or neither). */
 export function movementCounts(country: WorldCountry = "ENG"): { up: number; down: number }[] {
   return COUNTRY_LEAGUES[country].map((code) => {
     const m = movementPlaces(divisionConfig(code));
@@ -675,6 +721,14 @@ const NEW_TOWNS: Record<WorldCountry, { towns: readonly string[]; suffixes: read
       "Puente Viejo", "Castellar del Monte", "Villarroya", "Sotoluna", "Arroyo Claro", "Monteverde", "Fuentebrava", "Olivares del Mar",
     ],
     suffixes: ["CD", "UD", "CF", "Atlético", "Racing", "Deportivo"],
+    prefix: true,
+  },
+  GER: {
+    towns: [
+      "Lindenbach", "Oberwald", "Falkenau", "Wiesenthal", "Rotenberg", "Hohenfeld", "Birkenhagen", "Steinbach am See",
+      "Neuwiesen", "Tannenhof", "Adlerstein", "Grünhausen", "Mühlbach", "Eichenrode", "Sonnenfeld", "Kirchhofen",
+    ],
+    suffixes: ["SV", "FC", "1. FC", "TSV", "SpVgg", "VfL"],
     prefix: true,
   },
 };
@@ -771,10 +825,16 @@ export interface DivisionState {
   results: ResultMap;
   rows: StandingRow[];
   /** The table as promotion sees it (promotionRows): without the reserve sides, where the league has them. */
+  eligibleRows: StandingRow[];
+  /** The table the play-off bracket is built from: `eligibleRows`, or a pyramid play-off's two clubs at their places (pyramidRows). */
   playoffRows: StandingRow[];
-  /** Every league game has a score: the play-off's clubs are known. */
+  /** Its play-off (playoffConfigOf): the league's own, or the pyramid play-off it is the lower division of; none in the Premier League. */
+  playoff?: PlayoffConfig;
+  /** Every league game has a score. */
   leagueComplete: boolean;
-  /** The play-off's ties (none in the Premier League): clubs placed once the league is complete. */
+  /** The play-off's clubs are known: the league complete, and the division above too for a pyramid play-off. */
+  playoffKnown: boolean;
+  /** The play-off's ties: clubs placed once known. */
   bracket: PlayoffTie[][];
   playoffOptions: Omit<BracketOptions, "seasonComplete">;
   /** The league and its play-off are decided. */
@@ -790,18 +850,36 @@ export interface DivisionState {
   model: LeagueModel;
 }
 
-function stateOf(world: World, index: number, picks: ResultMap = seasonScores(world.divisions[index]!)): DivisionState {
+/** A division's table from its games and the scores so far, and whether every game has one. */
+function tableOf(world: World, index: number, picks: ResultMap = seasonScores(world.divisions[index]!)) {
   const d = world.divisions[index]!;
   const league = divisionConfig(d.code);
   const teams = d.clubs.map((id) => teamOf(world, id));
   const fixtures = sortFixtures(divisionFixtures(world, d).fixtures);
   const results = effectiveResults(fixtures, picks);
   const rows = standingsOf(league, d, teams, fixtures, results);
-  const playoffRows = promotionRows(league, rows, (id) => world.clubs[id]!.name);
-  const leagueComplete = fixtures.every((f) => results[f.id]);
+  return { d, league, teams, fixtures, results, rows, complete: fixtures.every((f) => results[f.id]) };
+}
+
+function stateOf(world: World, index: number, picks: ResultMap = seasonScores(world.divisions[index]!)): DivisionState {
+  const { d, league, teams, fixtures, results, rows, complete: leagueComplete } = tableOf(world, index, picks);
+  const eligibleRows = promotionRows(league, rows, (id) => world.clubs[id]!.name);
+  const playoff = playoffConfigOf(d.code);
+  let model = divisionForm(world, d, index).model;
+  // A pyramid play-off (the 2. Bundesliga's 3rd v the Bundesliga's 16th): its clubs are known once both leagues are complete.
+  const tie = pyramidPlayoffOf(d.code);
+  const upperIndex = tie?.lower === d.code ? world.divisions.findIndex((x) => x.code === tie.upper) : -1;
+  let playoffRows = eligibleRows;
+  let playoffKnown = leagueComplete;
+  if (tie && upperIndex >= 0) {
+    const upper = tableOf(world, upperIndex);
+    playoffKnown = leagueComplete && upper.complete;
+    playoffRows = pyramidRows(tie, upper.rows, eligibleRows);
+    if (playoffKnown) model = tieModel(model, divisionForm(world, upper.d, upperIndex).model, playoffRows.find((r) => r.position === tie.upperPlace)?.teamId);
+  }
   const options = playoffOptions(world, d, lastMatchday(fixtures));
-  const bracket = league.playoff ? buildBracket(playoffRows, league.playoff, picks, { ...options, seasonComplete: leagueComplete }) : [];
-  const done = leagueComplete && bracket.every((round) => round.every((tie) => tieOutcome(tie, picks) !== null));
+  const bracket = playoff ? buildBracket(playoffRows, playoff, picks, { ...options, seasonComplete: playoffKnown }) : [];
+  const done = leagueComplete && playoffKnown && bracket.every((round) => round.every((tie) => tieOutcome(tie, picks) !== null));
   let nextRound: number | null = null;
   if (!leagueComplete) {
     const open = fixtures.filter((f) => !results[f.id]);
@@ -814,7 +892,7 @@ function stateOf(world: World, index: number, picks: ResultMap = seasonScores(wo
     const level = ties.filter((tie) => tie.shootout && !tie.shootout.result && !picks[tie.shootout.id] && needsShootout(tie, picks));
     nextRound = legs.length ? Math.min(...legs.map((leg) => leg.matchday)) : level.length ? Math.max(...level.map((tie) => tie.legs.at(-1)!.matchday)) : null;
   }
-  return { code: d.code, index, league, teams, fixtures, picks, results, rows, playoffRows, leagueComplete, bracket, playoffOptions: options, done, nextRound, model: divisionForm(world, d, index).model };
+  return { code: d.code, index, league, teams, fixtures, picks, results, rows, eligibleRows, playoffRows, ...(playoff ? { playoff } : {}), leagueComplete, playoffKnown, bracket, playoffOptions: options, done, nextRound, model };
 }
 
 const indexOf = (world: World, code: DivisionCode) => {
@@ -835,28 +913,31 @@ export const seasonDone = (world: World) => seasonStates(world).every((s) => s.d
 /**
  * Play-off scores belong to one pairing, as on the league pages: once a
  * league score or an earlier round's changes who meets whom, the scores that
- * tie had go; they all go while the league isn't complete; and a shoot-out's
- * score goes once its tie isn't level. Scores just added stay.
+ * tie had go; they all go while the play-off's clubs aren't known (the league
+ * not complete, or the division above in a pyramid play-off); and a shoot-out's
+ * score goes once its tie isn't level. Scores just added stay. `before` and
+ * `after`: the world and the division's picks before and after the change
+ * (the change may be in another division's scores).
  */
-function tidyPlayoff(world: World, index: number, before: ResultMap, after: ResultMap): ResultMap {
-  const config = divisionConfig(world.divisions[index]!.code).playoff;
-  if (!config) return after;
-  const out = { ...after };
-  const bracketWith = (picks: ResultMap) => {
+function tidyPlayoff(before: { world: World; picks: ResultMap }, after: { world: World; picks: ResultMap }, index: number): ResultMap {
+  const config = playoffConfigOf(after.world.divisions[index]!.code);
+  if (!config) return after.picks;
+  const out = { ...after.picks };
+  const bracketWith = (world: World, picks: ResultMap) => {
     const state = stateOf(world, index, picks);
-    return state.leagueComplete ? state.bracket : null;
+    return state.playoffKnown ? state.bracket : null;
   };
-  if (!bracketWith(out)) {
+  if (!bracketWith(after.world, out)) {
     for (const id of playoffIds(config)) delete out[id];
     return out;
   }
   const pairing = (tie: PlayoffTie) => `${tie.higher.teamId}-${tie.lower.teamId}`;
-  const was = bracketWith(before);
+  const was = bracketWith(before.world, before.picks);
   if (was) {
     const pairings = new Map(was.flat().map((tie) => [`${tie.round}-${tie.index}`, pairing(tie)]));
-    const unchanged = (id: number) => before[id] !== undefined && out[id] !== undefined && before[id]!.home === out[id]!.home && before[id]!.away === out[id]!.away;
+    const unchanged = (id: number) => before.picks[id] !== undefined && out[id] !== undefined && before.picks[id]!.home === out[id]!.home && before.picks[id]!.away === out[id]!.away;
     for (let pass = 0; pass <= config.rounds.length; pass++) {
-      const stale = bracketWith(out)!
+      const stale = bracketWith(after.world, out)!
         .flat()
         .filter((tie) => pairings.get(`${tie.round}-${tie.index}`) !== pairing(tie))
         .flatMap((tie) => tieIds(tie.round, tie.index, tie.config))
@@ -865,7 +946,7 @@ function tidyPlayoff(world: World, index: number, before: ResultMap, after: Resu
       for (const id of stale) delete out[id];
     }
   }
-  for (const tie of bracketWith(out)!.flat()) {
+  for (const tie of bracketWith(after.world, out)!.flat()) {
     if (tie.config.bestOf) {
       for (const game of seriesGames(tie, out)) if (out[game.shootout.id] && !game.needsPenalties) delete out[game.shootout.id];
     } else if (tie.shootout && out[tie.shootout.id] && !needsShootout(tie, out)) delete out[tie.shootout.id];
@@ -873,9 +954,9 @@ function tidyPlayoff(world: World, index: number, before: ResultMap, after: Resu
   return out;
 }
 
-/** The world with a division's new scores (`after`, from `before`), less the play-off scores they leave stale. */
-function withScores(world: World, index: number, before: ResultMap, after: ResultMap): World {
-  const scores = Object.fromEntries(Object.entries(tidyPlayoff(world, index, before, after)).map(([id, s]) => [id, [s.home, s.away] as [number, number]]));
+/** The world with a division's picks replaced. */
+function withPicks(world: World, index: number, picks: ResultMap): World {
+  const scores = Object.fromEntries(Object.entries(picks).map(([id, s]) => [id, [s.home, s.away] as [number, number]]));
   return {
     ...world,
     divisions: world.divisions.map((d, i) => {
@@ -884,6 +965,24 @@ function withScores(world: World, index: number, before: ResultMap, after: Resul
       return Object.keys(scores).length ? { ...rest, scores } : rest;
     }),
   };
+}
+
+/**
+ * The world with a division's new scores (`after`, from `before`), less the
+ * play-off scores they leave stale: the division's own, and those of a lower
+ * division whose pyramid play-off this division's table decides (a Bundesliga
+ * score moves its 16th place, and so the 2. Bundesliga's tie).
+ */
+function withScores(world: World, index: number, before: ResultMap, after: ResultMap): World {
+  let next = withPicks(world, index, after);
+  const code = world.divisions[index]!.code;
+  const dependants = world.divisions.flatMap((d, k) => (k !== index && pyramidPlayoffOf(d.code)?.lower === d.code && pyramidPlayoffOf(d.code)?.upper === code ? [k] : []));
+  for (const k of [index, ...dependants]) {
+    const picksBefore = k === index ? before : seasonScores(world.divisions[k]!);
+    const picksAfter = k === index ? after : picksBefore;
+    next = withPicks(next, k, tidyPlayoff({ world, picks: picksBefore }, { world: next, picks: picksAfter }, k));
+  }
+  return next;
 }
 
 function putScore(world: World, index: number, id: number, score: Score | null): World {
@@ -922,26 +1021,24 @@ export function simulateMatchday(world: World, code: DivisionCode, matchday: num
   return withScores(world, state.index, state.picks, { ...state.picks, ...added });
 }
 
-/** The play-off's games without a score, once the league is complete ("Simulate matchday" on the play-off), from the season's form. */
+/** The play-off's games without a score, once its clubs are known ("Simulate matchday" on the play-off), from the season's form. */
 export function simulatePlayoffs(world: World, code: DivisionCode, rng: Rng = createRng(randomSeed())): World {
   const state = divisionState(world, code);
-  if (!state.league.playoff || !state.leagueComplete) return world;
-  const added = simulatePlayoff(state.playoffRows, state.league.playoff, state.picks, state.model, rng, state.playoffOptions);
+  if (!state.playoff || !state.playoffKnown) return world;
+  const added = simulatePlayoff(state.playoffRows, state.playoff, state.picks, state.model, rng, state.playoffOptions);
   return withScores(world, state.index, state.picks, { ...state.picks, ...added });
 }
 
-/** The rest of one league's season, its play-off included ("Simulate rest of season"): every game drawn from the season's form, as a whole season is. */
+/**
+ * The rest of one league's season, its play-off included ("Simulate rest of
+ * season"): every game drawn from the season's form, as a whole season is. A
+ * pyramid play-off waits for the division above to finish (its tie is then
+ * played from the play-off's fixtures, or when the season ends).
+ */
 export function simulateRest(world: World, code: DivisionCode, rng: Rng = createRng(randomSeed())): World {
   const state = divisionState(world, code);
   const league = simulateFixtures(state.fixtures, state.results, state.model, rng, { fast: true });
-  const picks = { ...state.picks, ...league };
-  if (state.league.playoff) {
-    const all = { ...state.results, ...league };
-    const d = world.divisions[state.index]!;
-    const rows = promotionRows(state.league, standingsOf(state.league, d, state.teams, state.fixtures, all), (id) => world.clubs[id]!.name);
-    Object.assign(picks, simulatePlayoff(rows, state.league.playoff, { ...state.picks, ...all }, state.model, rng, state.playoffOptions));
-  }
-  return withScores(world, state.index, state.picks, picks);
+  return simulatePlayoffs(withScores(world, state.index, state.picks, { ...state.picks, ...league }), code, rng);
 }
 
 /** One division's season back to how it started: every score typed in, rolled or simulated goes. */
@@ -953,7 +1050,7 @@ export function resetDivision(world: World, code: DivisionCode): World {
 /** Games still to play in a division's season: league games, play-off games, and a level tie's shoot-out. */
 export function gamesLeft(state: DivisionState): number {
   const league = state.fixtures.filter((f) => !state.results[f.id]).length;
-  const config = state.league.playoff;
+  const config = state.playoff;
   if (!config) return league;
   // English play-offs are one- and two-legged ties (no series): every leg is played.
   const legs = playoffIds(config).filter((id) => !isShootoutId(id)).length;
@@ -965,10 +1062,14 @@ export function gamesLeft(state: DivisionState): number {
 
 interface PlayedDivision {
   code: DivisionCode;
+  league: LeagueConfig;
   teams: Team[];
   fixtures: Fixture[];
   results: ResultMap;
   rows: StandingRow[];
+  /** The table as promotion sees it (promotionRows). */
+  eligible: StandingRow[];
+  model: LeagueModel;
   notes: Map<TeamId, RowNote>;
   final?: SavedDivision["final"];
   /** The play-off's scores, by game id. */
@@ -976,8 +1077,8 @@ interface PlayedDivision {
   ratings: SeasonRatings;
 }
 
-/** Plays the rest of one division's season: every game without a score (from the season's form, on its own random stream), the table, the play-off. */
-function playDivision(world: World, d: DivisionSeason, index: number): PlayedDivision {
+/** Plays the rest of one division's league season: every game without a score (from the season's form, on its own random stream), the table and the places' notes. The play-off comes after (playPlayoff). */
+function playLeague(world: World, d: DivisionSeason, index: number): PlayedDivision {
   const league = divisionConfig(d.code);
   const teams = d.clubs.map((id) => teamOf(world, id));
   const { fixtures } = divisionFixtures(world, d);
@@ -997,35 +1098,58 @@ function playDivision(world: World, d: DivisionSeason, index: number): PlayedDiv
     if (places.promotion.includes(r.position)) notes.set(r.teamId, "P");
     if (r.position === 1) notes.set(r.teamId, "C");
   }
-  let final: SavedDivision["final"];
-  const playoff: ResultMap = {};
-  if (league.playoff) {
-    let finalTie: PlayoffTie | undefined;
-    const rounds = league.playoff.rounds.length;
-    const knockout = seasonRng(world, 50 + index);
-    const options = playoffOptions(world, d, lastMatchday(fixtures));
-    // The play-off's scores so far stand (there are none until the league is complete: see tidyPlayoff).
-    const added = simulatePlayoff(eligible, league.playoff, picks, model, knockout, options, (r, ties) => {
-      if (r === rounds - 1) finalTie = ties[0];
-    });
-    const scores = { ...picks, ...added };
-    // Every play-off score, real ones included, by game id: the season's saved play-off.
-    for (const tie of buildBracket(eligible, league.playoff, scores, { ...options, seasonComplete: true }).flat()) {
-      for (const game of [...tie.legs, ...(tie.shootout ? [tie.shootout] : []), ...tie.gameShootouts]) {
-        const score = scores[game.id] ?? game.result;
-        if (score) playoff[game.id] = score;
-      }
-    }
-    const outcome = finalTie ? tieOutcome(finalTie, scores) : null;
-    if (finalTie && outcome) {
-      const loser = outcome.winner === finalTie.higher.teamId ? finalTie.lower.teamId! : finalTie.higher.teamId!;
-      const winnerGoals = outcome.winner === finalTie.higher.teamId ? outcome.higherGoals : outcome.lowerGoals;
-      const loserGoals = outcome.winner === finalTie.higher.teamId ? outcome.lowerGoals : outcome.higherGoals;
-      final = [outcome.winner, loser, winnerGoals, loserGoals, outcome.onPenalties];
-      if (places.playoffPromotes) notes.set(outcome.winner, "W");
+  return { code: d.code, league, teams, fixtures, results: all, rows, eligible, model, notes, playoff: {}, ratings: seasonRatings({ teams, fixtures, results: all }) };
+}
+
+/**
+ * Plays a division's play-off from the played leagues (its scores so far
+ * stand; the rest drawn on the season's own random stream): the league's own
+ * bracket, or the pyramid play-off it is the lower division of, whose winner
+ * goes up ("W") or stays up, the upper division's club relegated ("R") when it
+ * loses. Sets the division's final, play-off scores and notes.
+ */
+function playPlayoff(world: World, index: number, played: PlayedDivision[]): void {
+  const p = played[index]!;
+  const d = world.divisions[index]!;
+  const config = playoffConfigOf(d.code);
+  if (!config) return;
+  const tie = pyramidPlayoffOf(d.code);
+  const upperIndex = tie?.lower === d.code ? world.divisions.findIndex((x) => x.code === tie.upper) : -1;
+  const upper = upperIndex >= 0 ? played[upperIndex] : undefined;
+  const rows = tie && upper ? pyramidRows(tie, upper.rows, p.eligible) : p.eligible;
+  const model = tie && upper ? tieModel(p.model, upper.model, rows.find((r) => r.position === tie.upperPlace)?.teamId) : p.model;
+  const picks = seasonScores(d);
+  let finalTie: PlayoffTie | undefined;
+  const rounds = config.rounds.length;
+  const knockout = seasonRng(world, 50 + index);
+  const options = playoffOptions(world, d, lastMatchday(p.fixtures));
+  const added = simulatePlayoff(rows, config, picks, model, knockout, options, (r, ties) => {
+    if (r === rounds - 1) finalTie = ties[0];
+  });
+  const scores = { ...picks, ...added };
+  // Every play-off score, real ones included, by game id: the season's saved play-off.
+  for (const t of buildBracket(rows, config, scores, { ...options, seasonComplete: true }).flat()) {
+    for (const game of [...t.legs, ...(t.shootout ? [t.shootout] : []), ...t.gameShootouts]) {
+      const score = scores[game.id] ?? game.result;
+      if (score) p.playoff[game.id] = score;
     }
   }
-  return { code: d.code, teams, fixtures, results: all, rows, notes, ...(final ? { final } : {}), playoff, ratings: seasonRatings({ teams, fixtures, results: all }) };
+  const outcome = finalTie ? tieOutcome(finalTie, scores) : null;
+  if (!finalTie || !outcome) return;
+  const loser = outcome.winner === finalTie.higher.teamId ? finalTie.lower.teamId! : finalTie.higher.teamId!;
+  const winnerGoals = outcome.winner === finalTie.higher.teamId ? outcome.higherGoals : outcome.lowerGoals;
+  const loserGoals = outcome.winner === finalTie.higher.teamId ? outcome.lowerGoals : outcome.higherGoals;
+  p.final = [outcome.winner, loser, winnerGoals, loserGoals, outcome.onPenalties];
+  if (!movementPlaces(p.league).playoffPromotes) return;
+  if (tie && upper) {
+    const lowerClub = rows.find((r) => r.position === tie.lowerPlace)?.teamId;
+    if (outcome.winner === lowerClub) {
+      p.notes.set(lowerClub, "W");
+      upper.notes.set(loser, "R");
+    }
+  } else {
+    p.notes.set(outcome.winner, "W");
+  }
 }
 
 /**
@@ -1035,7 +1159,8 @@ function playDivision(world: World, d: DivisionSeason, index: number): PlayedDiv
  * world after it, with the season's review showing.
  */
 export function playSeason(world: World): World {
-  const played = world.divisions.map((d, i) => playDivision(world, d, i));
+  const played = world.divisions.map((d, i) => playLeague(world, d, i));
+  world.divisions.forEach((_, i) => playPlayoff(world, i, played));
   const clubs = { ...world.clubs };
   let nationalLeague = [...world.nationalLeague];
   let cupPool = [...world.cupPool];
@@ -1205,6 +1330,10 @@ export interface PastDivision {
   bracket: PlayoffTie[][];
 }
 
+/** A saved table's rows as standings rows (for a bracket). */
+const standingRows = (rows: readonly TableRow[]): StandingRow[] =>
+  rows.map((r) => ({ position: r.position, teamId: r.clubId, played: r.played, won: r.won, drawn: r.drawn, lost: r.lost, goalsFor: r.goalsFor, goalsAgainst: r.goalsAgainst, goalDifference: r.goalDifference, points: r.points, form: [] }));
+
 export function pastDivision(world: World, year: number, code: DivisionCode): PastDivision | undefined {
   const saved = world.history.find((s) => s.year === year)?.divisions.find((d) => d.code === code);
   const table = savedTable(world, year, code);
@@ -1219,23 +1348,27 @@ export function pastDivision(world: World, year: number, code: DivisionCode): Pa
         result: { home: g.home, away: g.away },
       }))
     : null;
-  const config = divisionConfig(code).playoff;
+  const config = playoffConfigOf(code);
   let bracket: PlayoffTie[][] = [];
   if (config && saved.playoff) {
     const scores: ResultMap = {};
     for (const [id, [home, away]] of Object.entries(saved.playoff)) scores[Number(id)] = { home, away };
-    const rows = promotionRows(
-      divisionConfig(code),
-      table.rows.map((r): StandingRow => ({ position: r.position, teamId: r.clubId, played: r.played, won: r.won, drawn: r.drawn, lost: r.lost, goalsFor: r.goalsFor, goalsAgainst: r.goalsAgainst, goalDifference: r.goalDifference, points: r.points, form: [] })),
-      (id) => world.clubs[id]!.name,
-    );
+    let rows = promotionRows(divisionConfig(code), standingRows(table.rows), (id) => world.clubs[id]!.name);
+    // A pyramid play-off: the upper division's club from its own saved table.
+    const tie = pyramidPlayoffOf(code);
+    if (tie?.lower === code) {
+      const upperTable = savedTable(world, year, tie.upper);
+      rows = pyramidRows(tie, upperTable ? standingRows(upperTable.rows) : [], rows);
+    }
     const last = fixtures ? lastMatchday(fixtures) : (divisionConfig(code).teams - 1) * 2;
     const scored = (f: Fixture): Fixture => ({ ...f, result: scores[f.id] ?? f.result });
     bracket = buildBracket(rows, config, scores, { seasonComplete: true, afterMatchday: last, afterDate: gameDate(year, last) }).map((round) =>
       round.map((tie) => ({ ...tie, legs: tie.legs.map(scored), shootout: tie.shootout && scored(tie.shootout), gameShootouts: tie.gameShootouts.map(scored) })),
     );
   }
-  return { code, rows: table.rows, ...(table.final ? { final: table.final } : {}), teams: saved.rows.map((r) => teamOf(world, r[0])), fixtures, bracket };
+  // The league's clubs, and the play-off's (a pyramid play-off's club from the division above).
+  const clubs = [...new Set([...saved.rows.map((r) => r[0]), ...bracket.flat().flatMap((tie) => [tie.higher.teamId, tie.lower.teamId]).filter((id): id is TeamId => id !== null)])];
+  return { code, rows: table.rows, ...(table.final ? { final: table.final } : {}), teams: clubs.map((id) => teamOf(world, id)), fixtures, bracket };
 }
 
 /** Where a club plays in the season in progress (undefined in the National League, or once it has left the pyramid). */

@@ -34,6 +34,8 @@ export interface PlayoffView {
    * names, so a seed reads "1st in Zone A" and a winner "Winner 1A/8B".
    */
   zoneSlots?: { ids: string[]; names: string[] };
+  /** What to call a table place that isn't this league's own (My World's Bundesliga v 2. Bundesliga play-off: "16th in the Bundesliga"), by position. */
+  slotLabels?: Record<number, string>;
 }
 
 interface Props {
@@ -158,6 +160,7 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff
   const zoneSlot = (position: number) => (zones ? { zone: (position - 1) % zones.ids.length, place: Math.ceil(position / zones.ids.length) } : null);
   const label = (side: PlayoffSide) => {
     if (side.teamId !== null) return teams.get(side.teamId)?.shortName ?? "";
+    if (!side.from && side.position !== null && playoff.slotLabels?.[side.position]) return playoff.slotLabels[side.position]!;
     const group = groupName(side.group);
     if (zones) {
       if (side.from) {
