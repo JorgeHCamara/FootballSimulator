@@ -1267,10 +1267,10 @@
     "comingSoon": "Real history coming soon"
   },
   "World": {
-    "metaTitle": "My World: take your club up the football pyramid, in England or Spain",
-    "metaDescription": "Pick a club from England or Spain and play season after season of their leagues and cups, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
+    "metaTitle": "My World: take your club up the football pyramid, in England, Spain or Germany",
+    "metaDescription": "Pick a club from England, Spain or Germany and play season after season of their leagues and cups, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
     "title": "My World",
-    "intro": "Pick your countries and a club, then play season after season of the English pyramid (Premier League to League Two, the FA Cup and the EFL Cup), the Spanish one (La Liga, the Segunda División and the Copa del Rey), or both, every result your way, as on the league pages: the play-offs, promotion and relegation included. Can you take a League Two club to the Premier League?",
+    "intro": "Pick your countries and a club, then play season after season of the English pyramid (Premier League to League Two, the FA Cup and the EFL Cup), the Spanish one (La Liga, the Segunda División and the Copa del Rey), the German one (Bundesliga, 2. Bundesliga and the DFB-Pokal), or any of them together, every result your way, as on the league pages: the play-offs, promotion and relegation included. Can you take a League Two club to the Premier League?",
     "savedNote": "Your world is saved in this browser only.",
     "notSaved": "This browser isn't saving your world (private browsing, or storage full): it will be lost when you leave the page.",
     "reset": {
@@ -1312,6 +1312,16 @@
         "the": "the Segunda División",
         "in": "in the Segunda División"
       },
+      "BL1": {
+        "name": "Bundesliga",
+        "the": "the Bundesliga",
+        "in": "in the Bundesliga"
+      },
+      "BL2": {
+        "name": "2. Bundesliga",
+        "the": "the 2. Bundesliga",
+        "in": "in the 2. Bundesliga"
+      },
       "NL": {
         "name": "National League",
         "the": "the National League",
@@ -1321,6 +1331,11 @@
         "name": "Primera Federación",
         "the": "the Primera Federación",
         "in": "in the Primera Federación"
+      },
+      "L3": {
+        "name": "3. Liga",
+        "the": "the 3. Liga",
+        "in": "in the 3. Liga"
       }
     },
     "cups": {
@@ -1338,11 +1353,17 @@
         "name": "Copa del Rey",
         "the": "the Copa del Rey",
         "in": "in the Copa del Rey"
+      },
+      "DFB": {
+        "name": "DFB-Pokal",
+        "the": "the DFB-Pokal",
+        "in": "in the DFB-Pokal"
       }
     },
     "countries": {
       "ENG": "England",
-      "ESP": "Spain"
+      "ESP": "Spain",
+      "GER": "Germany"
     },
     "setup": {
       "title": "Create your world",
@@ -1350,7 +1371,8 @@
       "countriesHint": "Every country you pick is played in full, its leagues and cups, season after season.",
       "countryLeagues": {
         "ENG": "Premier League to League Two, the FA Cup and the EFL Cup",
-        "ESP": "La Liga and the Segunda División, the Copa del Rey"
+        "ESP": "La Liga and the Segunda División, the Copa del Rey",
+        "GER": "Bundesliga and 2. Bundesliga, the DFB-Pokal"
       },
       "unavailable": "Its live data didn't load ({leagues}): try again later.",
       "and": " and ",

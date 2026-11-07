@@ -519,6 +519,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
               onChange={changeShown}
               canUndo={canUndo}
               onUndo={onUndo}
+              locale={locale}
             />
           ) : null}
         </section>

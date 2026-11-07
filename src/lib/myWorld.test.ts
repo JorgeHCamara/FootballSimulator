@@ -9,12 +9,16 @@ import {
   clubDivision,
   clubPath,
   createWorld,
+  divisionState,
+  gamesLeft,
+  playoffConfigOf,
+  pyramidPlayoffOf,
+  setScore,
+  simulateRest,
   currentTable,
   divisionConfig,
-  divisionState,
   ENGLAND,
   FIXTURE_SEASONS,
-  gamesLeft,
   movementCounts,
   NATIONAL_LEAGUE_ID_BASE,
   packReady,
@@ -27,10 +31,8 @@ import {
   seasonLabel,
   seasonMoves,
   seasonStates,
-  setScore,
   simulateMatchday,
   simulatePlayoffs,
-  simulateRest,
   startNextSeason,
   upgradeWorld,
   type DivisionCode,
@@ -709,3 +711,142 @@ describe("My World: Spain", () => {
     assert.equal(played.nationalLeague.length, 4);
   });
 });
+
+describe("My World: Germany", () => {
+  const NOW = new Date("2026-11-06T12:00:00Z");
+  let world: World;
+  let after: World;
+  before(() => {
+    const bl2 = pack.leagues.find((l) => l.code === "BL2")!;
+    world = createWorld(pack, { league: "BL2", club: bl2.teams[2]!.id, countries: ["GER"] }, 21, NOW);
+    after = playSeason(world);
+  });
+
+  it("moves two clubs each way between the Bundesliga and the 2. Bundesliga, the pyramid play-off (16th v 3rd) adding one to both or neither; two out of the 2. Bundesliga", () => {
+    assert.deepEqual(movementCounts("GER"), [
+      { up: 0, down: 2 },
+      { up: 3, down: 2 },
+    ]);
+    assert.deepEqual(pyramidPlayoffOf("BL2"), { upper: "BL1", lower: "BL2", upperPlace: 16, lowerPlace: 3 });
+    assert.equal(pyramidPlayoffOf("BL1"), pyramidPlayoffOf("BL2"));
+    assert.equal(pyramidPlayoffOf("SD"), undefined);
+    const config = playoffConfigOf("BL2")!;
+    assert.deepEqual(config.rounds.map((r) => [r.key, r.legs, r.levelTie, r.pairs]), [["final", 2, "penalties", [[16, 3]]]]);
+    assert.equal(config.promotedTo, "Bundesliga");
+    assert.deepEqual(config.directPromotion, [1, 2]);
+    assert.equal(playoffConfigOf("BL1"), undefined);
+  });
+
+  it("a world of Germany alone: the two leagues and the DFB-Pokal, the real cup's 28 lower sides in the pool, the 3. Liga empty to begin with", () => {
+    assert.deepEqual(world.countries, ["GER"]);
+    assert.deepEqual(world.divisions.map((d) => [d.code, d.clubs.length]), [["BL1", 18], ["BL2", 18]]);
+    assert.deepEqual(world.cups.map((c) => c.code), ["DFB"]);
+    assert.deepEqual(world.nationalLeague, []);
+    assert.ok(Object.values(world.clubs).every((c) => c.country === "GER"));
+    assert.equal(world.cupPool.length, 28);
+    const dfb = world.cups[0]!;
+    assert.deepEqual(Object.keys(dfb.entrants), ["firstRound"]);
+    assert.equal(dfb.entrants.firstRound!.length, 64, "every club in the first round: the 36 league clubs and the 28 lower sides");
+  });
+
+  it("the 2. Bundesliga's play-off is the tie with the Bundesliga's 16th: two legs, the Bundesliga club hosting the first, its clubs known once both leagues are complete, its games counted in the 2. Bundesliga's", () => {
+    const bl2 = divisionState(world, "BL2");
+    assert.ok(bl2.playoff, "a play-off, though the league config has none");
+    assert.equal(bl2.playoffKnown, false);
+    assert.equal(divisionState(world, "BL1").playoff, undefined);
+    assert.equal(gamesLeft(bl2), bl2.fixtures.filter((f) => !bl2.results[f.id]).length + 2, "the tie's two legs");
+    // The 2. Bundesliga played out: its tie waits for the Bundesliga.
+    const lowerDone = simulateRest(world, "BL2", createRng(1));
+    const waiting = divisionState(lowerDone, "BL2");
+    assert.equal(waiting.leagueComplete, true);
+    assert.equal(waiting.playoffKnown, false);
+    assert.equal(waiting.done, false);
+    assert.equal(gamesLeft(waiting), 2);
+    assert.equal(waiting.bracket[0]![0]!.legs.length, 0, "no clubs yet");
+    // The Bundesliga played out too: the tie's clubs known, the 16th hosting the first leg; Simulate rest on the 2. Bundesliga then plays it.
+    const bothDone = simulateRest(lowerDone, "BL1", createRng(2));
+    const known = divisionState(bothDone, "BL2");
+    assert.equal(known.playoffKnown, true);
+    assert.equal(known.done, false);
+    const tie = known.bracket[0]![0]!;
+    const upper16 = divisionState(bothDone, "BL1").rows.find((r) => r.position === 16)!.teamId;
+    const lower3 = known.eligibleRows.find((r) => r.position === 3)!.teamId;
+    assert.deepEqual([tie.lower.teamId, tie.higher.teamId], [upper16, lower3]);
+    assert.equal(tie.legs.length, 2);
+    assert.equal(tie.legs[0]!.homeId, upper16, "first leg at the Bundesliga club");
+    assert.equal(tie.legs[1]!.homeId, lower3, "second leg at the 2. Bundesliga club");
+    assert.ok(known.model.strengths.has(upper16), "the Bundesliga club rated on the 2. Bundesliga's scale");
+    const played = simulateRest(bothDone, "BL2", createRng(3));
+    const finished = divisionState(played, "BL2");
+    assert.equal(finished.done, true);
+    assert.equal(gamesLeft(finished), 0);
+    assert.equal(seasonDone(played), true, "both leagues and the tie decided (the cup is counted apart, by cupsDone)");
+    // A Bundesliga result that changes its 16th clears the tie's scores (they belonged to another pairing).
+    const bl1 = divisionState(played, "BL1");
+    const sixteenth = bl1.rows.find((r) => r.position === 16)!;
+    const seventeenth = bl1.rows.find((r) => r.position === 17)!;
+    const swing = bl1.fixtures.find((f) => f.homeId === seventeenth.teamId && f.awayId === sixteenth.teamId) ?? bl1.fixtures.find((f) => f.awayId === seventeenth.teamId && f.homeId === sixteenth.teamId)!;
+    const changed = setScore(played, "BL1", swing, swing.homeId === seventeenth.teamId ? { home: 9, away: 0 } : { home: 0, away: 9 });
+    const afterChange = divisionState(changed, "BL2");
+    if (afterChange.bracket[0]![0]!.lower.teamId !== upper16) {
+      assert.equal(Object.keys(afterChange.picks).some((id) => Number(id) >= 2_000_000_000), false, "the tie's scores went with its pairing");
+      assert.equal(afterChange.done, false);
+    }
+  });
+
+  it("playSeason settles the tie for both tables: the 2. Bundesliga's 3rd goes up or the Bundesliga's 16th goes down, and the leagues still match", () => {
+    const season = after.history[0]!;
+    const bl1 = season.divisions.find((d) => d.code === "BL1")!;
+    const bl2 = season.divisions.find((d) => d.code === "BL2")!;
+    const notes = (rows: typeof bl1.rows) => rows.map((r) => r[8]);
+    const won = bl2.rows[2]![8] === "W";
+    assert.ok(won || bl2.rows[2]![8] === "O", "the 3rd was in the play-off");
+    assert.equal(bl1.rows[15]![8], won ? "R" : "", "the 16th goes down only if it lost the tie");
+    assert.equal(count(notes(bl1.rows), "R"), won ? 3 : 2);
+    assert.equal(count(notes(bl2.rows), "C", "P", "W"), won ? 3 : 2);
+    assert.equal(count(notes(bl2.rows), "R"), 2, "17th and 18th down to the 3. Liga");
+    assert.ok(bl2.final, "the tie's result saved as the 2. Bundesliga's play-off final");
+    assert.ok([bl1.rows[15]![0], bl2.rows[2]![0]].includes(bl2.final![0]) && [bl1.rows[15]![0], bl2.rows[2]![0]].includes(bl2.final![1]));
+    assert.equal(bl1.final, undefined);
+    // Next season's divisions: the right size, the winner in the Bundesliga.
+    assert.deepEqual(after.divisions.map((d) => d.clubs.length), [18, 18]);
+    assert.ok(after.divisions[0]!.clubs.includes(bl2.final![0]), "the tie's winner in the Bundesliga");
+    assert.ok(after.divisions[1]!.clubs.includes(bl2.final![1]), "the loser in the 2. Bundesliga");
+    // Out of the 2. Bundesliga: into the 3. Liga; in: two real DFB-Pokal sides from the pool.
+    assert.equal(season.out.length, 2);
+    assert.equal(season.in.length, 2);
+    assert.ok(season.in.every((id) => after.clubs[id]!.origin === "real" && world.cupPool.includes(id)));
+    assert.equal(after.cupPool.length, 26);
+    assert.deepEqual(after.nationalLeague, season.out);
+    assert.deepEqual(seasonMoves(after, season).map((m) => [m.upper, m.lower, m.up.length, m.down.length]), [
+      ["BL1", "BL2", won ? 3 : 2, won ? 3 : 2],
+      ["BL2", null, 2, 2],
+    ]);
+    // The past season's 2. Bundesliga shows the tie as its play-off, both legs scored.
+    const past = pastDivision(after, season.year, "BL2")!;
+    assert.equal(past.bracket.length, 1);
+    assert.equal(past.bracket[0]!.length, 1);
+    const tie = past.bracket[0]![0]!;
+    assert.equal(tie.legs.length, 2);
+    assert.ok(tie.legs.every((leg) => leg.result));
+    assert.equal(tieOutcome(tie, {})?.winner, bl2.final![0]);
+    assert.equal(pastDivision(after, season.year, "BL1")!.bracket.length, 0);
+    // The club's path: the loser from the Bundesliga is "relegated", the winner from the 2. Bundesliga "play-off winners".
+    const winnerPath = clubPath(after, bl2.final![0]).at(-1)!;
+    assert.equal(winnerPath.outcome, won ? "playoffWinners" : "neutral");
+    assert.equal(clubPath(after, bl2.final![1]).at(-1)!.outcome, won ? "relegated" : "playoffs");
+    assert.deepEqual(cupStatesCodes(after), ["DFB"]);
+  });
+
+  it("every country together: three pyramids, four cups", () => {
+    const all = createWorld(pack, { league: "PL", club: pack.leagues[0]!.teams[0]!.id, countries: ["ENG", "ESP", "GER"] }, 4, NOW);
+    assert.deepEqual(all.divisions.map((d) => d.code), ["PL", "ELC", "EL1", "EL2", "PD", "SD", "BL1", "BL2"]);
+    assert.deepEqual(all.cups.map((c) => c.code), ["FAC", "EFC", "CDR", "DFB"]);
+    const played = playSeason(all);
+    assert.equal(played.history[0]!.divisions.length, 8);
+    assert.equal(played.history[0]!.cups!.length, 4);
+    assert.deepEqual(played.divisions.map((d) => d.clubs.length), [20, 24, 24, 24, 20, 22, 18, 18]);
+  });
+});
+
+const cupStatesCodes = (w: World) => w.cups.map((c) => c.code);
