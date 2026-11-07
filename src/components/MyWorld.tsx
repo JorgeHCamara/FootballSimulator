@@ -552,7 +552,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   );
 }
 
-/** The season just ended: how the visitor's club did, the champions, who went up and down; the next season starts from here. */
+/** The season just ended: how the visitor's club did, then one country at a time (the club's to begin with) its champions, cup finals and who went up and down; the next season starts from here. */
 function Review({ record, world, locale, onStart }: { record: SeasonRecord; world: World; locale: SiteLocale; onStart: () => void }) {
   const t = useTranslations("World");
   const name = (id: TeamId) => world.clubs[id]!.name;
@@ -577,7 +577,12 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
   const key = !mine ? undefined : note === "C" ? (next.above ? "CUp" : "C") : note === "P" || note === "W" || note === "O" ? note : note === "R" ? (next.below ? "R" : "out") : "stay";
   const headline = key && values ? t(`review.${key}`, key === "W" ? { ...values, league: t(`leagues.${mine!.code}.name`) } : values) : "";
   const good = note === "C" || note === "P" || note === "W";
-  const moves = seasonMoves(world, record);
+  // The country whose champions and moves show: the visitor's club's, each season.
+  const [shown, setShown] = useState<WorldCountry>(country);
+  useEffect(() => setShown(country), [record.year, country]);
+  const divisions = record.divisions.filter((d) => divisionCountry(d.code) === shown);
+  const cups = (record.cups ?? []).filter((c) => cupCountry(c.code) === shown);
+  const moves = seasonMoves(world, record).filter((m) => divisionCountry(m.upper) === shown);
   const list = (ids: TeamId[]) => (
     <ul className="space-y-1">
       {ids.map((id) => (
@@ -607,10 +612,11 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
             {t(c.final[4] ? "review.cupWonPens" : "review.cupWon", { club: name(world.userClub), cup: t(`cups.${c.code}.the`), loser: name(c.final[1]), score: `${c.final[2]}–${c.final[3]}` })}
           </p>
         ))}
+      <CountryPicker world={world} value={shown} onChange={setShown} testId="world-review-country" />
       <div>
         <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-zinc-500">{t("review.champions")}</h3>
         <ul className="grid gap-1 sm:grid-cols-2">
-          {record.divisions.map((d) => (
+          {divisions.map((d) => (
             <li key={d.code} className="flex items-center gap-2 text-sm">
               <Icon name="trophy" size={14} className="shrink-0 text-amber-500" />
               <span className="text-zinc-500">{t(`leagues.${d.code}.name`)}:</span>
@@ -618,7 +624,7 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
             </li>
           ))}
           {/* The cups: their winners and finals. */}
-          {(record.cups ?? []).map((c) => (
+          {cups.map((c) => (
             <li key={c.code} className="flex min-w-0 items-center gap-2 text-sm" data-testid="world-review-cup" data-cup={c.code} data-winner={c.final[0]}>
               <Icon name="trophy" size={14} className="shrink-0 text-amber-500" />
               <span className="shrink-0 text-zinc-500">{t(`cups.${c.code}.name`)}:</span>
