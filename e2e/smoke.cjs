@@ -2792,8 +2792,21 @@ async function step(name, fn) {
       assert.deepEqual(await p.locator('[data-testid="world-tabs"] [role="tab"]').allInnerTexts(), ["La Liga", "Segunda División", "Copa del Rey"]);
       assert.equal(await p.locator('[data-testid="world-tabs"] [aria-selected="true"]').getAttribute("data-league"), "SD");
       assert.equal(await p.locator('[data-testid="world-table"] [data-testid="world-row"]').count(), 22);
+      // The games left: the club's country open, England closed until it's opened, in the tables or by its row.
+      const openOf = async () => p.getByTestId("world-left-country").evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.open]));
+      assert.deepEqual(await openOf(), [["ENG", "false"], ["ESP", "true"]]);
       await picker.selectOption("ENG");
+      assert.deepEqual(await openOf(), [["ENG", "true"], ["ESP", "true"]], "opened in the tables: open in the games left too");
       assert.deepEqual(await p.locator('[data-testid="world-tabs"] [role="tab"]').allInnerTexts(), ["Premier League", "Championship", "League One", "League Two", "FA Cup", "EFL Cup"]);
+      const espRow = p.locator('[data-testid="world-left-country"][data-country="ESP"] [data-testid="world-left-toggle"]');
+      await espRow.click();
+      assert.equal(await espRow.getAttribute("aria-expanded"), "false");
+      assert.equal(await p.locator('[data-testid="world-left"][data-league="PD"]').isVisible(), false);
+      await espRow.click();
+      assert.equal(await p.locator('[data-testid="world-left"][data-league="PD"]').isVisible(), true);
+      // One total for the season, every competition's games left added up.
+      const sum = (await p.getByTestId("world-left").evaluateAll((els) => els.map((e) => Number(e.dataset.left)))).reduce((a, b) => a + b, 0);
+      assert.equal(Number(await p.getByTestId("world-left-total").getAttribute("data-left")), sum);
       await picker.selectOption("ESP");
       // The games left, by country: England's six, Spain's three.
       assert.deepEqual(await p.getByTestId("world-left-country").evaluateAll((els) => els.map((e) => [e.dataset.country, e.querySelectorAll('[data-testid="world-left"]').length])), [["ENG", 6], ["ESP", 3]]);

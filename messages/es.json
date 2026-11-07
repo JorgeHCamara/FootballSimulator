@@ -1383,6 +1383,7 @@
     "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
     "left": {
       "title": "Partidos por jugar",
+      "countShort": "{count, plural, =0 {Terminado} one {# restante} other {# restantes}}",
       "count": "{count, plural, =0 {Todos jugados} one {Falta # partido} other {Faltan # partidos}}",
       "note": "Juega los partidos de cada liga en los partidos de abajo (los dados, Simular jornada o Simular resto de temporada, con los playoffs) y cada copa ronda a ronda. Luego, pasa a la próxima temporada aquí."
     },

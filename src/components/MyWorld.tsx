@@ -16,6 +16,7 @@ import {
   cupCountry,
   divisionConfig,
   divisionCountry,
+  gamesInSeason,
   gamesLeft,
   LOWER_LEAGUE,
   neighbours,
@@ -37,7 +38,7 @@ import {
   worldDivisions,
 } from "../lib/myWorld.ts";
 import { browserStore, clearWorld, loadWorld, saveWorld } from "../lib/myWorldStorage.ts";
-import { cupGamesLeft, cupStates, isWorldCup, outsidersNeeded, type WorldCupCode } from "../lib/worldCups.ts";
+import { cupGamesInSeason, cupGamesLeft, cupStates, isWorldCup, outsidersNeeded, type WorldCupCode } from "../lib/worldCups.ts";
 import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
@@ -318,6 +319,10 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const opening = (c: WorldCountry): DivisionCode => (myDivision && divisionCountry(myDivision) === c ? myDivision : COUNTRY_LEAGUES[c][0]!);
   // The country whose competitions the tabs show, and the competition shown.
   const [country, setCountry] = useState<WorldCountry>(myCountry);
+  // The games-left panel's open countries: the club's, every one opened in the tables, and any opened by hand.
+  const [openLeft, setOpenLeft] = useState<WorldCountry[]>([myCountry]);
+  useEffect(() => setOpenLeft((open) => (open.includes(country) ? open : [...open, country])), [country]);
+  const toggleLeft = (c: WorldCountry) => setOpenLeft((open) => (open.includes(c) ? open.filter((x) => x !== c) : [...open, c]));
   const [viewed, setViewed] = useState<DivisionCode | WorldCupCode>(opening(myCountry));
   // The matchday each league's fixtures show (else its next round).
   const [matchdays, setMatchdays] = useState<Partial<Record<DivisionCode, number>>>({});
@@ -329,6 +334,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   // Where the visitor's club is when the season changes: its own division, on its next round, this season.
   useEffect(() => {
     setCountry(myCountry);
+    setOpenLeft([myCountry]);
     setViewed(opening(myCountry));
     setMatchdays({});
     setYear(world.year);
@@ -343,13 +349,17 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const firstSeason = world.divisions.some((d) => d.games);
   const season = seasonLabel(world.year);
   // Games left to play in each league (play-offs included) and each cup, by country; the next season once there are none.
-  const left = world.countries.map((c) => ({
-    country: c,
-    items: [
-      ...states.filter((s) => divisionCountry(s.code) === c).map((s) => ({ code: s.code as DivisionCode | WorldCupCode, games: gamesLeft(s) })),
-      ...cups.filter((x) => cupCountry(x.code) === c).map((x) => ({ code: x.code as DivisionCode | WorldCupCode, games: cupGamesLeft(x) })),
-    ],
-  }));
+  const left = world.countries.map((c) => {
+    const items = [
+      ...states.filter((s) => divisionCountry(s.code) === c).map((s) => ({ code: s.code as DivisionCode | WorldCupCode, games: gamesLeft(s), total: gamesInSeason(s) })),
+      ...cups.filter((x) => cupCountry(x.code) === c).map((x) => ({ code: x.code as DivisionCode | WorldCupCode, games: cupGamesLeft(x), total: cupGamesInSeason(x) })),
+    ];
+    return { country: c, items, games: items.reduce((n, i) => n + i.games, 0), total: items.reduce((n, i) => n + i.total, 0) };
+  });
+  const leftAll = left.reduce((n, c) => n + c.games, 0);
+  const totalAll = left.reduce((n, c) => n + c.total, 0);
+  /** Share of a season's games played (a shoot-out still to come doesn't count against it). */
+  const playedShare = (games: number, total: number) => (total > 0 ? Math.min(1, Math.max(0, 1 - games / total)) : 1);
   const done = states.every((s) => s.done) && cups.every((c) => c.done);
   const lowerOf = (c: WorldCountry) => ({ lower: t(`leagues.${LOWER_LEAGUE[c]}.the`), back: t(`leagues.${COUNTRY_LEAGUES[c].at(-1)!}.name`) });
   const shownSeason = seasonLabel(year);
@@ -404,38 +414,68 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
         </div>
         {/* Games left in each league; the season's end once every league is played (not while its review shows). */}
         {!world.review && (
-          <div className="space-y-2 lg:w-[30rem] lg:shrink-0" data-testid="world-left-card">
-            <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">{t("left.title")}</p>
-            {left.map(({ country: c, items }) => (
-              <div key={c} className="space-y-1" data-testid="world-left-country" data-country={c}>
-                {left.length > 1 && (
-                  <p className="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
-                    <Flag code={COUNTRY_FLAG[c]} width={16} />
-                    {t(`countries.${c}`)}
-                  </p>
-                )}
-                <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-                  {items.map(({ code, games }) => (
-                    <li key={code}>
+          <div className="space-y-3 lg:w-[26rem] lg:shrink-0" data-testid="world-left-card">
+            {/* The season's games left, all countries: one count and a bar of the share played. */}
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">{t("left.title")}</p>
+                <p className="text-sm font-semibold tabular-nums" data-testid="world-left-total" data-left={leftAll}>
+                  {t("left.count", { count: leftAll })}
+                </p>
+              </div>
+              <ProgressBar share={playedShare(leftAll, totalAll)} />
+            </div>
+            {/* One row per country, its competitions under it: the club's country open, the others a tap away. */}
+            <ul className="divide-y divide-zinc-200 overflow-hidden rounded-xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+              {left.map(({ country: c, items, games, total }) => {
+                const open = left.length === 1 || openLeft.includes(c);
+                const listId = `world-left-${c}`;
+                return (
+                  <li key={c} data-testid="world-left-country" data-country={c} data-open={open}>
+                    {left.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => showLeague(code)}
-                        className={`flex w-full min-w-0 flex-col items-start rounded-lg px-2.5 py-1.5 text-left text-xs hover:ring-1 hover:ring-pitch-500 ${games === 0 ? "bg-pitch-50 text-pitch-800 dark:bg-pitch-900/40 dark:text-pitch-100" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"}`}
-                        data-testid="world-left"
-                        data-league={code}
-                        data-left={games}
+                        onClick={() => toggleLeft(c)}
+                        aria-expanded={open}
+                        aria-controls={listId}
+                        className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+                        data-testid="world-left-toggle"
                       >
-                        <span className="w-full truncate font-semibold">{name(code)}</span>
-                        <span className="flex items-center gap-1 tabular-nums">
-                          {games === 0 && <Icon name="check" size={12} strokeWidth={3} />}
-                          {t("left.count", { count: games })}
+                        <Flag code={COUNTRY_FLAG[c]} width={20} />
+                        <span className="min-w-0 flex-1 truncate font-semibold">{t(`countries.${c}`)}</span>
+                        <span className="hidden w-20 sm:block">
+                          <ProgressBar share={playedShare(games, total)} />
                         </span>
+                        <span className={`shrink-0 whitespace-nowrap text-right text-xs tabular-nums ${games === 0 ? "font-semibold text-pitch-700 dark:text-pitch-100" : "text-zinc-600 dark:text-zinc-300"}`}>
+                          {t("left.countShort", { count: games })}
+                        </span>
+                        <Icon name="chevron-down" size={16} className={`shrink-0 text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`} />
                       </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+                    )}
+                    <ul id={listId} hidden={!open} className="grid grid-cols-1 gap-x-3 px-1.5 pb-1.5 pt-0.5 sm:grid-cols-2">
+                      {items.map(({ code, games: n }) => (
+                        <li key={code}>
+                          <button
+                            type="button"
+                            onClick={() => showLeague(code)}
+                            className="flex w-full min-w-0 items-center gap-2 rounded-md px-1.5 py-1 text-left text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                            data-testid="world-left"
+                            data-league={code}
+                            data-left={n}
+                          >
+                            <span className="min-w-0 flex-1 truncate text-zinc-700 dark:text-zinc-200">{name(code)}</span>
+                            <span className={`flex shrink-0 items-center gap-1 tabular-nums ${n === 0 ? "font-semibold text-pitch-700 dark:text-pitch-100" : "text-zinc-500"}`}>
+                              {n === 0 && <Icon name="check" size={12} strokeWidth={3} />}
+                              {t("left.countShort", { count: n })}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                );
+              })}
+            </ul>
             {done ? (
               <div className="space-y-1">
                 <button type="button" className={`${primary} w-full`} onClick={endSeason} disabled={playing} data-testid="world-end-season">
@@ -797,5 +837,14 @@ function Path({ world, locale }: { world: World; locale: SiteLocale }) {
         </ol>
       )}
     </section>
+  );
+}
+
+/** A thin bar of the share of a season's games played. */
+function ProgressBar({ share }: { share: number }) {
+  return (
+    <span className="block h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800" role="presentation">
+      <span className="block h-full rounded-full bg-pitch-600 transition-[width]" style={{ width: `${Math.round(share * 100)}%` }} />
+    </span>
   );
 }

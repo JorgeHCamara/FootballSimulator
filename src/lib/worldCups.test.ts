@@ -25,6 +25,7 @@ import { isWorld, loadWorld, saveWorld, WORLD_KEY } from "./myWorldStorage.ts";
 import {
   cupClubs,
   cupConfig,
+  cupGamesInSeason,
   cupGamesLeft,
   cupPlayable,
   cupsDone,
@@ -189,6 +190,7 @@ describe("My World: a new world's cups", () => {
     assert.deepEqual(state.rounds[0]!.ties[0]!.shootout.result, { home: 4, away: 3 }, "the level tie's shoot-out");
     assert.equal(tieWinner(state.rounds[0]!.ties[0]!, state.picks), state.rounds[0]!.ties[0]!.homeId, "decided on penalties");
     assert.equal(cupGamesLeft(state), 123 - 10, "ten ties played");
+    assert.equal(cupGamesInSeason(state), 123, "the season's games: 40 first-round ties to the final");
     assert.equal(state.rounds[1]!.drawn, "pending");
     // Played on from there to the final.
     const done = simulateWorldCupRest(live, "FAC", createRng(3));
