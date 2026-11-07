@@ -5,7 +5,7 @@ import { worldStartPack } from "./myWorldStart.ts";
 import { isWorld, loadWorld, saveWorld, WORLD_KEY } from "./myWorldStorage.ts";
 import { mostTitles } from "./winners.ts";
 import { leagueWinners } from "./winnersData.ts";
-import { historySeason, worldWinners } from "./worldWinners.ts";
+import { historySeason, worldCupWinners, worldWinners } from "./worldWinners.ts";
 
 let pack: StartPack;
 before(async () => {
@@ -115,5 +115,23 @@ describe("My World's Past Winners", () => {
     assert.equal(isWorld({ ...world, winners: "none" }), false);
     assert.equal(isWorld({ ...world, winners: [{ year: world.year, code: "PL", top: [[999_999, "Nobody", 1]] }] }), false);
     assert.equal(isWorld({ ...world, winners: [{ year: world.year, code: "PL", top: [[world.userClub, 1, 1]] }] }), false);
+  });
+});
+
+describe("My World's cup Past Winners", () => {
+  it("lists each finished season's final, newest first: the winner and the runner-up, no third place", () => {
+    const first = start();
+    assert.deepEqual(worldCupWinners(first, "FAC"), [], "nothing until a season is ended");
+    const second = startNextSeason(playSeason(first));
+    const world = startNextSeason(playSeason(second));
+    const rows = worldCupWinners(world, "FAC");
+    assert.deepEqual(rows.map((r) => r.season), [historySeason(second.year), historySeason(first.year)]);
+    for (const row of rows) {
+      const final = world.history.find((h) => h.year === row.startYear)!.cups!.find((c) => c.code === "FAC")!.final;
+      assert.deepEqual([row.champion!.id, row.runnerUp!.id, row.third], [final[0], final[1], null]);
+      assert.equal(row.champion!.name, world.clubs[final[0]]!.name);
+      assert.ok(row.world && row.format === "final" && row.competition === "FA Cup");
+    }
+    assert.equal(worldCupWinners(world, "EFC").length, 2, "each cup its own");
   });
 });

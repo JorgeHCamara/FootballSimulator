@@ -6,6 +6,7 @@ import { Flag } from "../../../../components/Flag.tsx";
 import { Icon } from "../../../../components/Icon.tsx";
 import { JsonLd } from "../../../../components/JsonLd.tsx";
 import { PastWinners } from "../../../../components/PastWinners.tsx";
+import { CUPS, getCupBySlug } from "../../../../config/cups.ts";
 import { getLeagueBySlug, type SiteLocale } from "../../../../config/leagues.ts";
 import { Link } from "../../../../i18n/navigation.ts";
 import { routing } from "../../../../i18n/routing.ts";
@@ -13,11 +14,24 @@ import { OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../lib/site
 import type { WinnerRow } from "../../../../lib/winners.ts";
 import { historySlugs, leagueWinners, pastWinnersPath } from "../../../../lib/winnersData.ts";
 
-/** Only the leagues with a history file (src/data/history) have this page; it's built from the file, nothing live. */
+/**
+ * The leagues with a history file (src/data/history) have this page, built from the file, nothing live; so
+ * does every cup, its history still to come (the page says so, and stays out of search results until then).
+ */
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return routing.locales.flatMap((locale) => historySlugs().map((league) => ({ locale, league })));
+  const slugs = [...new Set([...historySlugs(), ...CUPS.map((c) => c.slug)])];
+  return routing.locales.flatMap((locale) => slugs.map((league) => ({ locale, league })));
+}
+
+/** The competition and its rows: a league with a history file, or a cup (no rows until its file comes). */
+function competitionOf(slug: string) {
+  const league = getLeagueBySlug(slug);
+  const cup = league ? undefined : getCupBySlug(slug);
+  const competition = league ?? cup;
+  const rows = leagueWinners(slug) ?? (cup ? [] : undefined);
+  return competition && rows ? { competition, rows, cup: Boolean(cup) } : undefined;
 }
 
 type Params = Promise<{ locale: string; league: string }>;
@@ -34,17 +48,19 @@ const oldest = (rows: WinnerRow[]) => [...rows].reverse().find((r) => r.status =
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, league: slug } = await params;
-  const league = getLeagueBySlug(slug);
-  const rows = league ? leagueWinners(slug) : undefined;
-  if (!league || !rows) return {};
+  const found = competitionOf(slug);
+  if (!found) return {};
+  const { competition: league, rows } = found;
   const t = await getTranslations({ locale, namespace: "PastWinners" });
-  const year = String(oldest(rows).startYear);
-  const title = t("metaTitle", { league: league.name, article: articleOf(league.name, locale), year });
-  const description = t("metaDescription", { league: league.name, article: articleOf(league.name, locale), year });
+  const article = articleOf(league.name, locale);
+  const title = rows.length > 0 ? t("metaTitle", { league: league.name, article, year: String(oldest(rows).startYear) }) : t("heading", { league: league.name, article });
+  const description = rows.length > 0 ? t("metaDescription", { league: league.name, article, year: String(oldest(rows).startYear) }) : t("comingSoon");
   const path = pastWinnersPath(league);
   return {
     title,
     description,
+    // No history yet (the cups): out of search results until it comes.
+    ...(rows.length === 0 ? { robots: { index: false, follow: true } } : {}),
     alternates: alternates(locale, path),
     // The league's own card (a nested page has none of its own).
     openGraph: { type: "website", siteName: SITE_NAME, title, description, url: `/${locale}${path}`, locale: OG_LOCALE[locale], images: [{ url: `/${locale}/${league.slug}/opengraph-image`, width: 1200, height: 630 }] },
@@ -56,11 +72,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function PastWinnersPage({ params }: { params: Params }) {
   const { locale, league: slug } = await params;
   setRequestLocale(locale);
-  const league = getLeagueBySlug(slug);
-  const rows = league ? leagueWinners(slug) : undefined;
-  if (!league || !rows) notFound();
+  const found = competitionOf(slug);
+  if (!found) notFound();
+  const { competition: league, rows, cup } = found;
   const lang = langOf(locale);
-  const [t, seo, sim] = await Promise.all([getTranslations("PastWinners"), getTranslations("Seo"), getTranslations("Simulator")]);
+  const [t, seo, sim, tc] = await Promise.all([getTranslations("PastWinners"), getTranslations("Seo"), getTranslations("Simulator"), getTranslations("Cup")]);
   const leaguePath = `/${league.slug}`;
   const path = pastWinnersPath(league);
   const pageUrl = `${SITE_URL}/${locale}${path}`;
@@ -100,12 +116,14 @@ export default async function PastWinnersPage({ params }: { params: Params }) {
           <Flag code={league.flag} width={36} />
           <span>{heading}</span>
         </h1>
-        <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("intro", { league: league.name, article: articleOf(league.name, locale), season: oldest(rows).season })}</p>
+        {rows.length > 0 && (
+          <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("intro", { league: league.name, article: articleOf(league.name, locale), season: oldest(rows).season })}</p>
+        )}
       </header>
 
       <div className="flex w-fit rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="tablist">
         <Link href={leaguePath} role="tab" aria-selected={false} className={tab(false)} data-testid="view-table">
-          {sim("table")}
+          {cup ? tc("fixtures") : sim("table")}
         </Link>
         <Link href={`${leaguePath}#chances`} role="tab" aria-selected={false} className={tab(false)} data-testid="view-chances">
           {sim("chances")}
@@ -115,7 +133,7 @@ export default async function PastWinnersPage({ params }: { params: Params }) {
         </span>
       </div>
 
-      <PastWinners rows={rows} />
+      <PastWinners rows={rows} comingSoon={rows.length === 0} />
 
       {/* The same reserved placement as the league and club pages: nothing unless the slots are turned on (src/lib/adSlots.ts). */}
       <AdSlot kind="inContent" />

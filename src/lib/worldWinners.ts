@@ -6,7 +6,9 @@
  */
 
 import { divisionConfig, type DivisionCode, type World, type WorldPodium } from "./myWorld.ts";
+import { CUPS } from "../config/cups.ts";
 import type { WinnerClub, WinnerRow } from "./winners.ts";
+import { CALENDAR_YEAR, cupCountry, type WorldCupCode } from "./worldCountries.ts";
 
 /** A world season's label in the history files' style: 2026 → "2026-27". */
 export const historySeason = (year: number) => `${year}-${String((year + 1) % 100).padStart(2, "0")}`;
@@ -50,4 +52,37 @@ export function worldRows(world: World, code: DivisionCode, competition: string)
 export function worldWinners(world: World, code: DivisionCode, real: readonly WinnerRow[] | null): WinnerRow[] {
   const competition = real?.[0]?.competition ?? divisionConfig(code).name;
   return [...worldRows(world, code, competition), ...(real ?? [])];
+}
+
+/**
+ * A cup's Past Winners in a world: its finished seasons, newest first, each
+ * final's winner and runner-up (a cup has no third place). Calendar-year
+ * countries' cups (the Copa do Brasil) are labelled by their year. No cup has
+ * a real history yet.
+ */
+export function worldCupWinners(world: World, code: WorldCupCode): WinnerRow[] {
+  const calendar = CALENDAR_YEAR.includes(cupCountry(code));
+  const competition = CUPS.find((c) => c.code === code)?.name ?? code;
+  const club = (id: number): WinnerClub => {
+    const c = world.clubs[id];
+    return { key: c?.realId !== undefined ? `espn:${c.realId}` : `world:${id}`, id, name: c?.name ?? String(id), currentName: c?.name ?? String(id), crest: c?.crest ?? null, tla: c?.tla ?? null, points: null };
+  };
+  return world.history
+    .flatMap((record) => (record.cups ?? []).filter((cup) => cup.code === code).map((cup) => ({ year: record.year, final: cup.final })))
+    .sort((a, b) => b.year - a.year)
+    .map(({ year, final }) => ({
+      id: `world-${year}`,
+      season: calendar ? String(year) : historySeason(year),
+      startYear: year,
+      endYear: calendar ? year : year + 1,
+      tournament: null,
+      status: "completed",
+      competition,
+      format: "final",
+      notes: [],
+      champion: club(final[0]),
+      runnerUp: club(final[1]),
+      third: null,
+      world: true,
+    }));
 }

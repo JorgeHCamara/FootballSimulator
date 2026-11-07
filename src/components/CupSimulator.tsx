@@ -31,6 +31,7 @@ import { CupChances } from "./CupChances.tsx";
 import { CupRounds } from "./CupRounds.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { Icon } from "./Icon.tsx";
+import { Link } from "../i18n/navigation.ts";
 
 /** Fewer runs than a league: every run plays up to 123 games. */
 const CUP_ITERATIONS = 5_000;
@@ -51,6 +52,12 @@ export function CupSimulator({ cup, data }: Props) {
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const pw = useTranslations("PastWinners");
+
+  // Linked from the Past Winners page's "Chances" tab (#chances).
+  useEffect(() => {
+    if (window.location.hash === "#chances") setTab("chances");
+  }, []);
 
   const season = useSimStore((s) => (hydrated ? s.seasons[seasonKey] : undefined) ?? emptySeason);
   const canUndo = useSimStore((s) => (s.history[seasonKey]?.length ?? 0) > 0);
@@ -234,6 +241,10 @@ export function CupSimulator({ cup, data }: Props) {
           <button type="button" role="tab" aria-selected={tab === "chances"} className={tabButton(tab === "chances")} onClick={() => setTab("chances")}>
             {ts("chances")}
           </button>
+          {/* Its own page (every season's winner and runner-up); the simulator and its predictions stay as they are. */}
+          <Link href={`/${cup.slug}/past-winners`} role="tab" aria-selected={false} className={tabButton(false)} data-testid="past-winners-tab">
+            {pw("title")}
+          </Link>
         </div>
         <div className="flex flex-wrap gap-2" data-testid="actions">
           <button type="button" className={`${primaryButton} grow lg:grow-0`} onClick={simulateRound} disabled={round.drawn === "pending" || roundDecided}>
