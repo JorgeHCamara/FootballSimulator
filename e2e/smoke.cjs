@@ -2628,6 +2628,120 @@ async function step(name, fn) {
       assert.equal(res.status(), 404);
     });
 
+    await step("home hero: one H1 per language (the headline, not the logo), the two buttons, the trust line and the live title-chances card; 360 and 390px phones, tablet and desktop", async () => {
+      const expected = {
+        en: { h1: "The football simulator for every season", badge: "Free football simulator", cta: "Simulate the Premier League", world: "Start My World", card: "Premier League · Title chances", status: "Simulating…", href: "/en/premier-league" },
+        pt: { h1: "O simulador de futebol para todas as temporadas", badge: "Simulador de futebol grátis", cta: "Simular o Brasileirão", world: "Começar Meu Mundo", card: "Brasileirão Série A · Chances de título", status: "Simulando…", href: "/pt/brasileirao" },
+        es: { h1: "El simulador de fútbol para todas las temporadas", badge: "Simulador de fútbol gratis", cta: "Simular LaLiga", world: "Empezar Mi Mundo", card: "La Liga · Probabilidades de título", status: "Simulando…", href: "/es/la-liga" },
+      };
+      const overflowOf = (p) => p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      for (const [locale, x] of Object.entries(expected)) {
+        for (const width of [360, 390]) {
+          const ctx = await browser.newContext({ viewport: { width, height: 844 }, hasTouch: true, isMobile: true });
+          const p = await ctx.newPage();
+          await p.goto(`${BASE_URL}/${locale}`);
+          const tag = `${locale} at ${width}px`;
+          // Exactly one H1: the headline, not the header's logo.
+          assert.equal(await p.locator("h1").count(), 1, `${tag}: one h1`);
+          assert.equal((await p.locator("h1").innerText()).trim(), x.h1, tag);
+          assert.equal(await p.locator("header h1").count(), 0, `${tag}: the logo is no heading`);
+          assert.equal(await overflowOf(p), 0, `${tag}: no horizontal scroll`);
+          // The badge, then the H1 whole: inside the viewport, not clipped, 2–3 lines of 32–36px.
+          assert.equal((await p.getByTestId("hero-badge").innerText()).trim(), x.badge, tag);
+          const title = p.getByTestId("hero-title");
+          const box = await title.boundingBox();
+          assert.ok(box.x >= 0 && box.x + box.width <= width, `${tag}: h1 inside the viewport`);
+          const metrics = await title.evaluate((el) => {
+            const cs = getComputedStyle(el);
+            return { clipped: el.scrollWidth > el.clientWidth, size: parseFloat(cs.fontSize), lines: Math.round(el.getBoundingClientRect().height / parseFloat(cs.lineHeight)) };
+          });
+          assert.equal(metrics.clipped, false, `${tag}: h1 not cut off`);
+          assert.ok(metrics.size >= 32 && metrics.size <= 36, `${tag}: h1 ${metrics.size}px`);
+          assert.ok(metrics.lines >= 2 && metrics.lines <= 3, `${tag}: h1 on ${metrics.lines} lines`);
+          assert.ok((await p.getByTestId("hero-subtitle").innerText()).length > 40, `${tag}: the subtitle`);
+          // The buttons: stacked, full width, 48px tall, the primary first and on the first screen, My World (listed) under it.
+          const primary = p.getByTestId("hero-simulate");
+          assert.equal(await primary.getAttribute("href"), x.href, tag);
+          assert.equal((await primary.innerText()).trim(), x.cta, tag);
+          const pb = await primary.boundingBox();
+          assert.ok(pb.y + pb.height <= 844, `${tag}: the primary button on the first screen (${pb.y + pb.height})`);
+          assert.ok(pb.height >= 48 && pb.width >= width - 48, `${tag}: primary ${pb.width}×${pb.height}`);
+          const world = p.getByTestId("hero-my-world");
+          assert.equal(await world.getAttribute("href"), `/${locale}/my-world`, tag);
+          assert.equal((await world.innerText()).trim(), x.world, tag);
+          const wb = await world.boundingBox();
+          assert.ok(wb.height >= 48 && wb.width >= width - 48 && wb.y >= pb.y + pb.height + 11, `${tag}: My World stacked under the primary`);
+          // The trust line: the count of competitions, free, no sign-up, updated; two lines, none starting with a dot.
+          const trust = p.getByTestId("hero-trust");
+          const lines = await trust.evaluate((el) => {
+            const tops = new Map();
+            for (const item of el.querySelectorAll(":scope > span > span, :scope > span:last-child")) {
+              const r = item.getBoundingClientRect();
+              if (r.width === 0) continue;
+              const top = Math.round(r.top);
+              if (!tops.has(top)) tops.set(top, []);
+              tops.get(top).push(item.textContent.trim());
+            }
+            return [...tops.entries()].sort((a, b) => a[0] - b[0]).map(([, items]) => items);
+          });
+          assert.equal(lines.length, 2, `${tag}: trust line on two lines: ${JSON.stringify(lines)}`);
+          for (const line of lines) assert.doesNotMatch(line[0], /^·/, `${tag}: a line starts with a dot`);
+          assert.match(lines[0][0], /^\d{2} /, `${tag}: the number of competitions`);
+          assert.ok(lines[0].length === 3 && lines[1].length === 1, JSON.stringify(lines));
+          // The card: full width right under the buttons, a link to the league, its five rows each whole, with club, points and chance.
+          const card = p.getByTestId("hero-card");
+          assert.equal(await card.getAttribute("href"), x.href, tag);
+          const cb = await card.boundingBox();
+          assert.ok(cb.y > wb.y + wb.height && cb.width >= width - 48 && cb.y < 844, `${tag}: the card under the buttons, full width, starting on the first screen`);
+          assert.equal((await card.locator("h2").innerText()).replace(/\s+/g, " ").trim(), x.card, tag);
+          assert.equal((await card.getByTestId("hero-card-status").innerText()).trim(), x.status, tag);
+          assert.equal(await card.getByTestId("hero-card-body").getAttribute("data-kind"), "live", tag);
+          const rows = card.getByTestId("hero-card-row");
+          assert.equal(await rows.count(), 5, tag);
+          for (let i = 0; i < 5; i++) {
+            const row = rows.nth(i);
+            assert.ok(await row.isVisible(), `${tag}: row ${i + 1} visible`);
+            const rb = await row.boundingBox();
+            assert.ok(rb.x >= cb.x && rb.x + rb.width <= cb.x + cb.width + 1, `${tag}: row ${i + 1} inside the card`);
+            assert.equal((await row.locator(":scope > span").first().innerText()).trim(), String(i + 1));
+            assert.ok((await row.getByTestId("hero-card-club").innerText()).length > 0);
+            assert.match(await row.getByTestId("hero-card-points").innerText(), /^\d+ pts$/);
+            const chance = row.getByTestId("hero-card-chance");
+            assert.match(await chance.innerText(), /^(<1\s?%|>99\s?%|\d+\s?%)$/, `${tag}: a chance (PT and ES put a space before %)`);
+            const chb = await chance.boundingBox();
+            assert.ok(chb.x + chb.width <= cb.x + cb.width, `${tag}: the chance stays in view`);
+          }
+          assert.equal(await card.evaluate((el) => el.scrollWidth > el.clientWidth), false, `${tag}: no horizontal scroll in the card`);
+          // The mode cards under the hero, full width with full-width buttons.
+          const mode = p.getByTestId("home-quiz");
+          const mb = await mode.boundingBox();
+          assert.ok(mb.width >= width - 48 && mb.y > cb.y + cb.height, `${tag}: the quiz card under the hero, full width`);
+          assert.ok((await mode.locator(":scope > span").last().boundingBox()).width >= mb.width - 40, `${tag}: its button full width`);
+          await ctx.close();
+        }
+      }
+      // Desktop: two columns (the card beside the text), the My World and quiz cards side by side under the hero.
+      const d = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await d.goto(`${BASE_URL}/en`);
+      assert.equal(await d.locator("h1").count(), 1);
+      assert.equal(await overflowOf(d), 0);
+      const [tb, cb] = await Promise.all([d.getByTestId("hero-title").boundingBox(), d.getByTestId("hero-card").boundingBox()]);
+      assert.ok(cb.x > tb.x + tb.width && cb.y < tb.y + tb.height, "desktop: the card beside the text");
+      const [mw, quiz] = await Promise.all([d.getByTestId("home-my-world").boundingBox(), d.getByTestId("home-quiz").boundingBox()]);
+      assert.ok(Math.abs(mw.y - quiz.y) < 2 && quiz.x > mw.x + mw.width, "desktop: the mode cards side by side");
+      // Tablet: one centred column of about 640px, the card under the buttons.
+      await d.setViewportSize({ width: 768, height: 1024 });
+      const [tb2, cb2] = await Promise.all([d.getByTestId("hero-title").boundingBox(), d.getByTestId("hero-card").boundingBox()]);
+      assert.ok(cb2.y > tb2.y + tb2.height, "tablet: the card under the text");
+      assert.ok(cb2.width <= 640 && Math.abs(cb2.x + cb2.width / 2 - 384) < 2, `tablet: centred column (${cb2.x}, ${cb2.width})`);
+      assert.equal(await overflowOf(d), 0);
+      // 320px: no horizontal scroll even there.
+      await d.setViewportSize({ width: 320, height: 640 });
+      assert.equal(await overflowOf(d), 0, "320px: no horizontal scroll");
+      assert.equal(await d.getByTestId("hero-title").evaluate((el) => el.scrollWidth > el.clientWidth), false, "320px: h1 not cut off");
+      await d.close();
+    });
+
     console.log("\nAll e2e checks passed.");
   } finally {
     await browser.close();

@@ -27,3 +27,84 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/*
+ * The home page's hero (src/components/HomeHero.tsx): near-black, an emerald
+ * glow behind the headline, and faint pitch lines (the halfway line, the
+ * centre circle and a grid), all CSS: no image and nothing fixed. Phones get a
+ * softer glow and no circle; small screens keep the text clear of the notch.
+ */
+.home-hero {
+  background-color: #09090b;
+  background-image:
+    radial-gradient(60% 50% at 30% 0%, rgb(22 163 74 / 0.32), transparent 70%),
+    radial-gradient(40% 40% at 90% 100%, rgb(22 163 74 / 0.12), transparent 70%),
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    48px 48px,
+    48px 48px;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+@media (min-width: 640px) {
+  .home-hero {
+    background-image:
+      radial-gradient(55% 60% at 35% 0%, rgb(22 163 74 / 0.4), transparent 70%),
+      radial-gradient(35% 45% at 95% 100%, rgb(22 163 74 / 0.16), transparent 70%),
+      radial-gradient(circle at 50% 50%, transparent 139px, rgb(255 255 255 / 0.05) 140px, rgb(255 255 255 / 0.05) 141px, transparent 142px),
+      linear-gradient(90deg, transparent calc(50% - 1px), rgb(255 255 255 / 0.05) calc(50% - 1px), rgb(255 255 255 / 0.05) 50%, transparent 50%),
+      linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      56px 56px,
+      56px 56px;
+  }
+}
+
+/* The H1: about 32px on a 360px phone, 52px on a desktop, fluid in between. */
+.home-hero-title {
+  font-size: clamp(2rem, 1.2rem + 3.6vw, 3.25rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+/* The card's "Simulating…" dot, and its bars easing in; neither under reduced motion. */
+@keyframes home-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
+}
+@keyframes home-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.home-pulse {
+  animation: home-pulse 1.6s ease-in-out infinite;
+}
+.home-bar {
+  transform-origin: left;
+  animation: home-bar 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-pulse,
+  .home-bar {
+    animation: none;
+  }
+}

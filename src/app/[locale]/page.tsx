@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Faq } from "../../components/Faq.tsx";
 import { Flag } from "../../components/Flag.tsx";
+import { HomeHero } from "../../components/HomeHero.tsx";
 import { Icon } from "../../components/Icon.tsx";
 import { JsonLd } from "../../components/JsonLd.tsx";
 import { COMPETITIONS } from "../../config/competitions.ts";
@@ -10,6 +11,11 @@ import { HREFLANG, MY_WORLD_LISTED, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem
 
 /** Leagues with a card on the home page; every league is still in the header menu and footer. */
 const HOME_LEAGUES: readonly CompetitionCode[] = ["PL", "ELC", "PD", "BL1", "SA", "FL1", "PPL", "BSA", "MLS"];
+
+/** The hero's card reads the featured league's data and outlook like its league page: refreshed hourly, and with its tags (src/lib/sharedOutlook.ts). */
+export const revalidate = 3600;
+/** Room for the featured league's outlook on a cold server (shared with its league and club pages). */
+export const maxDuration = 60;
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -62,12 +68,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         ]}
       />
 
-      <section className="pt-4 text-center">
-        {/* Not shown (the header already says FootSimu), but kept as the page's H1 for search engines and screen readers. */}
-        <h1 className="sr-only">{t("heading")}</h1>
-        <p className="text-lg font-semibold text-pitch-700 dark:text-pitch-100">{t("tagline")}</p>
-        <p className="mx-auto mt-3 max-w-2xl text-zinc-600 text-pretty dark:text-zinc-400">{t("subheading")}</p>
-      </section>
+      {/* The hero: the page's one H1, the buttons and the featured league's live title-chances card. */}
+      <HomeHero locale={lang} subtitle={t("subheading")} />
 
       {/* The game modes, by the main simulators: My World (a club's seasons up the English pyramid; unlisted for now, see MY_WORLD_LISTED) and the daily quiz. */}
       <div className={`grid gap-3 ${MY_WORLD_LISTED ? "md:grid-cols-2" : ""}`}>
@@ -78,7 +80,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <Link
             key={mode.href}
             href={mode.href}
-            className="group flex flex-col gap-3 rounded-xl border border-pitch-100 bg-pitch-50 p-4 transition hover:border-pitch-500 hover:shadow-md dark:border-pitch-900 dark:bg-pitch-900/30"
+            className="group flex flex-col gap-3 rounded-2xl border border-zinc-200/70 bg-white/70 p-4 shadow-sm backdrop-blur-md transition hover:border-pitch-500/60 hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:hover:border-pitch-500/60"
             data-testid={mode.testId}
           >
             <span className="flex min-w-0 flex-1 items-start gap-3">
@@ -88,7 +90,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <span className="block text-sm text-zinc-600 dark:text-zinc-400">{mode.body}</span>
               </span>
             </span>
-            <span className="flex h-11 items-center justify-center gap-1.5 self-stretch rounded-lg bg-pitch-600 px-4 text-sm font-semibold text-white group-hover:bg-pitch-700 sm:self-start">
+            <span className="flex h-12 items-center justify-center gap-1.5 self-stretch rounded-xl bg-pitch-600 px-4 text-sm font-semibold text-white group-hover:bg-pitch-700 sm:self-start">
               {mode.cta}
               <Icon name="chevron-right" size={18} />
             </span>
@@ -98,7 +100,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {HOME_LEAGUES.flatMap((code) => LEAGUES.filter((l) => l.code === code)).map((l) => (
-          <li key={l.code}>
+          <li key={l.code} className="min-w-0">
             <Link
               href={`/${l.slug}`}
               className="group flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 transition hover:border-pitch-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
