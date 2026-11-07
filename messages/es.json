@@ -1271,8 +1271,25 @@
   "World": {
     "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés, español, alemán, italiano o brasileño",
     "metaDescription": "Elige un club de Inglaterra, España, Alemania, Italia o Brasil y juega temporada tras temporada de sus ligas y copas, con playoffs, ascensos y descensos. Guardado en tu navegador, con las tablas de todas las temporadas.",
+    "hero": {
+      "badge": "Modo de juego",
+      "start": "Empezar tu mundo",
+      "continue": "Continuar tu mundo",
+      "countries": "{count} países",
+      "leagues": "{count} ligas",
+      "cups": "{count} copas",
+      "saved": "Guardado en tu navegador",
+      "noSignup": "Sin registro"
+    },
+    "how": {
+      "title": "Cómo funciona",
+      "pick": "Elige uno o más países y tu club: todas las ligas y copas de cada uno se juegan enteras.",
+      "play": "Escribe cualquier marcador, tira los dados o simula una jornada o el resto de la temporada.",
+      "season": "Termina la temporada: campeones, copas, playoffs, ascensos y descensos, y después el repaso.",
+      "again": "Empieza la próxima temporada y sigue adelante, año tras año; las tablas de todas las temporadas quedan en tu navegador."
+    },
     "title": "Mi mundo",
-    "intro": "Elige tus países y un club, y juega temporada tras temporada de la pirámide inglesa (de la Premier League a la League Two, la FA Cup y la Copa de la Liga), de la española (LaLiga, la Segunda División y la Copa del Rey), de la alemana (Bundesliga, 2. Bundesliga y DFB-Pokal), de la italiana (Serie A, Serie B y Coppa Italia), de la brasileña (Série A, Série B, Série C y Copa do Brasil) o de todas juntas, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
+    "intro": "Elige tus países y un club, y juega temporada tras temporada de sus ligas y copas, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos. ¿Hasta dónde puedes llevar a tu club?",
     "savedNote": "Tu mundo se guarda solo en este navegador.",
     "notSaved": "Este navegador no está guardando tu mundo (navegación privada o almacenamiento lleno): se perderá cuando salgas de la página.",
     "reset": {
@@ -1529,7 +1546,7 @@
       "no": "Mantener este mundo"
     },
     "homeTitle": "Mi mundo",
-    "homeBody": "Lleva a un club de la League Two hasta la Premier League, temporada tras temporada, con ascensos, descensos y playoffs.",
+    "homeBody": "Elige un club y juega temporada tras temporada, cada resultado a tu manera: ligas, copas, playoffs, ascensos y descensos.",
     "homeCta": "Empezar tu mundo",
     "playOutCancelled": "Sin playout esta temporada: {lower} terminó {gap} puntos o más por detrás de {upper} y baja directamente.",
     "serieC": {

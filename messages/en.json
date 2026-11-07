@@ -1271,8 +1271,25 @@
   "World": {
     "metaTitle": "My World: take your club up the football pyramid, in England, Spain, Germany, Italy or Brazil",
     "metaDescription": "Pick a club from England, Spain, Germany, Italy or Brazil and play season after season of their leagues and cups, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
+    "hero": {
+      "badge": "Game mode",
+      "start": "Start your world",
+      "continue": "Continue your world",
+      "countries": "{count} countries",
+      "leagues": "{count} leagues",
+      "cups": "{count} cups",
+      "saved": "Saved in your browser",
+      "noSignup": "No sign-up"
+    },
+    "how": {
+      "title": "How it works",
+      "pick": "Pick one or more countries and your club: every league and cup of each is played in full.",
+      "play": "Type any score, roll the dice, or simulate a matchday or the rest of the season.",
+      "season": "End the season: champions, cups, play-offs, promotion and relegation, then the review.",
+      "again": "Start the next season and keep going, year after year; every season's tables stay in your browser."
+    },
     "title": "My World",
-    "intro": "Pick your countries and a club, then play season after season of the English pyramid (Premier League to League Two, the FA Cup and the EFL Cup), the Spanish one (La Liga, the Segunda División and the Copa del Rey), the German one (Bundesliga, 2. Bundesliga and the DFB-Pokal), the Italian one (Serie A, Serie B and the Coppa Italia), the Brazilian one (Série A, Série B, Série C and the Copa do Brasil), or any of them together, every result your way, as on the league pages: the play-offs, promotion and relegation included. Can you take a League Two club to the Premier League?",
+    "intro": "Pick your countries and a club, then play season after season of their leagues and cups, every result your way, as on the league pages: play-offs, promotion and relegation included. How far can you take your club?",
     "savedNote": "Your world is saved in this browser only.",
     "notSaved": "This browser isn't saving your world (private browsing, or storage full): it will be lost when you leave the page.",
     "reset": {
@@ -1529,7 +1546,7 @@
       "no": "Keep this world"
     },
     "homeTitle": "My World",
-    "homeBody": "Take a club from League Two to the Premier League, season after season, with promotion, relegation and the play-offs.",
+    "homeBody": "Pick a club and play season after season, every result your way: leagues, cups, play-offs, promotion and relegation.",
     "homeCta": "Start your world",
     "playOutCancelled": "No play-out this season: {lower} finished {gap} or more points behind {upper} and go straight down.",
     "serieC": {
