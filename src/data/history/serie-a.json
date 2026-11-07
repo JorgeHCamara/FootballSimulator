@@ -1,0 +1,4193 @@
+{
+  "league": "Serie A",
+  "footsimuSlug": "serie-a",
+  "footsimuCode": "SA",
+  "country": "Italy",
+  "scope": "Italian champions as officially recognised by the FIGC: Campionato Italiano di Football / Prima Categoria / Prima Divisione / Divisione Nazionale finals (1898-1929, decided by final rounds or finals) and Serie A (1929-30 onward)",
+  "source": [
+    "https://en.wikipedia.org/wiki/List_of_Italian_football_champions (revision 1371936691; champion, runner-up/finalist, third, points)",
+    "https://www.rsssf.org/tablesi/italchamp.html (RSSSF champions list, cross-check of every champion)",
+    "Wikipedia season articles (YYYY–YY Serie A) league tables, cross-check and missing points",
+    "https://site.api.espn.com/apis/v2/sports/soccer/ita.1/standings?season=YYYY (2002-03 to 2025-26, cross-check)"
+  ],
+  "retrievedAt": "2026-11-07T01:41:10+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id (the id FootSimu uses)",
+    "footsimuSlug": "club page slug on footsimu.com",
+    "footsimuPath": "club page path under the league the club plays in now (2026-27), without locale",
+    "points": "final points after deductions (2 points per win until 1993-94, 3 from 1994-95); null for seasons decided by finals",
+    "name": "club name used in the source for that season (e.g. Ambrosiana-Inter 1929-45)",
+    "currentName": "club as known today",
+    "tournament": "\"FIGC\"/\"CCI\" for the two rival championships of 1921-22, otherwise null",
+    "tiedWith": "other clubs sharing the same position (Italian tables listed tied clubs level); present only on tied placings",
+    "strippedChampion": "club that finished first but whose title was revoked and not reassigned (1926-27 Torino, 2004-05 Juventus); champion is null in those seasons"
+  },
+  "seasons": [
+    {
+      "season": "1898",
+      "startYear": 1898,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campionato Italiano di Football",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Internazionale Torino",
+        "currentName": "Internazionale Torino (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used",
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1899",
+      "startYear": 1899,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campionato Italiano di Football",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Internazionale Torino",
+        "currentName": "Internazionale Torino (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used",
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1900",
+      "startYear": 1900,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campionato Italiano di Football",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Torinese",
+        "currentName": "Torinese (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used",
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1901",
+      "startYear": 1901,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campionato Italiano di Football",
+      "format": "final",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used",
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1902",
+      "startYear": 1902,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campionato Italiano di Football",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used",
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1903",
+      "startYear": 1903,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campionato Italiano di Football",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used",
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1904",
+      "startYear": 1904,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used",
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1905",
+      "startYear": 1905,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "third": {
+        "name": "US Milanese",
+        "currentName": "US Milanese (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1906",
+      "startYear": 1906,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": null
+      },
+      "third": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "notes": [
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1907",
+      "startYear": 1907,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": null
+      },
+      "third": {
+        "name": "Andrea Doria",
+        "currentName": "Andrea Doria (merged into Sampdoria 1946)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1908",
+      "startYear": 1908,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Pro Vercelli",
+        "currentName": "Pro Vercelli",
+        "footsimuId": 3995,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "US Milanese",
+        "currentName": "US Milanese (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Andrea Doria",
+        "currentName": "Andrea Doria (merged into Sampdoria 1946)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1909",
+      "startYear": 1909,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Pro Vercelli",
+        "currentName": "Pro Vercelli",
+        "footsimuId": 3995,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "US Milanese",
+        "currentName": "US Milanese (defunct)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "notes": [
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1909-10",
+      "startYear": 1909,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Pro Vercelli",
+        "currentName": "Pro Vercelli",
+        "footsimuId": 3995,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": null
+      },
+      "notes": [
+        "Champion decided by a final/final round; runner-up is the other finalist"
+      ]
+    },
+    {
+      "season": "1910-11",
+      "startYear": 1910,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Pro Vercelli",
+        "currentName": "Pro Vercelli",
+        "footsimuId": 3995,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Vicenza",
+        "currentName": "Vicenza",
+        "footsimuId": 120,
+        "footsimuSlug": "vicenza",
+        "footsimuPath": "/serie-b/team/vicenza",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1911-12",
+      "startYear": 1911,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Pro Vercelli",
+        "currentName": "Pro Vercelli",
+        "footsimuId": 3995,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Venezia",
+        "currentName": "Venezia",
+        "footsimuId": 17530,
+        "footsimuSlug": "venezia",
+        "footsimuPath": "/serie-a/team/venezia",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1912-13",
+      "startYear": 1912,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Pro Vercelli",
+        "currentName": "Pro Vercelli",
+        "footsimuId": 3995,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1913-14",
+      "startYear": 1913,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Casale",
+        "currentName": "Casale",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1914-15",
+      "startYear": 1914,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Third place not available from sources used",
+        "Final round not completed due to the First World War; title assigned to Genoa, no runner-up defined"
+      ]
+    },
+    {
+      "season": "1915-16",
+      "startYear": 1915,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Cancelled due to the First World War"
+      ]
+    },
+    {
+      "season": "1916-17",
+      "startYear": 1916,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Cancelled due to the First World War"
+      ]
+    },
+    {
+      "season": "1917-18",
+      "startYear": 1917,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Cancelled due to the First World War"
+      ]
+    },
+    {
+      "season": "1918-19",
+      "startYear": 1918,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Cancelled due to the First World War"
+      ]
+    },
+    {
+      "season": "1919-20",
+      "startYear": 1919,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Livorno",
+        "currentName": "Livorno",
+        "footsimuId": 2926,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1920-21",
+      "startYear": 1920,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Pro Vercelli",
+        "currentName": "Pro Vercelli",
+        "footsimuId": 3995,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Pisa",
+        "currentName": "Pisa",
+        "footsimuId": 3956,
+        "footsimuSlug": "pisa",
+        "footsimuPath": "/serie-b/team/pisa",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1921-22",
+      "startYear": 1921,
+      "tournament": "CCI",
+      "status": "completed",
+      "competition": "Prima Divisione",
+      "format": "final",
+      "champion": {
+        "name": "Pro Vercelli",
+        "currentName": "Pro Vercelli",
+        "footsimuId": 3995,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Fortitudo Roma",
+        "currentName": "Fortitudo Roma (merged into AS Roma 1927)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1921-22",
+      "startYear": 1921,
+      "tournament": "FIGC",
+      "status": "completed",
+      "competition": "Prima Categoria",
+      "format": "final",
+      "champion": {
+        "name": "Novese",
+        "currentName": "Novese",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Sampierdarenese",
+        "currentName": "Sampierdarenese (merged into Sampdoria 1946)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1922-23",
+      "startYear": 1922,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Divisione",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1923-24",
+      "startYear": 1923,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Divisione",
+      "format": "final",
+      "champion": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Savoia",
+        "currentName": "Savoia",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1924-25",
+      "startYear": 1924,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Divisione",
+      "format": "final",
+      "champion": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Alba Trastevere",
+        "currentName": "Alba Roma (merged into AS Roma 1927)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1925-26",
+      "startYear": 1925,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Prima Divisione",
+      "format": "final",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Alba Trastevere",
+        "currentName": "Alba Roma (merged into AS Roma 1927)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Runner-up is the losing finalist (regional champion)",
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1926-27",
+      "startYear": 1926,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Divisione Nazionale",
+      "format": "final",
+      "champion": null,
+      "runnerUp": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": null
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": null
+      },
+      "notes": [
+        "Torino won the final round but the title was revoked by the FIGC in November 1927 (bribery case) and not reassigned; runner-up and third are the final-round places"
+      ],
+      "strippedChampion": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": null
+      }
+    },
+    {
+      "season": "1927-28",
+      "startYear": 1927,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Divisione Nazionale",
+      "format": "final",
+      "champion": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": null
+      },
+      "third": {
+        "name": "Alessandria",
+        "currentName": "Alessandria",
+        "footsimuId": 10435,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": []
+    },
+    {
+      "season": "1928-29",
+      "startYear": 1928,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Divisione Nazionale",
+      "format": "final",
+      "champion": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Third place not available from sources used"
+      ]
+    },
+    {
+      "season": "1929-30",
+      "startYear": 1929,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Ambrosiana-Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": 48
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 45
+      },
+      "notes": []
+    },
+    {
+      "season": "1930-31",
+      "startYear": 1930,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 51
+      },
+      "third": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 48
+      },
+      "notes": []
+    },
+    {
+      "season": "1931-32",
+      "startYear": 1931,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 50
+      },
+      "third": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 40
+      },
+      "notes": []
+    },
+    {
+      "season": "1932-33",
+      "startYear": 1932,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Ambrosiana-Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 46
+      },
+      "third": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 42,
+        "tiedWith": [
+          {
+            "name": "Napoli",
+            "currentName": "Napoli",
+            "footsimuId": 114,
+            "footsimuSlug": "napoli",
+            "footsimuPath": "/serie-a/team/napoli",
+            "points": 42
+          }
+        ]
+      },
+      "notes": [
+        "2 clubs tied for third place on 42 points (shared position; see tiedWith)"
+      ]
+    },
+    {
+      "season": "1933-34",
+      "startYear": 1933,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Ambrosiana-Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 49
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1934-35",
+      "startYear": 1934,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Ambrosiana-Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 42
+      },
+      "third": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1935-36",
+      "startYear": 1935,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 39
+      },
+      "third": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1936-37",
+      "startYear": 1936,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 39
+      },
+      "third": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1937-38",
+      "startYear": 1937,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Ambrosiana-Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 41
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 39
+      },
+      "third": {
+        "name": "Genoa",
+        "currentName": "Genoa",
+        "footsimuId": 3263,
+        "footsimuSlug": "genoa",
+        "footsimuPath": "/serie-a/team/genoa",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1938-39",
+      "startYear": 1938,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 38
+      },
+      "third": {
+        "name": "Ambrosiana-Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1939-40",
+      "startYear": 1939,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Ambrosiana-Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 41
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 36
+      },
+      "notes": []
+    },
+    {
+      "season": "1940-41",
+      "startYear": 1940,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 39
+      },
+      "runnerUp": {
+        "name": "Ambrosiana-Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 35
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 34
+      },
+      "notes": []
+    },
+    {
+      "season": "1941-42",
+      "startYear": 1941,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 39
+      },
+      "third": {
+        "name": "Venezia",
+        "currentName": "Venezia",
+        "footsimuId": 17530,
+        "footsimuSlug": "venezia",
+        "footsimuPath": "/serie-a/team/venezia",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1942-43",
+      "startYear": 1942,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Livorno",
+        "currentName": "Livorno",
+        "footsimuId": 2926,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 43
+      },
+      "third": {
+        "name": "Juventus Cisitalia",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1943-44",
+      "startYear": 1943,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Official championship not held (Second World War). The wartime Campionato Alta Italia was won by VV.FF. Spezia; FIGC recognised it in 2002 as an honorary title, not counted as a Scudetto."
+      ]
+    },
+    {
+      "season": "1944-45",
+      "startYear": 1944,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Cancelled due to the Second World War"
+      ]
+    },
+    {
+      "season": "1945-46",
+      "startYear": 1945,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 22
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 21
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 16
+      },
+      "notes": [
+        "Divisione Nazionale: northern and southern groups followed by a national final round; points are from the final round"
+      ]
+    },
+    {
+      "season": "1946-47",
+      "startYear": 1946,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 63
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 53
+      },
+      "third": {
+        "name": "Modena",
+        "currentName": "Modena",
+        "footsimuId": 2573,
+        "footsimuSlug": "modena",
+        "footsimuPath": "/serie-b/team/modena",
+        "points": 51
+      },
+      "notes": []
+    },
+    {
+      "season": "1947-48",
+      "startYear": 1947,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 49,
+        "tiedWith": [
+          {
+            "name": "Juventus",
+            "currentName": "Juventus",
+            "footsimuId": 111,
+            "footsimuSlug": "juventus",
+            "footsimuPath": "/serie-a/team/juventus",
+            "points": 49
+          },
+          {
+            "name": "Triestina",
+            "currentName": "Triestina",
+            "footsimuId": 3241,
+            "footsimuSlug": null,
+            "footsimuPath": null,
+            "points": 49
+          }
+        ]
+      },
+      "third": null,
+      "notes": [
+        "3 clubs tied for second place on 49 points (shared position; see tiedWith), no separate third place"
+      ]
+    },
+    {
+      "season": "1948-49",
+      "startYear": 1948,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 55
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 50
+      },
+      "notes": []
+    },
+    {
+      "season": "1949-50",
+      "startYear": 1949,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 57
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1950-51",
+      "startYear": 1950,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 59
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 54
+      },
+      "notes": []
+    },
+    {
+      "season": "1951-52",
+      "startYear": 1951,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 53
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1952-53",
+      "startYear": 1952,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 45
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1953-54",
+      "startYear": 1953,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 50
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 44,
+        "tiedWith": [
+          {
+            "name": "Fiorentina",
+            "currentName": "Fiorentina",
+            "footsimuId": 109,
+            "footsimuSlug": "fiorentina",
+            "footsimuPath": "/serie-a/team/fiorentina",
+            "points": 44
+          }
+        ]
+      },
+      "notes": [
+        "2 clubs tied for third place on 44 points (shared position; see tiedWith)"
+      ]
+    },
+    {
+      "season": "1954-55",
+      "startYear": 1954,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Udinese",
+        "currentName": "Udinese",
+        "footsimuId": 118,
+        "footsimuSlug": "udinese",
+        "footsimuPath": "/serie-a/team/udinese",
+        "points": 44
+      },
+      "third": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1955-56",
+      "startYear": 1955,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 41
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 39,
+        "tiedWith": [
+          {
+            "name": "Lazio",
+            "currentName": "Lazio",
+            "footsimuId": 112,
+            "footsimuSlug": "lazio",
+            "footsimuPath": "/serie-a/team/lazio",
+            "points": 39
+          }
+        ]
+      },
+      "notes": [
+        "2 clubs tied for third place on 39 points (shared position; see tiedWith)"
+      ]
+    },
+    {
+      "season": "1956-57",
+      "startYear": 1956,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 42
+      },
+      "third": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1957-58",
+      "startYear": 1957,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 43
+      },
+      "third": {
+        "name": "Padova",
+        "currentName": "Padova",
+        "footsimuId": 3952,
+        "footsimuSlug": "padova",
+        "footsimuPath": "/serie-b/team/padova",
+        "points": 42
+      },
+      "notes": []
+    },
+    {
+      "season": "1958-59",
+      "startYear": 1958,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 49
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1959-60",
+      "startYear": 1959,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 47
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1960-61",
+      "startYear": 1960,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 45
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1961-62",
+      "startYear": 1961,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 48
+      },
+      "third": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1962-63",
+      "startYear": 1962,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 45
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1963-64",
+      "startYear": 1963,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 54
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 51
+      },
+      "notes": [
+        "Bologna and Internazionale finished level on 54 points; Bologna won the title play-off 2-0"
+      ]
+    },
+    {
+      "season": "1964-65",
+      "startYear": 1964,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 51
+      },
+      "third": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1965-66",
+      "startYear": 1965,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 46
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 45
+      },
+      "notes": []
+    },
+    {
+      "season": "1966-67",
+      "startYear": 1966,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 48
+      },
+      "third": {
+        "name": "Bologna",
+        "currentName": "Bologna",
+        "footsimuId": 107,
+        "footsimuSlug": "bologna",
+        "footsimuPath": "/serie-a/team/bologna",
+        "points": 45
+      },
+      "notes": []
+    },
+    {
+      "season": "1967-68",
+      "startYear": 1967,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 37
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 36
+      },
+      "notes": []
+    },
+    {
+      "season": "1968-69",
+      "startYear": 1968,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Cagliari",
+        "currentName": "Cagliari",
+        "footsimuId": 2925,
+        "footsimuSlug": "cagliari",
+        "footsimuPath": "/serie-a/team/cagliari",
+        "points": 41
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1969-70",
+      "startYear": 1969,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Cagliari",
+        "currentName": "Cagliari",
+        "footsimuId": 2925,
+        "footsimuSlug": "cagliari",
+        "footsimuPath": "/serie-a/team/cagliari",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 41
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1970-71",
+      "startYear": 1970,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 42
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1971-72",
+      "startYear": 1971,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 42,
+        "tiedWith": [
+          {
+            "name": "Torino",
+            "currentName": "Torino",
+            "footsimuId": 239,
+            "footsimuSlug": "torino",
+            "footsimuPath": "/serie-a/team/torino",
+            "points": 42
+          }
+        ]
+      },
+      "third": null,
+      "notes": [
+        "2 clubs tied for second place on 42 points (shared position; see tiedWith), no separate third place"
+      ]
+    },
+    {
+      "season": "1972-73",
+      "startYear": 1972,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 44
+      },
+      "third": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1973-74",
+      "startYear": 1973,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 41
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 36
+      },
+      "notes": []
+    },
+    {
+      "season": "1974-75",
+      "startYear": 1974,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 41
+      },
+      "third": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1975-76",
+      "startYear": 1975,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 43
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1976-77",
+      "startYear": 1976,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 50
+      },
+      "third": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 35
+      },
+      "notes": []
+    },
+    {
+      "season": "1977-78",
+      "startYear": 1977,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Vicenza",
+        "currentName": "Vicenza",
+        "footsimuId": 120,
+        "footsimuSlug": "vicenza",
+        "footsimuPath": "/serie-b/team/vicenza",
+        "points": 39,
+        "tiedWith": [
+          {
+            "name": "Torino",
+            "currentName": "Torino",
+            "footsimuId": 239,
+            "footsimuSlug": "torino",
+            "footsimuPath": "/serie-a/team/torino",
+            "points": 39
+          }
+        ]
+      },
+      "third": null,
+      "notes": [
+        "2 clubs tied for second place on 39 points (shared position; see tiedWith), no separate third place"
+      ]
+    },
+    {
+      "season": "1978-79",
+      "startYear": 1978,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Perugia",
+        "currentName": "Perugia",
+        "footsimuId": 116,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1979-80",
+      "startYear": 1979,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 41
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 38
+      },
+      "third": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 35
+      },
+      "notes": []
+    },
+    {
+      "season": "1980-81",
+      "startYear": 1980,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 42
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1981-82",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 45
+      },
+      "third": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1982-83",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 39
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1983-84",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 41
+      },
+      "third": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 36
+      },
+      "notes": []
+    },
+    {
+      "season": "1984-85",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Hellas Verona",
+        "currentName": "Hellas Verona",
+        "footsimuId": 119,
+        "footsimuSlug": "hellas-verona",
+        "footsimuPath": "/serie-b/team/hellas-verona",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 39
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1985-86",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 41
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1986-87",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 39
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1987-88",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 42
+      },
+      "third": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1988-89",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 47
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1989-90",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 49
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1990-91",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Sampdoria",
+        "currentName": "Sampdoria",
+        "footsimuId": 2734,
+        "footsimuSlug": "sampdoria",
+        "footsimuPath": "/serie-b/team/sampdoria",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 46
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1991-92",
+      "startYear": 1991,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 48
+      },
+      "third": {
+        "name": "Torino",
+        "currentName": "Torino",
+        "footsimuId": 239,
+        "footsimuSlug": "torino",
+        "footsimuPath": "/serie-a/team/torino",
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1992-93",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 46
+      },
+      "third": {
+        "name": "Parma",
+        "currentName": "Parma",
+        "footsimuId": 115,
+        "footsimuSlug": "parma",
+        "footsimuPath": "/serie-a/team/parma",
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1993-94",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 47
+      },
+      "third": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1994-95",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 73
+      },
+      "runnerUp": {
+        "name": "Parma",
+        "currentName": "Parma",
+        "footsimuId": 115,
+        "footsimuSlug": "parma",
+        "footsimuPath": "/serie-a/team/parma",
+        "points": 63
+      },
+      "third": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "1995-96",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 73
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 65
+      },
+      "third": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 59
+      },
+      "notes": []
+    },
+    {
+      "season": "1996-97",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "Parma",
+        "currentName": "Parma",
+        "footsimuId": 115,
+        "footsimuSlug": "parma",
+        "footsimuPath": "/serie-a/team/parma",
+        "points": 63
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 59
+      },
+      "notes": []
+    },
+    {
+      "season": "1997-98",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 74
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 69
+      },
+      "third": {
+        "name": "Udinese",
+        "currentName": "Udinese",
+        "footsimuId": 118,
+        "footsimuSlug": "udinese",
+        "footsimuPath": "/serie-a/team/udinese",
+        "points": 64
+      },
+      "notes": []
+    },
+    {
+      "season": "1998-99",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 69
+      },
+      "third": {
+        "name": "Fiorentina",
+        "currentName": "Fiorentina",
+        "footsimuId": 109,
+        "footsimuSlug": "fiorentina",
+        "footsimuPath": "/serie-a/team/fiorentina",
+        "points": 56
+      },
+      "notes": []
+    },
+    {
+      "season": "1999-00",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 71
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 61
+      },
+      "notes": []
+    },
+    {
+      "season": "2000-01",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 75
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 73
+      },
+      "third": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2001-02",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 71
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 70
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2002-03",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 65
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 61
+      },
+      "notes": []
+    },
+    {
+      "season": "2003-04",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 71
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2004-05",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": null,
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 79
+      },
+      "third": {
+        "name": "Inter",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 72
+      },
+      "notes": [
+        "Juventus finished first but the title was revoked in 2006 (Calciopoli) and not assigned; runner-up and third are the on-pitch places as listed by the source"
+      ],
+      "strippedChampion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 86
+      }
+    },
+    {
+      "season": "2005-06",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 69
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 58
+      },
+      "notes": [
+        "Juventus finished first on the pitch but were stripped of the title and relegated (Calciopoli); the title was assigned to Internazionale. Runner-up and third reflect the official table after penalties"
+      ]
+    },
+    {
+      "season": "2006-07",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 97
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 75
+      },
+      "third": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 62
+      },
+      "notes": []
+    },
+    {
+      "season": "2007-08",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 85
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 82
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 72
+      },
+      "notes": []
+    },
+    {
+      "season": "2008-09",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 74
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 74
+      },
+      "notes": []
+    },
+    {
+      "season": "2009-10",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 80
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 70
+      },
+      "notes": []
+    },
+    {
+      "season": "2010-11",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 76
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 70
+      },
+      "notes": []
+    },
+    {
+      "season": "2011-12",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 80
+      },
+      "third": {
+        "name": "Udinese",
+        "currentName": "Udinese",
+        "footsimuId": 118,
+        "footsimuSlug": "udinese",
+        "footsimuPath": "/serie-a/team/udinese",
+        "points": 64
+      },
+      "notes": []
+    },
+    {
+      "season": "2012-13",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 78
+      },
+      "third": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 72
+      },
+      "notes": []
+    },
+    {
+      "season": "2013-14",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 102
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 85
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2014-15",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 70
+      },
+      "third": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2015-16",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 82
+      },
+      "third": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 80
+      },
+      "notes": []
+    },
+    {
+      "season": "2016-17",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 87
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 86
+      },
+      "notes": []
+    },
+    {
+      "season": "2017-18",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 95
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 91
+      },
+      "third": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 77
+      },
+      "notes": []
+    },
+    {
+      "season": "2018-19",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 79
+      },
+      "third": {
+        "name": "Atalanta",
+        "currentName": "Atalanta",
+        "footsimuId": 105,
+        "footsimuSlug": "atalanta",
+        "footsimuPath": "/serie-a/team/atalanta",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2019-20",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 83
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 82
+      },
+      "third": {
+        "name": "Atalanta",
+        "currentName": "Atalanta",
+        "footsimuId": 105,
+        "footsimuSlug": "atalanta",
+        "footsimuPath": "/serie-a/team/atalanta",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2020-21",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 79
+      },
+      "third": {
+        "name": "Atalanta",
+        "currentName": "Atalanta",
+        "footsimuId": 105,
+        "footsimuSlug": "atalanta",
+        "footsimuPath": "/serie-a/team/atalanta",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2021-22",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 86
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 84
+      },
+      "third": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 79
+      },
+      "notes": []
+    },
+    {
+      "season": "2022-23",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Lazio",
+        "currentName": "Lazio",
+        "footsimuId": 112,
+        "footsimuSlug": "lazio",
+        "footsimuPath": "/serie-a/team/lazio",
+        "points": 74
+      },
+      "third": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 72
+      },
+      "notes": []
+    },
+    {
+      "season": "2023-24",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 94
+      },
+      "runnerUp": {
+        "name": "Milan",
+        "currentName": "AC Milan",
+        "footsimuId": 103,
+        "footsimuSlug": "ac-milan",
+        "footsimuPath": "/serie-a/team/ac-milan",
+        "points": 75
+      },
+      "third": {
+        "name": "Juventus",
+        "currentName": "Juventus",
+        "footsimuId": 111,
+        "footsimuSlug": "juventus",
+        "footsimuPath": "/serie-a/team/juventus",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2024-25",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 81
+      },
+      "third": {
+        "name": "Atalanta",
+        "currentName": "Atalanta",
+        "footsimuId": 105,
+        "footsimuSlug": "atalanta",
+        "footsimuPath": "/serie-a/team/atalanta",
+        "points": 74
+      },
+      "notes": []
+    },
+    {
+      "season": "2025-26",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Serie A",
+      "format": "league",
+      "champion": {
+        "name": "Internazionale",
+        "currentName": "Inter",
+        "footsimuId": 110,
+        "footsimuSlug": "inter",
+        "footsimuPath": "/serie-a/team/inter",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Napoli",
+        "currentName": "Napoli",
+        "footsimuId": 114,
+        "footsimuSlug": "napoli",
+        "footsimuPath": "/serie-a/team/napoli",
+        "points": 76
+      },
+      "third": {
+        "name": "Roma",
+        "currentName": "Roma",
+        "footsimuId": 104,
+        "footsimuSlug": "roma",
+        "footsimuPath": "/serie-a/team/roma",
+        "points": 73
+      },
+      "notes": []
+    }
+  ]
+}

@@ -1266,7 +1266,9 @@
     "points": "{points} pts",
     "now": "now {club}",
     "world": "My World",
-    "comingSoon": "Real history coming soon"
+    "comingSoon": "Real history coming soon",
+    "revoked": "Title revoked",
+    "tied": "Shared place"
   },
   "World": {
     "metaTitle": "My World: take your club up the football pyramid, in England, Spain, Germany, Italy or Brazil",
