@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import type { Zone } from "../config/leagues.ts";
 import type { TeamId } from "../engine/types.ts";
 import { divisionConfig, divisionCountry, LOWER_LEAGUE, neighbours, type DivisionCode, type RowNote, type TableRow, type WorldClub } from "../lib/myWorld.ts";
 import { Icon, type IconName } from "./Icon.tsx";
@@ -21,9 +22,29 @@ const NOTE_ICONS: Record<Exclude<RowNote, "">, { icon: IconName; className: stri
  * table, with each club's outcome. Places are coloured as on the league's
  * own page; the visitor's club is highlighted; new clubs are labelled.
  */
-export function WorldTable({ rows, code, clubs, highlight, final, testId }: { rows: TableRow[]; code: DivisionCode; clubs: Record<number, WorldClub>; highlight: TeamId; final: boolean; testId: string }) {
+export function WorldTable({
+  rows,
+  code,
+  clubs,
+  highlight,
+  final,
+  testId,
+  zones: ownZones,
+  title,
+}: {
+  rows: TableRow[];
+  code: DivisionCode;
+  clubs: Record<number, WorldClub>;
+  highlight: TeamId;
+  final: boolean;
+  testId: string;
+  /** The places' colours, when they aren't the league's (Série C's phases and final classification). */
+  zones?: readonly Zone[];
+  /** A heading above the table (Série C's "First stage", its groups). */
+  title?: string;
+}) {
   const t = useTranslations("World");
-  const zones = divisionConfig(code).zones;
+  const zones = ownZones ?? divisionConfig(code).zones;
   // The country's bottom division: relegation is out of the pyramid, into the league below.
   const bottom = !neighbours(code).below;
   const zoneAt = (position: number) => zones.find((z) => position >= z.from && position <= z.to)?.kind;
@@ -32,6 +53,11 @@ export function WorldTable({ rows, code, clubs, highlight, final, testId }: { ro
   const cell = "px-1.5 py-2 text-right tabular-nums";
   return (
     <div className="space-y-2">
+      {title && (
+        <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-200" data-testid="world-table-title">
+          {title}
+        </h3>
+      )}
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
         <table className="w-full table-fixed text-sm" data-testid={testId} data-league={code}>
           <thead className="bg-zinc-50 text-xs text-zinc-500 dark:bg-zinc-800/60">
