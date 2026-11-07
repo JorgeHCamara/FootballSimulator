@@ -227,6 +227,47 @@ describe("Serie A's past winners", () => {
   });
 });
 
+describe("the Brasileirão's past winners", () => {
+  const rows = leagueWinners("brasileirao")!;
+
+  it("runs from 1937 to 2025, calendar years, with the Taça Brasil and the Robertão both in 1967 and 1968", () => {
+    assert.equal(rows.length, 70);
+    assert.equal(rows[0]!.season, "2025");
+    assert.deepEqual([rows[0]!.champion!.name, rows[0]!.runnerUp!.name, rows[0]!.third!.name], ["Flamengo", "Palmeiras", "Cruzeiro"]);
+    assert.equal(rows.at(-1)!.season, "1937");
+    assert.deepEqual(rows.filter((r) => r.startYear === 1967).map((r) => [r.tournament, r.champion!.name]), [
+      ["Torneio Roberto Gomes Pedrosa", "Palmeiras"],
+      ["Taça Brasil", "Palmeiras"],
+    ]);
+  });
+
+  it("counts the titles the CBF recognises, both of 1967's and 1968's among them", () => {
+    assert.deepEqual(
+      mostTitles(rows, 5).map((c) => [c.name, c.titles]),
+      [
+        ["Palmeiras", 12],
+        ["Flamengo", 8],
+        ["Santos", 8],
+        ["Corinthians", 7],
+        ["São Paulo", 6],
+      ],
+    );
+    assert.equal(rows.find((r) => r.season === "1987")!.champion!.name, "Sport Recife", "the CBF's 1987 champion");
+  });
+
+  it("keeps each parallel championship in its own era, and an era of one season", () => {
+    const list = eras(rows);
+    assert.deepEqual(list.slice(0, 3), [
+      { name: "Torneio dos Campeões", from: 1937, to: 1937 },
+      { name: "Taça Brasil", from: 1959, to: 1968 },
+      { name: "Torneio Roberto Gomes Pedrosa", from: 1967, to: 1970 },
+    ]);
+    assert.deepEqual(list.at(-1), { name: "Campeonato Brasileiro Série A", from: 2001, to: null });
+    assert.equal(filterRows(rows, { era: list[1] }).length, 10, "the Taça Brasil: 1959 to 1968");
+    assert.equal(filterRows(rows, { era: list[2] }).length, 4, "the Robertão: 1967 to 1970");
+  });
+});
+
 describe("parseLeagueHistory", () => {
   const placing = (id: number, name: string) => ({ name, currentName: name, footsimuId: id, footsimuSlug: name.toLowerCase(), footsimuPath: `/x/team/${name.toLowerCase()}`, points: 40 });
   const season = (over: Partial<HistorySeason> = {}): HistorySeason => ({
