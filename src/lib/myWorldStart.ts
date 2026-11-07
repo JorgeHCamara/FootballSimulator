@@ -1,7 +1,7 @@
 import { outlookSetup } from "./clubOutlook.ts";
 import { getCupData } from "./cupData.ts";
 import { getLeagueData } from "./leagueData.ts";
-import { divisionConfig, isDivision, WORLD_LEAGUES, type DivisionCode, type StartCup, type StartLeague, type StartPack, type WorldGame, type WorldPlayoffGame } from "./myWorld.ts";
+import { divisionConfig, divisionTeams, isDivision, WORLD_LEAGUES, type DivisionCode, type StartCup, type StartLeague, type StartPack, type WorldGame, type WorldPlayoffGame } from "./myWorld.ts";
 import { cupConfig, WORLD_CUPS, type WorldCupCode, type WorldCupTie } from "./worldCups.ts";
 
 /**
@@ -54,7 +54,7 @@ export async function worldStartPack(): Promise<StartPack> {
         const year = data.seasonYear ?? Number.parseInt(data.season, 10);
         const playing = new Set(data.fixtures.flatMap((f) => [f.homeId, f.awayId]));
         const teams = data.teams.filter((t) => playing.has(t.id));
-        if (!setup || !Number.isFinite(year) || teams.length !== league.teams) throw new Error(`${code}: incomplete data`);
+        if (!setup || !Number.isFinite(year) || teams.length !== divisionTeams(code, year)) throw new Error(`${code}: incomplete data`);
         const games = data.fixtures.map((f): WorldGame => [f.id, f.matchday, f.homeId, f.awayId, f.result?.home ?? null, f.result?.away ?? null]);
         const playoffGames = (data.postseason ?? []).map((f): WorldPlayoffGame => [
           f.id,

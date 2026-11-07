@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { tieWinner } from "../engine/cup.ts";
-import { seasonLabel, type World } from "../lib/myWorld.ts";
+import { worldSeasonLabel, type World } from "../lib/myWorld.ts";
 import {
   pastCup,
   resetCup,
@@ -51,7 +51,7 @@ function PastCup({ world, year, code }: { world: World; year: number; code: Worl
           {t("pastNoFixtures")}
         </p>
       )}
-      <CupChampion cup={past.cup} rounds={past.rounds ?? []} winner={past.final[0]} predictions={{}} teams={past.teams} season={seasonLabel(year)} />
+      <CupChampion cup={past.cup} rounds={past.rounds ?? []} winner={past.final[0]} predictions={{}} teams={past.teams} season={worldSeasonLabel(world, year)} />
     </div>
   );
 }
@@ -157,7 +157,7 @@ export function WorldCup({
           kickOff={false}
           ownDraw
         />
-        <CupChampion cup={cup} rounds={rounds} winner={state.winner} predictions={picks} teams={state.teams} season={seasonLabel(world.year)} />
+        <CupChampion cup={cup} rounds={rounds} winner={state.winner} predictions={picks} teams={state.teams} season={worldSeasonLabel(world, world.year)} />
       </div>
       <ConfirmDialog
         open={confirmReset}

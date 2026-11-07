@@ -2514,10 +2514,10 @@ async function step(name, fn) {
       assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/my-world");
       // Set up: the countries (one card each, every one picked is played: England, Spain), League Two, a club, create.
       const countryCards = p.getByTestId("world-country");
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.picked, e.disabled])), [["ENG", "false", false], ["ESP", "false", false], ["GER", "false", false], ["ITA", "false", false]]);
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England", "Spain", "Germany", "Italy"]);
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.picked, e.disabled])), [["ENG", "false", false], ["ESP", "false", false], ["GER", "false", false], ["ITA", "false", false], ["BRA", "false", false]]);
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England", "Spain", "Germany", "Italy", "Brazil"]);
       // Cards of the flag and the name alone, every one the same size.
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.trim())), ["England", "Spain", "Germany", "Italy"], "no description, only the name");
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.trim())), ["England", "Spain", "Germany", "Italy", "Brazil"], "no description, only the name");
       assert.equal((await countryCards.evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().height)))])).length, 1, "country cards the same height");
       assert.equal(await p.getByTestId("world-league").count(), 0, "no leagues until a country is picked");
       await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
@@ -2525,7 +2525,7 @@ async function step(name, fn) {
       await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
       assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["PL", "ELC", "EL1", "EL2", "PD", "SD"], "both: every league, England's first");
       await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.dataset.picked)), ["true", "false", "false", "false"], "Spain unpicked again");
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.dataset.picked)), ["true", "false", "false", "false", "false"], "Spain unpicked again");
       assert.equal(await p.getByTestId("world-league").count(), 4);
       await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
       const clubs = p.getByTestId("world-club");
@@ -3062,6 +3062,63 @@ async function step(name, fn) {
         assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
         assert.equal(await fixtures.getByTestId("match-score").count(), 2);
       }
+      await p.close();
+    });
+
+    await step("My World with Brazil: a Série B club, Brazil's tabs (Série A, Série B, Série C, Copa do Brasil), calendar-year seasons, the real Série C 2026 already played with its stages, the season ended with Série C growing to 24 and six up from Série D, its new season's first stage, groups and final", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      await p.locator('[data-testid="world-country"][data-country="BRA"]').click();
+      assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["BSA", "BSB", "BSC"]);
+      await p.locator('[data-testid="world-league"][data-league="BSB"]').click();
+      assert.equal(await p.getByTestId("world-club").count(), 20);
+      await p.getByTestId("world-club").nth(3).click();
+      assert.match(await p.getByTestId("world-summary").innerText(), /in Série B, starting with the \d{4} season\. Your world plays Brazil\.$/);
+      await p.getByTestId("world-create").click();
+      const world = p.getByTestId("world");
+      await world.waitFor();
+      const year = Number(await world.getAttribute("data-year"));
+      assert.deepEqual(await p.locator('[data-testid="world-tabs"] [role="tab"]').allInnerTexts(), ["Série A", "Série B", "Série C", "Copa do Brasil"]);
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${year} (this season)`, "a calendar-year season");
+      const left = async () => Object.fromEntries(await p.getByTestId("world-left").evaluateAll((els) => els.map((e) => [e.dataset.league, Number(e.dataset.left)])));
+      assert.deepEqual(Object.keys(await left()), ["BSA", "BSB", "BSC", "CDB"]);
+      assert.equal((await left()).BSC, 0, "the real Série C 2026, played to its final");
+      // Série C: its first stage's table and its second stage's two groups of four.
+      await p.locator('[data-testid="world-tabs"] [data-league="BSC"]').click();
+      assert.deepEqual(await p.getByTestId("world-table-title").allInnerTexts(), ["First stage", "Group A", "Group B"]);
+      assert.equal(await p.locator('[data-testid="world-table"] [data-testid="world-row"]').count(), 20);
+      assert.deepEqual(await p.getByTestId("world-group-table").evaluateAll((els) => els.map((e) => e.querySelectorAll('[data-testid="world-row"]').length)), [4, 4]);
+      for (const code of ["BSA", "BSB", "CDB"]) {
+        await p.locator(`[data-testid="world-left"][data-league="${code}"]`).click();
+        await p.getByTestId("world-simulate-rest").click();
+        await p.locator(`[data-testid="world-left"][data-league="${code}"][data-left="0"]`).waitFor();
+      }
+      await p.getByTestId("world-end-season").click();
+      await p.getByTestId("world-review").waitFor();
+      assert.equal(await p.getByTestId("world-review-country").inputValue(), "BRA");
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="BSA"] li').count(), 8, "four each way");
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="BSB"] li').count(), 8, "four each way, Série B's two play-off winners among them");
+      const lower = await p.locator('[data-testid="world-moves"][data-upper="BSC"]').innerText();
+      assert.ok(lower.includes("UP FROM SÉRIE D") && lower.includes("DOWN TO SÉRIE D"), lower);
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="BSC"] li').count(), 8, "six up from Série D, two down");
+      await p.getByTestId("world-start-season").click();
+      await p.getByTestId("world-tables").waitFor();
+      assert.equal((await left()).BSC, 302, "24 clubs: one round robin's 276 games, the second stage's 24, the final's two legs");
+      await p.locator('[data-testid="world-left"][data-league="BSC"]').click();
+      assert.deepEqual(await p.getByTestId("world-table-title").allInnerTexts(), ["First stage"]);
+      assert.equal(await p.locator('[data-testid="world-table"] [data-testid="world-row"]').count(), 24);
+      assert.equal(await p.getByTestId("world-split-note").count(), 1);
+      const options = await p.getByTestId("world-fixtures").getByTestId("matchday-select").locator("option").allInnerTexts();
+      assert.ok(options.includes("Group A, round 1") && options.includes("Group B, round 6") && options.at(-1) === "Play-off", options.join(", "));
+      await p.getByTestId("world-simulate-rest").click();
+      await p.locator('[data-testid="world-left"][data-league="BSC"][data-left="0"]').waitFor();
+      assert.deepEqual(await p.getByTestId("world-table-title").allInnerTexts(), ["First stage", "Group A", "Group B"]);
+      // Last season's Série C: its final classification and its final.
+      await p.getByTestId("world-season-select").selectOption(String(year));
+      assert.equal(await p.getByTestId("world-table-title").innerText(), "Final classification");
+      assert.equal(await p.locator('[data-testid="world-past-table"] [data-testid="world-row"]').count(), 20);
+      assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
       await p.close();
     });
 
