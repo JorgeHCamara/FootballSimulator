@@ -1369,11 +1369,6 @@
       "title": "Create your world",
       "countries": "Pick your countries",
       "countriesHint": "Every country you pick is played in full, its leagues and cups, season after season.",
-      "countryLeagues": {
-        "ENG": "Premier League to League Two, the FA Cup and the EFL Cup",
-        "ESP": "La Liga and the Segunda División, the Copa del Rey",
-        "GER": "Bundesliga and 2. Bundesliga, the DFB-Pokal"
-      },
       "unavailable": "Its live data didn't load ({leagues}): try again later.",
       "and": " and ",
       "league": "Pick a league",
