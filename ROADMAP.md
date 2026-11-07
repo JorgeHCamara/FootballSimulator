@@ -447,7 +447,8 @@ look back at past seasons from a season picker.
   begin with) swaps its two clubs with League Two's relegated ones each season.
 - The club's seasons, the latest first, each with its outcome: champions,
   promoted, the play-offs, relegated, a European place, or the neutral zone;
-  any club's, picked by country (England), league and club.
+  any club's, picked by country (England), league and club. A country picker
+  before the season's heading too (England for now; the club's country).
 - Unit tests for the games left, picked scores standing, play-off scores tied
   to their pairing, finishing a season from its scores, the kept results, and
   the save; e2e on desktop and phones, EN/PT/ES.

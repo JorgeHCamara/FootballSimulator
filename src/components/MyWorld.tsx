@@ -379,7 +379,13 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
       {/* The season, league by league, as on the league pages (or a finished one, picked to look back at); the next one only once it's started from the review. */}
       {!world.review && (
         <section className="scroll-mt-4 space-y-3" data-testid="world-tables">
-          <h2 className="text-xl font-bold tracking-tight">{t("seasonHeading", { season: shownSeason })}</h2>
+          {/* The country, then the season: more countries will be picked here once there are more pyramids. */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <CountryPicker world={world} testId="world-season-country" />
+            <h2 className="text-xl font-bold tracking-tight" data-testid="world-season-heading">
+              {t("seasonHeading", { season: shownSeason })}
+            </h2>
+          </div>
           <DivisionTabs value={viewed} onChange={setViewed} label={t("tables")} testId="world-tabs" />
           <p className="text-xs text-zinc-500">{year !== world.year ? t("pastNote", { season: shownSeason }) : firstSeason ? t("firstSeason") : t("newSeason")}</p>
           <WorldSeason
@@ -529,6 +535,21 @@ const OUTCOME_STYLE: Record<PathOutcome, { icon?: "trophy" | "arrow-up" | "arrow
   neutral: { tone: "text-zinc-500" },
 };
 
+/** The country picker: the visitor's club's pyramid, England, the only one so far (its flag, then the name). */
+function CountryPicker({ world, testId }: { world: World; testId: string }) {
+  const t = useTranslations("World");
+  return (
+    <Picker
+      icon={<Flag code="gb-eng" width={18} className="shrink-0" />}
+      label={t("country")}
+      value={world.pyramid}
+      options={[{ value: "ENG", label: t("countries.ENG") }]}
+      onChange={() => {}}
+      testId={testId}
+    />
+  );
+}
+
 /**
  * Any club, season by season, the latest first: its division, its place and
  * what came of it. Picked by country (England, for now), league and club; the
@@ -555,14 +576,7 @@ function Path({ world, locale }: { world: World; locale: SiteLocale }) {
     <section className="space-y-3" data-testid="world-path">
       <h2 className="text-xl font-bold tracking-tight">{t("path.title", { club: club.shortName })}</h2>
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" data-testid="world-path-pickers">
-        <Picker
-          icon={<Flag code="gb-eng" width={18} className="shrink-0" />}
-          label={t("path.country")}
-          value={world.pyramid}
-          options={[{ value: "ENG", label: t("countries.ENG") }]}
-          onChange={() => {}}
-          testId="world-path-country"
-        />
+        <CountryPicker world={world} testId="world-path-country" />
         <Picker
           icon={<Icon name="trophy" size={16} className="shrink-0 text-zinc-500" />}
           label={t("path.league")}

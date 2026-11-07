@@ -2433,6 +2433,14 @@ async function step(name, fn) {
       assert.equal(await review.count(), 0);
       await p.getByTestId("world-tables").waitFor();
       assert.deepEqual(Object.values(await left()), [380, 559, 557, 557], "the new season's games, play-offs included");
+      // The country, before the season's heading: England, the visitor's club's pyramid (the only one so far).
+      const seasonCountry = p.getByTestId("world-season-country");
+      assert.equal(await seasonCountry.inputValue(), "ENG");
+      assert.deepEqual(await seasonCountry.locator("option").allInnerTexts(), ["England"]);
+      assert.ok(
+        await p.getByTestId("world-season-heading").evaluate((h) => Boolean(h.compareDocumentPosition(document.querySelector('[data-testid="world-season-country"]')) & Node.DOCUMENT_POSITION_PRECEDING)),
+        "the country comes before the heading",
+      );
       // Last season, in the picker: its final tables (champions, relegated, the play-off final) and every result, nothing to change.
       assert.deepEqual(await picker.locator("option").allInnerTexts(), [`${label(year + 1)} (this season)`, label(year)]);
       await picker.selectOption(String(year));
