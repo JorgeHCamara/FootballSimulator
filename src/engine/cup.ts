@@ -123,14 +123,16 @@ export function hashSeed(...parts: (string | number)[]): number {
 }
 
 /**
- * Draws a round: every club gets a key from the seed and its id, clubs are
- * sorted by key and paired in order, the first of each pair at home. Changing
- * one club (an earlier upset) moves only that club, so the rest of the draw
- * mostly stays as it was.
+ * Draws a round: every club gets a key from the seed and its slot, clubs are
+ * sorted by key and paired in order, the first of each pair at home. A club's
+ * slot is where it comes from (`slotOf`: "the winner of tie 3"), by default
+ * the club itself; so with slots the draw pairs the slots, and whoever wins a
+ * tie takes its place in the same tie of the next round, the round's ties in
+ * the same order.
  */
-export function drawRound(clubs: readonly TeamId[], seed: number): [TeamId, TeamId][] {
-  const keyed = clubs.map((id) => ({ id, key: hashSeed(seed, id) }));
-  keyed.sort((a, b) => a.key - b.key || a.id - b.id);
+export function drawRound(clubs: readonly TeamId[], seed: number, slotOf: (id: TeamId) => string | number = (id) => id): [TeamId, TeamId][] {
+  const keyed = clubs.map((id) => ({ id, slot: String(slotOf(id)), key: hashSeed(seed, slotOf(id)) }));
+  keyed.sort((a, b) => a.key - b.key || a.slot.localeCompare(b.slot) || a.id - b.id);
   const pairs: [TeamId, TeamId][] = [];
   for (let i = 0; i + 1 < keyed.length; i += 2) pairs.push([keyed[i]!.id, keyed[i + 1]!.id]);
   return pairs;
@@ -335,14 +337,20 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
       return;
     }
     const remaining = participants.filter((id) => !placed.has(id));
+    // A simulated draw pairs slots, not clubs: the winner of the previous
+    // round's tie i, or a club entering in this round. A result changing who
+    // goes through then changes only who fills that slot; the round's
+    // pairings and their order, and every later round's, stay as they were.
+    const winnerOf = new Map((fromPrevious ?? []).map((id, i) => [id, i] as const));
+    const slotOf = (id: TeamId) => (winnerOf.has(id) ? `w${winnerOf.get(id)}` : `e${id}`);
     let pairs: [TeamId, TeamId][];
     if (roundConfig.bracket && bracketBase(config) >= 0) {
       // Fixed bracket: neighbouring slots meet, no draw.
       const base = bracketBase(config);
       const fixed = bracketPairs(remaining, bracketLines(config, rounds[base]!.ties), r - base);
-      pairs = [...fixed.pairs, ...drawRound(fixed.rest, hashSeed(config.code, r, options.drawSalt))];
+      pairs = [...fixed.pairs, ...drawRound(fixed.rest, hashSeed(config.code, r, options.drawSalt), slotOf)];
     } else {
-      pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt));
+      pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt), slotOf);
     }
     for (const pair of pairs) {
       if (ties.length >= roundConfig.ties) break;
