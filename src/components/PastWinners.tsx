@@ -157,13 +157,22 @@ export function PastWinners({ rows, comingSoon = false, testId = "past-winners" 
   const eraLabel = (e: Era) =>
     e.to === null ? t("eraOpen", { name: e.name, from: String(e.from) }) : e.to === e.from ? t("eraYear", { name: e.name, year: String(e.from) }) : t("era", { name: e.name, from: String(e.from), to: String(e.to) });
   const eraOf = (row: WinnerRow) => eraList.find((e) => inEra(row, e));
-  // The rows in their eras, newest first; a season's parallel championships stay together, each named by its tournament.
+  // The rows in their eras, newest first. A season's parallel championships stay together under one heading,
+  // which names each of their eras when they differ (2. Bundesliga Nord and Süd), each row named by its tournament.
+  const eraName = (row: WinnerRow) => {
+    const e = eraOf(row);
+    return e ? eraLabel(e) : row.competition;
+  };
   const groups: { label: string; rows: WinnerRow[] }[] = [];
-  for (const row of shown) {
-    const label = eraOf(row)?.name ?? row.competition;
+  for (let i = 0; i < shown.length; ) {
+    let j = i;
+    while (j < shown.length && shown[j]!.season === shown[i]!.season) j++;
+    const season = shown.slice(i, j);
+    const label = [...new Set(season.map(eraName))].join(" · ");
     const last = groups.at(-1);
-    if (last && (last.label === label || last.rows.at(-1)!.season === row.season)) last.rows.push(row);
-    else groups.push({ label, rows: [row] });
+    if (last && last.label === label) last.rows.push(...season);
+    else groups.push({ label, rows: season });
+    i = j;
   }
   const chip = (active: boolean) =>
     `min-h-11 rounded-full border px-3 text-sm font-semibold sm:min-h-8 ${active ? "border-pitch-600 bg-pitch-600 text-white" : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"}`;
@@ -254,10 +263,7 @@ export function PastWinners({ rows, comingSoon = false, testId = "past-winners" 
           {groups.map((g, i) => (
             <section key={`${g.label}-${i}`} className="space-y-2">
               <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-200" data-testid="past-winners-era">
-                {(() => {
-                  const e = eraOf(g.rows[0]!);
-                  return e ? eraLabel(e) : g.label;
-                })()}
+                {g.label}
               </h3>
               <ol className="space-y-2 sm:space-y-0 sm:divide-y sm:divide-zinc-100 sm:overflow-hidden sm:rounded-xl sm:border sm:border-zinc-200 sm:bg-white sm:dark:divide-zinc-800 sm:dark:border-zinc-800 sm:dark:bg-zinc-900">
                 {g.rows.map((row) => (

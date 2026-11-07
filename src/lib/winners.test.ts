@@ -327,6 +327,32 @@ describe("the Segunda División's past winners", () => {
   });
 });
 
+describe("the 2. Bundesliga's past winners", () => {
+  const rows = leagueWinners("2-bundesliga")!;
+
+  it("runs from 1974-75 to 2025-26, in a Nord and a Süd until 1980-81 and again in 1991-92", () => {
+    assert.equal(rows.length, 60);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows[0]!.champion!.name, "Schalke 04");
+    assert.deepEqual(rows.filter((r) => r.season === "1974-75").map((r) => [r.tournament, r.competition, r.champion!.name]), [
+      ["North", "2. Bundesliga Nord", "Hannover 96"],
+      ["South", "2. Bundesliga Süd", "Karlsruher SC"],
+    ]);
+    assert.deepEqual(
+      eras(rows).map((e) => [e.name, e.from, e.to]),
+      [
+        ["2. Bundesliga Nord", 1974, 1981],
+        ["2. Bundesliga Süd", 1974, 1981],
+        ["2. Bundesliga", 1981, 1991],
+        ["2. Bundesliga Nord", 1991, 1992],
+        ["2. Bundesliga Süd", 1991, 1992],
+        ["2. Bundesliga", 1992, null],
+      ],
+    );
+    assert.equal(mostTitles(rows, 1)[0]!.titles, 5, "1. FC Köln's five");
+  });
+});
+
 describe("parseLeagueHistory", () => {
   const placing = (id: number, name: string) => ({ name, currentName: name, footsimuId: id, footsimuSlug: name.toLowerCase(), footsimuPath: `/x/team/${name.toLowerCase()}`, points: 40 });
   const season = (over: Partial<HistorySeason> = {}): HistorySeason => ({

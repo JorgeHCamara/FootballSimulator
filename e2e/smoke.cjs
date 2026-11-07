@@ -1740,7 +1740,8 @@ async function step(name, fn) {
       assert.match(await both.nth(0).innerText(), /Torneio Roberto Gomes Pedrosa/);
       assert.match(await both.nth(1).innerText(), /Taça Brasil/);
       const eras = await p.getByTestId("past-winners-era").allInnerTexts();
-      assert.equal(eras.filter((e) => e.startsWith("Torneio Roberto Gomes Pedrosa")).length, 1, "the Robertão's heading once");
+      // 1967 and 1968 under one heading naming both championships' eras.
+      assert.ok(eras.includes("Torneio Roberto Gomes Pedrosa (1967–1970) · Taça Brasil (1959–1968)"), eras.join(" / "));
       await p.goto(`${BASE_URL}/es/brasileirao/past-winners`);
       assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores del Brasileirão Série A");
       await p.close();
@@ -1773,6 +1774,28 @@ async function step(name, fn) {
       assert.match(await groups.nth(1).innerText(), /Sur[\s\S]*Alcoyano/);
       await p.goto(`${BASE_URL}/en/segunda-division/past-winners`);
       assert.match(await p.getByTestId("past-winners-row").filter({ hasText: /^1949-50/ }).first().innerText(), /North/);
+      await p.close();
+    });
+
+    await step("Past Winners: the 2. Bundesliga's history (1974-75 on), with its Nord and Süd seasons under headings naming both", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/en/2-bundesliga/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 60);
+      const eras = await p.getByTestId("past-winners-era").allInnerTexts();
+      assert.deepEqual(eras, [
+        "2. Bundesliga (1992–)",
+        "2. Bundesliga Nord (1991–1992) · 2. Bundesliga Süd (1991–1992)",
+        "2. Bundesliga (1981–1991)",
+        "2. Bundesliga Nord (1974–1981) · 2. Bundesliga Süd (1974–1981)",
+      ]);
+      const split = rows.filter({ hasText: /^1974-75/ });
+      assert.equal(await split.count(), 2);
+      assert.match(await split.nth(0).innerText(), /North/);
+      assert.match(await split.nth(1).innerText(), /South/);
+      await p.goto(`${BASE_URL}/pt/2-bundesliga/past-winners`);
+      assert.match(await p.getByTestId("past-winners-row").filter({ hasText: /^1974-75/ }).first().innerText(), /Norte/);
       await p.close();
     });
 
