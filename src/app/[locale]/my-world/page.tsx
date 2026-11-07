@@ -3,8 +3,11 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Icon } from "../../../components/Icon.tsx";
 import { MyWorld } from "../../../components/MyWorld.tsx";
+import { PastWinnersProvider, type RealWinners } from "../../../components/PastWinnersProvider.tsx";
 import type { SiteLocale } from "../../../config/leagues.ts";
+import { divisionConfig, ENGLAND } from "../../../lib/myWorld.ts";
 import { worldStartPack } from "../../../lib/myWorldStart.ts";
+import { leagueWinners } from "../../../lib/winnersData.ts";
 import { MY_WORLD_LISTED, OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
 
 /** The live data a new world starts from, refreshed as the league pages are (hourly). A saved world needs none of it. */
@@ -36,6 +39,13 @@ export default async function Page({ params }: { params: Params }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const [t, messages, pack] = await Promise.all([getTranslations("World"), getMessages(), worldStartPack()]);
+  // Each league's real Past Winners (src/data/history), for the world's own seasons to go on top of; a league without a file shows the world's only.
+  const realWinners: RealWinners = Object.fromEntries(
+    ENGLAND.flatMap((code) => {
+      const rows = leagueWinners(divisionConfig(code).slug);
+      return rows ? [[code, rows]] : [];
+    }),
+  );
   return (
     <div className="space-y-6" data-testid="my-world">
       <header className="space-y-2">
@@ -47,8 +57,10 @@ export default async function Page({ params }: { params: Params }) {
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("intro")}</p>
       </header>
       {/* The game's own words, and the league simulator's (its fixtures and dice): the rest of the site's client messages aren't needed inside it. */}
-      <NextIntlClientProvider locale={locale} messages={{ World: messages.World, Simulator: messages.Simulator }}>
-        <MyWorld pack={pack} locale={langOf(locale)} />
+      <NextIntlClientProvider locale={locale} messages={{ World: messages.World, Simulator: messages.Simulator, PastWinners: messages.PastWinners }}>
+        <PastWinnersProvider value={realWinners}>
+          <MyWorld pack={pack} locale={langOf(locale)} />
+        </PastWinnersProvider>
       </NextIntlClientProvider>
     </div>
   );

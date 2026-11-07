@@ -1571,6 +1571,109 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Past Winners: the Premier League's third tab opens its history page (every champion since 1888 in eras, most titles, era chips, a club search, EN/PT/ES, a phone); back to the table keeps the prediction; no tab or page for a league without a history", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      await p.waitForLoadState("networkidle");
+      // A prediction first: it must survive the trip to the history and back.
+      const before = await totalPoints(p);
+      await p.getByRole("button", { name: "Simulate matchday" }).click();
+      let after = before;
+      for (let i = 0; i < 50 && after === before; i++) {
+        await p.waitForTimeout(100);
+        after = await totalPoints(p);
+      }
+      assert.notEqual(after, before, "a matchday simulated");
+      const tab = p.getByTestId("past-winners-tab");
+      assert.equal(await tab.getAttribute("href"), "/en/premier-league/past-winners");
+      await tab.click();
+      await p.waitForURL(/\/en\/premier-league\/past-winners$/);
+      await p.getByTestId("past-winners").waitFor();
+      // The simulator is put away: no table, fixtures or buttons; its own title and metadata.
+      for (const id of ["standings", "fixtures", "actions"]) assert.equal(await p.getByTestId(id).count(), 0, id);
+      assert.equal(await p.locator("h1").count(), 1);
+      assert.equal((await p.locator("h1").innerText()).trim(), "Premier League past winners");
+      assert.equal(await p.title(), "Premier League past winners: every champion since 1888 | FootSimu");
+      assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/premier-league/past-winners");
+      assert.equal(await p.locator('link[rel="alternate"][hreflang="x-default"]').getAttribute("href"), "https://footsimu.com/en/premier-league/past-winners");
+      assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/premier-league/past-winners");
+      // Every season, newest first, in its era; the war years as muted rows.
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 138);
+      assert.match(await rows.first().innerText(), /2025-26[\s\S]*Arsenal[\s\S]*85 pts[\s\S]*Manchester City[\s\S]*78 pts[\s\S]*Manchester United[\s\S]*71 pts/);
+      assert.deepEqual(await p.getByTestId("past-winners-era").allInnerTexts(), ["Premier League (1992–)", "Football League First Division (1892–1992)", "Football League (1888–1892)"]);
+      assert.equal(await p.locator('[data-testid="past-winners-row"][data-status="not_held"]').count(), 10);
+      assert.match(await p.locator('[data-testid="past-winners-row"][data-status="not_held"]').first().innerText(), /1945-46[\s\S]*Not held: League suspended due to the Second World War/);
+      assert.match(await p.locator('[data-testid="past-winners-row"][data-status="abandoned"]').innerText(), /1939-40[\s\S]*Abandoned: Season abandoned/);
+      // The name used that season, with the club it is today: The Wednesday's three titles.
+      assert.equal(await p.locator('[data-place="champion"] span[title="now Sheffield Wednesday"]').count(), 3);
+      // Most titles, from the data.
+      const titles = p.getByTestId("past-winners-title");
+      assert.deepEqual(await titles.evaluateAll((els) => els.map((e) => e.dataset.titles)), ["20", "20", "14", "10", "9"]);
+      const names = await titles.allInnerTexts();
+      for (const [i, n] of ["Liverpool", "Manchester United", "Arsenal", "Manchester City", "Everton"].entries()) assert.ok(names[i].includes(n), `${i + 1}: ${n}`);
+      // Era chips and the club search, in place.
+      const chips = p.getByTestId("past-winners-chip");
+      assert.deepEqual(await chips.allInnerTexts(), ["All", "Premier League (1992–)", "Football League First Division (1892–1992)", "Football League (1888–1892)"]);
+      await chips.nth(1).click();
+      assert.equal(await rows.count(), 34);
+      assert.equal(await p.getByTestId("past-winners-era").count(), 1);
+      await chips.nth(0).click();
+      assert.equal(await rows.count(), 138);
+      const search = p.getByTestId("past-winners-search");
+      await search.fill("Leicester");
+      assert.equal(await rows.count(), 3, "champions 2015-16, runners-up 1928-29, third 1927-28");
+      for (const text of await rows.allInnerTexts()) assert.match(text, /Leicester City/);
+      await search.fill("nobody");
+      await p.getByTestId("past-winners-empty").waitFor();
+      await search.fill("");
+      assert.equal(await rows.count(), 138);
+      assert.match(await p.getByTestId("past-winners").innerText(), /Historical placings compiled from RSSSF and Wikipedia\./);
+      assert.equal(await p.url(), `${BASE_URL}/en/premier-league/past-winners`, "filters don't touch the URL");
+      // Back to the table: the prediction as it was.
+      await p.getByTestId("view-table").click();
+      await p.waitForURL(/\/en\/premier-league$/);
+      await p.locator('[data-testid="standings"]').waitFor();
+      await p.waitForLoadState("networkidle");
+      assert.equal(await totalPoints(p), after, "the prediction survives the trip");
+      // Chances, from the history page.
+      await p.goto(`${BASE_URL}/en/premier-league/past-winners`);
+      await p.getByTestId("view-chances").click();
+      await p.waitForURL(/\/en\/premier-league#chances$/);
+      await p.locator('[data-testid="chances"]').waitFor({ timeout: 20_000 });
+      // A league without a history file: no tab, no page.
+      await p.goto(`${BASE_URL}/en/bundesliga`);
+      await p.locator('[role="tablist"]').first().waitFor();
+      assert.equal(await p.getByTestId("past-winners-tab").count(), 0);
+      assert.equal((await p.request.get(`${BASE_URL}/en/bundesliga/past-winners`)).status(), 404);
+      // The sitemap lists the page in every language.
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/premier-league/past-winners<`));
+      // PT and ES.
+      await p.goto(`${BASE_URL}/pt/premier-league/past-winners`);
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores da Premier League");
+      assert.equal(await p.title(), "Campeões anteriores da Premier League: todos os campeões desde 1888 | FootSimu");
+      // (innerText keeps the labels' CSS upper case.)
+      assert.match(await p.getByTestId("past-winners").innerText(), /Mais títulos[\s\S]*Campeão[\s\S]*Vice[\s\S]*Terceiro[\s\S]*Não disputado/i);
+      await p.goto(`${BASE_URL}/es/premier-league/past-winners`);
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores de la Premier League");
+      assert.match(await p.getByTestId("past-winners").innerText(), /Más títulos[\s\S]*Campeón[\s\S]*Subcampeón[\s\S]*Tercero[\s\S]*No disputado/i);
+      await p.close();
+      // A phone: a card a season with the placings stacked, tap-sized, no sideways scroll.
+      const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      await phone.goto(`${BASE_URL}/en/premier-league/past-winners`);
+      await phone.getByTestId("past-winners").waitFor();
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, "no horizontal scroll");
+      assert.ok((await phone.getByTestId("past-winners-chip").first().boundingBox()).height >= 44, "tap-sized chips");
+      assert.ok((await phone.getByTestId("past-winners-search").boundingBox()).height >= 44, "a tap-sized search box");
+      const first = phone.getByTestId("past-winners-row").first();
+      const boxes = await Promise.all([0, 1, 2].map((i) => first.locator("[data-place]").nth(i).boundingBox()));
+      assert.ok(boxes[0].y < boxes[1].y && boxes[1].y < boxes[2].y, "the placings stacked");
+      assert.ok(boxes.every((b) => b.height >= 44), "tap-sized placings");
+      assert.match(await first.locator('[data-place="champion"]').innerText(), /Champion[\s\S]*Arsenal/i);
+      await phone.close();
+    });
+
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       assert.match(await page.title(), /^Simulador do Brasileirão .* \| FootSimu$/);
@@ -2467,6 +2570,35 @@ async function step(name, fn) {
       await picker.selectOption(String(year));
       await p.locator('[data-testid="world-tabs"] [data-league="PL"]').click();
       assert.deepEqual(await past.evaluateAll((r) => r.map((x) => x.innerText)), firstPl, "the Premier League two seasons ago, unchanged");
+      // Past Winners, beside the season picker: this world's two seasons on top of the real history, newest first, the table and
+      // fixtures put away; a league without a real history yet says so; kept by the save.
+      await picker.selectOption(String(year + 2));
+      const winners = p.getByTestId("world-past-winners");
+      await winners.click();
+      await p.getByTestId("world-winners").waitFor();
+      for (const id of ["world-table", "world-fixtures", "world-actions"]) assert.equal(await p.getByTestId(id).count(), 0, id);
+      const worldRows = p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]');
+      assert.equal(await worldRows.count(), 2 + 138, "two world seasons, then every real one");
+      assert.deepEqual(await worldRows.evaluateAll((r) => r.slice(0, 3).map((x) => x.dataset.world ?? "")), ["true", "true", ""]);
+      const worldSeason = (y) => `${y}-${String((y + 1) % 100).padStart(2, "0")}`;
+      assert.match(await worldRows.nth(0).innerText(), new RegExp(`${worldSeason(year + 1)}[\\s\\S]*My World`, "i"));
+      assert.match(await worldRows.nth(1).innerText(), new RegExp(`${worldSeason(year)}[\\s\\S]*My World`, "i"));
+      assert.match(await worldRows.nth(2).innerText(), /2025-26[\s\S]*Arsenal/);
+      // The first world season's champion, as its final table has it.
+      const champion = (await worldRows.nth(1).locator('[data-place="champion"]').innerText()).replace(/\s*\d+ pts\s*$/, "").trim();
+      assert.ok(champion && firstPl[0].includes(champion), `${champion} won the first Premier League season`);
+      await p.locator('[data-testid="world-tabs"] [data-league="EL2"]').click();
+      await p.getByTestId("past-winners-coming-soon").waitFor();
+      assert.equal(await worldRows.count(), 2, "League Two: the world's seasons only");
+      await winners.click();
+      await p.getByTestId("world-table").waitFor();
+      assert.equal(await p.getByTestId("world-winners").count(), 0);
+      await p.reload();
+      await p.getByTestId("world-past-winners").click();
+      await p.locator('[data-testid="world-tabs"] [data-league="PL"]').click();
+      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"][data-world="true"]').count(), 2, "kept by the save");
+      await p.getByTestId("world-past-winners").click();
+      await p.getByTestId("world-table").waitFor();
       // The club's path: two seasons, the latest first (the first in League Two), each with what came of it.
       const path = p.getByTestId("world-path-step");
       assert.equal(await path.count(), 2);

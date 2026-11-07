@@ -25,6 +25,8 @@ interface Props {
   matchParams?: MatchParams;
   /** Points deducted in the current tournament's table (ESPN), also applied to the annual table. */
   deductions?: Record<number, number>;
+  /** The league's Past Winners page, a third tab in each simulator (see LeagueSimulator). */
+  pastWinners?: { href: string; label: string };
 }
 
 /**
@@ -34,7 +36,7 @@ interface Props {
  * (and in some leagues relegation). The annual table shares the current
  * tournament's predictions.
  */
-export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths, deductions, matchParams }: Props) {
+export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths, deductions, matchParams, pastWinners }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const [view, setView] = useState<string>(current);
@@ -112,6 +114,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           {...(shownGroups ? { groups: shownGroups } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
           {...(matchParams ? { matchParams } : {})}
+          {...(pastWinners ? { pastWinners } : {})}
           {...(deductions && shown.id === current ? { deductions } : {})}
         />
       ) : (
@@ -126,6 +129,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           {...(annual.champions.length ? { qualifiedElsewhere: annual.champions.map((c) => c.id) } : {})}
           {...(priorStrengths ? { priorStrengths } : {})}
           {...(matchParams ? { matchParams } : {})}
+          {...(pastWinners ? { pastWinners } : {})}
           {...(notes.length ? { qualifiedNote: notes.join(" ") } : {})}
           {...(deductions ? { deductions } : {})}
         />

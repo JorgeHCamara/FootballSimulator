@@ -24,6 +24,7 @@ import { Icon } from "../../../components/Icon.tsx";
 import { hasClubPages } from "../../../lib/clubs.ts";
 import { latestReportPath, readSnapshots, seasonReports } from "../../../lib/oddsReports.ts";
 import { leagueChancePath, snapshotOutcomeKey, snapshotOutcomes } from "../../../lib/chancePages.ts";
+import { hasPastWinners, pastWinnersPath } from "../../../lib/winnersData.ts";
 
 export const revalidate = 3600;
 
@@ -240,6 +241,9 @@ export default async function LeaguePage({ params }: { params: Params }) {
                     ? "step3Asia"
                     : step;
 
+  // Past Winners, for a league with a history file (src/data/history): a third tab beside Table and Chances, to its own page.
+  const pastWinners = loaded.kind === "league" && hasPastWinners(loaded.config.slug) ? { href: pastWinnersPath(loaded.config), label: (await getTranslations("PastWinners"))("title") } : undefined;
+
   return (
     <div className="space-y-4" data-source={data.source}>
       <JsonLd
@@ -326,6 +330,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(priorStrengths ? { priorStrengths } : {})}
           {...(matchParams ? { matchParams } : {})}
           {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
+          {...(pastWinners ? { pastWinners } : {})}
         />
       ) : (
         <LeagueSimulator
@@ -342,6 +347,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
           {...(loaded.data.firstPhaseIds ? { firstPhaseIds: loaded.data.firstPhaseIds } : {})}
           {...(loaded.data.fallbackOrder ? { fallbackOrder: loaded.data.fallbackOrder } : {})}
+          {...(pastWinners ? { pastWinners } : {})}
         />
       )}
 
