@@ -216,6 +216,9 @@ export function WorldSeason({
   // Phones: the season picker, table, buttons, fixtures. Desktop, as on the league pages: the picker
   // and the buttons on one row above the table and fixtures columns.
   const grid = "grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[auto_minmax(0,1fr)_400px] lg:items-start";
+  // The view, beside the season picker: the table and fixtures, or Past Winners (the one shown is pressed).
+  const view = (active: boolean) =>
+    `flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-semibold sm:flex-initial ${active ? "border-pitch-600 bg-pitch-600 text-white hover:bg-pitch-700" : "border-zinc-300 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"}`;
   const picker = (
     <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center lg:col-start-1 lg:row-start-1 lg:self-center">
       <SeasonPicker
@@ -227,16 +230,16 @@ export function WorldSeason({
           onYear(y);
         }}
       />
-      <button
-        type="button"
-        aria-pressed={winners}
-        onClick={() => setWinners((v) => !v)}
-        className={`flex h-9 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-semibold ${winners ? "border-pitch-600 bg-pitch-600 text-white hover:bg-pitch-700" : "border-zinc-300 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"}`}
-        data-testid="world-past-winners"
-      >
-        <Icon name="trophy" size={16} className="shrink-0" />
-        {pw("title")}
-      </button>
+      <div className="flex gap-2">
+        <button type="button" aria-pressed={!winners} onClick={() => setWinners(false)} className={view(!winners)} data-testid="world-table-view">
+          <Icon name="table" size={16} className="shrink-0" />
+          {sim("table")}
+        </button>
+        <button type="button" aria-pressed={winners} onClick={() => setWinners(true)} className={view(winners)} data-testid="world-past-winners">
+          <Icon name="trophy" size={16} className="shrink-0" />
+          {pw("title")}
+        </button>
+      </div>
     </div>
   );
   if (winners) {
