@@ -1,6 +1,5 @@
 import type { CupRoundKey } from "../config/cups.ts";
 import type { LeagueConfig } from "../config/leagues.ts";
-import { NATIONAL_LEAGUE_CLUBS } from "../config/nationalLeague.ts";
 import { expectedGoals, expectedGoalsNeutral, sampleDixonColes, sampleLikelyScore, simulateFixtures } from "../engine/match.ts";
 import { tierStrength } from "../engine/cupModel.ts";
 import { seasonRatings, type SeasonRatings } from "../engine/offseason.ts";
@@ -8,6 +7,8 @@ import {
   buildBracket,
   isShootoutId,
   needsShootout,
+  PLAYOFF_ID_BASE,
+  playoffCancelled,
   playoffIds,
   seriesGames,
   simulatePenalties,
@@ -31,7 +32,9 @@ import {
   divisionConfig,
   divisionCountry,
   LOWER_LEAGUE,
+  LOWER_LEAGUE_CLUBS,
   neighbours,
+  playoutOf,
   pyramidPlayoffOf,
   WORLD_COUNTRIES,
   WORLD_CUPS,
@@ -59,8 +62,12 @@ export {
   GERMANY,
   isDivision,
   isWorldCountry,
+  ITALY,
   LOWER_LEAGUE,
+  LOWER_LEAGUE_CLUBS,
   neighbours,
+  playoutOf,
+  PLAYOUTS,
   PYRAMID_PLAYOFFS,
   pyramidPlayoffOf,
   SPAIN,
@@ -70,6 +77,7 @@ export {
   worldDivisions,
   type DivisionCode,
   type LowerCode,
+  type Playout,
   type PyramidPlayoff,
   type WorldCountry,
 } from "./worldCountries.ts";
@@ -77,7 +85,8 @@ export {
 /*
  * My World: a fictional timeline of one or more countries' football pyramids
  * (England's, Premier League to League Two; Spain's, La Liga and the Segunda
- * División; Germany's, the Bundesliga and the 2. Bundesliga;
+ * División; Germany's, the Bundesliga and the 2. Bundesliga; Italy's, Serie A
+ * and Serie B;
  * src/lib/worldCountries.ts), started from the site's live data and
  * played on season by season in the visitor's browser (saved by
  * src/lib/myWorldStorage.ts). A world is set up with its countries
@@ -91,7 +100,8 @@ export {
  * a country's leagues at once; a reserve side (the Segunda División's B teams)
  * is never promoted, its place passing down; a play-off between two divisions
  * (the Bundesliga's 16th v the 2. Bundesliga's 3rd) decides one more place
- * either way. The bottom division's relegated
+ * either way, and a play-out within one (Serie B's 16th v 17th) one more
+ * relegation. The bottom division's relegated
  * clubs drop into the league below (England's National League, Spain's
  * Primera Federación) for a season, and its clubs come up in their place
  * (Boreham Wood and Harrogate Town the first time in England; in Spain, clubs
@@ -332,9 +342,18 @@ export const NATIONAL_LEAGUE_ID_BASE = 90_000;
 /** The cups' non-league sides' world ids (World.cupPool). */
 export const CUP_POOL_ID_BASE = 80_000;
 
+/**
+ * The clubs the league below each of these countries' bottom division starts
+ * with (LOWER_LEAGUE_CLUBS: England's National League, Italy's Serie C), as
+ * world clubs: each one's id is its place in the whole list, whichever
+ * countries the world plays.
+ */
+export const lowerLeagueClubs = (countries: readonly WorldCountry[]): WorldClub[] =>
+  WORLD_COUNTRIES.flatMap((country) => LOWER_LEAGUE_CLUBS[country].map((c) => ({ country, c })))
+    .map(({ country, c }, i): WorldClub => ({ id: NATIONAL_LEAGUE_ID_BASE + i + 1, name: c.name, shortName: c.shortName, tla: c.tla, crest: c.crest, origin: "real", country, realId: c.espnId }))
+    .filter((club) => countries.includes(clubCountry(club)));
 /** The National League's clubs a world starts with (src/config/nationalLeague.ts), as world clubs. */
-export const nationalLeagueClubs = (): WorldClub[] =>
-  NATIONAL_LEAGUE_CLUBS.map((c, i) => ({ id: NATIONAL_LEAGUE_ID_BASE + i + 1, name: c.name, shortName: c.shortName, tla: c.tla, crest: c.crest, origin: "real", country: "ENG", realId: c.espnId }));
+export const nationalLeagueClubs = (): WorldClub[] => lowerLeagueClubs(["ENG"]);
 
 /** A club's country (England for clubs from before Spain came). */
 export const clubCountry = (club: Pick<WorldClub, "country">): WorldCountry => club.country ?? "ENG";
@@ -471,9 +490,7 @@ function worldPool(clubs: Readonly<Record<number, WorldClub>>, starts: readonly 
   const out = { ...clubs };
   const cupPool: TeamId[] = [];
   const known = new Set(Object.values(clubs).flatMap((c) => (c.realId !== undefined ? [`${clubCountry(c)}:${c.realId}`] : [])));
-  NATIONAL_LEAGUE_CLUBS.forEach((c, i) => {
-    if (clubs[NATIONAL_LEAGUE_ID_BASE + i + 1]) known.add(`ENG:${c.espnId}`);
-  });
+  for (const club of lowerLeagueClubs(WORLD_COUNTRIES)) if (clubs[club.id]) known.add(`${clubCountry(club)}:${club.realId}`);
   let next = CUP_POOL_ID_BASE + 1;
   while (out[next]) next++;
   for (const start of starts) {
@@ -601,8 +618,8 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
     });
   }
   if (userClub === undefined) throw new Error("The chosen club isn't in that league");
-  // The National League, below League Two: its clubs come up after the first season (Spain's Primera Federación starts empty).
-  const nationalLeague = countries.includes("ENG") ? nationalLeagueClubs() : [];
+  // The league below each country's bottom division (England's National League, Italy's Serie C): its clubs come up after the first season (Spain's Primera Federación starts empty).
+  const nationalLeague = lowerLeagueClubs(countries);
   for (const club of nationalLeague) clubs[club.id] = club;
   const year = pack.leagues.find((l) => l.code === worldDivisions(countries)[0])!.year;
   // The cups' non-league sides, from the real cups.
@@ -713,13 +730,40 @@ function tieModel(lower: LeagueModel, upper: LeagueModel, upperClub: TeamId | un
   return { ...lower, strengths: new Map(lower.strengths).set(upperClub, { attack: strength.attack * scale.attack, defence: strength.defence * scale.defence }) };
 }
 
-/** Clubs each division of a country sends up and down: the counts its leagues must agree on (3, 3 and 4 between the four English leagues; 3 between Spain's two; 2 between Germany's, the pyramid play-off adding one to both or neither). */
+/** Clubs each division of a country sends up and down: the counts its leagues must agree on (3, 3 and 4 between the four English leagues; 3 between Spain's two; 2 between Germany's, the pyramid play-off adding one to both or neither; 3 between Italy's, Serie B's play-out sending one more down). */
 export function movementCounts(country: WorldCountry = "ENG"): { up: number; down: number }[] {
   return COUNTRY_LEAGUES[country].map((code) => {
     const m = movementPlaces(divisionConfig(code));
-    return { up: m.promotion.length + (m.playoffPromotes ? 1 : 0), down: m.relegation.length };
+    return { up: m.promotion.length + (m.playoffPromotes ? 1 : 0), down: m.relegation.length + (playoutOf(code) ? 1 : 0) };
   });
 }
+
+/** The play-out's games' ids, apart from the play-off's. */
+export const PLAYOUT_ID_BASE = PLAYOFF_ID_BASE + 1_000_000;
+
+/**
+ * A division's relegation play-out as the world plays it (PLAYOUTS: Serie B's
+ * 16th v 17th): a bracket of one two-legged tie between the two places, the
+ * better-placed club hosting the second leg and staying up if level on
+ * aggregate, its games numbered apart from the play-off's.
+ */
+export function playoutConfigOf(code: DivisionCode): PlayoffConfig | undefined {
+  const playout = playoutOf(code);
+  if (!playout) return undefined;
+  return { rounds: [{ key: "playOut", legs: 2, levelTie: "betterPlaced", pairs: [playout.places] }], idBase: PLAYOUT_ID_BASE };
+}
+
+/** True once the table makes the play-out unnecessary: its two clubs `gap` or more points apart, the lower-placed one going straight down. */
+export function playoutCancelled(code: DivisionCode, rows: readonly StandingRow[]): boolean {
+  const playout = playoutOf(code);
+  if (!playout) return false;
+  const [upper, lower] = playout.places.map((place) => rows.find((r) => r.position === place));
+  return upper !== undefined && lower !== undefined && upper.points - lower.points >= playout.gap;
+}
+
+/** Whether a bracket still has a game to play: a leg without a score, or a level tie's shoot-out. */
+export const bracketOpen = (bracket: readonly (readonly PlayoffTie[])[], picks: ResultMap): boolean =>
+  bracket.flat().some((tie) => tie.legs.some((leg) => !leg.result && !picks[leg.id]) || (tie.shootout !== null && !tie.shootout.result && !picks[tie.shootout.id] && needsShootout(tie, picks)));
 
 /** Fictional towns for the new clubs that come up from below (none is a real club's), and how their names are made. */
 const NEW_TOWNS: Record<WorldCountry, { towns: readonly string[]; suffixes: readonly string[]; prefix: boolean }> = {
@@ -745,6 +789,14 @@ const NEW_TOWNS: Record<WorldCountry, { towns: readonly string[]; suffixes: read
       "Neuwiesen", "Tannenhof", "Adlerstein", "Grünhausen", "Mühlbach", "Eichenrode", "Sonnenfeld", "Kirchhofen",
     ],
     suffixes: ["SV", "FC", "1. FC", "TSV", "SpVgg", "VfL"],
+    prefix: true,
+  },
+  ITA: {
+    towns: [
+      "Montefalcone", "Valdorcia", "Castelverde", "Pietrasanta Alta", "Roccabruna", "Sanvitale", "Colleluna", "Borgomare",
+      "Altavilla Marina", "Fontanarossa", "Pievecastello", "Torregiano", "Serravalle d'Arno", "Montelupo Nuovo", "Campolieto", "Rivalta Ligure",
+    ],
+    suffixes: ["US", "AC", "SS", "ASD", "Pro", "Virtus"],
     prefix: true,
   },
 };
@@ -853,6 +905,12 @@ export interface DivisionState {
   /** The play-off's ties: clubs placed once known. */
   bracket: PlayoffTie[][];
   playoffOptions: Omit<BracketOptions, "seasonComplete">;
+  /** Its relegation play-out (playoutConfigOf: Serie B's 16th v 17th); none elsewhere. */
+  playout?: PlayoffConfig;
+  /** The play-out's tie: its clubs placed once the league is complete; nothing when the table has made it unnecessary (playoutCancelled). */
+  playoutBracket: PlayoffTie[][];
+  /** The league is complete and its two clubs finished too far apart for a play-out: the lower-placed goes straight down. */
+  playoutCancelled: boolean;
   /** The league and its play-off are decided. */
   done: boolean;
   /**
@@ -895,20 +953,47 @@ function stateOf(world: World, index: number, picks: ResultMap = seasonScores(wo
   }
   const options = playoffOptions(world, d, lastMatchday(fixtures));
   const bracket = playoff ? buildBracket(playoffRows, playoff, picks, { ...options, seasonComplete: playoffKnown }) : [];
-  const done = leagueComplete && playoffKnown && bracket.every((round) => round.every((tie) => tieOutcome(tie, picks) !== null));
+  // A relegation play-out (Serie B's 16th v 17th): from the table itself, once the league is complete, unless it has made it unnecessary.
+  const playout = playoutConfigOf(d.code);
+  const playoutOff = leagueComplete && playoutCancelled(d.code, rows);
+  const playoutBracket = playout && !playoutOff ? buildBracket(rows, playout, picks, { ...options, seasonComplete: leagueComplete }) : [];
+  const decided = (ties: PlayoffTie[][]) => ties.every((round) => round.every((tie) => tieOutcome(tie, picks) !== null));
+  const done = leagueComplete && playoffKnown && decided(bracket) && decided(playoutBracket);
   let nextRound: number | null = null;
   if (!leagueComplete) {
     const open = fixtures.filter((f) => !results[f.id]);
     const from = startRound(d);
     nextRound = open.find((f) => f.matchday >= from)?.matchday ?? open.at(-1)!.matchday;
   } else if (!done) {
-    // English play-offs are one- and two-legged ties (no series).
-    const ties = bracket.flat();
+    // English play-offs are one- and two-legged ties (no series); the play-out's legs count the same.
+    const ties = [...bracket.flat(), ...playoutBracket.flat()];
     const legs = ties.flatMap((tie) => tie.legs.filter((leg) => !leg.result && !picks[leg.id]));
     const level = ties.filter((tie) => tie.shootout && !tie.shootout.result && !picks[tie.shootout.id] && needsShootout(tie, picks));
     nextRound = legs.length ? Math.min(...legs.map((leg) => leg.matchday)) : level.length ? Math.max(...level.map((tie) => tie.legs.at(-1)!.matchday)) : null;
   }
-  return { code: d.code, index, league, teams, fixtures, picks, results, rows, eligibleRows, playoffRows, ...(playoff ? { playoff } : {}), leagueComplete, playoffKnown, bracket, playoffOptions: options, done, nextRound, model };
+  return {
+    code: d.code,
+    index,
+    league,
+    teams,
+    fixtures,
+    picks,
+    results,
+    rows,
+    eligibleRows,
+    playoffRows,
+    ...(playoff ? { playoff } : {}),
+    leagueComplete,
+    playoffKnown,
+    bracket,
+    playoffOptions: options,
+    ...(playout ? { playout } : {}),
+    playoutBracket,
+    playoutCancelled: playoutOff,
+    done,
+    nextRound,
+    model,
+  };
 }
 
 const indexOf = (world: World, code: DivisionCode) => {
@@ -935,12 +1020,15 @@ export const seasonDone = (world: World) => seasonStates(world).every((s) => s.d
  * `after`: the world and the division's picks before and after the change
  * (the change may be in another division's scores).
  */
-function tidyPlayoff(before: { world: World; picks: ResultMap }, after: { world: World; picks: ResultMap }, index: number): ResultMap {
-  const config = playoffConfigOf(after.world.divisions[index]!.code);
+function tidyBracket(before: { world: World; picks: ResultMap }, after: { world: World; picks: ResultMap }, index: number, which: "playoff" | "playout"): ResultMap {
+  const code = after.world.divisions[index]!.code;
+  const config = which === "playoff" ? playoffConfigOf(code) : playoutConfigOf(code);
   if (!config) return after.picks;
   const out = { ...after.picks };
+  // The bracket with its clubs known, else null: the play-off's once its clubs are, the play-out's once the league is complete and hasn't made it unnecessary.
   const bracketWith = (world: World, picks: ResultMap) => {
     const state = stateOf(world, index, picks);
+    if (which === "playout") return state.leagueComplete && !state.playoutCancelled ? state.playoutBracket : null;
     return state.playoffKnown ? state.bracket : null;
   };
   if (!bracketWith(after.world, out)) {
@@ -956,7 +1044,7 @@ function tidyPlayoff(before: { world: World; picks: ResultMap }, after: { world:
       const stale = bracketWith(after.world, out)!
         .flat()
         .filter((tie) => pairings.get(`${tie.round}-${tie.index}`) !== pairing(tie))
-        .flatMap((tie) => tieIds(tie.round, tie.index, tie.config))
+        .flatMap((tie) => tieIds(tie.round, tie.index, tie.config, config.idBase))
         .filter(unchanged);
       if (!stale.length) break;
       for (const id of stale) delete out[id];
@@ -969,6 +1057,10 @@ function tidyPlayoff(before: { world: World; picks: ResultMap }, after: { world:
   }
   return out;
 }
+
+/** A division's picks less the play-off and play-out scores a change leaves stale (tidyBracket, for both). */
+const tidyPlayoff = (before: { world: World; picks: ResultMap }, after: { world: World; picks: ResultMap }, index: number): ResultMap =>
+  tidyBracket(before, { world: after.world, picks: tidyBracket(before, after, index, "playoff") }, index, "playout");
 
 /** The world with a division's picks replaced. */
 function withPicks(world: World, index: number, picks: ResultMap): World {
@@ -1040,8 +1132,13 @@ export function simulateMatchday(world: World, code: DivisionCode, matchday: num
 /** The play-off's games without a score, once its clubs are known ("Simulate matchday" on the play-off), from the season's form. */
 export function simulatePlayoffs(world: World, code: DivisionCode, rng: Rng = createRng(randomSeed())): World {
   const state = divisionState(world, code);
-  if (!state.playoff || !state.playoffKnown) return world;
-  const added = simulatePlayoff(state.playoffRows, state.playoff, state.picks, state.model, rng, state.playoffOptions);
+  const added: ResultMap = {};
+  if (state.playoff && state.playoffKnown) Object.assign(added, simulatePlayoff(state.playoffRows, state.playoff, state.picks, state.model, rng, state.playoffOptions));
+  // The play-out too (Serie B's 16th v 17th), once the league is complete and unless it has made it unnecessary.
+  if (state.playout && state.leagueComplete && !state.playoutCancelled) {
+    Object.assign(added, simulatePlayoff(state.rows, state.playout, { ...state.picks, ...added }, state.model, rng, state.playoffOptions));
+  }
+  if (!Object.keys(added).length) return world;
   return withScores(world, state.index, state.picks, { ...state.picks, ...added });
 }
 
@@ -1066,14 +1163,18 @@ export function resetDivision(world: World, code: DivisionCode): World {
 /** Games still to play in a division's season: league games, play-off games, and a level tie's shoot-out. */
 export function gamesLeft(state: DivisionState): number {
   const league = state.fixtures.filter((f) => !state.results[f.id]).length;
-  const config = state.playoff;
-  if (!config) return league;
-  // English play-offs are one- and two-legged ties (no series): every leg is played.
-  const legs = playoffIds(config).filter((id) => !isShootoutId(id)).length;
-  const ties = state.bracket.flat();
-  const played = ties.flatMap((tie) => tie.legs).filter((leg) => leg.result || state.picks[leg.id]).length;
-  const shootouts = ties.filter((tie) => tie.shootout && !tie.shootout.result && !state.picks[tie.shootout.id] && needsShootout(tie, state.picks)).length;
-  return league + legs - played + shootouts;
+  // English play-offs are one- and two-legged ties (no series): every leg is played; the play-out's two legs the same, unless the table has made it unnecessary.
+  const left = (config: PlayoffConfig | undefined, bracket: PlayoffTie[][]) => {
+    if (!config) return 0;
+    const legs = playoffIds(config).filter((id) => !isShootoutId(id)).length;
+    const ties = bracket.flat();
+    const played = ties.flatMap((tie) => tie.legs).filter((leg) => leg.result || state.picks[leg.id]).length;
+    const shootouts = ties.filter((tie) => tie.shootout && !tie.shootout.result && !state.picks[tie.shootout.id] && needsShootout(tie, state.picks)).length;
+    return legs - played + shootouts;
+  };
+  // A play-off the table has made unnecessary (Serie B's 3rd more than 14 points clear of 4th) has no games left.
+  const playoffOff = state.playoff !== undefined && state.playoffKnown && playoffCancelled(state.playoff, state.playoffRows);
+  return league + (playoffOff ? 0 : left(state.playoff, state.bracket)) + (state.playoutCancelled ? 0 : left(state.playout, state.playoutBracket));
 }
 
 /** A league's games in its season: every league game and its play-off's legs (a level tie's shoot-out comes on top), for the share played. */
@@ -1156,6 +1257,14 @@ function playPlayoff(world: World, index: number, played: PlayedDivision[]): voi
       if (score) p.playoff[game.id] = score;
     }
   }
+  // No play-off when the table makes it unnecessary (Serie B's 3rd more than 14 points clear of 4th): that club goes up directly.
+  if (config.directIfClear && playoffCancelled(config, rows)) {
+    // Nobody plays a play-off: the places' "in the play-off" notes go.
+    for (const [id, note] of p.notes) if (note === "O") p.notes.set(id, "");
+    const direct = rows.find((r) => r.position === config.directIfClear!.position);
+    if (direct && movementPlaces(p.league).playoffPromotes) p.notes.set(direct.teamId, "P");
+    return;
+  }
   const outcome = finalTie ? tieOutcome(finalTie, scores) : null;
   if (!finalTie || !outcome) return;
   const loser = outcome.winner === finalTie.higher.teamId ? finalTie.lower.teamId! : finalTie.higher.teamId!;
@@ -1175,6 +1284,42 @@ function playPlayoff(world: World, index: number, played: PlayedDivision[]): voi
 }
 
 /**
+ * Plays a division's relegation play-out (Serie B's 16th v 17th) from the
+ * played league: its scores so far stand, the rest drawn on the season's own
+ * random stream; the loser is relegated ("R"), or the lower-placed club
+ * straight away when the two finished too far apart for a play-out. Its
+ * scores join the division's saved play-off scores (their ids apart).
+ */
+function playPlayout(world: World, index: number, played: PlayedDivision[]): void {
+  const p = played[index]!;
+  const d = world.divisions[index]!;
+  const config = playoutConfigOf(d.code);
+  const playout = playoutOf(d.code);
+  if (!config || !playout) return;
+  if (playoutCancelled(d.code, p.rows)) {
+    const lower = p.rows.find((r) => r.position === playout.places[1]);
+    if (lower) p.notes.set(lower.teamId, "R");
+    return;
+  }
+  const picks = seasonScores(d);
+  let tie: PlayoffTie | undefined;
+  const options = playoffOptions(world, d, lastMatchday(p.fixtures));
+  const added = simulatePlayoff(p.rows, config, picks, p.model, seasonRng(world, 70 + index), options, (_, ties) => {
+    tie = ties[0];
+  });
+  const scores = { ...picks, ...added };
+  for (const t of buildBracket(p.rows, config, scores, { ...options, seasonComplete: true }).flat()) {
+    for (const game of t.legs) {
+      const score = scores[game.id] ?? game.result;
+      if (score) p.playoff[game.id] = score;
+    }
+  }
+  const outcome = tie ? tieOutcome(tie, scores) : null;
+  if (!tie || !outcome) return;
+  p.notes.set(outcome.winner === tie.higher.teamId ? tie.lower.teamId! : tie.higher.teamId!, "R");
+}
+
+/**
  * Plays the season in progress in all four leagues, saves every final table,
  * moves clubs up and down together (League Two's relegated clubs out, new clubs
  * in) and sets up the next season: new calendars, ratings carried over. The
@@ -1183,6 +1328,7 @@ function playPlayoff(world: World, index: number, played: PlayedDivision[]): voi
 export function playSeason(world: World): World {
   const played = world.divisions.map((d, i) => playLeague(world, d, i));
   world.divisions.forEach((_, i) => playPlayoff(world, i, played));
+  world.divisions.forEach((_, i) => playPlayout(world, i, played));
   const clubs = { ...world.clubs };
   let nationalLeague = [...world.nationalLeague];
   let cupPool = [...world.cupPool];
@@ -1348,6 +1494,8 @@ export interface PastDivision {
   fixtures: Fixture[] | null;
   /** The play-off's ties, each game carrying its score (`result`). */
   bracket: PlayoffTie[][];
+  /** The relegation play-out's tie (Serie B), the same way; none without one, or when the table made it unnecessary. */
+  playout: PlayoffTie[][];
 }
 
 /** A saved table's rows as standings rows (for a bracket). */
@@ -1369,11 +1517,14 @@ export function pastDivision(world: World, year: number, code: DivisionCode): Pa
       }))
     : null;
   const config = playoffConfigOf(code);
+  const playoutConfig = playoutConfigOf(code);
   let bracket: PlayoffTie[][] = [];
-  if (config && saved.playoff) {
+  let playout: PlayoffTie[][] = [];
+  if (saved.playoff && (config || playoutConfig)) {
     const scores: ResultMap = {};
     for (const [id, [home, away]] of Object.entries(saved.playoff)) scores[Number(id)] = { home, away };
-    let rows = promotionRows(divisionConfig(code), standingRows(table.rows), (id) => world.clubs[id]!.name);
+    const standings = standingRows(table.rows);
+    let rows = promotionRows(divisionConfig(code), standings, (id) => world.clubs[id]!.name);
     // A pyramid play-off: the upper division's club from its own saved table.
     const tie = pyramidPlayoffOf(code);
     if (tie?.lower === code) {
@@ -1382,13 +1533,16 @@ export function pastDivision(world: World, year: number, code: DivisionCode): Pa
     }
     const last = fixtures ? lastMatchday(fixtures) : (divisionConfig(code).teams - 1) * 2;
     const scored = (f: Fixture): Fixture => ({ ...f, result: scores[f.id] ?? f.result });
-    bracket = buildBracket(rows, config, scores, { seasonComplete: true, afterMatchday: last, afterDate: gameDate(year, last) }).map((round) =>
-      round.map((tie) => ({ ...tie, legs: tie.legs.map(scored), shootout: tie.shootout && scored(tie.shootout), gameShootouts: tie.gameShootouts.map(scored) })),
-    );
+    const build = (table: readonly StandingRow[], playoff: PlayoffConfig) =>
+      buildBracket(table, playoff, scores, { seasonComplete: true, afterMatchday: last, afterDate: gameDate(year, last) }).map((round) =>
+        round.map((t) => ({ ...t, legs: t.legs.map(scored), shootout: t.shootout && scored(t.shootout), gameShootouts: t.gameShootouts.map(scored) })),
+      );
+    if (config) bracket = build(rows, config);
+    if (playoutConfig && !playoutCancelled(code, standings)) playout = build(standings, playoutConfig);
   }
   // The league's clubs, and the play-off's (a pyramid play-off's club from the division above).
   const clubs = [...new Set([...saved.rows.map((r) => r[0]), ...bracket.flat().flatMap((tie) => [tie.higher.teamId, tie.lower.teamId]).filter((id): id is TeamId => id !== null)])];
-  return { code, rows: table.rows, ...(table.final ? { final: table.final } : {}), teams: clubs.map((id) => teamOf(world, id)), fixtures, bracket };
+  return { code, rows: table.rows, ...(table.final ? { final: table.final } : {}), teams: clubs.map((id) => teamOf(world, id)), fixtures, bracket, playout };
 }
 
 /** Where a club plays in the season in progress (undefined in the National League, or once it has left the pyramid). */

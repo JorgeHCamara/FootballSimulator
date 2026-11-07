@@ -27,7 +27,8 @@ export type PlayoffRoundKey =
   | "mlsCup"
   | "knockoutPlayoff"
   | "roundOf16"
-  | "quarterFinals";
+  | "quarterFinals"
+  | "playOut";
 
 export interface PlayoffRoundConfig {
   key: PlayoffRoundKey;
@@ -70,6 +71,12 @@ export interface PlayoffRoundConfig {
 
 export interface PlayoffConfig {
   rounds: readonly PlayoffRoundConfig[];
+  /**
+   * Base of the ties' synthetic fixture ids (PLAYOFF_ID_BASE by default): a
+   * second bracket beside a league's play-off (My World's Serie B play-out)
+   * keeps its ids apart, a multiple of 100 above.
+   */
+  idBase?: number;
   /** Positions promoted without the play-off. */
   directPromotion?: readonly number[];
   /** League the winners go up to (promotion play-offs). */
@@ -189,11 +196,11 @@ export function seedByGroupPlace(
 /** Play-off legs get synthetic fixture ids far above any real one. */
 export const PLAYOFF_ID_BASE = 2_000_000_000;
 
-const legId = (round: number, tie: number, leg: 1 | 2) => PLAYOFF_ID_BASE + round * 100 + tie * 2 + leg;
-const shootoutId = (round: number, tie: number) => PLAYOFF_ID_BASE + round * 100 + 50 + tie;
+const legId = (round: number, tie: number, leg: 1 | 2, base = PLAYOFF_ID_BASE) => base + round * 100 + tie * 2 + leg;
+const shootoutId = (round: number, tie: number, base = PLAYOFF_ID_BASE) => base + round * 100 + 50 + tie;
 // Best-of-three series: three games per tie, each with its own shoot-out.
-const gameId = (round: number, tie: number, game: number) => PLAYOFF_ID_BASE + round * 100 + tie * 3 + game;
-const gameShootoutId = (round: number, tie: number, game: number) => PLAYOFF_ID_BASE + round * 100 + 50 + tie * 3 + game - 1;
+const gameId = (round: number, tie: number, game: number, base = PLAYOFF_ID_BASE) => base + round * 100 + tie * 3 + game;
+const gameShootoutId = (round: number, tie: number, game: number, base = PLAYOFF_ID_BASE) => base + round * 100 + 50 + tie * 3 + game - 1;
 
 function tieCounts(config: PlayoffConfig): number[] {
   const counts: number[] = [];
@@ -209,15 +216,15 @@ function tieCounts(config: PlayoffConfig): number[] {
   return counts;
 }
 
-/** Ids belonging to one tie (its legs or games, and shoot-outs), whether or not its clubs are known yet. */
-export function tieIds(round: number, tie: number, config: PlayoffRoundConfig): number[] {
+/** Ids belonging to one tie (its legs or games, and shoot-outs), whether or not its clubs are known yet; `base` the play-off's (PlayoffConfig.idBase). */
+export function tieIds(round: number, tie: number, config: PlayoffRoundConfig, base = PLAYOFF_ID_BASE): number[] {
   if (config.bestOf) {
-    return [1, 2, 3].flatMap((g) => [gameId(round, tie, g), gameShootoutId(round, tie, g)]);
+    return [1, 2, 3].flatMap((g) => [gameId(round, tie, g, base), gameShootoutId(round, tie, g, base)]);
   }
   return [
-    legId(round, tie, 1),
-    ...(config.legs === 2 ? [legId(round, tie, 2)] : []),
-    ...(config.levelTie === "penalties" ? [shootoutId(round, tie)] : []),
+    legId(round, tie, 1, base),
+    ...(config.legs === 2 ? [legId(round, tie, 2, base)] : []),
+    ...(config.levelTie === "penalties" ? [shootoutId(round, tie, base)] : []),
   ];
 }
 
@@ -225,7 +232,7 @@ export const isShootoutId = (id: number) => id > PLAYOFF_ID_BASE && (id - PLAYOF
 
 /** Every synthetic id the play-off can use (legs and shoot-outs), for share links and clean-up. */
 export function playoffIds(config: PlayoffConfig): number[] {
-  return tieCounts(config).flatMap((count, r) => Array.from({ length: count }, (_, t) => tieIds(r, t, config.rounds[r]!)).flat());
+  return tieCounts(config).flatMap((count, r) => Array.from({ length: count }, (_, t) => tieIds(r, t, config.rounds[r]!, config.idBase)).flat());
 }
 
 /** A club in a tie: known once the table (or the previous round) decides it. */
@@ -409,6 +416,7 @@ export function buildBracket(
   const grouped = config.groupStage !== undefined && (options.groups?.length ?? 0) > 0;
   const groupRounds = grouped ? config.groupStage!.rounds : 0;
   const start = Date.parse(options.afterDate) || Date.now();
+  const base = config.idBase ?? PLAYOFF_ID_BASE;
   const used = new Set<number>();
   /** Real games between two clubs, oldest first, not yet given to another leg. */
   const realBetween = (a: TeamId, b: TeamId) =>
@@ -496,21 +504,21 @@ export function buildBracket(
           // Better-placed club hosts games 1 and 3.
           tie.legs = [1, 2, 3].map((n) => {
             const [home, away] = n === 2 ? [lower.teamId!, higher.teamId!] : [higher.teamId!, lower.teamId!];
-            return game(gameId(r, t, n), n, home, away, date(7 + (n - 1) * 3));
+            return game(gameId(r, t, n, base), n, home, away, date(7 + (n - 1) * 3));
           });
-          tie.gameShootouts = tie.legs.map((leg, i) => shootoutFor(leg, gameShootoutId(r, t, i + 1)));
+          tie.gameShootouts = tie.legs.map((leg, i) => shootoutFor(leg, gameShootoutId(r, t, i + 1, base)));
         } else {
           tie.legs =
             round.legs === 2
               ? [
-                  game(legId(r, t, 1), 1, lower.teamId, higher.teamId, date(7)),
-                  game(legId(r, t, 2), 2, higher.teamId, lower.teamId, date(14)),
+                  game(legId(r, t, 1, base), 1, lower.teamId, higher.teamId, date(7)),
+                  game(legId(r, t, 2, base), 2, higher.teamId, lower.teamId, date(14)),
                 ]
-              : [game(legId(r, t, 1), 1, higher.teamId, lower.teamId, date(7))];
+              : [game(legId(r, t, 1, base), 1, higher.teamId, lower.teamId, date(7))];
           if (round.levelTie === "penalties") {
             const last = tie.legs.at(-1)!;
             const pens = last.homeId === higher.teamId ? last.penalties : last.penalties && { home: last.penalties.away, away: last.penalties.home };
-            tie.shootout = { ...shootoutFor(last, shootoutId(r, t)), homeId: higher.teamId, awayId: lower.teamId, result: pens ?? null };
+            tie.shootout = { ...shootoutFor(last, shootoutId(r, t, base)), homeId: higher.teamId, awayId: lower.teamId, result: pens ?? null };
           }
         }
         // Keep the leg/game fixtures free of the feed-only penalties field.

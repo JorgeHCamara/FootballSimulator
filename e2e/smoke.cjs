@@ -2472,10 +2472,10 @@ async function step(name, fn) {
       assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/my-world");
       // Set up: the countries (one card each, every one picked is played: England, Spain), League Two, a club, create.
       const countryCards = p.getByTestId("world-country");
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.picked, e.disabled])), [["ENG", "false", false], ["ESP", "false", false], ["GER", "false", false]]);
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England", "Spain", "Germany"]);
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.picked, e.disabled])), [["ENG", "false", false], ["ESP", "false", false], ["GER", "false", false], ["ITA", "false", false]]);
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England", "Spain", "Germany", "Italy"]);
       // Cards of the flag and the name alone, every one the same size.
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.trim())), ["England", "Spain", "Germany"], "no description, only the name");
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.trim())), ["England", "Spain", "Germany", "Italy"], "no description, only the name");
       assert.equal((await countryCards.evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().height)))])).length, 1, "country cards the same height");
       assert.equal(await p.getByTestId("world-league").count(), 0, "no leagues until a country is picked");
       await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
@@ -2483,7 +2483,7 @@ async function step(name, fn) {
       await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
       assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["PL", "ELC", "EL1", "EL2", "PD", "SD"], "both: every league, England's first");
       await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.dataset.picked)), ["true", "false", "false"], "Spain unpicked again");
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.dataset.picked)), ["true", "false", "false", "false"], "Spain unpicked again");
       assert.equal(await p.getByTestId("world-league").count(), 4);
       await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
       const clubs = p.getByTestId("world-club");
@@ -2944,6 +2944,73 @@ async function step(name, fn) {
       await fixtures.getByTestId("matchday-select").selectOption("-1");
       assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
       assert.equal(await fixtures.getByTestId("match-score").count(), 2);
+      await p.close();
+    });
+
+    await step("My World with Italy: a Serie B club, Italy's tabs (Serie A, Serie B, Coppa Italia), Serie B's play-off and its play-out (16th v 17th) under its own entry, the season ended with four down to Serie C and four up, the past season's play-out", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      await p.locator('[data-testid="world-country"][data-country="ITA"]').click();
+      assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["SA", "SB"]);
+      await p.locator('[data-testid="world-league"][data-league="SB"]').click();
+      const clubs = p.getByTestId("world-club");
+      assert.equal(await clubs.count(), 20);
+      await clubs.nth(2).click();
+      assert.match(await p.getByTestId("world-summary").innerText(), /in Serie B, starting with the \d{4}\/\d{2} season\. Your world plays Italy\.$/);
+      await p.getByTestId("world-create").click();
+      const world = p.getByTestId("world");
+      await world.waitFor();
+      const year = Number(await world.getAttribute("data-year"));
+      assert.deepEqual(await p.getByTestId("world-season-country").locator("option").allInnerTexts(), ["Italy"]);
+      assert.deepEqual(await p.locator('[data-testid="world-tabs"] [role="tab"]').allInnerTexts(), ["Serie A", "Serie B", "Coppa Italia"]);
+      assert.equal(await p.locator('[data-testid="world-table"] [data-testid="world-row"]').count(), 20);
+      const left = async () => Object.fromEntries(await p.getByTestId("world-left").evaluateAll((els) => els.map((e) => [e.dataset.league, Number(e.dataset.left)])));
+      assert.deepEqual(Object.keys(await left()), ["SA", "SB", "CIT"]);
+      // Serie B's fixtures end with the play-off and the play-out, the play-out's places until the league is complete.
+      const fixtures = p.getByTestId("world-fixtures");
+      const select = fixtures.getByTestId("matchday-select");
+      assert.deepEqual(await select.locator("option").evaluateAll((els) => els.slice(-2).map((o) => [o.value, o.textContent])), [["-1", "Play-off"], ["-2", "Play-out"]]);
+      await select.selectOption("-2");
+      assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
+      assert.match(await fixtures.getByTestId("playoff-tie").innerText(), /^16th place × 17th place\n[\s\S]*16th place hosts the 2nd leg and stays up if the aggregate is level\./);
+      // Serie B played out: the play-off and the play-out decided (or the play-out skipped, the 17th too far behind), nothing left.
+      await p.getByTestId("world-simulate-rest").click();
+      await p.locator('[data-testid="world-left"][data-league="SB"][data-left="0"]').waitFor();
+      await select.selectOption("-2");
+      const skipped = await fixtures.getByTestId("playoff-cancelled").count();
+      if (skipped) assert.match(await fixtures.getByTestId("playoff-cancelled").innerText(), /^No play-out this season: .+ finished 5 or more points behind .+ and go straight down\.$/);
+      else assert.deepEqual(await fixtures.getByTestId("match-row").evaluateAll((rows) => rows.map((r) => [...r.querySelectorAll("input")].every((i) => i.value !== ""))), [true, true], "both legs scored");
+      await p.locator('[data-testid="world-left"][data-league="SA"]').click();
+      await p.getByTestId("world-simulate-rest").click();
+      await p.locator('[data-testid="world-left"][data-league="SA"][data-left="0"]').waitFor();
+      await p.locator('[data-testid="world-left"][data-league="CIT"]').click();
+      await p.getByTestId("world-simulate-rest").click();
+      await p.locator('[data-testid="world-left"][data-league="CIT"][data-left="0"]').waitFor();
+      await p.getByTestId("world-end-season").click();
+      const review = p.getByTestId("world-review");
+      await review.waitFor();
+      assert.equal(await p.getByTestId("world-review-country").inputValue(), "ITA");
+      assert.equal(await p.locator('[data-testid="world-review"] li', { hasText: /^(Serie A|Serie B):/ }).count(), 2);
+      assert.match(await p.getByTestId("world-review-cup").innerText(), /^Coppa Italia:/);
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="SA"] li').count(), 6, "three each way");
+      const lower = await p.locator('[data-testid="world-moves"][data-upper="SB"]').innerText();
+      assert.ok(lower.includes("UP FROM SERIE C") && lower.includes("DOWN TO SERIE C"), lower);
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="SB"] li').count(), 8, "four each way: the bottom three and the play-out's loser, the four Serie C clubs up");
+      await p.getByTestId("world-start-season").click();
+      await p.getByTestId("world-tables").waitFor();
+      assert.deepEqual(Object.values(await left()), [380, 390, 45], "the new season: 380 games each, Serie B's eight play-off games and the play-out's two, the cup's 45");
+      // Last season's Serie B: its play-off final, and its play-out under its own entry when it was played.
+      await p.getByTestId("world-season-select").selectOption(String(year));
+      await p.locator('[data-testid="world-tabs"] [data-league="SB"]').click();
+      if (await p.getByTestId("world-past-final").count()) assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
+      const entries = await select.locator("option").evaluateAll((els) => els.map((o) => o.value));
+      assert.equal(entries.includes("-2"), !skipped, "the play-out's entry when it was played");
+      if (!skipped) {
+        await select.selectOption("-2");
+        assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
+        assert.equal(await fixtures.getByTestId("match-score").count(), 2);
+      }
       await p.close();
     });
 

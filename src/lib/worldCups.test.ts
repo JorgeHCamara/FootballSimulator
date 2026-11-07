@@ -153,8 +153,8 @@ describe("My World: the cups' entry rounds", () => {
 describe("My World: a new world's cups", () => {
   it("has both cups, the FA Cup's pool of 32 non-league sides from the real cup (clubs of the world that play no league), and every club of each cup in the world", () => {
     assert.ok(packReady(pack));
-    assert.deepEqual(world.cups.map((c) => c.code), ["FAC", "EFC"], "England's cups, of the three a world can play");
-    assert.deepEqual([...WORLD_CUPS], ["FAC", "EFC", "CDR", "DFB"]);
+    assert.deepEqual(world.cups.map((c) => c.code), ["FAC", "EFC"], "England's cups, of the five a world can play");
+    assert.deepEqual([...WORLD_CUPS], ["FAC", "EFC", "CDR", "DFB", "CIT"]);
     assert.equal(world.cupPool.length, 32);
     const pool = world.cupPool.map((id) => world.clubs[id]!);
     assert.ok(pool.every((c) => c.origin === "real" && c.realId !== undefined && c.id > CUP_POOL_ID_BASE && c.id < NATIONAL_LEAGUE_ID_BASE), "real clubs, with the pool's ids");
