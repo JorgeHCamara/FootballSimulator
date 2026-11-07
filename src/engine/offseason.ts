@@ -52,7 +52,8 @@ export function seasonRatings(season: SeasonGames, halfLife = Infinity, xgWeight
 }
 
 const pow = (x: number, k: number) => Math.exp(k * Math.log(x));
-const moved = (typical: TeamStrength, from: TeamStrength, s: TeamStrength): TeamStrength => ({
+/** A club moving between divisions: `typical` for such a club in its new division, moved by MOVE of how its rating `s` differed from `from`, the typical one in the division it leaves. */
+export const moved = (typical: TeamStrength, from: TeamStrength, s: TeamStrength): TeamStrength => ({
   attack: typical.attack * pow(s.attack / from.attack, MOVE),
   defence: typical.defence * pow(s.defence / from.defence, MOVE),
 });

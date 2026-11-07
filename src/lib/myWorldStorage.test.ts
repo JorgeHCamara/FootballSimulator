@@ -44,6 +44,15 @@ describe("My World: the save", () => {
     assert.deepEqual(loadWorld(store).world!.countries, ["ENG"]);
   });
 
+  it("checks the club levels: a save from before them starts them from the ratings; levels of another shape are unreadable", () => {
+    const store = memoryStore();
+    const { levels: _l, ...old } = world;
+    store.setItem(WORLD_KEY, JSON.stringify(old));
+    assert.deepEqual(loadWorld(store).world!.levels, world.ratings);
+    assert.equal(isWorld({ ...world, levels: 5 }), false);
+    assert.equal(isWorld({ ...world, levels: null }), false);
+  });
+
   it("saves and reloads the same world", () => {
     const store = memoryStore();
     assert.deepEqual(loadWorld(store), { world: null, reason: "none" });

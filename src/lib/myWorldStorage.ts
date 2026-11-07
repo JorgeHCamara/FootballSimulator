@@ -78,6 +78,8 @@ export function isWorld(value: unknown): value is World {
   const { clubs, ratings, divisions, history, params } = value;
   if (!isNumber(value.year) || !isNumber(value.seed) || !isNumber(value.userClub) || !isNumber(value.newClubs) || typeof value.review !== "boolean") return false;
   if (!isRecord(clubs) || !isRecord(ratings) || !isRecord(params) || !Array.isArray(divisions) || !Array.isArray(history)) return false;
+  // The club levels (absent from saves from before them: upgradeWorld starts them from the ratings).
+  if (value.levels !== undefined && !isRecord(value.levels)) return false;
   // The world's countries (absent from saves from before the choice: England's).
   if (value.countries !== undefined && !(Array.isArray(value.countries) && value.countries.length > 0 && value.countries.every((c) => typeof c === "string" && isWorldCountry(c)))) return false;
   // The National League's clubs (absent from saves from before it: upgradeWorld adds it).

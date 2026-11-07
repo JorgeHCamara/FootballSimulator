@@ -56,6 +56,21 @@ const count = (list: string[], ...notes: string[]) => list.filter((n) => notes.i
 const divisionOf = (world: World) => new Map(world.divisions.flatMap((d) => d.clubs.map((id) => [id, d.code] as const)));
 /** A club that wins every game it plays (for walking a club up the pyramid). */
 const unbeatable = (world: World, id: number): World => ({ ...world, ratings: { ...world.ratings, [id]: [8, 0.1] } });
+const logQuality = (world: World, id: number) => Math.log(world.ratings[id]![0] / world.ratings[id]![1]);
+/** The world with every club's rating and level k times as far from average, in log terms. */
+const stretched = (world: World, k: number): World => {
+  const scale = (r: Record<number, [number, number]>) => Object.fromEntries(Object.entries(r).map(([id, [a, d]]) => [id, [a ** k, d ** k] as [number, number]]));
+  return { ...world, ratings: scale(world.ratings), levels: scale(world.levels) };
+};
+const logLevel = (world: World, id: number) => Math.log(world.levels[id]![0] / world.levels[id]![1]);
+const correlation = (pairs: number[][]) => {
+  const mean = (k: 0 | 1) => pairs.reduce((s, p) => s + p[k]!, 0) / pairs.length;
+  const [mx, my] = [mean(0), mean(1)];
+  const cov = pairs.reduce((s, p) => s + (p[0]! - mx) * (p[1]! - my), 0);
+  const vx = pairs.reduce((s, p) => s + (p[0]! - mx) ** 2, 0);
+  const vy = pairs.reduce((s, p) => s + (p[1]! - my) ** 2, 0);
+  return cov / Math.sqrt(vx * vy);
+};
 
 describe("My World: the pyramid", () => {
   it("moves the clubs the league configs say: 3 between the Premier League and the Championship, 3 below that, 4 between League One and League Two, 2 out of League Two", () => {
@@ -97,6 +112,11 @@ describe("My World: a new world", () => {
     // The live ratings.
     const first = pack.leagues[0]!.teams[0]!;
     assert.deepEqual(world.ratings[1], pack.leagues[0]!.model.strengths[first.id]);
+    // Each club's level starts as its rating (its own copy).
+    assert.deepEqual(world.levels, world.ratings);
+    assert.notEqual(world.levels[1], world.ratings[1]);
+    const { levels: _l, ...unlevelled } = world;
+    assert.deepEqual(upgradeWorld(unlevelled as World).levels, world.ratings, "a world from before the levels starts them from the ratings");
     assert.equal(world.history.length, 0);
     assert.throws(() => createWorld(pack, { league: "PL", club: -1 }), /isn't in that league/);
     // The world's countries, as chosen at setup: the club's own by default, and always among them.
@@ -204,6 +224,37 @@ describe("My World: a season", () => {
     }
     // Every division averages 1 (geometric mean).
     for (const d of after.divisions) assert.ok(Math.abs(mean(d.clubs, 0) - 1) < 0.01, d.code);
+    // Every club's level too, kept for the clubs that went down to the National League.
+    for (const d of after.divisions) for (const id of d.clubs) assert.ok(after.levels[id], `${d.code}: ${id} has a level`);
+    for (const id of season.out) assert.deepEqual(after.levels[id], start().levels[id], "a club that left keeps its level");
+    // A season moves a club's level a little, never resets it: the levels after it stand in the order they stood before.
+    const division = divisionOf(start());
+    const pairs = after.divisions.flatMap((d) => d.clubs.filter((id) => division.get(id) === d.code).map((id) => [logLevel(start(), id), logLevel(after, id)]));
+    assert.ok(correlation(pairs) > 0.9, `correlation ${correlation(pairs).toFixed(2)}`);
+  });
+
+  it("ten seasons on, the clubs still stand where they started: a club that keeps winning becomes a better club, and the top clubs stay top clubs", () => {
+    // The three countries, their ratings stretched to a real spread (the sample's live ratings sit close to average).
+    const first = stretched(createWorld(pack, { league: "EL2", club: pack.leagues[3]!.teams[0]!.id, countries: ["ENG", "ESP", "GER"] }, 7, NOW), 2);
+    let world = first;
+    const topClub = [...first.divisions[0]!.clubs].sort((a, b) => logQuality(first, b) - logQuality(first, a))[0]!;
+    // The Premier League's best-rated club is made to win every game for three seasons: its level rises season after season.
+    let level = logLevel(world, topClub);
+    for (let i = 0; i < 3; i++) {
+      world = startNextSeason(playSeason(unbeatable(world, topClub)));
+      assert.ok(logLevel(world, topClub) > level, `season ${i + 1}: a better club`);
+      level = logLevel(world, topClub);
+    }
+    for (let i = 3; i < 10; i++) world = startNextSeason(playSeason(world));
+    // Ten seasons on, the clubs still in their first division stand in much the same order as they started (under the
+    // real starting ratings' rule, 75% of the difference from average kept each season, next to nothing was left of it).
+    const division = divisionOf(first);
+    const pairs = world.divisions.flatMap((d) => d.clubs.filter((id) => division.get(id) === d.code).map((id) => [logLevel(first, id), logLevel(world, id)]));
+    assert.ok(pairs.length > 80, `${pairs.length} clubs still in their first division`);
+    assert.ok(correlation(pairs) > 0.6, `correlation ${correlation(pairs).toFixed(2)}`);
+    // The three best-rated Premier League clubs at the start are still in it.
+    const top3 = [...first.divisions[0]!.clubs].sort((a, b) => logQuality(first, b) - logQuality(first, a)).slice(0, 3);
+    for (const id of top3) assert.equal(clubDivision(world, id), "PL", `${first.clubs[id]!.name} still in the Premier League`);
   });
 
   it("the same world plays out the same way; another world differently", () => {
