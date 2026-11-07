@@ -22,7 +22,8 @@ import {
   neighbours,
   packReady,
   playSeason,
-  seasonLabel,
+  seasonLabelFor,
+  worldSeasonLabel,
   seasonMoves,
   seasonStates,
   startNextSeason,
@@ -142,7 +143,7 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
   const ready = WORLD_COUNTRIES.some(available);
   const name = (code: string) => t(isWorldCup(code) ? `cups.${code}.name` : `leagues.${code}.name`);
   const leagues = worldDivisions(countries);
-  const season = leagues[0] ? seasonLabel(pack.leagues.find((l) => l.code === leagues[0])?.year ?? NaN) : "";
+  const season = leagues[0] ? seasonLabelFor(countries, pack.leagues.find((l) => l.code === leagues[0])?.year ?? NaN) : "";
   const clubs = league ? (pack.leagues.find((l) => l.code === league)?.teams ?? []) : [];
   const chosen = clubs.find((c) => c.id === club);
   const createRef = useRef<HTMLDivElement>(null);
@@ -347,7 +348,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const mine = states.find((s) => s.code === myDivision);
   const myRow = mine?.rows.find((r) => r.teamId === world.userClub);
   const firstSeason = world.divisions.some((d) => d.games);
-  const season = seasonLabel(world.year);
+  const season = worldSeasonLabel(world, world.year);
   // Games left to play in each league (play-offs included) and each cup, by country; the next season once there are none.
   const left = world.countries.map((c) => {
     const items = [
@@ -362,7 +363,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const playedShare = (games: number, total: number) => (total > 0 ? Math.min(1, Math.max(0, 1 - games / total)) : 1);
   const done = states.every((s) => s.done) && cups.every((c) => c.done);
   const lowerOf = (c: WorldCountry) => ({ lower: t(`leagues.${LOWER_LEAGUE[c]}.the`), back: t(`leagues.${COUNTRY_LEAGUES[c].at(-1)!}.name`) });
-  const shownSeason = seasonLabel(year);
+  const shownSeason = worldSeasonLabel(world, year);
   /** A competition's name: a league's or a cup's. */
   const name = (code: DivisionCode | WorldCupCode) => t(isWorldCup(code) ? `cups.${code}.name` : `leagues.${code}.name`);
 
@@ -507,8 +508,8 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
           <Icon name="info" size={18} className="mt-0.5 shrink-0 text-pitch-700" />
           {/* A season in the league below, then back up; or (a world from before the National League) gone for good. */}
           {world.nationalLeague.includes(me.id)
-            ? t("outNotice", { club: me.name, season: seasonLabel(me.left), ...lowerOf(clubCountry(me)) })
-            : t("goneNotice", { club: me.name, season: seasonLabel(me.left) })}
+            ? t("outNotice", { club: me.name, season: worldSeasonLabel(world, me.left), ...lowerOf(clubCountry(me)) })
+            : t("goneNotice", { club: me.name, season: worldSeasonLabel(world, me.left) })}
         </p>
       )}
 
@@ -648,7 +649,7 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
     <section className={`${card} space-y-4 border-pitch-600/40`} data-testid="world-review" data-note={note}>
       <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight">
         <Icon name="trophy" size={22} className="text-amber-500" />
-        {t("review.title", { season: seasonLabel(record.year) })}
+        {t("review.title", { season: worldSeasonLabel(world, record.year) })}
       </h2>
       {headline && (
         <p className={`rounded-lg p-3 text-sm font-semibold ${good ? "bg-pitch-50 text-pitch-800 dark:bg-pitch-900/40 dark:text-pitch-100" : note === "R" ? "bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200" : "bg-zinc-50 dark:bg-zinc-800"}`} data-testid="world-review-headline">
@@ -810,7 +811,7 @@ function Path({ world, locale }: { world: World; locale: SiteLocale }) {
             const place = s.position === null ? "–" : ordinal(s.position, locale);
             return (
               <li key={s.year} className="flex items-center gap-3 px-3 py-2.5 text-sm" data-testid="world-path-step" data-league={s.code} data-move={s.move} data-outcome={s.outcome}>
-                <span className="w-16 shrink-0 font-semibold tabular-nums">{seasonLabel(s.year)}</span>
+                <span className="w-16 shrink-0 font-semibold tabular-nums">{worldSeasonLabel(world, s.year)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="flex min-w-0 items-center gap-1.5">
                     <span className="truncate">{t(`leagues.${s.code}.name`)}</span>

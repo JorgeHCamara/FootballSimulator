@@ -72,6 +72,14 @@ const isSavedCup = (value: unknown, clubs: Record<string, unknown>) =>
       value.rounds.every((r) => Array.isArray(r) && r.length === 2 && typeof r[0] === "string" && (r[1] === 1 || r[1] === 2)) &&
       isPackedCupTies(value.ties, value.clubs.length, value.rounds.length)));
 
+/** Série C's first-phase groups (from 2028): two lists of its clubs, every one in exactly one. */
+const isGroups = (value: unknown, clubs: unknown[]) =>
+  value === undefined ||
+  (Array.isArray(value) &&
+    value.length === 2 &&
+    value.every((g) => Array.isArray(g) && g.every((id) => clubs.includes(id))) &&
+    value.reduce((n: number, g: unknown[]) => n + g.length, 0) === clubs.length);
+
 /** The parts a page needs to show a world, checked: anything else counts as unreadable. */
 export function isWorld(value: unknown): value is World {
   if (!isRecord(value) || value.version !== WORLD_VERSION || value.pyramid !== "ENG") return false;
@@ -106,7 +114,7 @@ export function isWorld(value: unknown): value is World {
   if (!isRecord(clubs[String(value.userClub)])) return false;
   // The divisions of the world's countries (England's for a save from before the choice), in order.
   const expected = worldDivisions((value.countries as WorldCountry[] | undefined) ?? ["ENG"]);
-  if (divisions.length !== expected.length || !divisions.every((d, i) => isRecord(d) && d.code === expected[i] && Array.isArray(d.clubs) && d.clubs.every((id) => isRecord(clubs[String(id)])) && isScores(d.scores) && (d.calendar === undefined || d.calendar === 2))) return false;
+  if (divisions.length !== expected.length || !divisions.every((d, i) => isRecord(d) && d.code === expected[i] && Array.isArray(d.clubs) && d.clubs.every((id) => isRecord(clubs[String(id)])) && isScores(d.scores) && (d.calendar === undefined || d.calendar === 2) && isGroups(d.groups, d.clubs))) return false;
   if (!expected.every((code) => isRecord(params[code]) && isNumber(params[code].avgHomeGoals) && isNumber(params[code].avgAwayGoals))) return false;
   return history.every(
     (s) =>

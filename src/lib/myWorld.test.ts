@@ -40,6 +40,8 @@ import {
   simulatePlayoffs,
   startNextSeason,
   upgradeWorld,
+  divisionTeams,
+  worldSeasonLabel,
   type DivisionCode,
   type StartPack,
   type World,
@@ -1068,5 +1070,102 @@ describe("My World: Italy", () => {
     assert.equal(played.history[0]!.divisions.length, 10);
     assert.equal(played.history[0]!.out.filter((id) => played.clubs[id]!.country === "ITA").length, 4);
     assert.equal(played.history[0]!.in.filter((id) => played.clubs[id]!.country === "ITA").length, 4);
+  });
+});
+
+describe("My World: Brazil", () => {
+  const NOW = new Date("2026-11-06T12:00:00Z");
+  let world: World;
+  let seasons: World[];
+  before(() => {
+    const bsb = pack.leagues.find((l) => l.code === "BSB")!;
+    world = createWorld(pack, { league: "BSB", club: bsb.teams[1]!.id, countries: ["BRA"] }, 41, NOW);
+    seasons = [world];
+    for (let i = 0; i < 3; i++) seasons.push(startNextSeason(playSeason(seasons.at(-1)!)));
+  });
+
+  it("four each way between Série A and B, four between B and C (Série B's two play-off winners among them), Série C's relegated two a season to 2027 and six from 2028", () => {
+    assert.deepEqual(movementCounts("BRA", 2026), [
+      { up: 0, down: 4 },
+      { up: 4, down: 4 },
+      { up: 4, down: 2 },
+    ]);
+    assert.deepEqual(movementCounts("BRA", 2028).at(-1), { up: 4, down: 6 });
+    assert.equal(worldSeasonLabel(world, 2026), "2026", "Brazil's seasons are calendar years");
+    assert.equal(worldSeasonLabel({ countries: ["ENG", "BRA"] }, 2026), "2026/27");
+    assert.deepEqual([2026, 2027, 2028].map((y) => divisionTeams("BSC", y)), [20, 24, 28]);
+  });
+
+  it("a world of Brazil alone: its three leagues and the Copa do Brasil, the real Série C 2026 already played, fourteen real Série D clubs below", () => {
+    assert.deepEqual(world.divisions.map((d) => [d.code, d.clubs.length]), [["BSA", 20], ["BSB", 20], ["BSC", 20]]);
+    assert.deepEqual(world.cups.map((c) => c.code), ["CDB"]);
+    assert.deepEqual(world.nationalLeague.map((id) => world.clubs[id]!.name).slice(0, 6), ["ABC", "ASA", "Gama", "Goiatuba", "Nacional-AM", "Uberlândia"]);
+    assert.equal(world.nationalLeague.length, 14);
+    assert.ok(world.nationalLeague.every((id) => world.clubs[id]!.country === "BRA" && world.clubs[id]!.origin === "real"));
+    // No Série C club twice: the cup's own data names them under other ids.
+    const serieC = new Set(world.divisions.find((d) => d.code === "BSC")!.clubs.map((id) => world.clubs[id]!.name));
+    assert.ok(world.cupPool.every((id) => !serieC.has(world.clubs[id]!.name)));
+    const bsc = divisionState(world, "BSC");
+    assert.ok(bsc.split);
+    assert.equal(bsc.split.firstComplete, true);
+    assert.equal(bsc.split.members?.length, 2);
+    assert.equal(bsc.done, true, "the real season, final included");
+    assert.equal(gamesLeft(bsc), 0);
+  });
+
+  it("season after season: Série C grows to 24 then 28 clubs (two groups of 14 from 2028), the leagues' sizes hold, and no fictional club is made", () => {
+    assert.deepEqual(seasons.map((w) => w.divisions.map((d) => d.clubs.length)), [[20, 20, 20], [20, 20, 24], [20, 20, 28], [20, 20, 28]]);
+    assert.deepEqual(seasons.map((w) => w.divisions[2]!.groups?.map((g) => g.length) ?? null), [null, null, [14, 14], [14, 14]]);
+    assert.equal(seasons.at(-1)!.newClubs, 0);
+    const history = seasons.at(-1)!.history;
+    assert.deepEqual(history.map((s) => [s.out.length, s.in.length]), [[2, 6], [2, 6], [6, 6]]);
+    // The clubs relegated in 2026 come back after a season, with four more from Série D.
+    assert.ok(history[0]!.out.every((id) => history[1]!.in.includes(id)));
+    for (const s of history) {
+      const notes = (code: string) => s.divisions.find((d) => d.code === code)!.rows.map((r) => r[8]);
+      assert.equal(count(notes("BSA"), "R"), 4);
+      assert.equal(count(notes("BSB"), "C", "P", "W"), 4, "two up directly, the play-off's two semi-final winners");
+      assert.equal(count(notes("BSB"), "W"), 2);
+      assert.equal(count(notes("BSC"), "C"), 1);
+      assert.equal(count(notes("BSC"), "C", "P"), 4);
+      assert.equal(count(notes("BSC"), "O"), 4, "the rest of the second phase");
+      assert.equal(count(notes("BSC"), "R"), s.out.length);
+      assert.ok(s.divisions.find((d) => d.code === "BSC")!.final, "the final");
+      assert.deepEqual(s.cups?.map((c) => c.code), ["CDB"]);
+    }
+  });
+
+  it("a generated Série C season: the first phase, then the second phase's groups once it's complete (places standing in before), the final last; Simulate rest plays it all", () => {
+    const w = seasons[1]!;
+    const state = divisionState(w, "BSC");
+    assert.equal(state.split!.format.clubs, 24);
+    assert.equal(state.fixtures.length, 276 + 24);
+    assert.equal(gamesLeft(state), 276 + 24 + 2);
+    assert.ok(state.fixtures.filter((f) => f.homeId < 0).length === 24, "the second phase's places");
+    assert.equal(state.playoffKnown, false);
+    const done = simulateRest(w, "BSC", createRng(5));
+    const after = divisionState(done, "BSC");
+    assert.equal(after.done, true);
+    assert.equal(gamesLeft(after), 0);
+    assert.ok(after.fixtures.every((f) => f.homeId > 0));
+    assert.equal(after.bracket[0]![0]!.legs.length, 2);
+    // A first-phase result that changes the groups clears the second-phase scores of the games no longer in them.
+    const rows = after.split!.firstTables[0]!;
+    const [eighth, ninth] = [rows[7]!.teamId, rows[8]!.teamId];
+    const game = after.split!.firstFixtures.find((f) => (f.homeId === ninth && f.awayId === eighth) || (f.homeId === eighth && f.awayId === ninth))!;
+    const changed = divisionState(setScore(done, "BSC", game, game.homeId === ninth ? { home: 9, away: 0 } : { home: 0, away: 9 }), "BSC");
+    const games = new Set(changed.fixtures.map((f) => f.id));
+    assert.ok(Object.keys(changed.picks).map(Number).every((id) => id > 0 || games.has(id)), "no score for a game no longer played");
+  });
+
+  it("past seasons: Série C's final classification and its final, its second phase's games by group round", () => {
+    const w = seasons.at(-1)!;
+    const past = pastDivision(w, 2027, "BSC")!;
+    assert.equal(past.rows.length, 24);
+    assert.equal(past.rows[0]!.note, "C");
+    assert.equal(past.bracket.length, 1);
+    assert.ok(past.bracket[0]![0]!.legs.every((leg) => leg.result));
+    assert.ok(past.fixtures!.some((f) => f.matchday > 1000), "the second phase's rounds");
+    assert.equal(past.fixtures!.length, 300);
   });
 });

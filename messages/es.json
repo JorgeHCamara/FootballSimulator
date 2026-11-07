@@ -1269,10 +1269,10 @@
     "comingSoon": "Historial real próximamente"
   },
   "World": {
-    "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés, español, alemán o italiano",
-    "metaDescription": "Elige un club de Inglaterra, España, Alemania o Italia y juega temporada tras temporada de sus ligas y copas, con playoffs, ascensos y descensos. Guardado en tu navegador, con las tablas de todas las temporadas.",
+    "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés, español, alemán, italiano o brasileño",
+    "metaDescription": "Elige un club de Inglaterra, España, Alemania, Italia o Brasil y juega temporada tras temporada de sus ligas y copas, con playoffs, ascensos y descensos. Guardado en tu navegador, con las tablas de todas las temporadas.",
     "title": "Mi mundo",
-    "intro": "Elige tus países y un club, y juega temporada tras temporada de la pirámide inglesa (de la Premier League a la League Two, la FA Cup y la Copa de la Liga), de la española (LaLiga, la Segunda División y la Copa del Rey), de la alemana (Bundesliga, 2. Bundesliga y DFB-Pokal), de la italiana (Serie A, Serie B y Coppa Italia) o de todas juntas, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
+    "intro": "Elige tus países y un club, y juega temporada tras temporada de la pirámide inglesa (de la Premier League a la League Two, la FA Cup y la Copa de la Liga), de la española (LaLiga, la Segunda División y la Copa del Rey), de la alemana (Bundesliga, 2. Bundesliga y DFB-Pokal), de la italiana (Serie A, Serie B y Coppa Italia), de la brasileña (Série A, Série B, Série C y Copa do Brasil) o de todas juntas, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
     "savedNote": "Tu mundo se guarda solo en este navegador.",
     "notSaved": "Este navegador no está guardando tu mundo (navegación privada o almacenamiento lleno): se perderá cuando salgas de la página.",
     "reset": {
@@ -1353,6 +1353,26 @@
         "name": "Serie C",
         "the": "la Serie C",
         "in": "en la Serie C"
+      },
+      "BSA": {
+        "name": "Série A",
+        "the": "la Série A",
+        "in": "en la Série A"
+      },
+      "BSB": {
+        "name": "Série B",
+        "the": "la Série B",
+        "in": "en la Série B"
+      },
+      "BSC": {
+        "name": "Série C",
+        "the": "la Série C",
+        "in": "en la Série C"
+      },
+      "BSD": {
+        "name": "Série D",
+        "the": "la Série D",
+        "in": "en la Série D"
       }
     },
     "cups": {
@@ -1380,13 +1400,19 @@
         "name": "Coppa Italia",
         "the": "la Coppa Italia",
         "in": "en la Coppa Italia"
+      },
+      "CDB": {
+        "name": "Copa do Brasil",
+        "the": "la Copa do Brasil",
+        "in": "en la Copa do Brasil"
       }
     },
     "countries": {
       "ENG": "Inglaterra",
       "ESP": "España",
       "GER": "Alemania",
-      "ITA": "Italia"
+      "ITA": "Italia",
+      "BRA": "Brasil"
     },
     "setup": {
       "title": "Crea tu mundo",
@@ -1505,6 +1531,16 @@
     "homeTitle": "Mi mundo",
     "homeBody": "Lleva a un club de la League Two hasta la Premier League, temporada tras temporada, con ascensos, descensos y playoffs.",
     "homeCta": "Empezar tu mundo",
-    "playOutCancelled": "Sin playout esta temporada: {lower} terminó {gap} puntos o más por detrás de {upper} y baja directamente."
+    "playOutCancelled": "Sin playout esta temporada: {lower} terminó {gap} puntos o más por detrás de {upper} y baja directamente.",
+    "serieC": {
+      "firstStage": "Primera fase",
+      "group": "Grupo {group}",
+      "promotionGroup": "Cuadrangular {group}",
+      "round": "{group}, jornada {round}",
+      "slot": "{place} del Grupo {group}",
+      "classification": "Clasificación final",
+      "secondPending": "Los dos grupos de cuatro de la segunda fase (1.º, 4.º, 5.º y 8.º; 2.º, 3.º, 6.º y 7.º) salen de la tabla de la primera fase cuando termine.",
+      "secondPendingGroups": "Los cuatro primeros de cada grupo juegan un cuadrangular de ascenso cuando termine la primera fase."
+    }
   }
 }
