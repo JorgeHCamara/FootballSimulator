@@ -1259,6 +1259,7 @@
     "all": "All",
     "era": "{name} ({from}–{to})",
     "eraOpen": "{name} ({from}–)",
+    "eraYear": "{name} ({year})",
     "decade": "{decade}s",
     "search": "Search for a club",
     "noMatches": "No season matches.",

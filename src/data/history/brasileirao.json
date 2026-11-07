@@ -1,0 +1,2437 @@
+{
+  "league": "Brasileirão Série A",
+  "footsimuSlug": "brasileirao",
+  "footsimuCode": "BSA",
+  "country": "Brazil",
+  "scope": "Brazilian champions as recognised by the CBF: 1937 Torneio dos Campeões (recognised August 2023), Taça Brasil 1959-1968 and Torneio Roberto Gomes Pedrosa 1967-1970 (unified December 2010), and the national championship / Série A from 1971 (incl. the 2000 Copa João Havelange). No national championship existed 1938-1958, so those years have no rows. 1967 and 1968 each have two rows (tournament = \"Taça Brasil\" / \"Torneio Roberto Gomes Pedrosa\"). Calendar-year seasons through 2025",
+  "source": [
+    "https://en.wikipedia.org/wiki/List_of_Brazilian_football_champions (revision 1376696116; champion, runner-up, third)",
+    "https://pt.wikipedia.org/wiki/Lista_de_campeões_do_Campeonato_Brasileiro_de_Futebol (revision 72725003; champion, runner-up, third, title counts)",
+    "https://www.rsssf.org/tablesb/brazchamp.html (RSSSF champions and runners-up, 1937-2025)",
+    "Wikipedia season articles (YYYY Campeonato Brasileiro Série A) league tables (cross-check, points 2003-2025)",
+    "https://site.api.espn.com/apis/v2/sports/soccer/bra.1/standings?season=YYYY (2003-2025 league-format seasons, cross-check)"
+  ],
+  "retrievedAt": "2026-11-07T01:53:05+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id (the id FootSimu uses); present for some clubs not in FootSimu leagues",
+    "footsimuSlug": "club page slug on footsimu.com, only for clubs in a FootSimu league in 2026-27",
+    "footsimuPath": "club page path under the league the club plays in now, without locale",
+    "points": "final points (3 per win); only for round-robin seasons (1937 and 2003 onward); null for cup/play-off formats",
+    "name": "club name used in the source for that season",
+    "currentName": "club as known today (FootSimu name where available)",
+    "tournament": "\"Taça Brasil\" or \"Torneio Roberto Gomes Pedrosa\" for the two parallel championships of 1967 and 1968; null otherwise",
+    "competition": "name of the national championship that year",
+    "tiedWith": "not used",
+    "strippedChampion": "not used; the 1987 dispute is documented in notes (official champion Sport Recife)"
+  },
+  "seasons": [
+    {
+      "season": "1937",
+      "startYear": 1937,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Torneio dos Campeões",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": 9
+      },
+      "runnerUp": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": 6
+      },
+      "third": {
+        "name": "Rio Branco",
+        "currentName": "Rio Branco-ES",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 5
+      },
+      "notes": [
+        "Torneio dos Campeões (Copa dos Campeões Estaduais): four state champions in a round robin; recognised by the CBF as a Brazilian championship in August 2023"
+      ]
+    },
+    {
+      "season": "1959",
+      "startYear": 1959,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Bahia",
+        "currentName": "Bahia",
+        "footsimuId": 9967,
+        "footsimuSlug": "bahia",
+        "footsimuPath": "/brasileirao/team/bahia",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "third": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)"
+      ]
+    },
+    {
+      "season": "1960",
+      "startYear": 1960,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Fortaleza",
+        "currentName": "Fortaleza",
+        "footsimuId": 6272,
+        "footsimuSlug": "fortaleza",
+        "footsimuPath": "/brasileirao-serie-b/team/fortaleza",
+        "points": null
+      },
+      "third": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)"
+      ]
+    },
+    {
+      "season": "1961",
+      "startYear": 1961,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Bahia",
+        "currentName": "Bahia",
+        "footsimuId": 9967,
+        "footsimuSlug": "bahia",
+        "footsimuPath": "/brasileirao/team/bahia",
+        "points": null
+      },
+      "third": {
+        "name": "America",
+        "currentName": "America-RJ",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)"
+      ]
+    },
+    {
+      "season": "1962",
+      "startYear": 1962,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": null
+      },
+      "third": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)"
+      ]
+    },
+    {
+      "season": "1963",
+      "startYear": 1963,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Bahia",
+        "currentName": "Bahia",
+        "footsimuId": 9967,
+        "footsimuSlug": "bahia",
+        "footsimuPath": "/brasileirao/team/bahia",
+        "points": null
+      },
+      "third": null,
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)",
+        "No official third place: the English Wikipedia list gives Botafogo and pt.wikipedia gives Grêmio (both losing semi-finalists); left null"
+      ]
+    },
+    {
+      "season": "1964",
+      "startYear": 1964,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": null
+      },
+      "third": {
+        "name": "Ceará",
+        "currentName": "Ceará",
+        "footsimuId": 9969,
+        "footsimuSlug": "ceara",
+        "footsimuPath": "/brasileirao-serie-b/team/ceara",
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)"
+      ]
+    },
+    {
+      "season": "1965",
+      "startYear": 1965,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "third": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)"
+      ]
+    },
+    {
+      "season": "1966",
+      "startYear": 1966,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "third": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)"
+      ]
+    },
+    {
+      "season": "1967",
+      "startYear": 1967,
+      "tournament": "Torneio Roberto Gomes Pedrosa",
+      "status": "completed",
+      "competition": "Torneio Roberto Gomes Pedrosa",
+      "format": "playoff",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "third": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "notes": [
+        "Torneio Roberto Gomes Pedrosa (\"Robertão\"): group stage followed by a four-team final round robin; CBF recognised its titles as Brazilian championships in December 2010; places are from the final group",
+        "Two national championships recognised by the CBF this year (Taça Brasil and Torneio Roberto Gomes Pedrosa); each is a separate row distinguished by the tournament field"
+      ]
+    },
+    {
+      "season": "1967",
+      "startYear": 1967,
+      "tournament": "Taça Brasil",
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": null
+      },
+      "third": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)",
+        "Two national championships recognised by the CBF this year (Taça Brasil and Torneio Roberto Gomes Pedrosa); each is a separate row distinguished by the tournament field"
+      ]
+    },
+    {
+      "season": "1968",
+      "startYear": 1968,
+      "tournament": "Torneio Roberto Gomes Pedrosa",
+      "status": "completed",
+      "competition": "Torneio Roberto Gomes Pedrosa",
+      "format": "playoff",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "third": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "notes": [
+        "Torneio Roberto Gomes Pedrosa (\"Robertão\"): group stage followed by a four-team final round robin; CBF recognised its titles as Brazilian championships in December 2010; places are from the final group",
+        "Two national championships recognised by the CBF this year (Taça Brasil and Torneio Roberto Gomes Pedrosa); each is a separate row distinguished by the tournament field"
+      ]
+    },
+    {
+      "season": "1968",
+      "startYear": 1968,
+      "tournament": "Taça Brasil",
+      "status": "completed",
+      "competition": "Taça Brasil",
+      "format": "final",
+      "champion": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Fortaleza",
+        "currentName": "Fortaleza",
+        "footsimuId": 6272,
+        "footsimuSlug": "fortaleza",
+        "footsimuPath": "/brasileirao-serie-b/team/fortaleza",
+        "points": null
+      },
+      "third": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "notes": [
+        "Taça Brasil: knockout cup between state champions, decided by a final; CBF recognised its titles as Brazilian championships in December 2010. Third place is the better-ranked losing semi-finalist as listed by the sources (no third-place match)",
+        "Two national championships recognised by the CBF this year (Taça Brasil and Torneio Roberto Gomes Pedrosa); each is a separate row distinguished by the tournament field"
+      ]
+    },
+    {
+      "season": "1969",
+      "startYear": 1969,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Torneio Roberto Gomes Pedrosa",
+      "format": "playoff",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "third": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "notes": [
+        "Torneio Roberto Gomes Pedrosa (\"Robertão\"): group stage followed by a four-team final round robin; CBF recognised its titles as Brazilian championships in December 2010; places are from the final group"
+      ]
+    },
+    {
+      "season": "1970",
+      "startYear": 1970,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Torneio Roberto Gomes Pedrosa",
+      "format": "playoff",
+      "champion": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "third": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "notes": [
+        "Torneio Roberto Gomes Pedrosa (\"Robertão\"): group stage followed by a four-team final round robin; CBF recognised its titles as Brazilian championships in December 2010; places are from the final group"
+      ]
+    },
+    {
+      "season": "1971",
+      "startYear": 1971,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Nacional de Clubes",
+      "format": "playoff",
+      "champion": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": null
+      },
+      "third": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1972",
+      "startYear": 1972,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Nacional de Clubes",
+      "format": "playoff",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": null
+      },
+      "third": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1973",
+      "startYear": 1973,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Nacional de Clubes",
+      "format": "playoff",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": null
+      },
+      "third": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1974",
+      "startYear": 1974,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Nacional de Clubes",
+      "format": "playoff",
+      "champion": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "third": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1975",
+      "startYear": 1975,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "third": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1976",
+      "startYear": 1976,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "third": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1977",
+      "startYear": 1977,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "third": {
+        "name": "Operário",
+        "currentName": "Operário-PR",
+        "footsimuId": 18187,
+        "footsimuSlug": "operario-pr",
+        "footsimuPath": "/brasileirao-serie-b/team/operario-pr",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1978",
+      "startYear": 1978,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "third": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1979",
+      "startYear": 1979,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "third": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1980",
+      "startYear": 1980,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça de Ouro",
+      "format": "playoff",
+      "champion": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "third": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1981",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça de Ouro",
+      "format": "playoff",
+      "champion": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": null
+      },
+      "third": {
+        "name": "Ponte Preta",
+        "currentName": "Ponte Preta",
+        "footsimuId": 3459,
+        "footsimuSlug": "ponte-preta",
+        "footsimuPath": "/brasileirao-serie-b/team/ponte-preta",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1982",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça de Ouro",
+      "format": "playoff",
+      "champion": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "third": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1983",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça de Ouro",
+      "format": "playoff",
+      "champion": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "third": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1984",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "third": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1985",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Taça de Ouro",
+      "format": "playoff",
+      "champion": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Bangu",
+        "currentName": "Bangu",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Brasil de Pelotas",
+        "currentName": "Brasil de Pelotas",
+        "footsimuId": 17134,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1986",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": null
+      },
+      "third": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1987",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "Sport Recife",
+        "currentName": "Sport",
+        "footsimuId": 7635,
+        "footsimuSlug": "sport",
+        "footsimuPath": "/brasileirao-serie-b/team/sport",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": null
+      },
+      "third": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)",
+        "Disputed title: the CBF and the 2017 Supreme Federal Court (STF) ruling recognise Sport Recife as the sole 1987 champion (the CBF scheduled a final quadrangular between the top two of the Green and Yellow Modules; Flamengo and Internacional refused to play, and Sport beat Guarani in the remaining matches). Flamengo won the Copa União (Green Module, organised by Clube dos Treze, runner-up Internacional) and still claims the title; the CBF briefly recognised both in 2011 before the courts restored Sport as sole champion. Runner-up Guarani; third Flamengo per the official classification"
+      ]
+    },
+    {
+      "season": "1988",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
+        "name": "Bahia",
+        "currentName": "Bahia",
+        "footsimuId": 9967,
+        "footsimuSlug": "bahia",
+        "footsimuPath": "/brasileirao/team/bahia",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "third": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": null
+      },
+      "notes": [
+        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1989",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": null
+      },
+      "third": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1990",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": null
+      },
+      "third": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1991",
+      "startYear": 1991,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Bragantino",
+        "currentName": "Red Bull Bragantino",
+        "footsimuId": 6079,
+        "footsimuSlug": "red-bull-bragantino",
+        "footsimuPath": "/brasileirao/team/red-bull-bragantino",
+        "points": null
+      },
+      "third": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1992",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": null
+      },
+      "third": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1993",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Vitória",
+        "currentName": "Vitória",
+        "footsimuId": 3457,
+        "footsimuSlug": "vitoria",
+        "footsimuPath": "/brasileirao/team/vitoria",
+        "points": null
+      },
+      "third": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1994",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "third": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1995",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "third": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1996",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Portuguesa",
+        "currentName": "Portuguesa",
+        "footsimuId": 4773,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1997",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "third": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1998",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "third": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "1999",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": null
+      },
+      "third": {
+        "name": "Vitória",
+        "currentName": "Vitória",
+        "footsimuId": 3457,
+        "footsimuSlug": "vitoria",
+        "footsimuPath": "/brasileirao/team/vitoria",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "2000",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Copa João Havelange",
+      "format": "playoff",
+      "champion": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "São Caetano",
+        "currentName": "São Caetano",
+        "footsimuId": 6084,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": null
+      },
+      "notes": [
+        "Copa João Havelange: organised by Clube dos Treze when the CBF could not stage the 2000 championship (SE Gama court case); recognised by the CBF as the 2000 Brazilian championship. Third place per the official final classification",
+        "Played as the Copa João Havelange; the final was replayed after the first second leg was abandoned (São Januário crowd incident)"
+      ]
+    },
+    {
+      "season": "2001",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Atlético Paranaense",
+        "currentName": "Athletico Paranaense",
+        "footsimuId": 3458,
+        "footsimuSlug": "athletico-paranaense",
+        "footsimuPath": "/brasileirao/team/athletico-paranaense",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "São Caetano",
+        "currentName": "São Caetano",
+        "footsimuId": 6084,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "2002",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "playoff",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": null
+      },
+      "third": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "notes": [
+        "Group/league stage followed by knockout play-offs; third place per the official final classification (points not comparable)"
+      ]
+    },
+    {
+      "season": "2003",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": 100
+      },
+      "runnerUp": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": 87
+      },
+      "third": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2004",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": 89
+      },
+      "runnerUp": {
+        "name": "Atlético Paranaense",
+        "currentName": "Athletico Paranaense",
+        "footsimuId": 3458,
+        "footsimuSlug": "athletico-paranaense",
+        "footsimuPath": "/brasileirao/team/athletico-paranaense",
+        "points": 86
+      },
+      "third": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": 82
+      },
+      "notes": []
+    },
+    {
+      "season": "2005",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": 81
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": 78
+      },
+      "third": {
+        "name": "Goiás",
+        "currentName": "Goiás",
+        "footsimuId": 3395,
+        "footsimuSlug": "goias",
+        "footsimuPath": "/brasileirao-serie-b/team/goias",
+        "points": 74
+      },
+      "notes": []
+    },
+    {
+      "season": "2006",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": 78
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": 69
+      },
+      "third": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": 67
+      },
+      "notes": []
+    },
+    {
+      "season": "2007",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": 77
+      },
+      "runnerUp": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": 62
+      },
+      "third": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 61
+      },
+      "notes": [
+        "ESPN standings list Fluminense third; Flamengo and Fluminense finished level on 61 points and Flamengo is third on the first tie-break (wins: 17 v 16), per the season article and pt.wikipedia"
+      ]
+    },
+    {
+      "season": "2008",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": 75
+      },
+      "runnerUp": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": 72
+      },
+      "third": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": 67
+      },
+      "notes": []
+    },
+    {
+      "season": "2009",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 67
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": 65
+      },
+      "third": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": 65
+      },
+      "notes": []
+    },
+    {
+      "season": "2010",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": 71
+      },
+      "runnerUp": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": 69
+      },
+      "third": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": 68
+      },
+      "notes": []
+    },
+    {
+      "season": "2011",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": 71
+      },
+      "runnerUp": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": 69
+      },
+      "third": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "2012",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": 77
+      },
+      "runnerUp": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": 72
+      },
+      "third": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2013",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": 65
+      },
+      "third": {
+        "name": "Atlético Paranaense",
+        "currentName": "Athletico Paranaense",
+        "footsimuId": 3458,
+        "footsimuSlug": "athletico-paranaense",
+        "footsimuPath": "/brasileirao/team/athletico-paranaense",
+        "points": 64
+      },
+      "notes": []
+    },
+    {
+      "season": "2014",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "São Paulo",
+        "currentName": "São Paulo",
+        "footsimuId": 2026,
+        "footsimuSlug": "sao-paulo",
+        "footsimuPath": "/brasileirao/team/sao-paulo",
+        "points": 70
+      },
+      "third": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2015",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": 81
+      },
+      "runnerUp": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": 69
+      },
+      "third": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": 68
+      },
+      "notes": []
+    },
+    {
+      "season": "2016",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": 71
+      },
+      "third": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2017",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 63
+      },
+      "third": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "2018",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 72
+      },
+      "third": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2019",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": 74
+      },
+      "third": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 74
+      },
+      "notes": []
+    },
+    {
+      "season": "2020",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 71
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": 70
+      },
+      "third": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": 68
+      },
+      "notes": [
+        "Season finished in February 2021 because of the COVID-19 pandemic"
+      ]
+    },
+    {
+      "season": "2021",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 71
+      },
+      "third": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 66
+      },
+      "notes": []
+    },
+    {
+      "season": "2022",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 81
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": 73
+      },
+      "third": {
+        "name": "Fluminense",
+        "currentName": "Fluminense",
+        "footsimuId": 3445,
+        "footsimuSlug": "fluminense",
+        "footsimuPath": "/brasileirao/team/fluminense",
+        "points": 70
+      },
+      "notes": []
+    },
+    {
+      "season": "2023",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": 68
+      },
+      "third": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": 66
+      },
+      "notes": []
+    },
+    {
+      "season": "2024",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 73
+      },
+      "third": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 70
+      },
+      "notes": []
+    },
+    {
+      "season": "2025",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série A",
+      "format": "league",
+      "champion": {
+        "name": "Flamengo",
+        "currentName": "Flamengo",
+        "footsimuId": 819,
+        "footsimuSlug": "flamengo",
+        "footsimuPath": "/brasileirao/team/flamengo",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 76
+      },
+      "third": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": 70
+      },
+      "notes": []
+    }
+  ]
+}
