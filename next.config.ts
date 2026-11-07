@@ -20,8 +20,8 @@ const nextConfig: NextConfig = {
     "/*/*": ["./src/data/snapshots/**/*"],
     "/sitemap.xml": ["./src/data/snapshots/**/*"],
     // Leagues whose ratings use xG read it at run time (src/lib/xgStore.ts), on every page that builds their model.
-    // Série C's crests are the site's own files: the card images read them from disk (crestDataUri).
-    "/**": ["./src/data/xg/**/*", "./public/crests/serie-c/**/*"],
+    // The site's own crests (Série C's, the cut-outs, the saved fallbacks): the card images read them from disk (crestDataUri).
+    "/**": ["./src/data/xg/**/*", "./public/crests/**/*"],
   },
   experimental: {
     // Generate all pages in one worker so each league is fetched once per build
