@@ -1269,8 +1269,8 @@
     "comingSoon": "Real history coming soon"
   },
   "World": {
-    "metaTitle": "My World: take your club up the football pyramid, in England, Spain, Germany or Italy",
-    "metaDescription": "Pick a club from England, Spain, Germany or Italy and play season after season of their leagues and cups, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
+    "metaTitle": "My World: take your club up the football pyramid, in England, Spain, Germany, Italy or Brazil",
+    "metaDescription": "Pick a club from England, Spain, Germany, Italy or Brazil and play season after season of their leagues and cups, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
     "hero": {
       "badge": "Game mode",
       "start": "Start your world",
@@ -1370,6 +1370,26 @@
         "name": "Serie C",
         "the": "Serie C",
         "in": "in Serie C"
+      },
+      "BSA": {
+        "name": "Série A",
+        "the": "Série A",
+        "in": "in Série A"
+      },
+      "BSB": {
+        "name": "Série B",
+        "the": "Série B",
+        "in": "in Série B"
+      },
+      "BSC": {
+        "name": "Série C",
+        "the": "Série C",
+        "in": "in Série C"
+      },
+      "BSD": {
+        "name": "Série D",
+        "the": "Série D",
+        "in": "in Série D"
       }
     },
     "cups": {
@@ -1397,13 +1417,19 @@
         "name": "Coppa Italia",
         "the": "the Coppa Italia",
         "in": "in the Coppa Italia"
+      },
+      "CDB": {
+        "name": "Copa do Brasil",
+        "the": "the Copa do Brasil",
+        "in": "in the Copa do Brasil"
       }
     },
     "countries": {
       "ENG": "England",
       "ESP": "Spain",
       "GER": "Germany",
-      "ITA": "Italy"
+      "ITA": "Italy",
+      "BRA": "Brazil"
     },
     "setup": {
       "title": "Create your world",
@@ -1522,6 +1548,16 @@
     "homeTitle": "My World",
     "homeBody": "Pick a club and play season after season, every result your way: leagues, cups, play-offs, promotion and relegation.",
     "homeCta": "Start your world",
-    "playOutCancelled": "No play-out this season: {lower} finished {gap} or more points behind {upper} and go straight down."
+    "playOutCancelled": "No play-out this season: {lower} finished {gap} or more points behind {upper} and go straight down.",
+    "serieC": {
+      "firstStage": "First stage",
+      "group": "Group {group}",
+      "promotionGroup": "Promotion group {group}",
+      "round": "{group}, round {round}",
+      "slot": "{place} in Group {group}",
+      "classification": "Final classification",
+      "secondPending": "The second stage's two groups of four (1st, 4th, 5th and 8th; 2nd, 3rd, 6th and 7th) are drawn from the first stage's table once it's complete.",
+      "secondPendingGroups": "Each group's top four play a promotion group of four once the first stage is complete."
+    }
   }
 }

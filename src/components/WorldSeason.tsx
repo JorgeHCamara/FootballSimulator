@@ -16,7 +16,7 @@ import {
   pyramidPlayoffOf,
   resetDivision,
   rollScore,
-  seasonLabel,
+  worldSeasonLabel,
   setScore,
   simulateMatchday,
   simulatePlayoffs,
@@ -29,6 +29,8 @@ import {
 } from "../lib/myWorld.ts";
 import { isWorldCup, type WorldCupCode } from "../lib/worldCups.ts";
 import { worldWinners } from "../lib/worldWinners.ts";
+import { isSplitDivision, serieCFinalZones, serieCFormat, serieCTables, type SerieCPhase } from "../lib/worldSerieC.ts";
+import { groupOfRound, GROUP_ROUND_BASE } from "../engine/split.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList, PLAYOFF_MATCHDAY, PLAYOUT_MATCHDAY } from "./FixtureList.tsx";
 import { Icon } from "./Icon.tsx";
@@ -57,6 +59,49 @@ export function DivisionTabs({ country, value, onChange, label, testId }: { coun
           {t(isWorldCup(code) ? `cups.${code}.name` : `leagues.${code}.name`)}
         </button>
       ))}
+    </div>
+  );
+}
+
+/** Série C's round names: "Group A, round 1" for the second phase's (its keys from GROUP_ROUND_BASE). */
+function splitRounds(t: ReturnType<typeof useTranslations<"World">>, matchdays: readonly number[], year: number, code: DivisionCode): Record<number, string> | undefined {
+  if (!isSplitDivision(code)) return undefined;
+  const two = serieCFormat(year).groups === 2;
+  const labels: Record<number, string> = {};
+  for (const md of matchdays) {
+    const g = groupOfRound(md);
+    if (g === null) continue;
+    labels[md] = t("serieC.round", { group: t(two ? "serieC.promotionGroup" : "serieC.group", { group: String.fromCharCode(65 + g) }), round: md % GROUP_ROUND_BASE });
+  }
+  return labels;
+}
+
+/** Série C's tables in progress: the first phase (one table or two groups), then the second phase's groups. */
+function SerieCTables({ split, code, world }: { split: SerieCPhase; code: DivisionCode; world: World }) {
+  const t = useTranslations("World");
+  const letter = (g: number | null) => String.fromCharCode(65 + (g ?? 0));
+  return (
+    <div className="space-y-4" data-testid="world-split-tables">
+      {serieCTables(split).map((table) => (
+        <WorldTable
+          key={`${table.kind}-${table.group}`}
+          rows={tableRows(table.rows)}
+          code={code}
+          clubs={world.clubs}
+          highlight={world.userClub}
+          final={false}
+          testId={table.kind === "first" ? "world-table" : "world-group-table"}
+          zones={table.zones}
+          title={
+            table.kind === "first"
+              ? t("serieC.firstStage")
+              : table.kind === "firstGroup"
+                ? t("serieC.group", { group: letter(table.group) })
+                : t(split.format.groups === 2 ? "serieC.promotionGroup" : "serieC.group", { group: letter(table.group) })
+          }
+        />
+      ))}
+      {!split.members && <p className="text-xs text-zinc-500" data-testid="world-split-note">{t(split.format.groups === 2 ? "serieC.secondPendingGroups" : "serieC.secondPending")}</p>}
     </div>
   );
 }
@@ -116,8 +161,8 @@ export function SeasonPicker({ world, year, onYear }: { world: World; year: numb
       label={t("seasonSelect")}
       value={String(year)}
       options={[
-        { value: String(world.year), label: t("seasonCurrent", { season: seasonLabel(world.year) }) },
-        ...[...world.history].reverse().map((s) => ({ value: String(s.year), label: seasonLabel(s.year) })),
+        { value: String(world.year), label: t("seasonCurrent", { season: worldSeasonLabel(world, world.year) }) },
+        ...[...world.history].reverse().map((s) => ({ value: String(s.year), label: worldSeasonLabel(world, s.year) })),
       ]}
       onChange={(y) => onYear(Number(y))}
       testId="world-season-select"
@@ -141,7 +186,15 @@ function PastSeason({ world, year, code }: { world: World; year: number; code: D
   return (
     <>
       <div className="min-w-0 space-y-2 lg:col-span-2 lg:col-start-1 lg:row-start-2">
-        <WorldTable rows={past.rows} code={code} clubs={world.clubs} highlight={world.userClub} final testId="world-past-table" />
+        <WorldTable
+          rows={past.rows}
+          code={code}
+          clubs={world.clubs}
+          highlight={world.userClub}
+          final
+          testId="world-past-table"
+          {...(isSplitDivision(code) ? { zones: serieCFinalZones(year, past.rows.length), title: t("serieC.classification") } : {})}
+        />
         {final && (
           <p className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400" data-testid="world-past-final">
             <Icon name="trophy" size={16} className="shrink-0 text-amber-500" />
@@ -159,6 +212,7 @@ function PastSeason({ world, year, code }: { world: World; year: number; code: D
             matchday={matchday}
             matchdays={matchdays}
             onMatchdayChange={setMatchday}
+            {...(splitRounds(t, matchdays, year, code) ? { roundLabels: splitRounds(t, matchdays, year, code)! } : {})}
             fixtures={past.fixtures.filter((f) => f.matchday === matchday)}
             teams={teams}
             predictions={{}}
@@ -237,8 +291,14 @@ export function WorldSeason({
       const c = world.clubs[r.teamId];
       if (c && !map.has(r.teamId)) map.set(r.teamId, { id: c.id, name: c.name, shortName: c.shortName, tla: c.tla, ...(c.crest ? { crest: c.crest } : {}) });
     }
+    // Série C's second phase before its groups are known: places standing in for the clubs ("1st", "2nd in Group A").
+    for (const [id, slot] of state.split?.slots ?? []) {
+      const place = ordinal(slot.place, locale);
+      const name = slot.group === null ? place : t("serieC.slot", { place, group: String.fromCharCode(65 + slot.group) });
+      map.set(id, { id, name, shortName: name, tla: "" });
+    }
     return map;
-  }, [state.teams, state.playoffRows, world.clubs]);
+  }, [state.teams, state.playoffRows, state.split, world.clubs, locale, t]);
   const matchdays = useMemo(
     () =>
       [...new Set(state.fixtures.map((f) => f.matchday))]
@@ -308,7 +368,11 @@ export function WorldSeason({
     <div className={grid}>
       {picker}
       <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2">
-        <WorldTable rows={tableRows(state.rows)} code={code} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-table" />
+        {state.split ? (
+          <SerieCTables split={state.split} code={code} world={world} />
+        ) : (
+          <WorldTable rows={tableRows(state.rows)} code={code} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-table" />
+        )}
         {playoff?.promotedTo && (
           <PromotedClubs
             bracket={state.bracket}
@@ -318,7 +382,7 @@ export function WorldSeason({
             seasonComplete={state.playoffKnown}
             directPromotion={playoff.directPromotion ?? []}
             promotedTo={playoff.promotedTo}
-            nextSeason={seasonLabel(world.year + 1)}
+            nextSeason={worldSeasonLabel(world, world.year + 1)}
             cancelled={playoffOff}
             {...(playoff.directIfClear ? { clearPosition: playoff.directIfClear.position } : {})}
           />
@@ -349,6 +413,7 @@ export function WorldSeason({
           matchday={matchday}
           matchdays={matchdays}
           onMatchdayChange={onMatchday}
+          {...(splitRounds(t, matchdays, world.year, code) ? { roundLabels: splitRounds(t, matchdays, world.year, code)! } : {})}
           fixtures={games}
           teams={teams}
           predictions={picks}

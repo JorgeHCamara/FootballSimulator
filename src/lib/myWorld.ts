@@ -35,6 +35,7 @@ import {
   neighbours,
   playoutOf,
   pyramidPlayoffOf,
+  seasonLabelFor,
   WORLD_COUNTRIES,
   WORLD_CUPS,
   WORLD_LEAGUES,
@@ -49,8 +50,12 @@ import {
 import { cupConfig, cupPlayable, finishCups, generateCup, outsidersNeeded, type SavedCup, type WorldCupSeason, type WorldCupTie } from "./worldCups.ts";
 import { divisionForm, seasonRng, shuffled, teamOf, worldTierStrength } from "./worldForm.ts";
 import { nextSeason } from "./worldLevels.ts";
+import { isSplitDivision, serieCClassification, serieCFixtures, serieCFormat, serieCGroups, serieCLeagueFixtures, serieCPhase, type SerieCPhase } from "./worldSerieC.ts";
 
 export {
+  BRAZIL,
+  CALENDAR_YEAR,
+  seasonLabelFor,
   COUNTRY_CUPS,
   COUNTRY_FLAG,
   COUNTRY_LEAGUES,
@@ -141,6 +146,11 @@ export const WORLD_VERSION = 1;
 
 /** "2026/27" for the season starting in 2026. */
 export const seasonLabel = (year: number) => `${year}/${String((year + 1) % 100).padStart(2, "0")}`;
+/** A world's season label: "2026" for a world of calendar-year countries only (Brazil), else "2026/27". */
+export const worldSeasonLabel = (world: Pick<World, "countries">, year: number) => seasonLabelFor(world.countries, year);
+
+/** A division's clubs in a season: Série C's grow with its format (src/lib/worldSerieC.ts), the others' are their league's. */
+export const divisionTeams = (code: DivisionCode, year: number) => (isSplitDivision(code) ? serieCFormat(year).clubs : divisionConfig(code).teams);
 
 /** A club of the world: a real one from the site's data, or a new one that came up from below. */
 export interface WorldClub {
@@ -200,6 +210,8 @@ export interface DivisionSeason {
    * those games; see upgradeWorld).
    */
   calendar?: 2;
+  /** Série C from 2028: its two first-phase groups (src/lib/worldSerieC.ts). */
+  groups?: TeamId[][];
 }
 
 /**
@@ -349,7 +361,7 @@ export const CUP_POOL_ID_BASE = 80_000;
  */
 export const lowerLeagueClubs = (countries: readonly WorldCountry[]): WorldClub[] =>
   WORLD_COUNTRIES.flatMap((country) => LOWER_LEAGUE_CLUBS[country].map((c) => ({ country, c })))
-    .map(({ country, c }, i): WorldClub => ({ id: NATIONAL_LEAGUE_ID_BASE + i + 1, name: c.name, shortName: c.shortName, tla: c.tla, crest: c.crest, origin: "real", country, realId: c.espnId }))
+    .map(({ country, c }, i): WorldClub => ({ id: NATIONAL_LEAGUE_ID_BASE + i + 1, name: c.name, shortName: c.shortName, tla: c.tla, ...(c.crest ? { crest: c.crest } : {}), origin: "real", country, ...(c.espnId !== undefined ? { realId: c.espnId } : {}) }))
     .filter((club) => countries.includes(clubCountry(club)));
 /** The National League's clubs a world starts with (src/config/nationalLeague.ts), as world clubs. */
 export const nationalLeagueClubs = (): WorldClub[] => lowerLeagueClubs(["ENG"]);
@@ -451,7 +463,7 @@ export function packReady(pack: StartPack, countries: readonly WorldCountry[] = 
   if (pack.missing.some((code) => (divisions as readonly string[]).includes(code) || (cups as readonly string[]).includes(code))) return false;
   const leagues = divisions.map((code) => pack.leagues.find((l) => l.code === code));
   const years = new Set(leagues.map((l) => l?.year));
-  return leagues.every((league, i) => league !== undefined && league.teams.length === divisionConfig(divisions[i]!).teams) && years.size === 1 && cups.every((code) => pack.cups.some((c) => c.code === code));
+  return leagues.every((league, i) => league !== undefined && league.teams.length === divisionTeams(divisions[i]!, league.year)) && years.size === 1 && cups.every((code) => pack.cups.some((c) => c.code === code));
 }
 
 /** A club's quality from its rating: more goals scored and fewer conceded. */
@@ -483,13 +495,24 @@ export function divisionRanking(world: World): TeamId[][] {
  * The cups' non-league sides (World.cupPool) from the live cups': every club
  * of each in no league, as world clubs of the cup's country (a club the world
  * has already, such as a National League club, is the world's own). Without
- * the live data, no pool: fillPool makes it up.
+ * the live data, no pool: fillPool makes it up. `byName`: league clubs whose
+ * ids aren't ESPN's (Série C's, from the CBF), matched to a cup's clubs by
+ * name instead; `aliases` gives each matched cup club's id the world club.
  */
-function worldPool(clubs: Readonly<Record<number, WorldClub>>, starts: readonly StartCup[]): { clubs: Record<number, WorldClub>; cupPool: TeamId[] } {
+function worldPool(
+  clubs: Readonly<Record<number, WorldClub>>,
+  starts: readonly StartCup[],
+  byName: readonly WorldClub[] = [],
+): { clubs: Record<number, WorldClub>; cupPool: TeamId[]; aliases: Map<number, TeamId> } {
   const out = { ...clubs };
   const cupPool: TeamId[] = [];
+  const aliases = new Map<number, TeamId>();
+  const sameClub = (team: { name: string; shortName: string }, club: WorldClub) => {
+    const [a, b, c] = [plainName(team.name), plainName(team.shortName), plainName(club.name)];
+    return a === c || b === c || a.startsWith(c) || c.startsWith(b);
+  };
   const known = new Set(Object.values(clubs).flatMap((c) => (c.realId !== undefined ? [`${clubCountry(c)}:${c.realId}`] : [])));
-  for (const club of lowerLeagueClubs(WORLD_COUNTRIES)) if (clubs[club.id]) known.add(`${clubCountry(club)}:${club.realId}`);
+  for (const club of lowerLeagueClubs(WORLD_COUNTRIES)) if (clubs[club.id] && club.realId !== undefined) known.add(`${clubCountry(club)}:${club.realId}`);
   let next = CUP_POOL_ID_BASE + 1;
   while (out[next]) next++;
   for (const start of starts) {
@@ -498,14 +521,28 @@ function worldPool(clubs: Readonly<Record<number, WorldClub>>, starts: readonly 
     if (outsidersNeeded(cupConfig(start.code), COUNTRY_LEAGUES[country].reduce((n, code) => n + divisionConfig(code).teams, 0)) === 0) continue;
     for (const team of start.teams) {
       if (start.divisions[team.id] || known.has(`${country}:${team.id}`)) continue;
+      // A league club the cup's data has under another id (Série C's): the world's own.
+      const named = byName.find((club) => clubCountry(club) === country && sameClub(team, club));
+      if (named) {
+        aliases.set(team.id, named.id);
+        continue;
+      }
       const id = next++;
       out[id] = { id, name: team.name, shortName: team.shortName, tla: team.tla, ...(team.crest ? { crest: team.crest } : {}), origin: "real", country, realId: team.id };
       known.add(`${country}:${team.id}`);
       cupPool.push(id);
     }
   }
-  return { clubs: out, cupPool };
+  return { clubs: out, cupPool, aliases };
 }
+
+/** A name to compare clubs by: no accents, case, spaces or punctuation ("Ferroviária" and "Ferroviaria", "Botafogo-PB" and "Botafogo PB"). */
+const plainName = (name: string) =>
+  name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
 
 /** The clubs of `ids` from one country. */
 const ofCountry = (world: Pick<World, "clubs">, ids: readonly TeamId[], country: WorldCountry) => ids.filter((id) => clubCountry(world.clubs[id]!) === country);
@@ -622,7 +659,8 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
   for (const club of nationalLeague) clubs[club.id] = club;
   const year = pack.leagues.find((l) => l.code === worldDivisions(countries)[0])!.year;
   // The cups' non-league sides, from the real cups.
-  const pool = worldPool(clubs, pack.cups.filter((c) => countries.includes(cupCountry(c.code))));
+  const firstParty = divisions.filter((d) => divisionConfig(d.code).firstParty).flatMap((d) => d.clubs.map((id) => clubs[id]!));
+  const pool = worldPool(clubs, pack.cups.filter((c) => countries.includes(cupCountry(c.code))), firstParty);
   const world: World = {
     version: WORLD_VERSION,
     pyramid: "ENG",
@@ -648,6 +686,8 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
   // The cups where the real ones stand (their draws and results so far); a cup that can't be taken over is drawn among the world's clubs.
   const byReal = new Map<string, TeamId>();
   for (const club of Object.values(world.clubs)) if (club.realId !== undefined) byReal.set(`${clubDivision(world, club.id) ?? ""}:${club.realId}`, club.id);
+  // Série C's clubs, in the cup's data under ESPN's ids.
+  for (const [realId, id] of pool.aliases) byReal.set(`:${realId}`, id);
   const idOf = (division: DivisionCode | undefined, realId: number) => byReal.get(`${division ?? ""}:${realId}`);
   const inherited = worldCups(countries).flatMap((code) => {
     const start = pack.cups.find((c) => c.code === code);
@@ -682,6 +722,8 @@ export function divisionFixtures(world: World, d: DivisionSeason): { fixtures: F
     return { fixtures, results: effectiveResults(fixtures) };
   }
   const order = shuffled(d.clubs, seasonRng(world, 100 + WORLD_LEAGUES.indexOf(d.code)));
+  // Série C: its first phase, one round robin or two groups (src/lib/worldSerieC.ts).
+  if (isSplitDivision(d.code)) return { fixtures: serieCFixtures(order, serieCFormat(world.year), gameDate(world.year, 1), d.groups), results: {} };
   const schedule = d.calendar === 2 ? balancedDoubleRoundRobin : doubleRoundRobin;
   return { fixtures: schedule(order, gameDate(world.year, 1)), results: {} };
 }
@@ -730,10 +772,17 @@ function tieModel(lower: LeagueModel, upper: LeagueModel, upperClub: TeamId | un
 }
 
 /** Clubs each division of a country sends up and down: the counts its leagues must agree on (3, 3 and 4 between the four English leagues; 3 between Spain's two; 2 between Germany's, the pyramid play-off adding one to both or neither; 3 between Italy's, Serie B's play-out sending one more down). */
-export function movementCounts(country: WorldCountry = "ENG"): { up: number; down: number }[] {
+export function movementCounts(country: WorldCountry = "ENG", year = 2026): { up: number; down: number }[] {
   return COUNTRY_LEAGUES[country].map((code) => {
+    // Série C: its second phase's four promoted, its first phase's relegated (two a season to 2027, six from 2028).
+    if (isSplitDivision(code)) {
+      const format = serieCFormat(year);
+      return { up: 4, down: format.groups * format.relegated };
+    }
     const m = movementPlaces(divisionConfig(code));
-    return { up: m.promotion.length + (m.playoffPromotes ? 1 : 0), down: m.relegation.length + (playoutOf(code) ? 1 : 0) };
+    // A play-off sends up its last round's winners: one final, or two semi-finals' (Série B).
+    const winners = m.playoffPromotes ? (playoffConfigOf(code)?.rounds.at(-1)?.pairs?.length ?? 1) : 0;
+    return { up: m.promotion.length + winners, down: m.relegation.length + (playoutOf(code) ? 1 : 0) };
   });
 }
 
@@ -796,6 +845,14 @@ const NEW_TOWNS: Record<WorldCountry, { towns: readonly string[]; suffixes: read
       "Altavilla Marina", "Fontanarossa", "Pievecastello", "Torregiano", "Serravalle d'Arno", "Montelupo Nuovo", "Campolieto", "Rivalta Ligure",
     ],
     suffixes: ["US", "AC", "SS", "ASD", "Pro", "Virtus"],
+    prefix: true,
+  },
+  BRA: {
+    towns: [
+      "Vale Verde", "Serra Alta", "Rio Claro do Norte", "Porto Sereno", "Campo Belo do Sul", "Lagoa Dourada", "Santa Aurora", "Pedra Branca",
+      "Monte Azul", "Areia Fina", "Boa Esperança do Leste", "Cachoeira Nova", "Ribeirão Alto", "Vila Serena", "Barra do Sol", "Mata Grande",
+    ],
+    suffixes: ["EC", "SE", "AA", "CA", "AE", "SC"],
     prefix: true,
   },
 };
@@ -906,6 +963,8 @@ export interface DivisionState {
   playoffOptions: Omit<BracketOptions, "seasonComplete">;
   /** Its relegation play-out (playoutConfigOf: Serie B's 16th v 17th); none elsewhere. */
   playout?: PlayoffConfig;
+  /** Série C: its phases (the first-phase table or groups, the second phase's groups, the final's seeds). */
+  split?: SerieCPhase;
   /** The play-out's tie: its clubs placed once the league is complete; nothing when the table has made it unnecessary (playoutCancelled). */
   playoutBracket: PlayoffTie[][];
   /** The league is complete and its two clubs finished too far apart for a play-out: the lower-placed goes straight down. */
@@ -928,14 +987,44 @@ function tableOf(world: World, index: number, picks: ResultMap = seasonScores(wo
   const d = world.divisions[index]!;
   const league = divisionConfig(d.code);
   const teams = d.clubs.map((id) => teamOf(world, id));
+  if (isSplitDivision(d.code)) {
+    const split = splitPhaseOf(world, d, teams, picks);
+    const fixtures = serieCLeagueFixtures(split);
+    const results = effectiveResults(fixtures, picks);
+    return { d, league, teams, fixtures, results, rows: splitRows(split), complete: fixtures.every((f) => results[f.id]), split };
+  }
   const fixtures = sortFixtures(divisionFixtures(world, d).fixtures);
   const results = effectiveResults(fixtures, picks);
   const rows = standingsOf(league, d, teams, fixtures, results);
-  return { d, league, teams, fixtures, results, rows, complete: fixtures.every((f) => results[f.id]) };
+  return { d, league, teams, fixtures, results, rows, complete: fixtures.every((f) => results[f.id]), split: undefined };
 }
 
+/** Série C's standings options: the league's, and its groups' own tiebreakers. */
+const splitOptions = (league: LeagueConfig, d: DivisionSeason) => ({
+  options: { tiebreakers: league.tiebreakers, includeForm: false, ...(d.deductions ? { deductions: d.deductions } : {}) },
+  groupOptions: { tiebreakers: league.split?.groupTiebreakers ?? league.tiebreakers, includeForm: false },
+});
+
+/** Série C's phases from its first-phase games (and a first season's real second-phase ones) and the scores: its own results, the generated games' scores too. */
+function splitPhaseOf(world: World, d: DivisionSeason, teams: readonly Team[], picks: ResultMap): SerieCPhase {
+  const base = sortFixtures(divisionFixtures(world, d).fixtures);
+  const results: ResultMap = {};
+  for (const [id, score] of Object.entries(picks)) if (Number(id) < PLAYOFF_ID_BASE) results[Number(id)] = score;
+  Object.assign(results, effectiveResults(base, picks));
+  return serieCPhase({ teams, fixtures: base, results, format: serieCFormat(world.year), ...(d.groups ? { groups: d.groups } : {}), ...splitOptions(divisionConfig(d.code), d) });
+}
+
+/** Série C's table as one list: its first-phase table, or its two groups' alike places together. */
+const splitRows = (split: SerieCPhase): StandingRow[] =>
+  split.firstTables.length === 1
+    ? split.firstTables[0]!
+    : split.firstTables
+        .flat()
+        .sort((a, b) => a.position - b.position || b.points - a.points)
+        .map((r, i) => ({ ...r, position: i + 1 }));
+
 function stateOf(world: World, index: number, picks: ResultMap = seasonScores(world.divisions[index]!)): DivisionState {
-  const { d, league, teams, fixtures, results, rows, complete: leagueComplete } = tableOf(world, index, picks);
+  const { d, league, teams, fixtures, results, rows, complete: leagueComplete, split } = tableOf(world, index, picks);
   const eligibleRows = promotionRows(league, rows, (id) => world.clubs[id]!.name);
   const playoff = playoffConfigOf(d.code);
   let model = divisionForm(world, d, index).model;
@@ -944,6 +1033,8 @@ function stateOf(world: World, index: number, picks: ResultMap = seasonScores(wo
   const upperIndex = tie?.lower === d.code ? world.divisions.findIndex((x) => x.code === tie.upper) : -1;
   let playoffRows = eligibleRows;
   let playoffKnown = leagueComplete;
+  // Série C's final: the second phase's group winners, the better campaign hosting the second leg.
+  if (split) playoffRows = split.finalRows;
   if (tie && upperIndex >= 0) {
     const upper = tableOf(world, upperIndex);
     playoffKnown = leagueComplete && upper.complete;
@@ -989,6 +1080,7 @@ function stateOf(world: World, index: number, picks: ResultMap = seasonScores(wo
     ...(playout ? { playout } : {}),
     playoutBracket,
     playoutCancelled: playoutOff,
+    ...(split ? { split } : {}),
     done,
     nextRound,
     model,
@@ -1058,8 +1150,14 @@ function tidyBracket(before: { world: World; picks: ResultMap }, after: { world:
 }
 
 /** A division's picks less the play-off and play-out scores a change leaves stale (tidyBracket, for both). */
-const tidyPlayoff = (before: { world: World; picks: ResultMap }, after: { world: World; picks: ResultMap }, index: number): ResultMap =>
-  tidyBracket(before, { world: after.world, picks: tidyBracket(before, after, index, "playoff") }, index, "playout");
+function tidyPlayoff(before: { world: World; picks: ResultMap }, after: { world: World; picks: ResultMap }, index: number): ResultMap {
+  const out = tidyBracket(before, { world: after.world, picks: tidyBracket(before, after, index, "playoff") }, index, "playout");
+  // Série C: a second-phase game's score goes once the first phase puts other clubs in its group.
+  if (!isSplitDivision(after.world.divisions[index]!.code)) return out;
+  const games = new Set(stateOf(after.world, index, out).fixtures.map((f) => f.id));
+  for (const id of Object.keys(out).map(Number)) if (id < 0 && !games.has(id)) delete out[id];
+  return out;
+}
 
 /** The world with a division's picks replaced. */
 function withPicks(world: World, index: number, picks: ResultMap): World {
@@ -1124,7 +1222,7 @@ export function rollScore(world: World, code: DivisionCode, fixture: Fixture, rn
 /** A matchday's games without a score ("Simulate matchday"), each drawn from the season's form, the full distribution (upsets included). */
 export function simulateMatchday(world: World, code: DivisionCode, matchday: number, rng: Rng = createRng(randomSeed())): World {
   const state = divisionState(world, code);
-  const added = simulateFixtures(state.fixtures.filter((f) => f.matchday === matchday), state.results, state.model, rng, { fast: true });
+  const added = simulateFixtures(state.fixtures.filter((f) => f.matchday === matchday && f.homeId > 0 && f.awayId > 0), state.results, state.model, rng, { fast: true });
   return withScores(world, state.index, state.picks, { ...state.picks, ...added });
 }
 
@@ -1148,9 +1246,16 @@ export function simulatePlayoffs(world: World, code: DivisionCode, rng: Rng = cr
  * played from the play-off's fixtures, or when the season ends).
  */
 export function simulateRest(world: World, code: DivisionCode, rng: Rng = createRng(randomSeed())): World {
-  const state = divisionState(world, code);
-  const league = simulateFixtures(state.fixtures, state.results, state.model, rng, { fast: true });
-  return simulatePlayoffs(withScores(world, state.index, state.picks, { ...state.picks, ...league }), code, rng);
+  let next = world;
+  // Série C's second phase is known once its first is played: each phase in turn (one pass elsewhere).
+  for (let pass = 0; pass < 3; pass++) {
+    const state = divisionState(next, code);
+    const open = state.fixtures.filter((f) => !state.results[f.id] && f.homeId > 0 && f.awayId > 0);
+    if (!open.length) break;
+    const league = simulateFixtures(open, state.results, state.model, rng, { fast: true });
+    next = withScores(next, state.index, state.picks, { ...state.picks, ...league });
+  }
+  return simulatePlayoffs(next, code, rng);
 }
 
 /** One division's season back to how it started: every score typed in, rolled or simulated goes. */
@@ -1197,10 +1302,13 @@ interface PlayedDivision {
   /** The play-off's scores, by game id. */
   playoff: ResultMap;
   ratings: SeasonRatings;
+  /** Série C's phases. */
+  split?: SerieCPhase;
 }
 
 /** Plays the rest of one division's league season: every game without a score (from the season's form, on its own random stream), the table and the places' notes. The play-off comes after (playPlayoff). */
 function playLeague(world: World, d: DivisionSeason, index: number): PlayedDivision {
+  if (isSplitDivision(d.code)) return playSplit(world, d, index);
   const league = divisionConfig(d.code);
   const teams = d.clubs.map((id) => teamOf(world, id));
   const { fixtures } = divisionFixtures(world, d);
@@ -1224,6 +1332,51 @@ function playLeague(world: World, d: DivisionSeason, index: number): PlayedDivis
 }
 
 /**
+ * Plays the rest of Série C's phases (src/lib/worldSerieC.ts): the first
+ * phase, then the second phase's groups from its table; the table saved is
+ * the final classification (playPlayoff puts the champion first). The top two
+ * of each group go up ("P", the champion "C" after the final), its other clubs
+ * were in the second phase ("O"), the first phase's bottom clubs go down ("R").
+ */
+function playSplit(world: World, d: DivisionSeason, index: number): PlayedDivision {
+  const league = divisionConfig(d.code);
+  const teams = d.clubs.map((id) => teamOf(world, id));
+  const picks = seasonScores(d);
+  const { model, rng } = divisionForm(world, d, index);
+  const fill = (phase: SerieCPhase, results: ResultMap) => {
+    for (const f of serieCLeagueFixtures(phase)) {
+      if (results[f.id] || f.homeId < 0 || f.awayId < 0) continue;
+      results[f.id] = sampleDixonColes(expectedGoals(model, f.homeId, f.awayId), model.rho ?? 0, rng);
+    }
+  };
+  let split = splitPhaseOf(world, d, teams, picks);
+  const results: ResultMap = { ...picks, ...effectiveResults(serieCLeagueFixtures(split), picks) };
+  fill(split, results);
+  split = serieCPhase({ ...splitInput(world, d, teams), results });
+  fill(split, results);
+  split = serieCPhase({ ...splitInput(world, d, teams), results });
+  const { options } = splitOptions(league, d);
+  const rows = serieCClassification(split, teams, results, options);
+  const notes = new Map<TeamId, RowNote>(rows.map((r) => [r.teamId, ""]));
+  for (const ids of split.members ?? []) for (const id of ids) notes.set(id, "O");
+  for (const table of split.secondTables) for (const r of table.slice(0, 2)) notes.set(r.teamId, "P");
+  for (const id of split.relegated) notes.set(id, "R");
+  const fixtures = serieCLeagueFixtures(split);
+  return { code: d.code, league, teams, fixtures, results, rows, eligible: rows, model, notes, playoff: {}, ratings: seasonRatings({ teams, fixtures, results }), split };
+}
+
+/** serieCPhase's input for a division, but its results. */
+function splitInput(world: World, d: DivisionSeason, teams: readonly Team[]) {
+  return {
+    teams,
+    fixtures: sortFixtures(divisionFixtures(world, d).fixtures),
+    format: serieCFormat(world.year),
+    ...(d.groups ? { groups: d.groups } : {}),
+    ...splitOptions(divisionConfig(d.code), d),
+  };
+}
+
+/**
  * Plays a division's play-off from the played leagues (its scores so far
  * stand; the rest drawn on the season's own random stream): the league's own
  * bracket, or the pyramid play-off it is the lower division of, whose winner
@@ -1238,15 +1391,15 @@ function playPlayoff(world: World, index: number, played: PlayedDivision[]): voi
   const tie = pyramidPlayoffOf(d.code);
   const upperIndex = tie?.lower === d.code ? world.divisions.findIndex((x) => x.code === tie.upper) : -1;
   const upper = upperIndex >= 0 ? played[upperIndex] : undefined;
-  const rows = tie && upper ? pyramidRows(tie, upper.rows, p.eligible) : p.eligible;
+  const rows = p.split ? p.split.finalRows : tie && upper ? pyramidRows(tie, upper.rows, p.eligible) : p.eligible;
   const model = tie && upper ? tieModel(p.model, upper.model, rows.find((r) => r.position === tie.upperPlace)?.teamId) : p.model;
   const picks = seasonScores(d);
-  let finalTie: PlayoffTie | undefined;
+  let lastTies: readonly PlayoffTie[] = [];
   const rounds = config.rounds.length;
   const knockout = seasonRng(world, 50 + index);
   const options = playoffOptions(world, d, lastMatchday(p.fixtures));
   const added = simulatePlayoff(rows, config, picks, model, knockout, options, (r, ties) => {
-    if (r === rounds - 1) finalTie = ties[0];
+    if (r === rounds - 1) lastTies = ties;
   });
   const scores = { ...picks, ...added };
   // Every play-off score, real ones included, by game id: the season's saved play-off.
@@ -1264,13 +1417,26 @@ function playPlayoff(world: World, index: number, played: PlayedDivision[]): voi
     if (direct && movementPlaces(p.league).playoffPromotes) p.notes.set(direct.teamId, "P");
     return;
   }
-  const outcome = finalTie ? tieOutcome(finalTie, scores) : null;
-  if (!finalTie || !outcome) return;
+  // The last round: one final, or several ties each sending its winner up (Série B's two semi-finals).
+  const outcomes = lastTies.map((t) => ({ tie: t, outcome: tieOutcome(t, scores) }));
+  if (!outcomes.length || outcomes.some((o) => !o.outcome)) return;
+  const finalTie = outcomes[0]!.tie;
+  const outcome = outcomes[0]!.outcome!;
   const loser = outcome.winner === finalTie.higher.teamId ? finalTie.lower.teamId! : finalTie.higher.teamId!;
   const winnerGoals = outcome.winner === finalTie.higher.teamId ? outcome.higherGoals : outcome.lowerGoals;
   const loserGoals = outcome.winner === finalTie.higher.teamId ? outcome.lowerGoals : outcome.higherGoals;
-  p.final = [outcome.winner, loser, winnerGoals, loserGoals, outcome.onPenalties];
+  if (outcomes.length === 1) p.final = [outcome.winner, loser, winnerGoals, loserGoals, outcome.onPenalties];
+  // Série C's final: its winner is champion, first in the final classification.
+  if (p.split) {
+    p.notes.set(outcome.winner, "C");
+    p.rows = serieCClassification(p.split, p.teams, p.results, splitOptions(p.league, d).options, outcome.winner);
+    return;
+  }
   if (!movementPlaces(p.league).playoffPromotes) return;
+  if (outcomes.length > 1) {
+    for (const o of outcomes) p.notes.set(o.outcome!.winner, "W");
+    return;
+  }
   if (tie && upper) {
     const lowerClub = rows.find((r) => r.position === tie.lowerPlace)?.teamId;
     if (outcome.winner === lowerClub) {
@@ -1353,9 +1519,12 @@ export function playSeason(world: World): World {
     const relegated = down.at(-1)!;
     for (const id of relegated) clubs[id] = { ...clubs[id]!, left: world.year };
     const below = ofCountry({ clubs }, nationalLeague, country);
-    const coming: TeamId[] = below.slice(0, relegated.length);
+    // As many come up as went down; Série C, growing, takes its format's arrivals from Série D (six a season).
+    const bottomCode = own.at(-1)!.code;
+    const arriving = isSplitDivision(bottomCode) ? serieCFormat(world.year).arrivals : relegated.length;
+    const coming: TeamId[] = below.slice(0, arriving);
     // A league below short of clubs (Spain's Primera Federación to begin with): real clubs from the country's cup pool, then fictional new ones.
-    while (coming.length < relegated.length) {
+    while (coming.length < arriving) {
       const fromPool = ofCountry({ clubs }, cupPool, country)[0];
       if (fromPool !== undefined) {
         cupPool = cupPool.filter((id) => id !== fromPool);
@@ -1368,7 +1537,8 @@ export function playSeason(world: World): World {
       }
     }
     const taken = new Set(coming);
-    nationalLeague = [...nationalLeague.filter((id) => !taken.has(id)), ...relegated];
+    // The relegated clubs first, to come back up after a season (Série D's clubs wait behind them while Série C grows).
+    nationalLeague = [...relegated, ...nationalLeague.filter((id) => !taken.has(id))];
     out.push(...relegated);
     arrivals.push(...coming);
 
@@ -1378,7 +1548,7 @@ export function playSeason(world: World): World {
       const fromAbove = k > 0 ? down[k - 1]! : [];
       const fromBelow = k < own.length - 1 ? up[k + 1]! : coming;
       nextClubs[at[k]!] = [...stay, ...fromAbove, ...fromBelow];
-      if (nextClubs[at[k]!]!.length !== divisionConfig(p.code).teams) throw new Error(`${p.code}: ${nextClubs[at[k]!]!.length} clubs next season`);
+      if (nextClubs[at[k]!]!.length !== divisionTeams(p.code, world.year + 1)) throw new Error(`${p.code}: ${nextClubs[at[k]!]!.length} clubs next season`);
     });
 
     // Next season's ratings and levels: each division's from this season's results, through the world's between-season rule.
@@ -1410,7 +1580,13 @@ export function playSeason(world: World): World {
     clubs,
     ratings,
     levels,
-    divisions: nextClubs.map((ids, i) => ({ code: world.divisions[i]!.code, clubs: ids, calendar: 2 as const })),
+    divisions: nextClubs.map((ids, i) => {
+      const code = world.divisions[i]!.code;
+      // Série C in two groups (from 2028): drawn in turn by rating, the stronger clubs spread across both.
+      const grouped = isSplitDivision(code) && serieCFormat(world.year + 1).groups === 2;
+      const byStrength = [...ids].sort((a, b) => quality({ ratings }, b) - quality({ ratings }, a) || a - b);
+      return { code, clubs: ids, calendar: 2 as const, ...(grouped ? { groups: serieCGroups(byStrength) } : {}) };
+    }),
     // Every result of the last FIXTURE_SEASONS seasons; older ones keep their final tables.
     history: [...world.history, record].map((season, i, all) =>
       i < all.length - FIXTURE_SEASONS
@@ -1530,12 +1706,18 @@ export function pastDivision(world: World, year: number, code: DivisionCode): Pa
       const upperTable = savedTable(world, year, tie.upper);
       rows = pyramidRows(tie, upperTable ? standingRows(upperTable.rows) : [], rows);
     }
-    const last = fixtures ? lastMatchday(fixtures) : (divisionConfig(code).teams - 1) * 2;
+    const last = fixtures ? lastMatchday(fixtures) : (divisionTeams(code, year) - 1) * 2;
     const scored = (f: Fixture): Fixture => ({ ...f, result: scores[f.id] ?? f.result });
     const build = (table: readonly StandingRow[], playoff: PlayoffConfig) =>
       buildBracket(table, playoff, scores, { seasonComplete: true, afterMatchday: last, afterDate: gameDate(year, last) }).map((round) =>
         round.map((t) => ({ ...t, legs: t.legs.map(scored), shootout: t.shootout && scored(t.shootout), gameShootouts: t.gameShootouts.map(scored) })),
       );
+    // Série C's final: its two finalists, the better campaign (their whole season's record) first.
+    if (isSplitDivision(code) && saved.final) {
+      const finalists = standings.filter((r) => r.teamId === saved.final![0] || r.teamId === saved.final![1]);
+      const better = (a: StandingRow, b: StandingRow) => b.points - a.points || b.won - a.won || b.goalDifference - a.goalDifference || b.goalsFor - a.goalsFor || a.position - b.position;
+      rows = [...finalists].sort(better).map((r, i) => ({ ...r, position: i + 1 }));
+    }
     if (config) bracket = build(rows, config);
     if (playoutConfig && !playoutCancelled(code, standings)) playout = build(standings, playoutConfig);
   }

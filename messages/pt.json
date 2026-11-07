@@ -1270,8 +1270,8 @@
     "comingSoon": "Histórico real em breve"
   },
   "World": {
-    "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol, alemão ou italiano",
-    "metaDescription": "Escolha um clube da Inglaterra, da Espanha, da Alemanha ou da Itália e jogue temporada após temporada de suas ligas e copas, com playoffs, acesso e rebaixamento. Salvo no seu navegador, com as tabelas de todas as temporadas.",
+    "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol, alemão, italiano ou brasileiro",
+    "metaDescription": "Escolha um clube da Inglaterra, da Espanha, da Alemanha, da Itália ou do Brasil e jogue temporada após temporada de suas ligas e copas, com playoffs, acesso e rebaixamento. Salvo no seu navegador, com as tabelas de todas as temporadas.",
     "hero": {
       "badge": "Modo de jogo",
       "start": "Começar seu mundo",
@@ -1371,6 +1371,26 @@
         "name": "Serie C",
         "the": "a Serie C",
         "in": "na Serie C"
+      },
+      "BSA": {
+        "name": "Série A",
+        "the": "a Série A",
+        "in": "na Série A"
+      },
+      "BSB": {
+        "name": "Série B",
+        "the": "a Série B",
+        "in": "na Série B"
+      },
+      "BSC": {
+        "name": "Série C",
+        "the": "a Série C",
+        "in": "na Série C"
+      },
+      "BSD": {
+        "name": "Série D",
+        "the": "a Série D",
+        "in": "na Série D"
       }
     },
     "cups": {
@@ -1398,13 +1418,19 @@
         "name": "Coppa Italia",
         "the": "a Coppa Italia",
         "in": "na Coppa Italia"
+      },
+      "CDB": {
+        "name": "Copa do Brasil",
+        "the": "a Copa do Brasil",
+        "in": "na Copa do Brasil"
       }
     },
     "countries": {
       "ENG": "Inglaterra",
       "ESP": "Espanha",
       "GER": "Alemanha",
-      "ITA": "Itália"
+      "ITA": "Itália",
+      "BRA": "Brasil"
     },
     "setup": {
       "title": "Crie seu mundo",
@@ -1523,6 +1549,16 @@
     "homeTitle": "Meu mundo",
     "homeBody": "Escolha um clube e jogue temporada após temporada, cada resultado do seu jeito: ligas, copas, playoffs, acesso e rebaixamento.",
     "homeCta": "Começar seu mundo",
-    "playOutCancelled": "Sem playout nesta temporada: {lower} terminou {gap} pontos ou mais atrás de {upper} e cai direto."
+    "playOutCancelled": "Sem playout nesta temporada: {lower} terminou {gap} pontos ou mais atrás de {upper} e cai direto.",
+    "serieC": {
+      "firstStage": "1ª fase",
+      "group": "Grupo {group}",
+      "promotionGroup": "Quadrangular {group}",
+      "round": "{group}, rodada {round}",
+      "slot": "{place} do Grupo {group}",
+      "classification": "Classificação final",
+      "secondPending": "Os dois quadrangulares da 2ª fase (1º, 4º, 5º e 8º; 2º, 3º, 6º e 7º) saem da tabela da 1ª fase quando ela terminar.",
+      "secondPendingGroups": "Os quatro primeiros de cada grupo jogam um quadrangular de acesso quando a 1ª fase terminar."
+    }
   }
 }
