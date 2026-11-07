@@ -23,6 +23,9 @@ export function generateStaticParams() {
 type Params = Promise<{ locale: string; league: string }>;
 const langOf = (locale: string) => (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
 
+/** Whether the league's name brings its own article ("La Liga": "of La Liga", not "of the La Liga"). */
+const articleOf = (name: string) => (/^La /.test(name) ? "none" : "other");
+
 /** The oldest season played (the page says "since" it). */
 const oldest = (rows: WinnerRow[]) => [...rows].reverse().find((r) => r.status === "completed") ?? rows.at(-1)!;
 
@@ -33,8 +36,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!league || !rows) return {};
   const t = await getTranslations({ locale, namespace: "PastWinners" });
   const year = String(oldest(rows).startYear);
-  const title = t("metaTitle", { league: league.name, year });
-  const description = t("metaDescription", { league: league.name, year });
+  const title = t("metaTitle", { league: league.name, article: articleOf(league.name), year });
+  const description = t("metaDescription", { league: league.name, article: articleOf(league.name), year });
   const path = pastWinnersPath(league);
   return {
     title,
@@ -58,7 +61,7 @@ export default async function PastWinnersPage({ params }: { params: Params }) {
   const leaguePath = `/${league.slug}`;
   const path = pastWinnersPath(league);
   const pageUrl = `${SITE_URL}/${locale}${path}`;
-  const heading = t("heading", { league: league.name });
+  const heading = t("heading", { league: league.name, article: articleOf(league.name) });
   // The league page's view switch, with this view selected: Table and Chances go back to the simulator.
   const tab = (active: boolean) => `rounded-md px-3 py-1.5 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-700" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"}`;
 
@@ -94,7 +97,7 @@ export default async function PastWinnersPage({ params }: { params: Params }) {
           <Flag code={league.flag} width={36} />
           <span>{heading}</span>
         </h1>
-        <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("intro", { league: league.name, season: oldest(rows).season })}</p>
+        <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("intro", { league: league.name, article: articleOf(league.name), season: oldest(rows).season })}</p>
       </header>
 
       <div className="flex w-fit rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="tablist">

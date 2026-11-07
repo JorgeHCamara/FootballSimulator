@@ -175,6 +175,11 @@ describe("parseLeagueHistory", () => {
   });
   const file = (seasons: HistorySeason[]): LeagueHistory => ({ league: "Test", footsimuSlug: "test", footsimuCode: "TST", country: "Nowhere", seasons });
 
+  it("two seasons starting the same year: the one ending later is newer (La Liga's 1929, then 1929-30)", () => {
+    const rows = winnerRows(file([season({ season: "1929", startYear: 1929 }), season({ season: "1929-30", startYear: 1929 }), season({ season: "1930-31", startYear: 1930 })]), () => null);
+    assert.deepEqual(rows.map((r) => r.season), ["1930-31", "1929-30", "1929"]);
+  });
+
   it("accepts a sound file, a missing third place, a tournament and a season not held", () => {
     const parsed = parseLeagueHistory(
       file([
