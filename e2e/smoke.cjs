@@ -2943,7 +2943,9 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
       await fixtures.getByTestId("matchday-select").selectOption("-1");
       assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
-      assert.equal(await fixtures.getByTestId("match-score").count(), 2);
+      // Both legs scored, and a third score when the tie was level: its shoot-out.
+      const scores = await fixtures.getByTestId("match-score").count();
+      assert.ok(scores === 2 || (scores === 3 && (await fixtures.locator('[data-testid="playoff-tie"] [data-attached="true"]').count()) === 1), `both legs scored (and a level tie's shoot-out): ${scores}`);
       await p.close();
     });
 
