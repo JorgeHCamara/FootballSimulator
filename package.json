@@ -20,7 +20,8 @@
     "snapshots": "NODE_USE_ENV_PROXY=1 node scripts/snapshot-odds.ts",
     "snapshots:check": "NODE_USE_ENV_PROXY=1 node scripts/check-snapshots.ts",
     "history": "NODE_USE_ENV_PROXY=1 node scripts/build-history.ts",
-    "xg": "NODE_USE_ENV_PROXY=1 node scripts/fetch-xg.ts"
+    "xg": "NODE_USE_ENV_PROXY=1 node scripts/fetch-xg.ts",
+    "crests:backgrounds": "NODE_USE_ENV_PROXY=1 node scripts/crest-backgrounds.ts"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

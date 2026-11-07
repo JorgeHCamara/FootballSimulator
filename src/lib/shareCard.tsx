@@ -262,8 +262,8 @@ export async function crestDataUri(url: string | undefined): Promise<string | un
   try {
     let type: string;
     let bytes: Buffer;
-    if (/^\/crests\/serie-c\/\d+\.png$/.test(url)) {
-      // The site's own crest (Série C): read from the deployment, no request.
+    if (/^\/crests\/(?:[a-z-]+\/)?\d+\.png$/.test(url)) {
+      // The site's own crest (Série C's, a cut-out, a saved fallback): read from the deployment, no request.
       type = "image/png";
       bytes = await readFile(join(process.cwd(), "public", url));
     } else {

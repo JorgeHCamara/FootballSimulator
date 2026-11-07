@@ -1,4 +1,5 @@
 import type { Team } from "../engine/types.ts";
+import { CREST_CUTOUTS } from "./crestCutouts.ts";
 
 // Crests for clubs ESPN has none for, from TheSportsDB (thesportsdb.com,
 // community-uploaded artwork), matched by hand-checked script and saved under
@@ -156,7 +157,17 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   133851: "/crests/133851.png", // Ceuta 6 de Junio
 };
 
-/** Gives clubs without a crest the saved one, keyed by ESPN team id; ESPN's own crests stay. */
+/**
+ * Gives clubs without a crest the saved one, keyed by ESPN team id; ESPN's own
+ * crests stay, cut out where they come with a background (src/config/crestCutouts.ts).
+ */
 export function withFallbackCrests(teams: readonly Team[]): Team[] {
-  return teams.map((team) => (team.crest || !CREST_FALLBACKS[team.id] ? team : { ...team, crest: CREST_FALLBACKS[team.id] }));
+  return teams.map((team) => {
+    const crest = team.crest || CREST_FALLBACKS[team.id];
+    if (!crest) return team;
+    // A crest that comes with a background shows cut out, while it's still the one the cut-out was made from.
+    const cutout = CREST_CUTOUTS[team.id];
+    const shown = cutout && cutout.from === crest ? cutout.crest : crest;
+    return shown === team.crest ? team : { ...team, crest: shown };
+  });
 }
