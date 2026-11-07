@@ -633,14 +633,18 @@
       "CDB": "Each club's strength comes from its own league this season (Série A or Série B), scaled by the division; clubs from Série C, Série D and the state leagues are rated below Série B.",
       "CDR": "Each club's strength comes from its own league this season (La Liga or Segunda División), scaled by the division; clubs from Primera Federación and below are rated under Segunda.",
       "CIT": "Each club's strength comes from its own league this season (Serie A or Serie B), scaled by the division; Serie C clubs are rated below Serie B. There is no draw: the Coppa Italia follows a fixed bracket.",
-      "DFB": "Each club's strength comes from its own league this season (Bundesliga or 2. Bundesliga), scaled by the division; 3. Liga and amateur clubs are rated below the 2. Bundesliga. An amateur club drawn against a professional one plays at home."
+      "DFB": "Each club's strength comes from its own league this season (Bundesliga or 2. Bundesliga), scaled by the division; 3. Liga and amateur clubs are rated below the 2. Bundesliga. An amateur club drawn against a professional one plays at home.",
+      "EFC": "Each club's strength comes from its own league this season (Premier League, Championship, League One or League Two), scaled by the division. There is no extra time before the final: a tie level after 90 minutes goes straight to penalties, and the two-legged semi-finals are decided on aggregate, then penalties."
     },
     "finalAfter": "The winners of the {round} meet here.",
     "bracketAfter": "Fixed bracket, no draw: the winners meet like this.",
     "versus": "v",
     "bracketWinnerOf": "Winner of {round} {n}",
     "chancesNoteBracket": "There is no draw: every run follows the fixed bracket.",
-    "bracketStatus": "Fixed bracket"
+    "bracketStatus": "Fixed bracket",
+    "levelPenalties": "No extra time: a game level after 90 minutes goes straight to penalties.",
+    "levelPenaltiesTwoLegs": "Two legs, decided on aggregate; level after the second leg: straight to penalties, no extra time.",
+    "levelExtraTime": "Level after 90 minutes: extra time, then penalties."
   },
   "Continents": {
     "Europe": "Europe",
@@ -1295,6 +1299,7 @@
     },
     "endSeason": "End season",
     "endSeasonNote": "Every game has been played: end the {season} season to see its review, with the champions and who goes up and down.",
+    "country": "Country",
     "seasonHeading": "The {season} season",
     "seasonSelect": "Season",
     "seasonCurrent": "{season} (this season)",
@@ -1351,7 +1356,6 @@
     },
     "path": {
       "title": "{club}'s seasons",
-      "country": "Country",
       "league": "League",
       "club": "Club",
       "empty": "No seasons played yet.",

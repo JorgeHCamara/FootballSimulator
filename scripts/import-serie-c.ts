@@ -8,7 +8,7 @@
 // It writes src/data/serie-c/2026.json (the clubs, every game of the three
 // phases and the CBF's official tables, to check the data against) and each
 // club's crest to public/crests/serie-c/{CBF club id}.png (cut out of the CBF's
-// JPEG, kept in scripts/data/serie-c-crests: see scripts/serieCCrests.ts). Run it again only to
+// JPEG, kept in scripts/data/serie-c-crests: see scripts/crest-backgrounds.ts). Run it again only to
 // correct the data (the 2026 season is over).
 //
 // Where it reads from:
@@ -25,7 +25,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ORIGINALS, OUT as CRESTS, writeCrests } from "./serieCCrests.ts";
+import { SERIE_C_ORIGINALS as ORIGINALS, SERIE_C_OUT as CRESTS, writeSerieCCrests } from "./crest-backgrounds.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "src/data/serie-c/2026.json");
@@ -205,7 +205,7 @@ async function main() {
     await writeFile(join(ORIGINALS, `${id}.jpg`), Buffer.from(await res.arrayBuffer()));
   }
 
-  await writeCrests();
+  await writeSerieCCrests();
 
   const cbfNames = new Map(firstTable.map((r) => [r.clubId, r.cbfName]));
   const data = {

@@ -3,7 +3,7 @@ import type { CompetitionCode, FlagCode, SiteLocale } from "./leagues.ts";
 // Knockout cups. Unlike a league, a cup has no table: each round's pairings are
 // drawn, and clubs from several divisions (and outside the league system) meet.
 
-export type CupCode = "FAC" | "CDB" | "CDR" | "CIT" | "DFB";
+export type CupCode = "FAC" | "CDB" | "CDR" | "CIT" | "DFB" | "EFC";
 
 export type CupRoundKey =
   | "preliminaryRound"
@@ -45,6 +45,13 @@ export interface CupRoundConfig {
    * clubs from neighbouring slots of the bracket (see `CupConfig.bracketOrder`).
    */
   bracket?: boolean;
+  /**
+   * A level tie goes straight to penalties, without extra time (the EFL Cup
+   * before the final); false: extra time, then penalties. Only the rule shown
+   * changes (a level game is decided on penalties either way, as the engine
+   * plays no extra time); unset, no rule is shown (the cups so far).
+   */
+  noExtraTime?: boolean;
 }
 
 export interface CupConfig {
@@ -237,6 +244,38 @@ export const CUPS: readonly CupConfig[] = [
     hostTier: 2,
     tagOutsiders: false,
     title: "DFB-Pokal",
+  },
+  {
+    kind: "cup",
+    code: "EFC",
+    slug: "efl-cup",
+    name: "EFL Cup",
+    country: "England",
+    flag: "gb-eng",
+    simulatorName: { en: "EFL Cup Simulator", pt: "Simulador da Copa da Liga Inglesa", es: "Simulador de la Copa de la Liga de Inglaterra" },
+    aka: { en: "Carabao Cup", pt: "Copa da Liga Inglesa, Carabao Cup", es: "Copa de la Liga de Inglaterra, Carabao Cup" },
+    espn: { slug: "eng.league_cup", seasons: "split" },
+    // 2026/27: a preliminary round of two ties, then the 70 EFL clubs in the
+    // first round. Eleven Premier League clubs enter in the second round (the
+    // real draw names them) and the nine in Europe in the third round. Single
+    // games with no extra time (level after 90 minutes: straight to
+    // penalties), two-legged semi-finals decided on aggregate then penalties,
+    // and a final at Wembley with extra time before penalties.
+    rounds: [
+      { key: "preliminaryRound", espnSlug: "preliminary-round", ties: 2, noExtraTime: true },
+      { key: "firstRound", espnSlug: "first-round", ties: 35, noExtraTime: true },
+      { key: "secondRound", espnSlug: "second-round", ties: 23, noExtraTime: true },
+      { key: "thirdRound", espnSlug: "third-round", ties: 16, entrantsFrom: ["PL"], entrantsNotYetIn: true, noExtraTime: true },
+      { key: "fourthRound", espnSlug: "fourth-round", ties: 8, noExtraTime: true },
+      { key: "quarterFinals", espnSlug: "quarterfinals", ties: 4, noExtraTime: true },
+      { key: "semiFinals", espnSlug: "semifinals", ties: 2, legs: 2, noExtraTime: true },
+      { key: "final", espnSlug: "final", ties: 1, neutral: true, venue: "Wembley", noExtraTime: false },
+    ],
+    feederLeagues: ["PL", "ELC", "EL1", "EL2"],
+    // Every club is one of the 92; a club outside them would rate as non-league.
+    outsiderTier: 4.5,
+    tagOutsiders: false,
+    title: "EFL Cup",
   },
 ];
 

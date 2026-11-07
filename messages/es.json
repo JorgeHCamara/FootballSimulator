@@ -633,14 +633,18 @@
       "CDB": "La fuerza de cada club sale de su propia liga esta temporada (Série A o Série B), ajustada por la división; los clubes de la Série C, la Série D y los campeonatos estatales quedan por debajo de la Série B.",
       "CDR": "La fuerza de cada club sale de su propia liga esta temporada (LaLiga o Segunda División), ajustada por la división; los clubes de Primera Federación y categorías inferiores quedan por debajo de Segunda.",
       "CIT": "La fuerza de cada club sale de su propia liga esta temporada (Serie A o Serie B), ajustada por la división; los clubes de la Serie C quedan por debajo de la Serie B. No hay sorteo: la Coppa Italia sigue un cuadro fijo.",
-      "DFB": "La fuerza de cada club sale de su propia liga esta temporada (Bundesliga o 2. Bundesliga), ajustada por la división; los clubes de la 3. Liga y los aficionados quedan por debajo de la 2. Bundesliga. Un club aficionado emparejado con uno profesional juega en casa."
+      "DFB": "La fuerza de cada club sale de su propia liga esta temporada (Bundesliga o 2. Bundesliga), ajustada por la división; los clubes de la 3. Liga y los aficionados quedan por debajo de la 2. Bundesliga. Un club aficionado emparejado con uno profesional juega en casa.",
+      "EFC": "La fuerza de cada club sale de su propia liga esta temporada (Premier League, Championship, League One o League Two), ajustada por la división. No hay prórroga antes de la final: un partido empatado a los 90 minutos va directo a los penaltis, y las semifinales a doble partido se deciden por el global y, si sigue igualado, en los penaltis."
     },
     "finalAfter": "Aquí se enfrentan los ganadores de las {round}.",
     "bracketAfter": "Cuadro fijo, sin sorteo: los ganadores se cruzan así.",
     "versus": "vs.",
     "bracketWinnerOf": "Ganador de {round} {n}",
     "chancesNoteBracket": "No hay sorteo: cada simulación sigue el cuadro fijo.",
-    "bracketStatus": "Cuadro fijo"
+    "bracketStatus": "Cuadro fijo",
+    "levelPenalties": "Sin prórroga: un partido empatado a los 90 minutos va directo a los penaltis.",
+    "levelPenaltiesTwoLegs": "Doble partido, decidido por el global; empate tras la vuelta: directo a los penaltis, sin prórroga.",
+    "levelExtraTime": "Empate a los 90 minutos: prórroga y después penaltis."
   },
   "Continents": {
     "Europe": "Europa",
@@ -1295,6 +1299,7 @@
     },
     "endSeason": "Terminar temporada",
     "endSeasonNote": "Ya se jugaron todos los partidos: termina la temporada {season} para ver su resumen, con los campeones y quién sube y quién baja.",
+    "country": "País",
     "seasonHeading": "La temporada {season}",
     "seasonSelect": "Temporada",
     "seasonCurrent": "{season} (esta temporada)",
@@ -1351,7 +1356,6 @@
     },
     "path": {
       "title": "Las temporadas de {club}",
-      "country": "País",
       "league": "Liga",
       "club": "Club",
       "empty": "Aún no hay temporadas jugadas.",

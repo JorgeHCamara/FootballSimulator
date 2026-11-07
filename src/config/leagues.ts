@@ -942,7 +942,7 @@ export const LEAGUES: readonly LeagueConfig[] = [
     teams: 20,
     // Série C 2026 (CBF, REC 2026): a first phase of one round robin (19
     // games); its top 8 play two groups of 4, home and away, from zero points
-    // (the CBF's groups B and C: 1st, 4th, 5th and 8th, and 2nd, 3rd, 6th and
+    // (group A: 1st, 4th, 5th and 8th; group B: 2nd, 3rd, 6th and
     // 7th); each group's top 2 go up to Série B 2027 and the group winners
     // play a two-legged final, the better campaign over both phases hosting
     // the second leg, level on aggregate: penalties. The bottom 2 of the first
@@ -978,17 +978,17 @@ export const LEAGUES: readonly LeagueConfig[] = [
     ],
     groups: [
       {
+        id: "A",
+        espnName: "",
+        name: { en: "Group A", pt: "Grupo A", es: "Grupo A" },
+        shortName: { en: "Group A", pt: "Grupo A", es: "Grupo A" },
+        zones: [{ kind: "promotion", from: 1, to: 2 }],
+      },
+      {
         id: "B",
         espnName: "",
         name: { en: "Group B", pt: "Grupo B", es: "Grupo B" },
         shortName: { en: "Group B", pt: "Grupo B", es: "Grupo B" },
-        zones: [{ kind: "promotion", from: 1, to: 2 }],
-      },
-      {
-        id: "C",
-        espnName: "",
-        name: { en: "Group C", pt: "Grupo C", es: "Grupo C" },
-        shortName: { en: "Group C", pt: "Grupo C", es: "Grupo C" },
         zones: [{ kind: "promotion", from: 1, to: 2 }],
       },
     ],

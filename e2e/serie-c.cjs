@@ -49,9 +49,9 @@ function watchRequests(page) {
   try {
     await step("EN/PT/ES: the first stage as the CBF's table, real names and local crests, no feed called", async () => {
       for (const [locale, heading, tabs] of [
-        ["en", "Série C Simulator", ["1st stage", "Group B", "Group C"]],
-        ["pt", "Simulador da Série C", ["1ª fase", "Grupo B", "Grupo C"]],
-        ["es", "Simulador de la Serie C", ["1ª fase", "Grupo B", "Grupo C"]],
+        ["en", "Série C Simulator", ["1st stage", "Group A", "Group B"]],
+        ["pt", "Simulador da Série C", ["1ª fase", "Grupo A", "Grupo B"]],
+        ["es", "Simulador de la Serie C", ["1ª fase", "Grupo A", "Grupo B"]],
       ]) {
         const page = track(await browser.newPage({ viewport: { width: 1280, height: 900 } }));
         const outside = watchRequests(page);
@@ -84,11 +84,11 @@ function watchRequests(page) {
       const page = track(await browser.newPage({ viewport: { width: 1280, height: 900 } }));
       await page.goto(`${BASE_URL}/en/${LEAGUE}`);
       const sw = page.locator('[data-testid="group-switch"]');
-      await sw.getByRole("button", { name: "Group B" }).click();
+      await sw.getByRole("button", { name: "Group A" }).click();
       assert.deepEqual(await names(page), ["Maringá", "Santa Cruz", "Floresta", "Botafogo-PB"]);
       const zones = await page.locator('[data-testid="standings-row"]').evaluateAll((r) => r.map((x) => x.dataset.zone));
       assert.deepEqual(zones, ["promotion", "promotion", "", ""]);
-      await sw.getByRole("button", { name: "Group C" }).click();
+      await sw.getByRole("button", { name: "Group B" }).click();
       assert.deepEqual(await names(page), ["Ferroviária", "Inter de Limeira", "Brusque", "Paysandu"]);
       // The final: Maringá host the first leg, Ferroviária (the better campaign) the second.
       await page.locator('[data-testid="matchday-select"]').selectOption("-1");
@@ -164,7 +164,7 @@ function watchRequests(page) {
       const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
       for (const path of [`/en/${LEAGUE}`, `/pt/${LEAGUE}`, `/es/${LEAGUE}`, `/pt/${LEAGUE}/team/santa-cruz`]) assert.match(sitemap, new RegExp(path.replace(/\//g, "\\/")));
       await page.goto(`${BASE_URL}/en/${LEAGUE}`);
-      assert.match(await page.getByTestId("league-facts").innerText(), /top 8 go into two groups \(1st, 4th, 5th, 8th: Group B; 2nd, 3rd, 6th, 7th: Group C\)/);
+      assert.match(await page.getByTestId("league-facts").innerText(), /top 8 go into two groups \(1st, 4th, 5th, 8th: Group A; 2nd, 3rd, 6th, 7th: Group B\)/);
       await page.close();
       const phone = track(await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }));
       await phone.goto(`${BASE_URL}/pt/${LEAGUE}`);

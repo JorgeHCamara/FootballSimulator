@@ -66,7 +66,8 @@ async function missingClubs() {
   const year = new Date().getUTCFullYear();
   const month = new Date().getUTCMonth();
   const competitions = [
-    ...LEAGUES.map((l) => ({ code: l.code, country: l.country, slug: l.espn.slug, seasons: l.espn.seasons })),
+    // First-party leagues (Série C) have no feed: their crests are the site's own.
+    ...LEAGUES.filter((l) => l.espn).map((l) => ({ code: l.code, country: l.country, slug: l.espn.slug, seasons: l.espn.seasons })),
     ...CUPS.map((c) => ({ code: c.code, country: c.country, slug: c.espn.slug, seasons: c.espn.seasons })),
   ];
   const clubs = new Map();
@@ -177,6 +178,7 @@ if (download) {
   await writeFile(
     MAP,
     `import type { Team } from "../engine/types.ts";
+import { CREST_CUTOUTS } from "./crestCutouts.ts";
 
 // Crests for clubs ESPN has none for, from TheSportsDB (thesportsdb.com,
 // community-uploaded artwork), matched by hand-checked script and saved under
@@ -186,9 +188,19 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
 ${lines.join("\n")}
 };
 
-/** Gives clubs without a crest the saved one, keyed by ESPN team id; ESPN's own crests stay. */
+/**
+ * Gives clubs without a crest the saved one, keyed by ESPN team id; ESPN's own
+ * crests stay, cut out where they come with a background (src/config/crestCutouts.ts).
+ */
 export function withFallbackCrests(teams: readonly Team[]): Team[] {
-  return teams.map((team) => (team.crest || !CREST_FALLBACKS[team.id] ? team : { ...team, crest: CREST_FALLBACKS[team.id] }));
+  return teams.map((team) => {
+    const crest = team.crest || CREST_FALLBACKS[team.id];
+    if (!crest) return team;
+    // A crest that comes with a background shows cut out, while it's still the one the cut-out was made from.
+    const cutout = CREST_CUTOUTS[team.id];
+    const shown = cutout && cutout.from === crest ? cutout.crest : crest;
+    return shown === team.crest ? team : { ...team, crest: shown };
+  });
 }
 `,
   );

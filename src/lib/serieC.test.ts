@@ -17,6 +17,7 @@ import { getLeagueData } from "./leagueData.ts";
 import { leagueFacts } from "./leagueFacts.ts";
 import { scenarioOutcome } from "./scenario.ts";
 import { shareFixtureList } from "./splitSetup.ts";
+import { cornerAlphas, seeThrough } from "./testdata/crests.ts";
 
 // Brasileirão Série C 2026: the site's own data (src/data/serie-c/2026.json,
 // imported once from the CBF), checked against the CBF's official tables and
@@ -44,33 +45,6 @@ const tuple = (r: { position: number; points: number; played: number; won: numbe
   r.goalsAgainst,
 ];
 
-/** Share of a crest's outer shape (its silhouette, holes filled) that is transparent. */
-function seeThrough(rgba: Uint8Array, w: number, h: number): number {
-  const clear = (p: number) => rgba[p * 4 + 3]! <= 40;
-  const outside = new Uint8Array(w * h);
-  const stack: number[] = [];
-  for (let x = 0; x < w; x++) stack.push(x, (h - 1) * w + x);
-  for (let y = 0; y < h; y++) stack.push(y * w, y * w + w - 1);
-  while (stack.length) {
-    const p = stack.pop()!;
-    if (outside[p] || !clear(p)) continue;
-    outside[p] = 1;
-    const x = p % w;
-    if (x > 0) stack.push(p - 1);
-    if (x < w - 1) stack.push(p + 1);
-    if (p >= w) stack.push(p - w);
-    if (p < w * (h - 1)) stack.push(p + w);
-  }
-  let inside = 0;
-  let holes = 0;
-  for (let p = 0; p < w * h; p++) {
-    if (outside[p]) continue;
-    inside++;
-    if (clear(p)) holes++;
-  }
-  return holes / inside;
-}
-
 describe("Série C 2026 (first-party data)", () => {
   it("is registered as a first-party league with no feed", () => {
     assert.equal(getLeagueBySlug("brasileirao-serie-c"), league);
@@ -97,8 +71,7 @@ describe("Série C 2026 (first-party data)", () => {
       assert.ok(bytes.length > 2000, team.name);
       const { data: px, info } = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       assert.equal(info.channels, 4, team.name);
-      const alphaAt = (x: number, y: number) => px[(y * info.width + x) * 4 + 3]!;
-      for (const [x, y] of [[0, 0], [info.width - 1, 0], [0, info.height - 1], [info.width - 1, info.height - 1]]) assert.equal(alphaAt(x!, y!), 0, `${team.name} corner`);
+      assert.deepEqual(cornerAlphas(px, info.width, info.height), [0, 0, 0, 0], `${team.name} corners`);
       let opaque = 0;
       for (let i = 3; i < px.length; i += 4) if (px[i]! > 200) opaque++;
       assert.ok(opaque > info.width * info.height * 0.15, `${team.name}: the crest is there`);
@@ -201,7 +174,7 @@ describe("Série C 2026 (first-party data)", () => {
   });
 
   it("lets a changed first-phase result change the groups, and the final follows", () => {
-    // Ypiranga (9th, 29 points) beats Santa Cruz (8th) instead of losing: Ypiranga goes into group B, Santa Cruz is out.
+    // Ypiranga (9th, 29 points) beats Santa Cruz (8th) instead of losing: Ypiranga goes into group A, Santa Cruz is out.
     const game = data.fixtures.find((f) => f.matchday <= 19 && [f.homeId, f.awayId].includes(id("Ypiranga")) && [f.homeId, f.awayId].includes(id("Santa Cruz")))!;
     const ypirangaHome = game.homeId === id("Ypiranga");
     const predictions: ResultMap = { [game.id]: ypirangaHome ? { home: 3, away: 0 } : { home: 0, away: 3 } };

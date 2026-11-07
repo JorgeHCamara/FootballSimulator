@@ -1359,7 +1359,7 @@ async function step(name, fn) {
       assert.deepEqual(columns, ["uefa", "austria", "belgium", "england", "france", "germany", "greece", "italy", "netherlands", "portugal", "scotland", "spain", "turkey"]);
       assert.deepEqual((await menu.locator("#menu-eu a").allInnerTexts()).map((x) => x.trim()), ["Champions League", "Europa League", "Conference League"]);
       const england = menu.locator("#menu-gb-eng");
-      assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship", "League One", "League Two", "FA Cup"]);
+      assert.deepEqual((await england.locator("a").allInnerTexts()).map((x) => x.trim()), ["Premier League", "Championship", "League One", "League Two", "FA Cup", "EFL Cup"]);
       // The wide panel stays inside the window.
       const box = await panel.boundingBox();
       assert.ok(box.x >= 0 && box.x + box.width <= 1280, `panel within the viewport: ${box.x}–${box.x + box.width}`);
@@ -1604,7 +1604,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 44, "every competition once");
+      assert.equal(links.length, 45, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();
@@ -2433,6 +2433,14 @@ async function step(name, fn) {
       assert.equal(await review.count(), 0);
       await p.getByTestId("world-tables").waitFor();
       assert.deepEqual(Object.values(await left()), [380, 559, 557, 557], "the new season's games, play-offs included");
+      // The country, before the season's heading: England, the visitor's club's pyramid (the only one so far).
+      const seasonCountry = p.getByTestId("world-season-country");
+      assert.equal(await seasonCountry.inputValue(), "ENG");
+      assert.deepEqual(await seasonCountry.locator("option").allInnerTexts(), ["England"]);
+      assert.ok(
+        await p.getByTestId("world-season-heading").evaluate((h) => Boolean(h.compareDocumentPosition(document.querySelector('[data-testid="world-season-country"]')) & Node.DOCUMENT_POSITION_PRECEDING)),
+        "the country comes before the heading",
+      );
       // Last season, in the picker: its final tables (champions, relegated, the play-off final) and every result, nothing to change.
       assert.deepEqual(await picker.locator("option").allInnerTexts(), [`${label(year + 1)} (this season)`, label(year)]);
       await picker.selectOption(String(year));
@@ -2740,6 +2748,97 @@ async function step(name, fn) {
       assert.equal(await overflowOf(d), 0, "320px: no horizontal scroll");
       assert.equal(await d.getByTestId("hero-title").evaluate((el) => el.scrollWidth > el.clientWidth), false, "320px: h1 not cut off");
       await d.close();
+    });
+
+    await step("EFL Cup: preliminary round from the real draw, no extra time before the final, two-legged semi-finals, Wembley final, chances, EN/PT/ES, phone", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/efl-cup`);
+      assert.equal(await p.locator("h1").count(), 1);
+      assert.match(await p.locator("h1").innerText(), /EFL Cup Simulator \d{4}\/\d{2}/);
+      assert.match(await p.title(), /^EFL Cup Simulator \d{4}\/\d{2} – Predict the Draw and the Final \| FootSimu$/);
+      assert.match(await p.locator('meta[name="description"]').getAttribute("content"), /EFL Cup Simulator .* \(Carabao Cup\)/);
+      assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/efl-cup");
+      assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/efl-cup");
+      assert.equal(await p.locator('link[rel="alternate"][hreflang="es"]').getAttribute("href"), "https://footsimu.com/es/efl-cup");
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["Preliminary round", "First Round", "Second Round", "Third Round", "Fourth Round", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 2, "two preliminary-round ties from the real draw");
+      // The first tie was level and went to penalties: shown under the score, decided by it.
+      const played = ties.first();
+      assert.equal(await played.locator("input").count(), 0, "played ties show the result");
+      await played.locator('[data-testid="shootout-line"]').waitFor();
+      assert.notEqual(await played.getAttribute("data-winner"), "");
+      assert.match(await p.locator('[data-testid="level-rule"]').innerText(), /^No extra time: a game level after 90 minutes goes straight to penalties\.$/);
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /CH|L1|L2/, "division tags");
+      // A played result can be changed: the result box opens for editing and the new score counts.
+      await played.locator('[data-testid="match-row"] button[title="Change this result"]').click();
+      const inputs = played.locator('[data-testid="match-row"] input');
+      await inputs.nth(0).fill("0");
+      await inputs.nth(1).fill("3");
+      await played.locator('[data-testid="shootout-line"]').waitFor({ state: "detached" });
+      assert.equal(await played.getAttribute("data-winner"), await played.getAttribute("data-away"), "the edited result decides the tie");
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+      await played.locator('[data-testid="shootout-line"]').waitFor();
+
+      // Down to the final: the semi-finals over two legs on aggregate, the final at Wembley with extra time, a champion.
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      assert.ok((await bar.allInnerTexts()).every((x) => x.includes("Complete")));
+      await bar.nth(6).click();
+      const semis = p.locator('[data-testid="bracket-round"]').nth(1).locator('[data-testid="cup-tie"]');
+      assert.equal(await semis.count(), 2);
+      assert.deepEqual(await semis.evaluateAll((els) => els.map((e) => e.dataset.legs)), ["2", "2"]);
+      assert.equal(await semis.first().locator('[data-testid="cup-aggregate"]').count(), 1, "aggregate shown");
+      assert.match(await p.locator('[data-testid="level-rule"]').innerText(), /Two legs, decided on aggregate; level after the second leg: straight to penalties, no extra time\./);
+      await bar.nth(7).click();
+      assert.match(await p.locator('[data-testid="level-rule"]').innerText(), /^Level after 90 minutes: extra time, then penalties\.$/);
+      assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Wembley/);
+      const champion = await p.locator('[data-testid="champion"]').innerText();
+      assert.match(champion, /EFL Cup \d{4}\/\d{2} winner/);
+      assert.match(champion, /Semi-finals: \d+–\d+ on aggregate v /);
+
+      // Chances: win chances add up to about 100%; every round's column from the first open one.
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="cup-chances"]').waitFor({ timeout: 90000 });
+      await p.getByRole("button", { name: /Show all/ }).click();
+      assert.equal(await p.locator('[data-testid="cup-chance-row"]').count(), 3 + 68 + 11 + 9, "the open preliminary tie's two clubs, the decided tie's winner, and every club still to enter");
+      const wins = await p.locator('[data-testid="cup-win-chance"]').allInnerTexts();
+      const total = wins.reduce((n, x) => n + (x === "–" ? 0 : x.startsWith("<") ? 0.05 : parseFloat(x)), 0);
+      assert.ok(total > 90 && total < 110, `win chances sum to ${total}%`);
+      await p.close();
+
+      // PT and ES: their own words, the brand-neutral name with the sponsor as the subtitle only.
+      for (const [locale, h1, aka] of [["pt", "Simulador da Copa da Liga Inglesa", "Copa da Liga Inglesa, Carabao Cup"], ["es", "Simulador de la Copa de la Liga de Inglaterra", "Copa de la Liga de Inglaterra, Carabao Cup"]]) {
+        const q = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+        await q.goto(`${BASE_URL}/${locale}/efl-cup`);
+        assert.equal(await q.locator("h1").count(), 1);
+        assert.ok((await q.locator("h1").innerText()).startsWith(h1), locale);
+        assert.ok((await q.locator('meta[name="description"]').getAttribute("content")).includes(aka), locale);
+        assert.equal(await q.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com/${locale}/efl-cup`);
+        assert.equal(await q.locator('[data-testid="cup-tie"]').count(), 2);
+        await q.close();
+      }
+
+      // Phone: no horizontal scroll; the menu lists the cup under England, after the FA Cup.
+      const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })).newPage();
+      await phone.goto(`${BASE_URL}/en/efl-cup`);
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0);
+      await phone.locator('[data-testid="mobile-menu-button"]').tap();
+      // The menu opens on the page's own continent, Europe, with its countries' competitions.
+      await phone.locator('[data-testid="mobile-menu"] a', { hasText: "FA Cup" }).waitFor();
+      const england = (await phone.locator('[data-testid="mobile-menu"] a').allInnerTexts()).map((x) => x.trim());
+      assert.ok(england.indexOf("EFL Cup") === england.indexOf("FA Cup") + 1, england.join(", "));
+      assert.equal(await phone.locator('[data-testid="mobile-menu"] a', { hasText: "EFL Cup" }).getAttribute("href"), "/en/efl-cup");
+      const sitemap = await (await phone.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/efl-cup<`));
+      await phone.context().close();
     });
 
     console.log("\nAll e2e checks passed.");
