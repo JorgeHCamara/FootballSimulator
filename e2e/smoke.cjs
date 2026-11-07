@@ -3049,7 +3049,9 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
       await fixtures.getByTestId("matchday-select").selectOption("-1");
       assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
-      assert.equal(await fixtures.getByTestId("match-score").count(), 2);
+      // Both legs, and the shoot-out's score when the tie was level on aggregate.
+      const scores = await fixtures.getByTestId("match-score").count();
+      assert.ok(scores === 2 || scores === 3, `${scores} scores`);
       await p.close();
     });
 
