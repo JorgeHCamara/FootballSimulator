@@ -109,9 +109,21 @@ function liveFaCup(pack: StartPack, { played = 10, outsiders = 32, ties = 40, ye
 }
 
 describe("My World: the cups' entry rounds", () => {
-  it("the FA Cup brings 32 non-league sides in; the EFL Cup is the Football League's 92 alone", () => {
+  it("the FA Cup brings 32 non-league sides in; the EFL Cup is the Football League's 92 alone; the Copa del Rey 84 from below Spain's two leagues", () => {
     assert.equal(outsidersNeeded(cupConfig("FAC"), 92), 32);
     assert.equal(outsidersNeeded(cupConfig("EFC"), 92), 0);
+    assert.equal(outsidersNeeded(cupConfig("CDR"), 42), 84);
+  });
+
+  it("the Copa del Rey: the lower sides in the qualifying round and, with the Segunda and most of La Liga, in the first round; La Liga's strongest four in the round of 32", () => {
+    const spain = [ids(1, 20), ids(21, 22)];
+    const outsiders = ids(2001, 90);
+    const cdr = generateCup("CDR", spain, outsiders);
+    assert.deepEqual(Object.keys(cdr.entrants), ["qualifyingRound", "firstRound", "roundOf32"]);
+    assert.deepEqual(cdr.entrants.qualifyingRound, ids(2001, 20));
+    assert.deepEqual(cdr.entrants.firstRound, [...ids(2021, 64), ...ids(21, 22), ...ids(1, 16)]);
+    assert.deepEqual(cdr.entrants.roundOf32, ids(17, 4));
+    assert.ok(cupPlayable(cdr));
   });
 
   it("fills each round from the weakest club up, as many as its ties need: the FA Cup's first round takes the non-league sides and the two lower leagues, its third round the top two", () => {
@@ -140,7 +152,8 @@ describe("My World: the cups' entry rounds", () => {
 describe("My World: a new world's cups", () => {
   it("has both cups, the FA Cup's pool of 32 non-league sides from the real cup (clubs of the world that play no league), and every club of each cup in the world", () => {
     assert.ok(packReady(pack));
-    assert.deepEqual(world.cups.map((c) => c.code), [...WORLD_CUPS]);
+    assert.deepEqual(world.cups.map((c) => c.code), ["FAC", "EFC"], "England's cups, of the three a world can play");
+    assert.deepEqual([...WORLD_CUPS], ["FAC", "EFC", "CDR"]);
     assert.equal(world.cupPool.length, 32);
     const pool = world.cupPool.map((id) => world.clubs[id]!);
     assert.ok(pool.every((c) => c.origin === "real" && c.realId !== undefined && c.id > CUP_POOL_ID_BASE && c.id < NATIONAL_LEAGUE_ID_BASE), "real clubs, with the pool's ids");

@@ -4,8 +4,9 @@ import { useTranslations } from "next-intl";
 import { useMemo, useState, type ReactNode } from "react";
 import type { Fixture, Score, Team, TeamId } from "../engine/types.ts";
 import {
+  COUNTRY_CUPS,
+  COUNTRY_LEAGUES,
   divisionConfig,
-  ENGLAND,
   pastDivision,
   resetDivision,
   rollScore,
@@ -18,8 +19,9 @@ import {
   type DivisionCode,
   type DivisionState,
   type World,
+  type WorldCountry,
 } from "../lib/myWorld.ts";
-import { isWorldCup, WORLD_CUPS, type WorldCupCode } from "../lib/worldCups.ts";
+import { isWorldCup, type WorldCupCode } from "../lib/worldCups.ts";
 import { worldWinners } from "../lib/worldWinners.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
@@ -29,12 +31,14 @@ import { useRealWinners } from "./PastWinnersProvider.tsx";
 import { PromotedClubs } from "./PromotedClubs.tsx";
 import { WorldTable } from "./WorldTable.tsx";
 
-/** The season's competitions as tabs: one button per league, then the cups. */
-export function DivisionTabs({ value, onChange, label, testId }: { value: DivisionCode | WorldCupCode; onChange: (code: DivisionCode | WorldCupCode) => void; label: string; testId: string }) {
+/** A country's competitions as tabs: one button per league, then its cups. */
+export function DivisionTabs({ country, value, onChange, label, testId }: { country: WorldCountry; value: DivisionCode | WorldCupCode; onChange: (code: DivisionCode | WorldCupCode) => void; label: string; testId: string }) {
   const t = useTranslations("World");
+  const codes = [...COUNTRY_LEAGUES[country], ...COUNTRY_CUPS[country]];
+  const columns = codes.length >= 6 ? "sm:grid-cols-3 lg:grid-cols-6" : codes.length >= 4 ? "sm:grid-cols-4" : "sm:grid-cols-3";
   return (
-    <div role="tablist" aria-label={label} className="grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 sm:grid-cols-3 lg:grid-cols-6 dark:bg-zinc-800" data-testid={testId}>
-      {[...ENGLAND, ...WORLD_CUPS].map((code) => (
+    <div role="tablist" aria-label={label} className={`grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800 ${columns}`} data-testid={testId} data-country={country}>
+      {codes.map((code) => (
         <button
           key={code}
           type="button"
@@ -270,7 +274,7 @@ export function WorldSeason({
         {playoff?.promotedTo && (
           <PromotedClubs
             bracket={state.bracket}
-            rows={state.rows}
+            rows={state.playoffRows}
             teams={teams}
             predictions={picks}
             seasonComplete={state.leagueComplete}

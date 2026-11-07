@@ -5,7 +5,7 @@ import { Icon } from "../../../components/Icon.tsx";
 import { MyWorld } from "../../../components/MyWorld.tsx";
 import { PastWinnersProvider, type RealWinners } from "../../../components/PastWinnersProvider.tsx";
 import type { SiteLocale } from "../../../config/leagues.ts";
-import { divisionConfig, ENGLAND } from "../../../lib/myWorld.ts";
+import { divisionConfig, WORLD_LEAGUES } from "../../../lib/myWorld.ts";
 import { worldStartPack } from "../../../lib/myWorldStart.ts";
 import { leagueWinners } from "../../../lib/winnersData.ts";
 import { MY_WORLD_LISTED, OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
@@ -41,7 +41,7 @@ export default async function Page({ params }: { params: Params }) {
   const [t, messages, pack] = await Promise.all([getTranslations("World"), getMessages(), worldStartPack()]);
   // Each league's real Past Winners (src/data/history), for the world's own seasons to go on top of; a league without a file shows the world's only.
   const realWinners: RealWinners = Object.fromEntries(
-    ENGLAND.flatMap((code) => {
+    WORLD_LEAGUES.flatMap((code) => {
       const rows = leagueWinners(divisionConfig(code).slug);
       return rows ? [[code, rows]] : [];
     }),

@@ -6,13 +6,19 @@ import type { SiteLocale } from "../config/leagues.ts";
 import type { TeamId } from "../engine/types.ts";
 import { ordinal } from "../lib/clubText.ts";
 import {
+  clubCountry,
   clubDivision,
   clubPath,
+  COUNTRY_CUPS,
+  COUNTRY_FLAG,
   COUNTRY_LEAGUES,
   createWorld,
+  cupCountry,
   divisionConfig,
-  ENGLAND,
+  divisionCountry,
   gamesLeft,
+  LOWER_LEAGUE,
+  neighbours,
   packReady,
   playSeason,
   seasonLabel,
@@ -27,10 +33,9 @@ import {
   type WorldClub,
   type WorldCountry,
   isDivision,
-  PLAYED_COUNTRIES,
   WORLD_COUNTRIES,
+  worldDivisions,
 } from "../lib/myWorld.ts";
-import { getLeagueByCode } from "../config/leagues.ts";
 import { browserStore, clearWorld, loadWorld, saveWorld } from "../lib/myWorldStorage.ts";
 import { cupGamesLeft, cupStates, isWorldCup, outsidersNeeded, type WorldCupCode } from "../lib/worldCups.ts";
 import { Flag } from "./Flag.tsx";
@@ -125,21 +130,18 @@ function Loading() {
   );
 }
 
-/** The choices of countries a world can be set up with: both, England, Spain (as data-countries values). */
-const COUNTRY_CHOICES: readonly (readonly WorldCountry[])[] = [["ENG", "ESP"], ["ENG"], ["ESP"]];
-
-/** Picking the countries, then the league, then the club, then creating the world. */
+/** Picking the countries (one card each; every one picked is played in full), then the league, then the club, then creating the world. */
 function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: SiteLocale; reset?: "incompatible" | "unreadable"; onCreate: (league: DivisionCode, club: number, countries: WorldCountry[]) => void }) {
   const t = useTranslations("World");
-  const [countries, setCountries] = useState<readonly WorldCountry[] | null>(null);
+  const [countries, setCountries] = useState<WorldCountry[]>([]);
   const [league, setLeague] = useState<DivisionCode | null>(null);
   const [club, setClub] = useState<number | null>(null);
-  const ready = packReady(pack);
-  // The countries whose leagues can be picked now, and those still to come (Spain).
-  const playable = (countries ?? []).filter((c) => PLAYED_COUNTRIES.includes(c));
-  const comingSoon = (countries ?? []).filter((c) => !PLAYED_COUNTRIES.includes(c));
-  const countryNames = (list: readonly WorldCountry[]) => (list.length === 2 ? t("setup.countryBoth") : t(`countries.${list[0]!}`));
-  const season = pack.leagues[0] ? seasonLabel(pack.leagues[0].year) : "";
+  // A country whose live data didn't load can't be picked; with none to pick, no new world for now.
+  const available = (country: WorldCountry) => packReady(pack, [country]);
+  const ready = WORLD_COUNTRIES.some(available);
+  const name = (code: string) => t(isWorldCup(code) ? `cups.${code}.name` : `leagues.${code}.name`);
+  const leagues = worldDivisions(countries);
+  const season = leagues[0] ? seasonLabel(pack.leagues.find((l) => l.code === leagues[0])?.year ?? NaN) : "";
   const clubs = league ? (pack.leagues.find((l) => l.code === league)?.teams ?? []) : [];
   const chosen = clubs.find((c) => c.id === club);
   const createRef = useRef<HTMLDivElement>(null);
@@ -147,8 +149,16 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
   useEffect(() => {
     if (club !== null) createRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [club]);
+  const toggle = (country: WorldCountry) => {
+    setCountries((picked) => WORLD_COUNTRIES.filter((c) => (c === country ? !picked.includes(c) : picked.includes(c))));
+    setLeague(null);
+    setClub(null);
+  };
+  const countryNames = (list: readonly WorldCountry[]) => list.map((c) => t(`countries.${c}`)).join(t("setup.and"));
   const step = "flex items-center gap-2 text-base font-bold";
   const number = "inline-flex h-6 w-6 items-center justify-center rounded-full bg-pitch-600 text-xs font-bold text-white";
+  const cardButton = (active: boolean) =>
+    `flex min-h-14 w-full items-center gap-3 rounded-xl border-2 px-3 py-2 text-left text-sm font-semibold transition ${active ? "border-pitch-600 bg-pitch-50 dark:bg-pitch-900/40" : "border-zinc-200 bg-white hover:border-pitch-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 dark:disabled:hover:border-zinc-800"}`;
   return (
     <section className="space-y-5" data-testid="world-setup">
       <h2 className="text-xl font-bold tracking-tight">{t("setup.title")}</h2>
@@ -161,7 +171,7 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
       {!ready ? (
         <p className={`${card} flex gap-2 text-sm`} role="alert" data-testid="world-missing">
           <Icon name="info" size={18} className="mt-0.5 shrink-0 text-red-600" />
-          {t("missing", { leagues: (pack.missing.length ? pack.missing : ENGLAND).map((c) => t(isWorldCup(c) ? `cups.${c}.name` : `leagues.${c}.name`)).join(", ") })}
+          {t("missing", { leagues: (pack.missing.length ? pack.missing : worldDivisions(WORLD_COUNTRIES)).map(name).join(", ") })}
         </p>
       ) : (
         <>
@@ -170,85 +180,69 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
               <span className={number}>1</span>
               {t("setup.countries")}
             </h3>
-            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {COUNTRY_CHOICES.map((choice) => {
-                const key = choice.join(",");
-                const active = countries?.join(",") === key;
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("setup.countriesHint")}</p>
+            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {WORLD_COUNTRIES.map((country) => {
+                const picked = countries.includes(country);
+                const ok = available(country);
                 return (
-                  <li key={key}>
+                  <li key={country}>
                     <button
                       type="button"
-                      onClick={() => {
-                        setCountries(choice);
-                        setLeague(null);
-                        setClub(null);
-                      }}
-                      aria-pressed={active}
-                      className={`flex min-h-14 w-full items-center gap-3 rounded-xl border-2 px-3 py-2 text-left text-sm font-semibold transition ${active ? "border-pitch-600 bg-pitch-50 dark:bg-pitch-900/40" : "border-zinc-200 bg-white hover:border-pitch-500 dark:border-zinc-800 dark:bg-zinc-900"}`}
-                      data-testid="world-countries"
-                      data-countries={key}
+                      onClick={() => toggle(country)}
+                      aria-pressed={picked}
+                      disabled={!ok}
+                      className={cardButton(picked)}
+                      data-testid="world-country"
+                      data-country={country}
+                      data-picked={picked}
                     >
-                      <span className="flex shrink-0 items-center gap-1">
-                        {choice.map((c) => (
-                          <Flag key={c} code={c === "ENG" ? "gb-eng" : "es"} width={24} />
-                        ))}
+                      <Flag code={COUNTRY_FLAG[country]} width={24} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate">{t(`countries.${country}`)}</span>
+                        <span className="block text-xs font-normal text-zinc-500">
+                          {ok ? t(`setup.countryLeagues.${country}`) : t("setup.unavailable", { leagues: [...COUNTRY_LEAGUES[country], ...COUNTRY_CUPS[country]].filter((code) => pack.missing.includes(code)).map(name).join(", ") })}
+                        </span>
                       </span>
-                      <span className="min-w-0">
-                        <span className="block truncate">{countryNames(choice)}</span>
-                        <span className="block text-xs font-normal text-zinc-500">{choice.map((c) => t(`setup.countryLeagues.${c}`)).join(" · ")}</span>
-                      </span>
+                      {picked && <Icon name="check" size={16} strokeWidth={3} className="shrink-0 text-pitch-700" />}
                     </button>
                   </li>
                 );
               })}
             </ul>
           </div>
-          {countries && (
+          {countries.length > 0 && (
             <div className="space-y-3">
               <h3 className={step}>
                 <span className={number}>2</span>
                 {t("setup.league")}
               </h3>
-              {comingSoon.length > 0 && (
-                <p className={`${card} flex gap-2 text-sm`} role="status" data-testid="world-coming-soon">
-                  <Icon name="info" size={18} className="mt-0.5 shrink-0 text-pitch-700" />
-                  {t(playable.length ? "setup.comingSoonNote" : "setup.comingSoonOnly", { country: comingSoon.map((c) => t(`countries.${c}`)).join(", ") })}
-                </p>
-              )}
               <ul className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-                {countries.flatMap((country) =>
-                  COUNTRY_LEAGUES[country].map((code) => {
-                    const plays = isDivision(code);
-                    const config = plays ? divisionConfig(code) : getLeagueByCode(code)!;
-                    return (
-                      <li key={code}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (!plays) return;
-                            setLeague(code);
-                            setClub(null);
-                          }}
-                          aria-pressed={league === code}
-                          disabled={!plays}
-                          className={`flex min-h-14 w-full items-center gap-3 rounded-xl border-2 px-3 py-2 text-left text-sm font-semibold transition ${league === code ? "border-pitch-600 bg-pitch-50 dark:bg-pitch-900/40" : "border-zinc-200 bg-white hover:border-pitch-500 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 dark:disabled:hover:border-zinc-800"}`}
-                          data-testid={plays ? "world-league" : "world-league-soon"}
-                          data-league={code}
-                        >
-                          <Flag code={config.flag} width={24} />
-                          <span className="min-w-0">
-                            <span className="block truncate">{plays ? t(`leagues.${code}.name`) : config.name}</span>
-                            <span className="block text-xs font-normal text-zinc-500">{plays ? t("setup.clubs", { count: config.teams }) : t("setup.comingSoon")}</span>
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  }),
-                )}
+                {leagues.map((code) => (
+                  <li key={code}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLeague(code);
+                        setClub(null);
+                      }}
+                      aria-pressed={league === code}
+                      className={cardButton(league === code)}
+                      data-testid="world-league"
+                      data-league={code}
+                    >
+                      <Flag code={divisionConfig(code).flag} width={24} />
+                      <span className="min-w-0">
+                        <span className="block truncate">{t(`leagues.${code}.name`)}</span>
+                        <span className="block text-xs font-normal text-zinc-500">{t("setup.clubs", { count: divisionConfig(code).teams })}</span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
           )}
-          {countries && league && (
+          {countries.length > 0 && league && (
             <div className="space-y-3">
               <h3 className={step}>
                 <span className={number}>3</span>
@@ -275,7 +269,7 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
               </ul>
             </div>
           )}
-          {countries && league && chosen && (
+          {countries.length > 0 && league && chosen && (
             <div ref={createRef} className={`${card} space-y-3`}>
               <h3 className={step}>
                 <span className={number}>4</span>
@@ -315,7 +309,12 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const t = useTranslations("World");
   const me = world.clubs[world.userClub]!;
   const myDivision = clubDivision(world, world.userClub);
-  const [viewed, setViewed] = useState<DivisionCode | WorldCupCode>(myDivision ?? "EL2");
+  const myCountry = myDivision ? divisionCountry(myDivision) : clubCountry(me);
+  /** The competition a country opens on: the visitor's club's division when it's there, else the country's top league. */
+  const opening = (c: WorldCountry): DivisionCode => (myDivision && divisionCountry(myDivision) === c ? myDivision : COUNTRY_LEAGUES[c][0]!);
+  // The country whose competitions the tabs show, and the competition shown.
+  const [country, setCountry] = useState<WorldCountry>(myCountry);
+  const [viewed, setViewed] = useState<DivisionCode | WorldCupCode>(opening(myCountry));
   // The matchday each league's fixtures show (else its next round).
   const [matchdays, setMatchdays] = useState<Partial<Record<DivisionCode, number>>>({});
   // The season the tables and fixtures show: this one, or a finished one picked to look back at.
@@ -325,7 +324,8 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const last = world.history.at(-1);
   // Where the visitor's club is when the season changes: its own division, on its next round, this season.
   useEffect(() => {
-    setViewed(clubDivision(world, world.userClub) ?? "EL2");
+    setCountry(myCountry);
+    setViewed(opening(myCountry));
     setMatchdays({});
     setYear(world.year);
   }, [world.year, world.userClub]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -338,9 +338,16 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const myRow = mine?.rows.find((r) => r.teamId === world.userClub);
   const firstSeason = world.divisions.some((d) => d.games);
   const season = seasonLabel(world.year);
-  // Games left to play in each league (play-offs included) and each cup; the next season once there are none.
-  const left: { code: DivisionCode | WorldCupCode; games: number }[] = [...states.map((s) => ({ code: s.code, games: gamesLeft(s) })), ...cups.map((c) => ({ code: c.code, games: cupGamesLeft(c) }))];
+  // Games left to play in each league (play-offs included) and each cup, by country; the next season once there are none.
+  const left = world.countries.map((c) => ({
+    country: c,
+    items: [
+      ...states.filter((s) => divisionCountry(s.code) === c).map((s) => ({ code: s.code as DivisionCode | WorldCupCode, games: gamesLeft(s) })),
+      ...cups.filter((x) => cupCountry(x.code) === c).map((x) => ({ code: x.code as DivisionCode | WorldCupCode, games: cupGamesLeft(x) })),
+    ],
+  }));
   const done = states.every((s) => s.done) && cups.every((c) => c.done);
+  const lowerOf = (c: WorldCountry) => ({ lower: t(`leagues.${LOWER_LEAGUE[c]}.the`), back: t(`leagues.${COUNTRY_LEAGUES[c].at(-1)!}.name`) });
   const shownSeason = seasonLabel(year);
   /** A competition's name: a league's or a cup's. */
   const name = (code: DivisionCode | WorldCupCode) => t(isWorldCup(code) ? `cups.${code}.name` : `leagues.${code}.name`);
@@ -354,8 +361,14 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
       setPlaying(false);
     }, 30);
   };
+  /** A country picked: its competitions, opening on the visitor's club's division when it's there. */
+  const pickCountry = (c: WorldCountry) => {
+    setCountry(c);
+    setViewed(opening(c));
+  };
   /** A league's or a cup's games left, tapped: its table and fixtures (its rounds), this season. */
   const showLeague = (code: DivisionCode | WorldCupCode) => {
+    setCountry(isWorldCup(code) ? cupCountry(code) : divisionCountry(code));
     setViewed(code);
     setYear(world.year);
     document.querySelector('[data-testid="world-tables"]')?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -380,7 +393,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
             </p>
             <p className="text-sm text-zinc-600 dark:text-zinc-400" data-testid="world-season">
               {t("season", { season })}
-              {myDivision ? ` · ${t(`leagues.${myDivision}.name`)}` : world.nationalLeague.includes(me.id) ? ` · ${t("leagues.NL.name")}` : ""}
+              {myDivision ? ` · ${t(`leagues.${myDivision}.name`)}` : world.nationalLeague.includes(me.id) ? ` · ${t(`leagues.${LOWER_LEAGUE[clubCountry(me)]}.name`)}` : ""}
               {myRow && myRow.played > 0 ? ` · ${t("standing", { position: ordinal(myRow.position, locale), points: myRow.points })}` : ""}
             </p>
           </div>
@@ -389,26 +402,36 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
         {!world.review && (
           <div className="space-y-2 lg:w-[30rem] lg:shrink-0" data-testid="world-left-card">
             <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">{t("left.title")}</p>
-            <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-              {left.map(({ code, games }) => (
-                <li key={code}>
-                  <button
-                    type="button"
-                    onClick={() => showLeague(code)}
-                    className={`flex w-full min-w-0 flex-col items-start rounded-lg px-2.5 py-1.5 text-left text-xs hover:ring-1 hover:ring-pitch-500 ${games === 0 ? "bg-pitch-50 text-pitch-800 dark:bg-pitch-900/40 dark:text-pitch-100" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"}`}
-                    data-testid="world-left"
-                    data-league={code}
-                    data-left={games}
-                  >
-                    <span className="w-full truncate font-semibold">{name(code)}</span>
-                    <span className="flex items-center gap-1 tabular-nums">
-                      {games === 0 && <Icon name="check" size={12} strokeWidth={3} />}
-                      {t("left.count", { count: games })}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {left.map(({ country: c, items }) => (
+              <div key={c} className="space-y-1" data-testid="world-left-country" data-country={c}>
+                {left.length > 1 && (
+                  <p className="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                    <Flag code={COUNTRY_FLAG[c]} width={16} />
+                    {t(`countries.${c}`)}
+                  </p>
+                )}
+                <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                  {items.map(({ code, games }) => (
+                    <li key={code}>
+                      <button
+                        type="button"
+                        onClick={() => showLeague(code)}
+                        className={`flex w-full min-w-0 flex-col items-start rounded-lg px-2.5 py-1.5 text-left text-xs hover:ring-1 hover:ring-pitch-500 ${games === 0 ? "bg-pitch-50 text-pitch-800 dark:bg-pitch-900/40 dark:text-pitch-100" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"}`}
+                        data-testid="world-left"
+                        data-league={code}
+                        data-left={games}
+                      >
+                        <span className="w-full truncate font-semibold">{name(code)}</span>
+                        <span className="flex items-center gap-1 tabular-nums">
+                          {games === 0 && <Icon name="check" size={12} strokeWidth={3} />}
+                          {t("left.count", { count: games })}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
             {done ? (
               <div className="space-y-1">
                 <button type="button" className={`${primary} w-full`} onClick={endSeason} disabled={playing} data-testid="world-end-season">
@@ -433,9 +456,9 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
       {!myDivision && me.left !== undefined && (
         <p className={`${card} flex gap-2 text-sm`} role="status" data-testid="world-out">
           <Icon name="info" size={18} className="mt-0.5 shrink-0 text-pitch-700" />
-          {/* A season in the National League, then back up; or (a world from before it) gone for good. */}
+          {/* A season in the league below, then back up; or (a world from before the National League) gone for good. */}
           {world.nationalLeague.includes(me.id)
-            ? t("outNotice", { club: me.name, season: seasonLabel(me.left) })
+            ? t("outNotice", { club: me.name, season: seasonLabel(me.left), ...lowerOf(clubCountry(me)) })
             : t("goneNotice", { club: me.name, season: seasonLabel(me.left) })}
         </p>
       )}
@@ -458,12 +481,12 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
         <section className="scroll-mt-4 space-y-3" data-testid="world-tables">
           {/* The country, then the season: more countries will be picked here once there are more pyramids. */}
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-            <CountryPicker world={world} testId="world-season-country" />
+            <CountryPicker world={world} value={country} onChange={pickCountry} testId="world-season-country" />
             <h2 className="text-xl font-bold tracking-tight" data-testid="world-season-heading">
               {t("seasonHeading", { season: shownSeason })}
             </h2>
           </div>
-          <DivisionTabs value={viewed} onChange={setViewed} label={t("competitions")} testId="world-tabs" />
+          <DivisionTabs country={country} value={viewed} onChange={setViewed} label={t("competitions")} testId="world-tabs" />
           <p className="text-xs text-zinc-500">
             {cupShown
               ? year !== world.year
@@ -539,18 +562,22 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
   const mine = i >= 0 ? record.divisions[i]! : undefined;
   const at = mine ? mine.rows.findIndex((r) => r[0] === world.userClub) : -1;
   const note = mine ? mine.rows[at]![8] : "";
+  const next = mine ? neighbours(mine.code) : {};
+  const country = mine ? divisionCountry(mine.code) : clubCountry(world.clubs[world.userClub]!);
   const values = mine
     ? {
         club: name(world.userClub),
         position: ordinal(at + 1, locale),
         ...leagueOf(mine.code),
-        to: i > 0 && (note === "C" || note === "P" || note === "W") ? t(`leagues.${ENGLAND[i - 1]!}.the`) : note === "R" && i < ENGLAND.length - 1 ? t(`leagues.${ENGLAND[i + 1]!}.the`) : "",
+        to: next.above && (note === "C" || note === "P" || note === "W") ? t(`leagues.${next.above}.the`) : note === "R" && next.below ? t(`leagues.${next.below}.the`) : "",
+        lower: t(`leagues.${LOWER_LEAGUE[country]}.the`),
+        back: t(`leagues.${mine.code}.name`),
       }
     : undefined;
-  const key = !mine ? undefined : note === "C" ? (i > 0 ? "CUp" : "C") : note === "P" || note === "W" || note === "O" ? note : note === "R" ? (i === ENGLAND.length - 1 ? "out" : "R") : "stay";
+  const key = !mine ? undefined : note === "C" ? (next.above ? "CUp" : "C") : note === "P" || note === "W" || note === "O" ? note : note === "R" ? (next.below ? "R" : "out") : "stay";
   const headline = key && values ? t(`review.${key}`, key === "W" ? { ...values, league: t(`leagues.${mine!.code}.name`) } : values) : "";
   const good = note === "C" || note === "P" || note === "W";
-  const moves = seasonMoves(record);
+  const moves = seasonMoves(world, record);
   const list = (ids: TeamId[]) => (
     <ul className="space-y-1">
       {ids.map((id) => (
@@ -609,14 +636,14 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
               <div className="min-w-0">
                 <p className="mb-1 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide text-pitch-700 dark:text-pitch-100">
                   <Icon name="arrow-up" size={13} strokeWidth={2.5} />
-                  {m.lower ? t("review.up") : t("review.in_")}
+                  {m.lower ? t("review.up") : t("review.in_", { league: t(`leagues.${LOWER_LEAGUE[divisionCountry(m.upper)]}.the`) })}
                 </p>
                 {list(m.up)}
               </div>
               <div className="min-w-0">
                 <p className="mb-1 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide text-red-600">
                   <Icon name="arrow-down" size={13} strokeWidth={2.5} />
-                  {m.lower ? t("review.down") : t("review.out_")}
+                  {m.lower ? t("review.down") : t("review.out_", { league: t(`leagues.${LOWER_LEAGUE[divisionCountry(m.upper)]}.the`) })}
                 </p>
                 {list(m.down)}
               </div>
@@ -650,17 +677,17 @@ const OUTCOME_STYLE: Record<PathOutcome, { icon?: "trophy" | "arrow-up" | "arrow
   neutral: { tone: "text-zinc-500" },
 };
 
-/** The country picker: the world's countries (its flag, then the name); England, whose leagues play, is the one shown, a country still to come can't be picked yet. */
-function CountryPicker({ world, testId }: { world: World; testId: string }) {
+/** The country picker: the world's countries (the one picked's flag, then the names). */
+function CountryPicker({ world, value, onChange, testId }: { world: World; value: WorldCountry; onChange: (country: WorldCountry) => void; testId: string }) {
   const t = useTranslations("World");
   const countries = WORLD_COUNTRIES.filter((c) => (world.countries ?? ["ENG"]).includes(c));
   return (
     <Picker
-      icon={<Flag code="gb-eng" width={18} className="shrink-0" />}
+      icon={<Flag code={COUNTRY_FLAG[value]} width={18} className="shrink-0" />}
       label={t("country")}
-      value={world.pyramid}
-      options={countries.map((c) => (PLAYED_COUNTRIES.includes(c) ? { value: c, label: t(`countries.${c}`) } : { value: c, label: `${t(`countries.${c}`)} (${t("setup.comingSoon").toLowerCase()})`, disabled: true }))}
-      onChange={() => {}}
+      value={value}
+      options={countries.map((c) => ({ value: c, label: t(`countries.${c}`) }))}
+      onChange={(c) => onChange(c as WorldCountry)}
       testId={testId}
     />
   );
@@ -680,24 +707,29 @@ function Path({ world, locale }: { world: World; locale: SiteLocale }) {
   const steps = useMemo(() => [...clubPath(world, club.id)].reverse(), [world, club.id]);
   const clubsOf = (code: DivisionCode) =>
     [...(world.divisions.find((d) => d.code === code)?.clubs ?? [])].sort((a, b) => world.clubs[a]!.name.localeCompare(world.clubs[b]!.name, locale));
-  // A club's league this season; for a season in the National League, the last one it played in (it's listed there).
+  // A club's league this season; for a season in the league below, the last one it played in (it's listed there), else its country's bottom league.
   const leagueOf = (id: TeamId): DivisionCode =>
-    clubDivision(world, id) ?? ([...clubPath(world, id)].reverse().find((s) => s.code !== "NL")?.code as DivisionCode | undefined) ?? "EL2";
+    clubDivision(world, id) ??
+    ([...clubPath(world, id)].reverse().find((s) => isDivision(s.code))?.code as DivisionCode | undefined) ??
+    COUNTRY_LEAGUES[clubCountry(world.clubs[id]!)].at(-1)!;
   const league = leagueOf(club.id);
+  const country = divisionCountry(league);
   const clubs = clubsOf(league);
   if (!clubs.includes(club.id)) clubs.push(club.id);
   /** Another league: the visitor's club if it's that club's league, else the league's first club. */
   const pickLeague = (code: DivisionCode) => setPicked(leagueOf(world.userClub) === code ? world.userClub : (clubsOf(code)[0] ?? club.id));
+  /** Another country: its league with the visitor's club, else its top league. */
+  const pickCountry = (c: WorldCountry) => pickLeague(divisionCountry(leagueOf(world.userClub)) === c ? leagueOf(world.userClub) : COUNTRY_LEAGUES[c][0]!);
   return (
     <section className="space-y-3" data-testid="world-path">
       <h2 className="text-xl font-bold tracking-tight">{t("path.title", { club: club.shortName })}</h2>
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" data-testid="world-path-pickers">
-        <CountryPicker world={world} testId="world-path-country" />
+        <CountryPicker world={world} value={country} onChange={pickCountry} testId="world-path-country" />
         <Picker
           icon={<Icon name="trophy" size={16} className="shrink-0 text-zinc-500" />}
           label={t("path.league")}
           value={league}
-          options={ENGLAND.map((code) => ({ value: code, label: t(`leagues.${code}.name`) }))}
+          options={COUNTRY_LEAGUES[country].map((code) => ({ value: code, label: t(`leagues.${code}.name`) }))}
           onChange={(code) => pickLeague(code as DivisionCode)}
           testId="world-path-league"
         />

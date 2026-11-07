@@ -1267,10 +1267,10 @@
     "comingSoon": "Historial real próximamente"
   },
   "World": {
-    "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés",
-    "metaDescription": "Elige un club de la Premier League a la League Two y juega temporada tras temporada de las cuatro ligas, con playoffs, ascensos y descensos, la FA Cup y la Copa de la Liga. Guardado en tu navegador, con las tablas de todas las temporadas.",
+    "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés o español",
+    "metaDescription": "Elige un club de Inglaterra o de España y juega temporada tras temporada de sus ligas y copas, con playoffs, ascensos y descensos. Guardado en tu navegador, con las tablas de todas las temporadas.",
     "title": "Mi mundo",
-    "intro": "Elige un club y juega temporada tras temporada de la pirámide inglesa, de la Premier League a la League Two, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos, la FA Cup y la Copa de la Liga. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
+    "intro": "Elige tus países y un club, y juega temporada tras temporada de la pirámide inglesa (de la Premier League a la League Two, la FA Cup y la Copa de la Liga), de la española (LaLiga, la Segunda División y la Copa del Rey) o de las dos, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
     "savedNote": "Tu mundo se guarda solo en este navegador.",
     "notSaved": "Este navegador no está guardando tu mundo (navegación privada o almacenamiento lleno): se perderá cuando salgas de la página.",
     "reset": {
@@ -1302,10 +1302,25 @@
         "the": "la League Two",
         "in": "en la League Two"
       },
+      "PD": {
+        "name": "LaLiga",
+        "the": "LaLiga",
+        "in": "en LaLiga"
+      },
+      "SD": {
+        "name": "Segunda División",
+        "the": "la Segunda División",
+        "in": "en la Segunda División"
+      },
       "NL": {
         "name": "National League",
         "the": "la National League",
         "in": "en la National League"
+      },
+      "PF": {
+        "name": "Primera Federación",
+        "the": "la Primera Federación",
+        "in": "en la Primera Federación"
       }
     },
     "cups": {
@@ -1318,6 +1333,11 @@
         "name": "Copa de la Liga",
         "the": "la Copa de la Liga de Inglaterra",
         "in": "en la Copa de la Liga de Inglaterra"
+      },
+      "CDR": {
+        "name": "Copa del Rey",
+        "the": "la Copa del Rey",
+        "in": "en la Copa del Rey"
       }
     },
     "countries": {
@@ -1327,14 +1347,13 @@
     "setup": {
       "title": "Crea tu mundo",
       "countries": "Elige tus países",
-      "countryBoth": "Inglaterra y España",
+      "countriesHint": "Cada país que elijas se juega entero, con sus ligas y copas, temporada tras temporada.",
       "countryLeagues": {
         "ENG": "De la Premier League a la League Two, la FA Cup y la Copa de la Liga",
-        "ESP": "LaLiga y Segunda División (próximamente)"
+        "ESP": "LaLiga y la Segunda División, la Copa del Rey"
       },
-      "comingSoon": "Próximamente",
-      "comingSoonNote": "Las ligas de {country} aún no están en Mi mundo: se unen a tu mundo cuando lleguen. Elige un club de Inglaterra para empezar.",
-      "comingSoonOnly": "Las ligas de {country} aún no están en Mi mundo. Elige también Inglaterra para empezar un mundo ahora: las ligas de {country} se unirán cuando lleguen.",
+      "unavailable": "Sus datos en vivo no cargaron ({leagues}): inténtalo más tarde.",
+      "and": " y ",
       "league": "Elige una liga",
       "club": "Elige tu club",
       "create": "Crear mi mundo",
@@ -1380,13 +1399,13 @@
       "W": "¡Ascenso! {club} ganó la final de los playoffs {in} y sube a {to}.",
       "O": "{club} terminó {position} {in} y cayó en los playoffs.",
       "R": "Descenso: {club} terminó {position} {in} y baja a {to}.",
-      "out": "{club} terminó {position} {in} y bajó a la National League: vuelve a la League Two después de una temporada allí.",
+      "out": "{club} terminó {position} {in} y bajó a {lower}: vuelve a {back} después de una temporada allí.",
       "stay": "{club} terminó {position} {in}.",
       "champions": "Campeones",
       "up": "Suben",
       "down": "Bajan",
-      "out_": "Bajan a la National League",
-      "in_": "Suben de la National League",
+      "out_": "Bajan a {league}",
+      "in_": "Suben de {league}",
       "final": "Final de los playoffs: {winner} {score} {loser}",
       "penalties": "{score}, en penaltis",
       "cupFinal": "venció a {loser} por {score} en la final",
@@ -1395,7 +1414,7 @@
       "cupWonPens": "¡Campeón de copa! {club} ganó {cup} al vencer a {loser} en los penaltis ({score}) en la final.",
       "next": "Empezar próxima temporada"
     },
-    "outNotice": "{club} está en la National League esta temporada, tras bajar de la League Two en {season}: vuelve a la League Two al final de ella.",
+    "outNotice": "{club} está en {lower} esta temporada, tras bajar de {back} en {season}: vuelve a {back} al final de ella.",
     "goneNotice": "{club} salió de la Football League en {season}, antes de que Mi mundo tuviera la National League: empieza un mundo nuevo para seguir jugando.",
     "newClub": "Nuevo",
     "newClubHint": "Un club nuevo, llegado de fuera de la Football League",
@@ -1416,7 +1435,7 @@
       "W": "Ganador de los playoffs",
       "O": "Playoffs",
       "R": "Descenso",
-      "out": "Bajó a la National League"
+      "out": "Bajó a {league}"
     },
     "path": {
       "title": "Las temporadas de {club}",

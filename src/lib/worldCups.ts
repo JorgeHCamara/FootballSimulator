@@ -27,11 +27,15 @@ import { isValidScore } from "../engine/results.ts";
 import { createRng, randomSeed, type Rng } from "../engine/rng.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import type { World } from "./myWorld.ts";
+import { COUNTRY_CUPS, cupCountry, isWorldCup, WORLD_CUPS, type WorldCountry, type WorldCupCode } from "./worldCountries.ts";
 import { seasonRng, seasonStrengths, teamOf } from "./worldForm.ts";
 
+export { COUNTRY_CUPS, cupCountry, isWorldCup, WORLD_CUPS, type WorldCupCode };
+
 /*
- * My World's cups: the FA Cup and the EFL Cup, part of every season beside the
- * four leagues (src/lib/myWorld.ts), played with the site's own cup engine
+ * My World's cups: the FA Cup and the EFL Cup in England, the Copa del Rey in
+ * Spain (src/lib/worldCountries.ts), part of every season beside the leagues
+ * (src/lib/myWorld.ts), played with the site's own cup engine
  * (src/engine/cup.ts: a draw per round, one game or two legs, a level tie on
  * penalties). The world's first season takes the real cup where it stands
  * (its draw and results so far, from the live data); every later season's cup
@@ -54,11 +58,6 @@ import { seasonRng, seasonStrengths, teamOf } from "./worldForm.ts";
  * ends and keeps every tie of the season (SavedCup).
  */
 
-/** The cups the world plays each season, in the order shown: the FA Cup, then the EFL Cup. */
-export const WORLD_CUPS = ["FAC", "EFC"] as const;
-export type WorldCupCode = (typeof WORLD_CUPS)[number];
-
-export const isWorldCup = (code: string): code is WorldCupCode => (WORLD_CUPS as readonly string[]).includes(code);
 export const cupConfig = (code: WorldCupCode): CupConfig => CUPS.find((c) => c.code === code)!;
 
 /** A real tie a season started with, or a finished season's: its clubs, each leg's score and the shoot-out. */
@@ -131,9 +130,9 @@ export function generateCup(code: WorldCupCode, ranking: readonly (readonly Team
   return { code, entrants };
 }
 
-/** Every cup's season drawn among the world's clubs (generateCup). */
-export const generateCups = (ranking: readonly (readonly TeamId[])[], outsiders: readonly TeamId[]): WorldCupSeason[] =>
-  WORLD_CUPS.map((code) => generateCup(code, ranking, outsiders));
+/** A country's cups' seasons drawn among its clubs (generateCup). */
+export const generateCups = (country: WorldCountry, ranking: readonly (readonly TeamId[])[], outsiders: readonly TeamId[]): WorldCupSeason[] =>
+  COUNTRY_CUPS[country].map((code) => generateCup(code, ranking, outsiders));
 
 /** The ties a season started with (WorldCupTie) as the cup engine's real ties: their games numbered by their place in the round. */
 function realTiesOf(cup: CupConfig, year: number, ties: readonly WorldCupTie[]): RealCupTie[] {
