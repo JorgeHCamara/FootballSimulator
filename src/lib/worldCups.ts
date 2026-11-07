@@ -19,7 +19,7 @@ import {
   type CupTie,
   type RealCupTie,
 } from "../engine/cup.ts";
-import { cupModelFor, tierStrength } from "../engine/cupModel.ts";
+import { cupModelFor } from "../engine/cupModel.ts";
 import { expectedGoals, expectedGoalsNeutral, sampleLikelyScore } from "../engine/match.ts";
 import { simulatePenalties } from "../engine/playoffs.ts";
 import type { LeagueModel, TeamStrength } from "../engine/ratings.ts";
@@ -28,7 +28,7 @@ import { createRng, randomSeed, type Rng } from "../engine/rng.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import type { World } from "./myWorld.ts";
 import { COUNTRY_CUPS, cupCountry, isWorldCup, WORLD_CUPS, type WorldCountry, type WorldCupCode } from "./worldCountries.ts";
-import { seasonRng, seasonStrengths, teamOf } from "./worldForm.ts";
+import { seasonRng, seasonStrengths, teamOf, worldTierStrength } from "./worldForm.ts";
 
 export { COUNTRY_CUPS, cupCountry, isWorldCup, WORLD_CUPS, type WorldCupCode };
 
@@ -196,13 +196,15 @@ export function cupScores(season: WorldCupSeason): ResultMap {
 export const cupDivisions = (world: World): Record<TeamId, CompetitionCode> =>
   Object.fromEntries(world.divisions.flatMap((d) => d.clubs.map((id) => [id, d.code] as const)));
 
-/** The cup's model: each league club's season form scaled by its division's tier, the non-league sides at the cup's outsider tier. */
+/** The cup's model: each league club's season form scaled by its division's tier, the non-league sides at the cup's outsider tier, on the world's scale (worldTierStrength). */
 function cupModel(world: World, cup: CupConfig, clubs: Iterable<TeamId>): LeagueModel {
   const strengths = new Map<TeamId, TeamStrength>();
   for (const [id, s] of seasonStrengths(world)) {
-    const scale = tierStrength(s.tier);
+    const scale = worldTierStrength(s.tier);
     strengths.set(id, { attack: s.attack * scale.attack, defence: s.defence * scale.defence });
   }
+  const outsider = worldTierStrength(cup.outsiderTier);
+  for (const id of clubs) if (!strengths.has(id)) strengths.set(id, outsider);
   return cupModelFor(strengths, clubs, cup.outsiderTier);
 }
 
