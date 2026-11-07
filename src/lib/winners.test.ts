@@ -231,7 +231,7 @@ describe("the Brasileirão's past winners", () => {
   const rows = leagueWinners("brasileirao")!;
 
   it("runs from 1937 to 2025, calendar years, with the Taça Brasil and the Robertão both in 1967 and 1968", () => {
-    assert.equal(rows.length, 70);
+    assert.equal(rows.length, 71);
     assert.equal(rows[0]!.season, "2025");
     assert.deepEqual([rows[0]!.champion!.name, rows[0]!.runnerUp!.name, rows[0]!.third!.name], ["Flamengo", "Palmeiras", "Cruzeiro"]);
     assert.equal(rows.at(-1)!.season, "1937");
@@ -241,18 +241,22 @@ describe("the Brasileirão's past winners", () => {
     ]);
   });
 
-  it("counts the titles the CBF recognises, both of 1967's and 1968's among them", () => {
+  it("counts the titles, both of 1967's and 1968's and both of 1987's among them", () => {
     assert.deepEqual(
       mostTitles(rows, 5).map((c) => [c.name, c.titles]),
       [
         ["Palmeiras", 12],
-        ["Flamengo", 8],
+        ["Flamengo", 9],
         ["Santos", 8],
         ["Corinthians", 7],
         ["São Paulo", 6],
       ],
     );
-    assert.equal(rows.find((r) => r.season === "1987")!.champion!.name, "Sport Recife", "the CBF's 1987 champion");
+    // 1987: the CBF's champion and the Copa União's, each without a third place.
+    assert.deepEqual(rows.filter((r) => r.season === "1987").map((r) => [r.tournament, r.champion!.name, r.runnerUp!.name, r.third]), [
+      ["CBF", "Sport Recife", "Guarani", null],
+      ["Copa União", "Flamengo", "Internacional", null],
+    ]);
   });
 
   it("keeps each parallel championship in its own era, and an era of one season", () => {

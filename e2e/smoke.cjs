@@ -1730,10 +1730,17 @@ async function step(name, fn) {
       await p.getByTestId("past-winners").waitFor();
       assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores do Brasileirão Série A");
       const rows = p.getByTestId("past-winners-row");
-      assert.equal(await rows.count(), 70);
+      assert.equal(await rows.count(), 71);
       const chips = await p.getByTestId("past-winners-chip").allInnerTexts();
       for (const chip of ["Taça Brasil (1959–1968)", "Torneio Roberto Gomes Pedrosa (1967–1970)", "Torneio dos Campeões (1937)", "Campeonato Brasileiro Série A (2001–)"]) assert.ok(chips.includes(chip), chip);
-      assert.deepEqual(await p.getByTestId("past-winners-title").evaluateAll((els) => els.map((e) => e.dataset.titles)), ["12", "8", "8", "7", "6"]);
+      assert.deepEqual(await p.getByTestId("past-winners-title").evaluateAll((els) => els.map((e) => e.dataset.titles)), ["12", "9", "8", "7", "6"]);
+      // 1987: Sport (the CBF's) and Flamengo (the Copa União's), no third place; Guarani with its own badge.
+      const y1987 = rows.filter({ hasText: /^1987/ });
+      assert.equal(await y1987.count(), 2);
+      assert.match(await y1987.nth(0).innerText(), /CBF[\s\S]*Sport Recife[\s\S]*Guarani/);
+      assert.match(await y1987.nth(1).innerText(), /Copa União[\s\S]*Flamengo[\s\S]*Internacional/);
+      assert.equal(await y1987.nth(0).locator('[data-place="runnerUp"] img[src*="/3448.png"]').count(), 1, "Guarani's crest");
+      assert.equal(await y1987.locator('[data-place="third"] [data-testid="shield-badge"]').count(), 0);
       // 1967: both championships, one after the other, under one heading.
       const both = rows.filter({ hasText: /^1967/ });
       assert.equal(await both.count(), 2);
