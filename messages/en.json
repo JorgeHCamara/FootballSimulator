@@ -1267,10 +1267,27 @@
     "comingSoon": "Real history coming soon"
   },
   "World": {
-    "metaTitle": "My World: take your club up the English football pyramid",
-    "metaDescription": "Pick a club from the Premier League to League Two and play season after season of all four leagues, with the play-offs, promotion and relegation, the FA Cup and the EFL Cup. Saved in your browser, with every season's tables.",
+    "metaTitle": "My World: take your club up the football pyramid, in England, Spain or Germany",
+    "metaDescription": "Pick a club from England, Spain or Germany and play season after season of their leagues and cups, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
+    "hero": {
+      "badge": "Game mode",
+      "start": "Start your world",
+      "continue": "Continue your world",
+      "countries": "{count} countries",
+      "leagues": "{count} leagues",
+      "cups": "{count} cups",
+      "saved": "Saved in your browser",
+      "noSignup": "No sign-up"
+    },
+    "how": {
+      "title": "How it works",
+      "pick": "Pick one or more countries and your club: every league and cup of each is played in full.",
+      "play": "Type any score, roll the dice, or simulate a matchday or the rest of the season.",
+      "season": "End the season: champions, cups, play-offs, promotion and relegation, then the review.",
+      "again": "Start the next season and keep going, year after year; every season's tables stay in your browser."
+    },
     "title": "My World",
-    "intro": "Pick a club, then play season after season of the English pyramid, from the Premier League to League Two, every result your way, as on the league pages: the play-offs, promotion and relegation, the FA Cup and the EFL Cup included. Can you take a League Two club to the Premier League?",
+    "intro": "Pick your countries and a club, then play season after season of their leagues and cups, every result your way, as on the league pages: play-offs, promotion and relegation included. How far can you take your club?",
     "savedNote": "Your world is saved in this browser only.",
     "notSaved": "This browser isn't saving your world (private browsing, or storage full): it will be lost when you leave the page.",
     "reset": {
@@ -1302,10 +1319,40 @@
         "the": "League Two",
         "in": "in League Two"
       },
+      "PD": {
+        "name": "La Liga",
+        "the": "La Liga",
+        "in": "in La Liga"
+      },
+      "SD": {
+        "name": "Segunda División",
+        "the": "the Segunda División",
+        "in": "in the Segunda División"
+      },
+      "BL1": {
+        "name": "Bundesliga",
+        "the": "the Bundesliga",
+        "in": "in the Bundesliga"
+      },
+      "BL2": {
+        "name": "2. Bundesliga",
+        "the": "the 2. Bundesliga",
+        "in": "in the 2. Bundesliga"
+      },
       "NL": {
         "name": "National League",
         "the": "the National League",
         "in": "in the National League"
+      },
+      "PF": {
+        "name": "Primera Federación",
+        "the": "the Primera Federación",
+        "in": "in the Primera Federación"
+      },
+      "L3": {
+        "name": "3. Liga",
+        "the": "the 3. Liga",
+        "in": "in the 3. Liga"
       }
     },
     "cups": {
@@ -1318,17 +1365,34 @@
         "name": "EFL Cup",
         "the": "the EFL Cup",
         "in": "in the EFL Cup"
+      },
+      "CDR": {
+        "name": "Copa del Rey",
+        "the": "the Copa del Rey",
+        "in": "in the Copa del Rey"
+      },
+      "DFB": {
+        "name": "DFB-Pokal",
+        "the": "the DFB-Pokal",
+        "in": "in the DFB-Pokal"
       }
     },
     "countries": {
-      "ENG": "England"
+      "ENG": "England",
+      "ESP": "Spain",
+      "GER": "Germany"
     },
     "setup": {
       "title": "Create your world",
+      "countries": "Pick your countries",
+      "countriesHint": "Every country you pick is played in full, its leagues and cups, season after season.",
+      "unavailable": "Its live data didn't load ({leagues}): try again later.",
+      "and": " and ",
       "league": "Pick a league",
       "club": "Pick your club",
       "create": "Create my world",
       "summary": "{club} {league}, starting with the {season} season.",
+      "summaryCountries": "Your world plays {countries}.",
       "clubs": "{count} clubs"
     },
     "season": "Season {season}",
@@ -1336,6 +1400,7 @@
     "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
     "left": {
       "title": "Games left to play",
+      "countShort": "{count, plural, =0 {Done} other {# left}}",
       "count": "{count, plural, =0 {All played} one {# game left} other {# games left}}",
       "note": "Play each league's games by its fixtures below (the dice, Simulate matchday or Simulate rest of season, play-offs included) and each cup round by round. Then go to the next season here."
     },
@@ -1369,13 +1434,13 @@
       "W": "Promoted! {club} won the {league} play-off final and go up to {to}.",
       "O": "{club} finished {position} {in} and lost in the play-offs.",
       "R": "Relegated: {club} finished {position} {in} and go down to {to}.",
-      "out": "{club} finished {position} {in} and go down to the National League: they come back up to League Two after a season there.",
+      "out": "{club} finished {position} {in} and go down to {lower}: they come back up to {back} after a season there.",
       "stay": "{club} finished {position} {in}.",
       "champions": "Champions",
       "up": "Up",
       "down": "Down",
-      "out_": "Down to the National League",
-      "in_": "Up from the National League",
+      "out_": "Down to {league}",
+      "in_": "Up from {league}",
       "final": "Play-off final: {winner} {score} {loser}",
       "penalties": "{score}, on penalties",
       "cupFinal": "beat {loser} {score} in the final",
@@ -1384,7 +1449,7 @@
       "cupWonPens": "Cup winners! {club} won {cup}, beating {loser} on penalties ({score}) in the final.",
       "next": "Start next season"
     },
-    "outNotice": "{club} are in the National League this season, after going down from League Two in {season}: they come back up to League Two at the end of it.",
+    "outNotice": "{club} are in {lower} this season, after going down from {back} in {season}: they come back up to {back} at the end of it.",
     "goneNotice": "{club} dropped out of the Football League in {season}, before My World had a National League: start a new world to play on.",
     "newClub": "New",
     "newClubHint": "A new club, up from outside the Football League",
@@ -1405,7 +1470,7 @@
       "W": "Play-off winners",
       "O": "Play-offs",
       "R": "Relegated",
-      "out": "Down to the National League"
+      "out": "Down to {league}"
     },
     "path": {
       "title": "{club}'s seasons",
@@ -1432,7 +1497,7 @@
       "no": "Keep this world"
     },
     "homeTitle": "My World",
-    "homeBody": "Take a club from League Two to the Premier League, season after season, with promotion, relegation and the play-offs.",
+    "homeBody": "Pick a club and play season after season, every result your way: leagues, cups, play-offs, promotion and relegation.",
     "homeCta": "Start your world"
   }
 }

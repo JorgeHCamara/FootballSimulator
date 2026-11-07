@@ -2,11 +2,15 @@
 
 import { useTranslations } from "next-intl";
 import { useMemo, useState, type ReactNode } from "react";
+import type { SiteLocale } from "../config/leagues.ts";
 import type { Fixture, Score, Team, TeamId } from "../engine/types.ts";
+import { ordinal } from "../lib/clubText.ts";
 import {
-  divisionConfig,
-  ENGLAND,
+  COUNTRY_CUPS,
+  COUNTRY_LEAGUES,
   pastDivision,
+  playoffConfigOf,
+  pyramidPlayoffOf,
   resetDivision,
   rollScore,
   seasonLabel,
@@ -18,8 +22,9 @@ import {
   type DivisionCode,
   type DivisionState,
   type World,
+  type WorldCountry,
 } from "../lib/myWorld.ts";
-import { isWorldCup, WORLD_CUPS, type WorldCupCode } from "../lib/worldCups.ts";
+import { isWorldCup, type WorldCupCode } from "../lib/worldCups.ts";
 import { worldWinners } from "../lib/worldWinners.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
@@ -29,12 +34,14 @@ import { useRealWinners } from "./PastWinnersProvider.tsx";
 import { PromotedClubs } from "./PromotedClubs.tsx";
 import { WorldTable } from "./WorldTable.tsx";
 
-/** The season's competitions as tabs: one button per league, then the cups. */
-export function DivisionTabs({ value, onChange, label, testId }: { value: DivisionCode | WorldCupCode; onChange: (code: DivisionCode | WorldCupCode) => void; label: string; testId: string }) {
+/** A country's competitions as tabs: one button per league, then its cups. */
+export function DivisionTabs({ country, value, onChange, label, testId }: { country: WorldCountry; value: DivisionCode | WorldCupCode; onChange: (code: DivisionCode | WorldCupCode) => void; label: string; testId: string }) {
   const t = useTranslations("World");
+  const codes = [...COUNTRY_LEAGUES[country], ...COUNTRY_CUPS[country]];
+  const columns = codes.length >= 6 ? "sm:grid-cols-3 lg:grid-cols-6" : codes.length >= 4 ? "sm:grid-cols-4" : "sm:grid-cols-3";
   return (
-    <div role="tablist" aria-label={label} className="grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 sm:grid-cols-3 lg:grid-cols-6 dark:bg-zinc-800" data-testid={testId}>
-      {[...ENGLAND, ...WORLD_CUPS].map((code) => (
+    <div role="tablist" aria-label={label} className={`grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800 ${columns}`} data-testid={testId} data-country={country}>
+      {codes.map((code) => (
         <button
           key={code}
           type="button"
@@ -54,7 +61,7 @@ export function DivisionTabs({ value, onChange, label, testId }: { value: Divisi
 /** The matchday a division's fixtures open on: its next round, the play-off once the league is complete, else its last matchday. */
 export function openingMatchday(state: DivisionState): number {
   if (state.nextRound !== null) return state.leagueComplete ? PLAYOFF_MATCHDAY : state.nextRound;
-  return state.league.playoff ? PLAYOFF_MATCHDAY : (state.fixtures.at(-1)?.matchday ?? 1);
+  return state.playoff ? PLAYOFF_MATCHDAY : (state.fixtures.at(-1)?.matchday ?? 1);
 }
 
 /** A picker in the style of the page's buttons: an icon, then a select (labelled for screen readers). */
@@ -69,7 +76,7 @@ export function Picker({
   icon: ReactNode;
   label: string;
   value: string;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; disabled?: boolean }[];
   onChange: (value: string) => void;
   testId: string;
 }) {
@@ -84,7 +91,7 @@ export function Picker({
         data-testid={testId}
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+          <option key={o.value} value={o.value} disabled={o.disabled} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
             {o.label}
           </option>
         ))}
@@ -118,7 +125,7 @@ function PastSeason({ world, year, code }: { world: World; year: number; code: D
   const [matchday, setMatchday] = useState(1);
   const teams = useMemo(() => new Map<TeamId, Team>((past?.teams ?? []).map((team) => [team.id, team])), [past]);
   if (!past) return null;
-  const playoff = divisionConfig(code).playoff;
+  const playoff = playoffConfigOf(code);
   const matchdays = [...new Set((past.fixtures ?? []).map((f) => f.matchday))].sort((a, b) => a - b).concat(past.bracket.length ? [PLAYOFF_MATCHDAY] : []);
   const final = past.final;
   return (
@@ -180,9 +187,11 @@ export function WorldSeason({
   onChange,
   canUndo,
   onUndo,
+  locale,
 }: {
   world: World;
   state: DivisionState;
+  locale: SiteLocale;
   /** The season shown: the one in progress (world.year) or a finished one. */
   year: number;
   onYear: (year: number) => void;
@@ -199,9 +208,20 @@ export function WorldSeason({
   // Past Winners instead of the table and fixtures: the league's real history with this world's finished seasons on top.
   const [winners, setWinners] = useState(false);
   const real = useRealWinners();
-  const { code, league, picks } = state;
-  const playoff = league.playoff;
-  const teams = useMemo(() => new Map<TeamId, Team>(state.teams.map((team) => [team.id, team])), [state.teams]);
+  const { code, picks } = state;
+  const playoff = state.playoff;
+  // A pyramid play-off's places before its clubs are known: "16th in the Bundesliga" v "3rd in the 2. Bundesliga".
+  const tie = pyramidPlayoffOf(code);
+  const slotLabels = tie?.lower === code ? { [tie.upperPlace]: `${ordinal(tie.upperPlace, locale)} ${t(`leagues.${tie.upper}.in`)}`, [tie.lowerPlace]: `${ordinal(tie.lowerPlace, locale)} ${t(`leagues.${code}.in`)}` } : undefined;
+  // The league's clubs, and a pyramid play-off's club from the division above (the Bundesliga's 16th in the 2. Bundesliga's tie).
+  const teams = useMemo(() => {
+    const map = new Map<TeamId, Team>(state.teams.map((team) => [team.id, team]));
+    for (const r of state.playoffRows) {
+      const c = world.clubs[r.teamId];
+      if (c && !map.has(r.teamId)) map.set(r.teamId, { id: c.id, name: c.name, shortName: c.shortName, tla: c.tla, ...(c.crest ? { crest: c.crest } : {}) });
+    }
+    return map;
+  }, [state.teams, state.playoffRows, world.clubs]);
   const matchdays = useMemo(
     () => [...new Set(state.fixtures.map((f) => f.matchday))].sort((a, b) => a - b).concat(playoff ? [PLAYOFF_MATCHDAY] : []),
     [state.fixtures, playoff],
@@ -270,10 +290,10 @@ export function WorldSeason({
         {playoff?.promotedTo && (
           <PromotedClubs
             bracket={state.bracket}
-            rows={state.rows}
+            rows={state.eligibleRows}
             teams={teams}
             predictions={picks}
-            seasonComplete={state.leagueComplete}
+            seasonComplete={state.playoffKnown}
             directPromotion={playoff.directPromotion ?? []}
             promotedTo={playoff.promotedTo}
             nextSeason={seasonLabel(world.year + 1)}
@@ -285,7 +305,7 @@ export function WorldSeason({
           type="button"
           className="grow rounded-lg bg-pitch-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-pitch-700 disabled:opacity-40 lg:grow-0"
           onClick={() => onChange(onPlayoff ? simulatePlayoffs(world, code) : simulateMatchday(world, code, matchday))}
-          disabled={(onPlayoff && !state.leagueComplete) || state.done}
+          disabled={(onPlayoff && !state.playoffKnown) || state.done}
           data-testid="world-simulate-matchday"
         >
           {sim("simulateMatchday")}
@@ -315,8 +335,9 @@ export function WorldSeason({
             ? {
                 playoff: {
                   bracket: state.bracket,
-                  seasonComplete: state.leagueComplete,
+                  seasonComplete: state.playoffKnown,
                   ...(playoff.promotedTo ? { promotedTo: playoff.promotedTo } : {}),
+                  ...(slotLabels ? { slotLabels } : {}),
                 },
               }
             : {})}

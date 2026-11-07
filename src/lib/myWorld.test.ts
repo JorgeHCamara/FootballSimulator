@@ -9,12 +9,17 @@ import {
   clubDivision,
   clubPath,
   createWorld,
+  divisionState,
+  gamesInSeason,
+  gamesLeft,
+  playoffConfigOf,
+  pyramidPlayoffOf,
+  setScore,
+  simulateRest,
   currentTable,
   divisionConfig,
-  divisionState,
   ENGLAND,
   FIXTURE_SEASONS,
-  gamesLeft,
   movementCounts,
   NATIONAL_LEAGUE_ID_BASE,
   packReady,
@@ -27,10 +32,8 @@ import {
   seasonLabel,
   seasonMoves,
   seasonStates,
-  setScore,
   simulateMatchday,
   simulatePlayoffs,
-  simulateRest,
   startNextSeason,
   upgradeWorld,
   type DivisionCode,
@@ -53,6 +56,21 @@ const count = (list: string[], ...notes: string[]) => list.filter((n) => notes.i
 const divisionOf = (world: World) => new Map(world.divisions.flatMap((d) => d.clubs.map((id) => [id, d.code] as const)));
 /** A club that wins every game it plays (for walking a club up the pyramid). */
 const unbeatable = (world: World, id: number): World => ({ ...world, ratings: { ...world.ratings, [id]: [8, 0.1] } });
+const logQuality = (world: World, id: number) => Math.log(world.ratings[id]![0] / world.ratings[id]![1]);
+/** The world with every club's rating and level k times as far from average, in log terms. */
+const stretched = (world: World, k: number): World => {
+  const scale = (r: Record<number, [number, number]>) => Object.fromEntries(Object.entries(r).map(([id, [a, d]]) => [id, [a ** k, d ** k] as [number, number]]));
+  return { ...world, ratings: scale(world.ratings), levels: scale(world.levels) };
+};
+const logLevel = (world: World, id: number) => Math.log(world.levels[id]![0] / world.levels[id]![1]);
+const correlation = (pairs: number[][]) => {
+  const mean = (k: 0 | 1) => pairs.reduce((s, p) => s + p[k]!, 0) / pairs.length;
+  const [mx, my] = [mean(0), mean(1)];
+  const cov = pairs.reduce((s, p) => s + (p[0]! - mx) * (p[1]! - my), 0);
+  const vx = pairs.reduce((s, p) => s + (p[0]! - mx) ** 2, 0);
+  const vy = pairs.reduce((s, p) => s + (p[1]! - my) ** 2, 0);
+  return cov / Math.sqrt(vx * vy);
+};
 
 describe("My World: the pyramid", () => {
   it("moves the clubs the league configs say: 3 between the Premier League and the Championship, 3 below that, 4 between League One and League Two, 2 out of League Two", () => {
@@ -94,8 +112,20 @@ describe("My World: a new world", () => {
     // The live ratings.
     const first = pack.leagues[0]!.teams[0]!;
     assert.deepEqual(world.ratings[1], pack.leagues[0]!.model.strengths[first.id]);
+    // Each club's level starts as its rating (its own copy).
+    assert.deepEqual(world.levels, world.ratings);
+    assert.notEqual(world.levels[1], world.ratings[1]);
+    const { levels: _l, ...unlevelled } = world;
+    assert.deepEqual(upgradeWorld(unlevelled as World).levels, world.ratings, "a world from before the levels starts them from the ratings");
     assert.equal(world.history.length, 0);
     assert.throws(() => createWorld(pack, { league: "PL", club: -1 }), /isn't in that league/);
+    // The world's countries, as chosen at setup: the club's own by default, and always among them.
+    assert.deepEqual(world.countries, ["ENG"]);
+    assert.deepEqual(createWorld(pack, { league: "EL2", club: user.id, countries: ["ESP", "ENG"] }, 42).countries, ["ENG", "ESP"], "in the fixed order");
+    assert.deepEqual(createWorld(pack, { league: "EL2", club: user.id, countries: ["ESP"] }, 42).countries, ["ENG", "ESP"], "the club's country comes along");
+    const { countries: _c, ...before } = world;
+    assert.deepEqual(upgradeWorld(before as World).countries, ["ENG"], "a world from before the choice is England's");
+    assert.ok(Object.values(world.clubs).every((c) => c.country === "ENG"), "every club with its country");
     assert.throws(() => createWorld({ ...pack, missing: ["EL1"] }, { league: "EL2", club: user.id }), /isn't complete/);
   });
 });
@@ -168,7 +198,7 @@ describe("My World: a season", () => {
     assert.equal(Object.keys(after.clubs).length, 126, "92 in the pyramid, 2 in the National League, 32 in the FA Cup's pool");
     assert.equal(after.newClubs, 0, "no fictional clubs");
     // The review's moves.
-    const moves = seasonMoves(season);
+    const moves = seasonMoves(after, season);
     assert.deepEqual(moves.map((m) => [m.upper, m.lower, m.up.length, m.down.length]), [["PL", "ELC", 3, 3], ["ELC", "EL1", 3, 3], ["EL1", "EL2", 4, 4], ["EL2", null, 2, 2]]);
     // The next season starts on nothing, with a new calendar.
     assert.equal(after.divisions.every((d) => d.games === undefined), true);
@@ -194,6 +224,37 @@ describe("My World: a season", () => {
     }
     // Every division averages 1 (geometric mean).
     for (const d of after.divisions) assert.ok(Math.abs(mean(d.clubs, 0) - 1) < 0.01, d.code);
+    // Every club's level too, kept for the clubs that went down to the National League.
+    for (const d of after.divisions) for (const id of d.clubs) assert.ok(after.levels[id], `${d.code}: ${id} has a level`);
+    for (const id of season.out) assert.deepEqual(after.levels[id], start().levels[id], "a club that left keeps its level");
+    // A season moves a club's level a little, never resets it: the levels after it stand in the order they stood before.
+    const division = divisionOf(start());
+    const pairs = after.divisions.flatMap((d) => d.clubs.filter((id) => division.get(id) === d.code).map((id) => [logLevel(start(), id), logLevel(after, id)]));
+    assert.ok(correlation(pairs) > 0.9, `correlation ${correlation(pairs).toFixed(2)}`);
+  });
+
+  it("ten seasons on, the clubs still stand where they started: a club that keeps winning becomes a better club, and the top clubs stay top clubs", () => {
+    // The three countries, their ratings stretched to a real spread (the sample's live ratings sit close to average).
+    const first = stretched(createWorld(pack, { league: "EL2", club: pack.leagues[3]!.teams[0]!.id, countries: ["ENG", "ESP", "GER"] }, 7, NOW), 2);
+    let world = first;
+    const topClub = [...first.divisions[0]!.clubs].sort((a, b) => logQuality(first, b) - logQuality(first, a))[0]!;
+    // The Premier League's best-rated club is made to win every game for three seasons: its level rises season after season.
+    let level = logLevel(world, topClub);
+    for (let i = 0; i < 3; i++) {
+      world = startNextSeason(playSeason(unbeatable(world, topClub)));
+      assert.ok(logLevel(world, topClub) > level, `season ${i + 1}: a better club`);
+      level = logLevel(world, topClub);
+    }
+    for (let i = 3; i < 10; i++) world = startNextSeason(playSeason(world));
+    // Ten seasons on, the clubs still in their first division stand in much the same order as they started (under the
+    // real starting ratings' rule, 75% of the difference from average kept each season, next to nothing was left of it).
+    const division = divisionOf(first);
+    const pairs = world.divisions.flatMap((d) => d.clubs.filter((id) => division.get(id) === d.code).map((id) => [logLevel(first, id), logLevel(world, id)]));
+    assert.ok(pairs.length > 80, `${pairs.length} clubs still in their first division`);
+    assert.ok(correlation(pairs) > 0.6, `correlation ${correlation(pairs).toFixed(2)}`);
+    // The three best-rated Premier League clubs at the start are still in it.
+    const top3 = [...first.divisions[0]!.clubs].sort((a, b) => logQuality(first, b) - logQuality(first, a)).slice(0, 3);
+    for (const id of top3) assert.equal(clubDivision(world, id), "PL", `${first.clubs[id]!.name} still in the Premier League`);
   });
 
   it("the same world plays out the same way; another world differently", () => {
@@ -353,6 +414,10 @@ describe("My World: a season played your way", () => {
     const world = startNextSeason(playSeason(start()));
     // A new season: 380 Premier League games; 552 in each EFL league, plus 7 play-off games in the Championship (eliminators too) and 5 below.
     assert.deepEqual(seasonStates(world).map(gamesLeft), [380, 552 + 7, 552 + 5, 552 + 5]);
+    // Nothing played yet: every game of the season is left (the games-left bars start empty).
+    assert.deepEqual(seasonStates(world).map(gamesInSeason), seasonStates(world).map(gamesLeft));
+    // Played out: none left, the season's games the same.
+    assert.deepEqual([gamesLeft(divisionState(simulateRest(world, "ELC", createRng(2)), "ELC")), gamesInSeason(divisionState(simulateRest(world, "ELC", createRng(2)), "ELC"))], [0, 552 + 7]);
     assert.equal(gamesLeft(divisionState(simulateMatchday(world, "PL", 1, createRng(1)), "PL")), 370);
     const elc = simulateRest(world, "ELC", createRng(2));
     assert.equal(gamesLeft(divisionState(elc, "ELC")), 0);
@@ -573,3 +638,271 @@ describe("My World: a season played your way", () => {
     assert.ok(divisionState(simulateRest(world, "EL2", createRng(1)), "EL2").results[postponed.id]);
   });
 });
+
+describe("My World: Spain", () => {
+  const NOW = new Date("2026-11-06T12:00:00Z");
+  let world: World;
+  let after: World;
+  before(() => {
+    const sd = pack.leagues.find((l) => l.code === "SD")!;
+    world = createWorld(pack, { league: "SD", club: sd.teams[3]!.id, countries: ["ENG", "ESP"] }, 11, NOW);
+    after = playSeason(world);
+  });
+
+  it("moves the clubs Spain's configs say: 3 between La Liga and the Segunda División (two up, the play-off winner), 4 out of the Segunda", () => {
+    assert.deepEqual(movementCounts("ESP"), [
+      { up: 0, down: 3 },
+      { up: 3, down: 4 },
+    ]);
+  });
+
+  it("a world with England and Spain plays both pyramids and the three cups, every club with its country; Spain's Primera Federación starts empty", () => {
+    assert.deepEqual(world.countries, ["ENG", "ESP"]);
+    assert.deepEqual(world.divisions.map((d) => d.code), ["PL", "ELC", "EL1", "EL2", "PD", "SD"]);
+    assert.deepEqual(world.divisions.map((d) => d.clubs.length), [20, 24, 24, 24, 20, 22]);
+    assert.deepEqual(world.cups.map((c) => c.code), ["FAC", "EFC", "CDR"]);
+    assert.equal(clubDivision(world, world.userClub), "SD");
+    // The Copa del Rey's lower sides: its clubs in no league (the sample data reuses two Segunda ids among them, which stand for the league clubs).
+    const cdrData = pack.cups.find((c) => c.code === "CDR")!;
+    const leagueIds = new Set(pack.leagues.filter((l) => l.code === "PD" || l.code === "SD").flatMap((l) => l.teams.map((t) => t.id)));
+    const lowerSides = cdrData.teams.filter((t) => !cdrData.divisions[t.id] && !leagueIds.has(t.id)).length;
+    assert.ok(lowerSides >= 84, `${lowerSides} lower sides, enough for the cup`);
+    const spanish = Object.values(world.clubs).filter((c) => c.country === "ESP");
+    assert.equal(spanish.length, 42 + lowerSides, "the two leagues' clubs and the real Copa del Rey's lower sides");
+    assert.ok(world.nationalLeague.every((id) => world.clubs[id]!.country === "ENG"), "only England's National League clubs below the leagues");
+    assert.equal(world.cupPool.filter((id) => world.clubs[id]!.country === "ESP").length, lowerSides);
+    assert.equal(world.cupPool.filter((id) => world.clubs[id]!.country === "ENG").length, 32, "the EFL Cup brings none");
+    // The Copa del Rey drawn among Spain's clubs: the lower sides and the Segunda in the opening rounds, La Liga's strongest four in the round of 32.
+    const cdr = world.cups.find((c) => c.code === "CDR")!;
+    const where = (id: number) => clubDivision(world, id) ?? "lower";
+    const count = (ids: readonly number[]) => ids.reduce<Record<string, number>>((m, id) => ({ ...m, [where(id)]: (m[where(id)] ?? 0) + 1 }), {});
+    assert.deepEqual(count(cdr.entrants.qualifyingRound!), { lower: 20 });
+    assert.deepEqual(count(cdr.entrants.firstRound!), { lower: 64, SD: 22, PD: 16 });
+    assert.deepEqual(count(cdr.entrants.roundOf32!), { PD: 4 });
+    assert.ok(cdr.entrants.firstRound!.every((id) => !cdr.entrants.qualifyingRound!.includes(id)), "no club twice");
+  });
+
+  it("plays a season of both countries: each pyramid moves on its own, and the Segunda's four relegated clubs swap with Copa del Rey sides from the pool the first time", () => {
+    const season = after.history[0]!;
+    assert.deepEqual(season.divisions.map((d) => d.code), ["PL", "ELC", "EL1", "EL2", "PD", "SD"]);
+    const notesOf = (code: DivisionCode) => season.divisions.find((d) => d.code === code)!.rows.map((r) => r[8]);
+    assert.equal(count(notesOf("PD"), "R"), 3);
+    assert.equal(count(notesOf("SD"), "C", "P", "W"), 3, "two up and the play-off winner");
+    assert.equal(count(notesOf("SD"), "R"), 4);
+    assert.equal(count(notesOf("EL2"), "R"), 2);
+    // Out of the Segunda: into the Primera Federación; in: four real clubs from the Copa del Rey's lower sides, the pool four smaller.
+    const outEsp = season.out.filter((id) => after.clubs[id]!.country === "ESP");
+    const inEsp = season.in.filter((id) => after.clubs[id]!.country === "ESP");
+    assert.equal(outEsp.length, 4);
+    assert.equal(inEsp.length, 4);
+    assert.ok(inEsp.every((id) => after.clubs[id]!.origin === "real" && world.cupPool.includes(id)), "real Copa del Rey sides");
+    assert.equal(after.cupPool.filter((id) => after.clubs[id]!.country === "ESP").length, world.cupPool.filter((id) => world.clubs[id]!.country === "ESP").length - 4);
+    assert.deepEqual(after.nationalLeague.filter((id) => after.clubs[id]!.country === "ESP"), outEsp, "the relegated wait in the Primera Federación");
+    assert.deepEqual(after.nationalLeague.filter((id) => after.clubs[id]!.country === "ENG"), season.out.filter((id) => after.clubs[id]!.country === "ENG"));
+    assert.equal(after.newClubs, 0, "no fictional clubs");
+    const sd = after.divisions.find((d) => d.code === "SD")!;
+    assert.equal(sd.clubs.length, 22);
+    assert.ok(inEsp.every((id) => sd.clubs.includes(id)), "up into the Segunda");
+    assert.ok(outEsp.every((id) => !after.divisions.some((d) => d.clubs.includes(id))));
+    // The season's cups: all three, with their finals.
+    assert.deepEqual(season.cups!.map((c) => c.code), ["FAC", "EFC", "CDR"]);
+    assert.ok(season.cups!.every((c) => after.clubs[c.final[0]]));
+    assert.equal(after.clubs[season.cups![2]!.final[0]]!.country, "ESP");
+    // The review's moves, country by country.
+    const moves = seasonMoves(after, season);
+    assert.deepEqual(moves.map((m) => [m.upper, m.lower, m.up.length, m.down.length]), [
+      ["PL", "ELC", 3, 3],
+      ["ELC", "EL1", 3, 3],
+      ["EL1", "EL2", 4, 4],
+      ["EL2", null, 2, 2],
+      ["PD", "SD", 3, 3],
+      ["SD", null, 4, 4],
+    ]);
+    // Next season's Copa del Rey: the relegated four and the pool's in the qualifying and first rounds.
+    const cdr = after.cups.find((c) => c.code === "CDR")!;
+    const lower = [...cdr.entrants.qualifyingRound!, ...cdr.entrants.firstRound!].filter((id) => !after.divisions.some((d) => d.clubs.includes(id)));
+    assert.equal(lower.length, 84);
+    assert.ok(outEsp.every((id) => lower.includes(id)), "the Primera Federación's clubs are in");
+  });
+
+  it("a reserve side is never promoted or in the play-off: its place passes down", () => {
+    const sd = pack.leagues.find((l) => l.code === "SD")!;
+    const reserves = sd.teams.filter((t) => divisionConfig("SD").reserveTeams!.some((start) => t.name.startsWith(start)));
+    assert.ok(reserves.length >= 1, "the sample Segunda has reserve sides");
+    // A reserve side that wins every game tops the table but goes nowhere: the champions' promotion passes to the next club.
+    // (Unbeatable through the first season too, so it's still in the Segunda for a full season of its own calendar.)
+    const id = world.divisions.find((d) => d.code === "SD")!.clubs.find((c) => world.clubs[c]!.realId === reserves[0]!.id)!;
+    const unbeatable = (w: World) => ({ ...w, ratings: { ...w.ratings, [id]: [8, 0.1] as [number, number] } });
+    const first = playSeason(unbeatable(world));
+    assert.equal(first.history[0]!.divisions.find((d) => d.code === "SD")!.rows.find((r) => r[0] === id)![8], "", "never promoted");
+    const strong = playSeason(startNextSeason(unbeatable(first)));
+    const table = strong.history[1]!.divisions.find((d) => d.code === "SD")!;
+    assert.equal(table.rows[0]![0], id, "top of the table");
+    assert.equal(table.rows[0]![8], "", "no promotion for a reserve side");
+    assert.equal(table.rows[1]![8], "C", "the club below takes the champions' place");
+    assert.equal(count(table.rows.map((r) => r[8]), "C", "P", "W"), 3);
+    assert.ok(!strong.divisions.find((d) => d.code === "PD")!.clubs.includes(id));
+    assert.ok(strong.divisions.find((d) => d.code === "SD")!.clubs.includes(id), "stays in the Segunda");
+  });
+
+  it("a Spanish club's path: relegated into the Primera Federación, a season there, then back up", () => {
+    const season = after.history[0]!;
+    const down = season.out.filter((id) => after.clubs[id]!.country === "ESP")[0]!;
+    assert.deepEqual(clubPath(after, down).map((s) => [s.code, s.move, s.outcome]), [["SD", "down", "out"]]);
+    const later = playSeason(startNextSeason(after));
+    assert.deepEqual(clubPath(later, down).map((s) => [s.code, s.move, s.outcome]), [["SD", "down", "out"], ["PF", "up", "nationalLeague"]]);
+    assert.equal(clubDivision(later, down), "SD");
+  });
+
+  it("a world of Spain alone", () => {
+    const pd = pack.leagues.find((l) => l.code === "PD")!;
+    const spain = createWorld(pack, { league: "PD", club: pd.teams[0]!.id, countries: ["ESP"] }, 5, NOW);
+    assert.deepEqual(spain.countries, ["ESP"]);
+    assert.deepEqual(spain.divisions.map((d) => d.code), ["PD", "SD"]);
+    assert.deepEqual(spain.cups.map((c) => c.code), ["CDR"]);
+    assert.deepEqual(spain.nationalLeague, []);
+    assert.ok(Object.values(spain.clubs).every((c) => c.country === "ESP"));
+    const played = playSeason(spain);
+    assert.equal(played.history[0]!.divisions.length, 2);
+    assert.equal(played.nationalLeague.length, 4);
+  });
+});
+
+describe("My World: Germany", () => {
+  const NOW = new Date("2026-11-06T12:00:00Z");
+  let world: World;
+  let after: World;
+  before(() => {
+    const bl2 = pack.leagues.find((l) => l.code === "BL2")!;
+    world = createWorld(pack, { league: "BL2", club: bl2.teams[2]!.id, countries: ["GER"] }, 21, NOW);
+    after = playSeason(world);
+  });
+
+  it("moves two clubs each way between the Bundesliga and the 2. Bundesliga, the pyramid play-off (16th v 3rd) adding one to both or neither; two out of the 2. Bundesliga", () => {
+    assert.deepEqual(movementCounts("GER"), [
+      { up: 0, down: 2 },
+      { up: 3, down: 2 },
+    ]);
+    assert.deepEqual(pyramidPlayoffOf("BL2"), { upper: "BL1", lower: "BL2", upperPlace: 16, lowerPlace: 3 });
+    assert.equal(pyramidPlayoffOf("BL1"), pyramidPlayoffOf("BL2"));
+    assert.equal(pyramidPlayoffOf("SD"), undefined);
+    const config = playoffConfigOf("BL2")!;
+    assert.deepEqual(config.rounds.map((r) => [r.key, r.legs, r.levelTie, r.pairs]), [["final", 2, "penalties", [[16, 3]]]]);
+    assert.equal(config.promotedTo, "Bundesliga");
+    assert.deepEqual(config.directPromotion, [1, 2]);
+    assert.equal(playoffConfigOf("BL1"), undefined);
+  });
+
+  it("a world of Germany alone: the two leagues and the DFB-Pokal, the real cup's 28 lower sides in the pool, the 3. Liga empty to begin with", () => {
+    assert.deepEqual(world.countries, ["GER"]);
+    assert.deepEqual(world.divisions.map((d) => [d.code, d.clubs.length]), [["BL1", 18], ["BL2", 18]]);
+    assert.deepEqual(world.cups.map((c) => c.code), ["DFB"]);
+    assert.deepEqual(world.nationalLeague, []);
+    assert.ok(Object.values(world.clubs).every((c) => c.country === "GER"));
+    assert.equal(world.cupPool.length, 28);
+    const dfb = world.cups[0]!;
+    assert.deepEqual(Object.keys(dfb.entrants), ["firstRound"]);
+    assert.equal(dfb.entrants.firstRound!.length, 64, "every club in the first round: the 36 league clubs and the 28 lower sides");
+  });
+
+  it("the 2. Bundesliga's play-off is the tie with the Bundesliga's 16th: two legs, the Bundesliga club hosting the first, its clubs known once both leagues are complete, its games counted in the 2. Bundesliga's", () => {
+    const bl2 = divisionState(world, "BL2");
+    assert.ok(bl2.playoff, "a play-off, though the league config has none");
+    assert.equal(bl2.playoffKnown, false);
+    assert.equal(divisionState(world, "BL1").playoff, undefined);
+    assert.equal(gamesLeft(bl2), bl2.fixtures.filter((f) => !bl2.results[f.id]).length + 2, "the tie's two legs");
+    // The 2. Bundesliga played out: its tie waits for the Bundesliga.
+    const lowerDone = simulateRest(world, "BL2", createRng(1));
+    const waiting = divisionState(lowerDone, "BL2");
+    assert.equal(waiting.leagueComplete, true);
+    assert.equal(waiting.playoffKnown, false);
+    assert.equal(waiting.done, false);
+    assert.equal(gamesLeft(waiting), 2);
+    assert.equal(waiting.bracket[0]![0]!.legs.length, 0, "no clubs yet");
+    // The Bundesliga played out too: the tie's clubs known, the 16th hosting the first leg; Simulate rest on the 2. Bundesliga then plays it.
+    const bothDone = simulateRest(lowerDone, "BL1", createRng(2));
+    const known = divisionState(bothDone, "BL2");
+    assert.equal(known.playoffKnown, true);
+    assert.equal(known.done, false);
+    const tie = known.bracket[0]![0]!;
+    const upper16 = divisionState(bothDone, "BL1").rows.find((r) => r.position === 16)!.teamId;
+    const lower3 = known.eligibleRows.find((r) => r.position === 3)!.teamId;
+    assert.deepEqual([tie.lower.teamId, tie.higher.teamId], [upper16, lower3]);
+    assert.equal(tie.legs.length, 2);
+    assert.equal(tie.legs[0]!.homeId, upper16, "first leg at the Bundesliga club");
+    assert.equal(tie.legs[1]!.homeId, lower3, "second leg at the 2. Bundesliga club");
+    assert.ok(known.model.strengths.has(upper16), "the Bundesliga club rated on the 2. Bundesliga's scale");
+    const played = simulateRest(bothDone, "BL2", createRng(3));
+    const finished = divisionState(played, "BL2");
+    assert.equal(finished.done, true);
+    assert.equal(gamesLeft(finished), 0);
+    assert.equal(seasonDone(played), true, "both leagues and the tie decided (the cup is counted apart, by cupsDone)");
+    // A Bundesliga result that changes its 16th clears the tie's scores (they belonged to another pairing).
+    const bl1 = divisionState(played, "BL1");
+    const sixteenth = bl1.rows.find((r) => r.position === 16)!;
+    const seventeenth = bl1.rows.find((r) => r.position === 17)!;
+    const swing = bl1.fixtures.find((f) => f.homeId === seventeenth.teamId && f.awayId === sixteenth.teamId) ?? bl1.fixtures.find((f) => f.awayId === seventeenth.teamId && f.homeId === sixteenth.teamId)!;
+    const changed = setScore(played, "BL1", swing, swing.homeId === seventeenth.teamId ? { home: 9, away: 0 } : { home: 0, away: 9 });
+    const afterChange = divisionState(changed, "BL2");
+    if (afterChange.bracket[0]![0]!.lower.teamId !== upper16) {
+      assert.equal(Object.keys(afterChange.picks).some((id) => Number(id) >= 2_000_000_000), false, "the tie's scores went with its pairing");
+      assert.equal(afterChange.done, false);
+    }
+  });
+
+  it("playSeason settles the tie for both tables: the 2. Bundesliga's 3rd goes up or the Bundesliga's 16th goes down, and the leagues still match", () => {
+    const season = after.history[0]!;
+    const bl1 = season.divisions.find((d) => d.code === "BL1")!;
+    const bl2 = season.divisions.find((d) => d.code === "BL2")!;
+    const notes = (rows: typeof bl1.rows) => rows.map((r) => r[8]);
+    const won = bl2.rows[2]![8] === "W";
+    assert.ok(won || bl2.rows[2]![8] === "O", "the 3rd was in the play-off");
+    assert.equal(bl1.rows[15]![8], won ? "R" : "", "the 16th goes down only if it lost the tie");
+    assert.equal(count(notes(bl1.rows), "R"), won ? 3 : 2);
+    assert.equal(count(notes(bl2.rows), "C", "P", "W"), won ? 3 : 2);
+    assert.equal(count(notes(bl2.rows), "R"), 2, "17th and 18th down to the 3. Liga");
+    assert.ok(bl2.final, "the tie's result saved as the 2. Bundesliga's play-off final");
+    assert.ok([bl1.rows[15]![0], bl2.rows[2]![0]].includes(bl2.final![0]) && [bl1.rows[15]![0], bl2.rows[2]![0]].includes(bl2.final![1]));
+    assert.equal(bl1.final, undefined);
+    // Next season's divisions: the right size, the winner in the Bundesliga.
+    assert.deepEqual(after.divisions.map((d) => d.clubs.length), [18, 18]);
+    assert.ok(after.divisions[0]!.clubs.includes(bl2.final![0]), "the tie's winner in the Bundesliga");
+    assert.ok(after.divisions[1]!.clubs.includes(bl2.final![1]), "the loser in the 2. Bundesliga");
+    // Out of the 2. Bundesliga: into the 3. Liga; in: two real DFB-Pokal sides from the pool.
+    assert.equal(season.out.length, 2);
+    assert.equal(season.in.length, 2);
+    assert.ok(season.in.every((id) => after.clubs[id]!.origin === "real" && world.cupPool.includes(id)));
+    assert.equal(after.cupPool.length, 26);
+    assert.deepEqual(after.nationalLeague, season.out);
+    assert.deepEqual(seasonMoves(after, season).map((m) => [m.upper, m.lower, m.up.length, m.down.length]), [
+      ["BL1", "BL2", won ? 3 : 2, won ? 3 : 2],
+      ["BL2", null, 2, 2],
+    ]);
+    // The past season's 2. Bundesliga shows the tie as its play-off, both legs scored.
+    const past = pastDivision(after, season.year, "BL2")!;
+    assert.equal(past.bracket.length, 1);
+    assert.equal(past.bracket[0]!.length, 1);
+    const tie = past.bracket[0]![0]!;
+    assert.equal(tie.legs.length, 2);
+    assert.ok(tie.legs.every((leg) => leg.result));
+    assert.equal(tieOutcome(tie, {})?.winner, bl2.final![0]);
+    assert.equal(pastDivision(after, season.year, "BL1")!.bracket.length, 0);
+    // The club's path: the loser from the Bundesliga is "relegated", the winner from the 2. Bundesliga "play-off winners".
+    const winnerPath = clubPath(after, bl2.final![0]).at(-1)!;
+    assert.equal(winnerPath.outcome, won ? "playoffWinners" : "neutral");
+    assert.equal(clubPath(after, bl2.final![1]).at(-1)!.outcome, won ? "relegated" : "playoffs");
+    assert.deepEqual(cupStatesCodes(after), ["DFB"]);
+  });
+
+  it("every country together: three pyramids, four cups", () => {
+    const all = createWorld(pack, { league: "PL", club: pack.leagues[0]!.teams[0]!.id, countries: ["ENG", "ESP", "GER"] }, 4, NOW);
+    assert.deepEqual(all.divisions.map((d) => d.code), ["PL", "ELC", "EL1", "EL2", "PD", "SD", "BL1", "BL2"]);
+    assert.deepEqual(all.cups.map((c) => c.code), ["FAC", "EFC", "CDR", "DFB"]);
+    const played = playSeason(all);
+    assert.equal(played.history[0]!.divisions.length, 8);
+    assert.equal(played.history[0]!.cups!.length, 4);
+    assert.deepEqual(played.divisions.map((d) => d.clubs.length), [20, 24, 24, 24, 20, 22, 18, 18]);
+  });
+});
+
+const cupStatesCodes = (w: World) => w.cups.map((c) => c.code);

@@ -31,6 +31,28 @@ before(async () => {
 });
 
 describe("My World: the save", () => {
+  it("checks the world's countries: England, Spain or both, with their divisions; a save without them is England's", () => {
+    assert.equal(isWorld({ ...world, countries: ["ENG", "ESP"] }), false, "Spain's divisions are missing");
+    assert.equal(isWorld(createWorld(pack, { league: "PD", club: pack.leagues.find((l) => l.code === "PD")!.teams[0]!.id, countries: ["ENG", "ESP"] }, 3)), true);
+    assert.equal(isWorld(createWorld(pack, { league: "PD", club: pack.leagues.find((l) => l.code === "PD")!.teams[0]!.id, countries: ["ESP"] }, 3)), true);
+    assert.equal(isWorld({ ...world, countries: [] }), false);
+    assert.equal(isWorld({ ...world, countries: ["FRA"] }), false);
+    assert.equal(isWorld({ ...world, countries: "ENG" }), false);
+    const store = memoryStore();
+    const { countries: _c, ...old } = world;
+    store.setItem(WORLD_KEY, JSON.stringify(old));
+    assert.deepEqual(loadWorld(store).world!.countries, ["ENG"]);
+  });
+
+  it("checks the club levels: a save from before them starts them from the ratings; levels of another shape are unreadable", () => {
+    const store = memoryStore();
+    const { levels: _l, ...old } = world;
+    store.setItem(WORLD_KEY, JSON.stringify(old));
+    assert.deepEqual(loadWorld(store).world!.levels, world.ratings);
+    assert.equal(isWorld({ ...world, levels: 5 }), false);
+    assert.equal(isWorld({ ...world, levels: null }), false);
+  });
+
   it("saves and reloads the same world", () => {
     const store = memoryStore();
     assert.deepEqual(loadWorld(store), { world: null, reason: "none" });
