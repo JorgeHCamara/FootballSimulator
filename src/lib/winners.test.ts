@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { describe, it } from "node:test";
 import { getLeagueBySlug } from "../config/leagues.ts";
 import { HISTORY, HISTORY_LEAGUES, type HistoryLeague } from "./history.ts";
-import { decades, eras, filterRows, mostTitles, parseLeagueHistory, winnerRows, type HistorySeason, type LeagueHistory } from "./winners.ts";
+import { decades, eras, filterRows, mostTitles, parseLeagueHistory, rowClubs, winnerRows, type HistorySeason, type LeagueHistory } from "./winners.ts";
 import { HISTORY_DIR, crestFor, historySlugs, leagueHistory, leagueWinners } from "./winnersData.ts";
 
 const ESPN = /^https:\/\/a\.espncdn\.com\/i\/teamlogos\/soccer\/500\/\d+\.png$/;
@@ -29,7 +29,7 @@ describe("the Past Winners files", () => {
     }
   });
 
-  it("passes every check: seasons once and in order, a champion and a runner-up when completed, no club twice", () => {
+  it("passes every check: seasons once and in order, a champion (or a revoked one) when completed, no club twice", () => {
     for (const slug of slugs) {
       const raw = JSON.parse(readFileSync(join(HISTORY_DIR, `${slug}.json`), "utf8"));
       const history = parseLeagueHistory(raw, slug);
@@ -37,8 +37,12 @@ describe("the Past Winners files", () => {
       assert.equal(new Set(keys).size, keys.length, `${slug}: no duplicate seasons`);
       for (const s of history.seasons) {
         if (s.status === "completed") {
-          assert.ok(s.champion && s.runnerUp, `${slug} ${s.season}: champion and runner-up`);
-          const ids = [s.champion, s.runnerUp, s.third].filter((p) => p !== null).map((p) => p!.footsimuId ?? p!.currentName);
+          assert.ok(s.champion || s.strippedChampion, `${slug} ${s.season}: a champion, or the club whose title was revoked`);
+          assert.ok(s.runnerUp || (s.notes.length > 0 && !s.third), `${slug} ${s.season}: a runner-up, or a note on why there is none`);
+          const ids = [s.strippedChampion ?? null, s.champion, s.runnerUp, s.third]
+            .filter((p) => p !== null)
+            .flatMap((p) => [p!, ...(p!.tiedWith ?? [])])
+            .map((p) => p.footsimuId ?? p.currentName);
           assert.equal(new Set(ids).size, ids.length, `${slug} ${s.season}: champion, runner-up and third are different clubs`);
         } else {
           assert.equal(s.champion, null);
@@ -53,8 +57,7 @@ describe("the Past Winners files", () => {
   it("gives every club a badge: the site's own file or ESPN's crest for a club with an id, none (the shield) without", () => {
     for (const slug of slugs) {
       for (const row of leagueWinners(slug)!) {
-        for (const club of [row.champion, row.runnerUp, row.third]) {
-          if (!club) continue;
+        for (const club of rowClubs(row)) {
           if (club.id === null) assert.equal(club.crest, null, `${slug} ${row.season}: ${club.name} has no id, so a shield`);
           else assert.ok(club.crest && (LOCAL.test(club.crest) || ESPN.test(club.crest)), `${slug} ${row.season}: ${club.name}'s badge`);
         }
@@ -158,6 +161,72 @@ describe("the Premier League's past winners", () => {
   });
 });
 
+describe("Serie A's past winners", () => {
+  const rows = leagueWinners("serie-a")!;
+
+  it("runs from 1898 to 2025-26, with 1921-22's two championships as two rows", () => {
+    assert.equal(rows.length, 130);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.deepEqual([rows[0]!.champion!.name, rows[0]!.runnerUp!.name, rows[0]!.third!.name], ["Internazionale", "Napoli", "Roma"]);
+    assert.equal(rows.at(-1)!.season, "1898");
+    assert.deepEqual(rows.filter((r) => r.season === "1921-22").map((r) => [r.id, r.champion!.name]), [
+      ["1921-22-cci", "Pro Vercelli"],
+      ["1921-22-figc", "Novese"],
+    ]);
+  });
+
+  it("counts the titles the FIGC recognises: no champion for the two revoked titles", () => {
+    assert.deepEqual(
+      mostTitles(rows, 5).map((c) => [c.name, c.titles]),
+      [
+        ["Juventus", 36],
+        ["Inter", 21],
+        ["AC Milan", 19],
+        ["Genoa", 9],
+        ["Bologna", 7],
+      ],
+    );
+    for (const [season, club] of [
+      ["2004-05", "Juventus"],
+      ["1926-27", "Torino"],
+    ]) {
+      const row = rows.find((r) => r.season === season)!;
+      assert.equal(row.status, "completed");
+      assert.equal(row.champion, null, season);
+      assert.equal(row.stripped!.name, club, season);
+    }
+    // 1914-15: the final round was never finished, so Genoa's title has no runner-up.
+    const war = rows.find((r) => r.season === "1914-15")!;
+    assert.equal(war.champion!.name, "Genoa");
+    assert.equal(war.runnerUp, null);
+  });
+
+  it("keeps the clubs level in a place: three second in 1947-48, and none third", () => {
+    const row = rows.find((r) => r.season === "1947-48")!;
+    assert.deepEqual([row.runnerUp!, ...row.runnerUp!.tiedWith!].map((c) => [c.name, c.points]), [
+      ["Milan", 49],
+      ["Juventus", 49],
+      ["Triestina", 49],
+    ]);
+    assert.equal(row.third, null);
+    assert.ok(filterRows(rows, { query: "triestina" }).some((r) => r.season === "1947-48"));
+    assert.equal(rows.filter((r) => r.runnerUp?.tiedWith || r.third?.tiedWith).length, 6);
+  });
+
+  it("has its names over time as eras, the two of 1921-22 overlapping", () => {
+    assert.deepEqual(eras(rows), [
+      { name: "Campionato Italiano di Football", from: 1898, to: 1903 },
+      { name: "Prima Categoria", from: 1904, to: 1922 },
+      { name: "Prima Divisione", from: 1921, to: 1926 },
+      { name: "Divisione Nazionale", from: 1926, to: 1929 },
+      { name: "Serie A", from: 1929, to: null },
+    ]);
+    const [, prima, divisione] = eras(rows);
+    assert.ok(filterRows(rows, { era: prima }).some((r) => r.id === "1921-22-figc"));
+    assert.ok(filterRows(rows, { era: divisione }).some((r) => r.id === "1921-22-cci"));
+  });
+});
+
 describe("parseLeagueHistory", () => {
   const placing = (id: number, name: string) => ({ name, currentName: name, footsimuId: id, footsimuSlug: name.toLowerCase(), footsimuPath: `/x/team/${name.toLowerCase()}`, points: 40 });
   const season = (over: Partial<HistorySeason> = {}): HistorySeason => ({
@@ -204,12 +273,36 @@ describe("parseLeagueHistory", () => {
     assert.equal(mostTitles(rows)[0]!.titles, 3, "a tournament's title counts");
   });
 
+  it("accepts a title revoked and not reassigned, a final round never finished and shared places", () => {
+    const parsed = parseLeagueHistory(
+      file([
+        season({ champion: null, strippedChampion: placing(1, "A"), runnerUp: placing(2, "B") }),
+        season({ season: "1901-02", startYear: 1901, runnerUp: null, third: null, notes: ["Not finished"] }),
+        season({ season: "1902-03", startYear: 1902, third: { ...placing(3, "C"), tiedWith: [placing(4, "D")] } }),
+      ]),
+    );
+    const rows = winnerRows(parsed, () => null);
+    const [tied, unfinished, revoked] = rows;
+    assert.equal(revoked!.champion, null);
+    assert.equal(revoked!.stripped!.name, "A");
+    assert.equal(unfinished!.runnerUp, null);
+    assert.deepEqual(tied!.third!.tiedWith!.map((c) => c.name), ["D"]);
+    assert.equal(mostTitles(rows).find((c) => c.name === "A")!.titles, 2, "a revoked title doesn't count");
+    assert.equal(filterRows(rows, { query: "d" }).length, 1, "a search finds a club level in a place");
+    assert.deepEqual(rowClubs(revoked!).map((c) => c.name), ["A", "B", "C"]);
+  });
+
   it("names the file and the season when something is wrong", () => {
     const bad = (seasons: HistorySeason[], message: RegExp) => assert.throws(() => parseLeagueHistory(file(seasons), "test.json"), message);
     bad([season(), season()], /test\.json: 1900-01: listed twice/);
     bad([season({ season: "1901-02", startYear: 1901 }), season()], /1900-01: seasons must be oldest first/);
     bad([season({ third: placing(1, "A") })], /the same club in two places/);
-    bad([season({ runnerUp: null })], /needs a champion and a runner-up/);
+    bad([season({ champion: null })], /a completed season needs a champion \(or a revoked one\)/);
+    bad([season({ strippedChampion: placing(4, "D") })], /a revoked title \(strippedChampion\) leaves no champion/);
+    bad([season({ runnerUp: null })], /a third place needs a runner-up/);
+    bad([season({ third: { ...placing(3, "C"), tiedWith: [placing(1, "A")] } })], /the same club in two places/);
+    bad([season({ third: { ...placing(3, "C"), tiedWith: [] } })], /tiedWith must be a non-empty list of placings/);
+    bad([season({ status: "not_held", champion: null, runnerUp: null, third: null, strippedChampion: placing(4, "D") })], /a season not_held has no placings/);
     bad([season({ status: "not_held" })], /a season not_held has no placings/);
     bad([season({ status: "cancelled" as never })], /status must be/);
     bad([season({ format: "cup" as never })], /format must be/);

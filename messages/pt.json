@@ -1267,7 +1267,9 @@
     "points": "{points} pts",
     "now": "hoje {club}",
     "world": "My World",
-    "comingSoon": "Histórico real em breve"
+    "comingSoon": "Histórico real em breve",
+    "revoked": "Título revogado",
+    "tied": "Posição dividida"
   },
   "World": {
     "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol, alemão ou italiano",
