@@ -1268,9 +1268,9 @@
   },
   "World": {
     "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés",
-    "metaDescription": "Elige un club de la Premier League a la League Two y juega temporada tras temporada de las cuatro ligas, con playoffs, ascensos y descensos. Guardado en tu navegador, con las tablas de todas las temporadas.",
+    "metaDescription": "Elige un club de la Premier League a la League Two y juega temporada tras temporada de las cuatro ligas, con playoffs, ascensos y descensos, la FA Cup y la Copa de la Liga. Guardado en tu navegador, con las tablas de todas las temporadas.",
     "title": "Mi mundo",
-    "intro": "Elige un club y juega temporada tras temporada de la pirámide inglesa, de la Premier League a la League Two, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
+    "intro": "Elige un club y juega temporada tras temporada de la pirámide inglesa, de la Premier League a la League Two, cada resultado a tu manera, como en las páginas de las ligas: con los playoffs, los ascensos y los descensos, la FA Cup y la Copa de la Liga. ¿Puedes llevar a un club de la League Two hasta la Premier League?",
     "savedNote": "Tu mundo se guarda solo en este navegador.",
     "notSaved": "Este navegador no está guardando tu mundo (navegación privada o almacenamiento lleno): se perderá cuando salgas de la página.",
     "reset": {
@@ -1308,6 +1308,18 @@
         "in": "en la National League"
       }
     },
+    "cups": {
+      "FAC": {
+        "name": "FA Cup",
+        "the": "la FA Cup",
+        "in": "en la FA Cup"
+      },
+      "EFC": {
+        "name": "Copa de la Liga",
+        "the": "la Copa de la Liga de Inglaterra",
+        "in": "en la Copa de la Liga de Inglaterra"
+      }
+    },
     "countries": {
       "ENG": "Inglaterra"
     },
@@ -1325,10 +1337,10 @@
     "left": {
       "title": "Partidos por jugar",
       "count": "{count, plural, =0 {Todos jugados} one {Falta # partido} other {Faltan # partidos}}",
-      "note": "Juega los partidos de cada liga en los partidos de abajo: los dados, Simular jornada o Simular resto de temporada, con los playoffs. Luego, pasa a la próxima temporada aquí."
+      "note": "Juega los partidos de cada liga en los partidos de abajo (los dados, Simular jornada o Simular resto de temporada, con los playoffs) y cada copa ronda a ronda. Luego, pasa a la próxima temporada aquí."
     },
     "endSeason": "Terminar temporada",
-    "endSeasonNote": "Ya se jugaron todos los partidos: termina la temporada {season} para ver su resumen, con los campeones y quién sube y quién baja.",
+    "endSeasonNote": "Ya se jugaron todos los partidos: termina la temporada {season} para ver su resumen, con los campeones, los campeones de copa y quién sube y quién baja.",
     "country": "País",
     "seasonHeading": "La temporada {season}",
     "seasonSelect": "Temporada",
@@ -1337,11 +1349,18 @@
     "pastNoFixtures": "Los resultados de esta temporada no se guardaron (se jugó antes de que Mi mundo los guardara): aquí está su tabla final.",
     "firstSeason": "Esta temporada empezó desde la real, con sus resultados hasta ahora: a partir de aquí, el mundo es tuyo. Cambia cualquier resultado, tira los dados o simula el resto, liga por liga.",
     "newSeason": "Una nueva temporada: todos los clubes empiezan con 0 puntos.",
+    "cupFirst": "Esta temporada, {cup} empezó desde la real, con su sorteo y sus resultados hasta ahora: a partir de aquí, la copa es tuya. Cambia cualquier resultado, tira los dados o simula la ronda o el resto de la copa.",
+    "cupNew": "Nueva temporada: {cup} se sortea ronda a ronda entre los clubes de este mundo{outsiders}, cada partido con la forma de los clubes esta temporada.",
+    "cupOutsiders": " y {count} clubes de fuera de la liga, de la FA Cup real",
+    "pastCup": "La {cup} de {season}: todas las rondas y la final.",
     "tables": "Tablas",
+    "competitions": "Ligas y copas",
     "resetTitle": "¿Reiniciar la temporada de esta liga?",
     "resetConfirm": "Se borrarán todos los resultados escritos, tirados con los dados o simulados {in} esta temporada.",
     "resetConfirmFirst": "Se borrarán todos los resultados escritos, tirados con los dados o simulados {in} esta temporada; los resultados reales con los que empezó la temporada se mantienen.",
     "resetAction": "Reiniciar la liga",
+    "resetCupTitle": "¿Reiniciar la temporada de esta copa?",
+    "resetCupAction": "Reiniciar la copa",
     "review": {
       "title": "La temporada {season} terminó",
       "C": "¡Campeón! {club} ganó {league}.",
@@ -1359,6 +1378,10 @@
       "in_": "Suben de la National League",
       "final": "Final de los playoffs: {winner} {score} {loser}",
       "penalties": "{score}, en penaltis",
+      "cupFinal": "venció a {loser} por {score} en la final",
+      "cupFinalPens": "venció a {loser} en los penaltis ({score}) en la final",
+      "cupWon": "¡Campeón de copa! {club} ganó {cup} al vencer a {loser} por {score} en la final.",
+      "cupWonPens": "¡Campeón de copa! {club} ganó {cup} al vencer a {loser} en los penaltis ({score}) en la final.",
       "next": "Empezar próxima temporada"
     },
     "outNotice": "{club} está en la National League esta temporada, tras bajar de la League Two en {season}: vuelve a la League Two al final de ella.",
@@ -1399,7 +1422,8 @@
       "europaLeague": "Europa League",
       "conferenceLeague": "Conference League",
       "neutral": "Zona neutral",
-      "nationalLeague": "Ascenso"
+      "nationalLeague": "Ascenso",
+      "cupWon": "Campeón de la {cup}"
     },
     "newWorld": {
       "button": "Nuevo mundo",

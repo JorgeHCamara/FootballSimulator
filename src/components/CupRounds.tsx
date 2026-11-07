@@ -19,6 +19,12 @@ export interface CupViewProps {
   divisions: Record<TeamId, CompetitionCode>;
   onScore: (fixture: Fixture, score: Score | null) => void;
   onSimulate: (fixture: Fixture) => void;
+  /** Results to look at only (a finished My World season): no score boxes or dice, nothing to change. */
+  readOnly?: boolean;
+  /** Each game's kick-off date (off for My World, whose calendar has no real dates). */
+  kickOff?: boolean;
+  /** The draws are the competition's own (My World): a drawn round is as good as a real one, with no "simulated draw" status or note. */
+  ownDraw?: boolean;
 }
 
 /**
@@ -35,7 +41,7 @@ export function useDivisionTag(divisions: Record<TeamId, CompetitionCode>, cup: 
 }
 
 /** One tie as a card: its game (or both legs), the aggregate, the shoot-out when level, the winner in bold. */
-export function TieCard({ cup, tie, teams, predictions, divisions, onScore, onSimulate, compact = false }: Omit<CupViewProps, "rounds"> & { tie: CupTie; compact?: boolean }) {
+export function TieCard({ cup, tie, teams, predictions, divisions, onScore, onSimulate, compact = false, readOnly = false, kickOff = true }: Omit<CupViewProps, "rounds"> & { tie: CupTie; compact?: boolean }) {
   const t = useTranslations("Cup");
   const tag = useDivisionTag(divisions, cup);
   const winner = tieWinner(tie, predictions);
@@ -73,7 +79,9 @@ export function TieCard({ cup, tie, teams, predictions, divisions, onScore, onSi
           {...(twoLegs ? { label: t(n === 0 ? "firstLeg" : "secondLeg") } : {})}
           winner={winner}
           joinsNext={n === tie.legs.length - 1 ? pens || total !== null : true}
-          inlineDice
+          inlineDice={!readOnly}
+          disabled={readOnly}
+          kickOff={kickOff}
           onScore={(score) => onScore(leg, score)}
           onSimulate={() => onSimulate(leg)}
         />
@@ -87,6 +95,7 @@ export function TieCard({ cup, tie, teams, predictions, divisions, onScore, onSi
         <ShootoutLine
           fixture={tie.shootout}
           prediction={predictions[tie.shootout.id]}
+          readOnly={readOnly}
           onScore={(score) => onScore(tie.shootout, score)}
           onSimulate={() => onSimulate(tie.shootout)}
         />
@@ -100,10 +109,10 @@ export function TieCard({ cup, tie, teams, predictions, divisions, onScore, onSi
  * (small boxes aligned with the score above) so a card with penalties is
  * only slightly taller than its neighbours.
  */
-function ShootoutLine({ fixture, prediction, onScore, onSimulate }: { fixture: Fixture; prediction: Score | undefined; onScore: (score: Score | null) => void; onSimulate: () => void }) {
+function ShootoutLine({ fixture, prediction, readOnly = false, onScore, onSimulate }: { fixture: Fixture; prediction: Score | undefined; readOnly?: boolean; onScore: (score: Score | null) => void; onSimulate: () => void }) {
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
-  const locked = fixture.result !== null && prediction === undefined;
+  const locked = readOnly || (fixture.result !== null && prediction === undefined);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({ home: shown ? String(shown.home) : "", away: shown ? String(shown.away) : "" });
   useEffect(() => {
@@ -123,7 +132,11 @@ function ShootoutLine({ fixture, prediction, onScore, onSimulate }: { fixture: F
     <li className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 pb-2.5" data-testid="shootout-line" data-fixture={fixture.id}>
       <span className="text-right text-[11px] font-semibold uppercase tracking-wide text-zinc-500">{t("penalties")}</span>
       <span className="flex items-center gap-1">
-        {locked && !editing ? (
+        {readOnly ? (
+          <span className="flex h-7 items-center gap-1 rounded-md bg-zinc-100 px-2.5 text-sm font-bold tabular-nums dark:bg-zinc-800">
+            {shown?.home ?? "–"} <span className="text-zinc-400">–</span> {shown?.away ?? "–"}
+          </span>
+        ) : locked && !editing ? (
           <button type="button" title={t("editResult")} onClick={() => setEditing(true)} className="flex h-7 items-center gap-1 rounded-md bg-zinc-100 px-2.5 text-sm font-bold tabular-nums dark:bg-zinc-800">
             {shown!.home} <span className="text-zinc-400">–</span> {shown!.away}
           </button>
@@ -153,7 +166,7 @@ interface RoundsProps extends CupViewProps {
 
 /** Round bar (First Round … Final) and the selected round: a card grid, or the bracket from the quarter-finals. */
 export function CupRounds(props: RoundsProps) {
-  const { cup, rounds, roundIndex, onSelect, predictions } = props;
+  const { cup, rounds, roundIndex, onSelect, predictions, kickOff = true, ownDraw = false } = props;
   const t = useTranslations("Cup");
   const format = useFormatter();
   const round = rounds[roundIndex]!;
@@ -165,9 +178,10 @@ export function CupRounds(props: RoundsProps) {
     if (r.drawn === "pending") return t(r.config.bracket ? "bracketStatus" : "drawPending");
     const done = decided(r);
     if (done === r.config.ties) return t("roundComplete");
-    return r.drawn === "simulated" ? t("simulatedDraw") : `${done}/${r.config.ties}`;
+    return r.drawn === "simulated" && !ownDraw ? t("simulatedDraw") : `${done}/${r.config.ties}`;
   };
   const when = (r: CupRound) => {
+    if (!kickOff) return "";
     const date = r.ties[0]?.game.utcDate;
     return date && !Number.isNaN(Date.parse(date)) ? format.dateTime(new Date(date), { day: "numeric", month: "short" }) : "";
   };
@@ -205,7 +219,7 @@ export function CupRounds(props: RoundsProps) {
           {t(levelTieRule(round.config) === "penalties" ? (round.config.legs === 2 ? "levelPenaltiesTwoLegs" : "levelPenalties") : "levelExtraTime")}
         </p>
       )}
-      {round.drawn === "simulated" && round.ties.length > 0 && (
+      {round.drawn === "simulated" && !ownDraw && round.ties.length > 0 && (
         <p className="rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-900 dark:bg-sky-900/30 dark:text-sky-100" data-testid="simulated-draw-note">
           {t("simulatedDrawNote")}
         </p>
