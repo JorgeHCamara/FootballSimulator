@@ -1612,6 +1612,9 @@ async function step(name, fn) {
       assert.deepEqual(await titles.evaluateAll((els) => els.map((e) => e.dataset.titles)), ["20", "20", "14", "10", "9"]);
       const names = await titles.allInnerTexts();
       for (const [i, n] of ["Liverpool", "Manchester United", "Arsenal", "Manchester City", "Everton"].entries()) assert.ok(names[i].includes(n), `${i + 1}: ${n}`);
+      // Five cards on one row.
+      const cardTops = await Promise.all([0, 1, 2, 3, 4].map(async (i) => (await titles.nth(i).boundingBox()).y));
+      assert.ok(cardTops.every((y) => Math.abs(y - cardTops[0]) < 2), `the five cards side by side: ${cardTops.join(", ")}`);
       // Era chips and the club search, in place.
       const chips = p.getByTestId("past-winners-chip");
       assert.deepEqual(await chips.allInnerTexts(), ["All", "Premier League (1992–)", "Football League First Division (1892–1992)", "Football League (1888–1892)"]);
@@ -1664,6 +1667,12 @@ async function step(name, fn) {
       await phone.getByTestId("past-winners").waitFor();
       assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, "no horizontal scroll");
       assert.ok((await phone.getByTestId("past-winners-chip").first().boundingBox()).height >= 44, "tap-sized chips");
+      // The top three as cards on one row (the fourth and fifth only from tablets up).
+      const phoneCards = phone.locator('[data-testid="past-winners-title"]:visible');
+      assert.equal(await phoneCards.count(), 3, "three cards on a phone");
+      const phoneTops = await Promise.all([0, 1, 2].map(async (i) => (await phoneCards.nth(i).boundingBox()).y));
+      assert.ok(phoneTops.every((y) => Math.abs(y - phoneTops[0]) < 2), `the three cards side by side: ${phoneTops.join(", ")}`);
+      assert.match(await phoneCards.first().innerText(), /1[\s\S]*Liverpool[\s\S]*20[\s\S]*titles/i);
       assert.ok((await phone.getByTestId("past-winners-search").boundingBox()).height >= 44, "a tap-sized search box");
       const first = phone.getByTestId("past-winners-row").first();
       const boxes = await Promise.all([0, 1, 2].map((i) => first.locator("[data-place]").nth(i).boundingBox()));
