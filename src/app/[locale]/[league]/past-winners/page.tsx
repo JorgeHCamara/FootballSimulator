@@ -23,8 +23,11 @@ export function generateStaticParams() {
 type Params = Promise<{ locale: string; league: string }>;
 const langOf = (locale: string) => (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
 
-/** Whether the league's name takes no article: "of La Liga", not "of the La Liga"; in English "of Serie A" (Spanish keeps "de la Serie A"). */
-const articleOf = (name: string, locale: string) => (/^La /.test(name) || (locale === "en" && /^Serie /.test(name)) ? "none" : "other");
+/**
+ * The article the league's name takes: none for "La Liga" ("of La Liga", not "of the La Liga") and, in English,
+ * "Serie A" (Spanish keeps "de la Serie A"); masculine for the Brasileirão ("do Brasileirão", "del Brasileirão").
+ */
+const articleOf = (name: string, locale: string) => (/^La /.test(name) || (locale === "en" && /^Serie /.test(name)) ? "none" : /^Brasileirão/.test(name) ? "masc" : "other");
 
 /** The oldest season played (the page says "since" it). */
 const oldest = (rows: WinnerRow[]) => [...rows].reverse().find((r) => r.status === "completed") ?? rows.at(-1)!;
