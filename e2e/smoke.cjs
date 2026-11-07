@@ -2807,11 +2807,31 @@ async function step(name, fn) {
       await p.getByTestId("world-end-season").click();
       const review = p.getByTestId("world-review");
       await review.waitFor();
-      assert.equal(await p.locator('[data-testid="world-review"] li', { hasText: /^(La Liga|Segunda División):/ }).count(), 2, "Spain's champions with England's");
-      assert.equal(await p.getByTestId("world-review-cup").count(), 3);
-      assert.match(await p.getByTestId("world-review-cup").nth(2).innerText(), /^Copa del Rey:/);
-      assert.equal(await p.getByTestId("world-moves").count(), 6);
+      // The review, one country at a time: the club's country first (Spain), England behind its country picker, between the headline and the champions.
+      const reviewCountry = p.getByTestId("world-review-country");
+      assert.equal(await reviewCountry.inputValue(), "ESP");
+      assert.deepEqual(await reviewCountry.locator("option").allInnerTexts(), ["England", "Spain"]);
+      assert.ok(
+        await reviewCountry.evaluate((el) => {
+          const headline = document.querySelector('[data-testid="world-review-headline"]');
+          const champions = [...document.querySelectorAll('[data-testid="world-review"] h3')].find((h) => h.textContent.trim().toLowerCase() === "champions");
+          return Boolean(headline.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) && Boolean(el.compareDocumentPosition(champions) & Node.DOCUMENT_POSITION_FOLLOWING);
+        }),
+        "between the headline and Champions",
+      );
+      assert.equal(await p.locator('[data-testid="world-review"] li', { hasText: /^(La Liga|Segunda División):/ }).count(), 2, "Spain's champions");
+      assert.equal(await p.locator('[data-testid="world-review"] li', { hasText: /^Premier League:/ }).count(), 0, "England's behind the picker");
+      assert.equal(await p.getByTestId("world-review-cup").count(), 1);
+      assert.match(await p.getByTestId("world-review-cup").nth(0).innerText(), /^Copa del Rey:/);
+      assert.equal(await p.getByTestId("world-moves").count(), 2);
       assert.equal(await p.locator('[data-testid="world-moves"][data-upper="PD"] li').count(), 6, "three up, three down");
+      await reviewCountry.selectOption("ENG");
+      assert.equal(await p.locator('[data-testid="world-review"] li', { hasText: /^Premier League:/ }).count(), 1);
+      assert.equal(await p.getByTestId("world-review-cup").count(), 2);
+      assert.match(await p.getByTestId("world-review-cup").nth(0).innerText(), /^FA Cup:/);
+      assert.equal(await p.getByTestId("world-moves").count(), 4);
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="EL2"] li').count(), 4);
+      await reviewCountry.selectOption("ESP");
       const segunda = await p.locator('[data-testid="world-moves"][data-upper="SD"]').innerText();
       assert.equal(await p.locator('[data-testid="world-moves"][data-upper="SD"] li').count(), 8, "four up from the Primera Federación, four down to it");
       assert.ok(segunda.includes("UP FROM THE PRIMERA FEDERACIÓN") && segunda.includes("DOWN TO THE PRIMERA FEDERACIÓN") && !segunda.includes("NEW"), "real Copa del Rey sides come up");
