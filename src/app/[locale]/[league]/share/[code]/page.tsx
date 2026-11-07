@@ -109,6 +109,7 @@ export default async function SharePage({ params }: { params: Params }) {
         matchParams={matchParams}
         {...(data.deductions ? { deductions: data.deductions } : {})}
         {...(data.firstPhaseIds ? { firstPhaseIds: data.firstPhaseIds } : {})}
+        {...(data.fallbackOrder ? { fallbackOrder: data.fallbackOrder } : {})}
       />
 
       {/* Phones: share this prediction, right under the table. */}

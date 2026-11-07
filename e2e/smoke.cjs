@@ -509,7 +509,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/pt`);
       const menu = p.locator('[data-testid="league-menu"]');
       await menu.getByRole("button", { name: "América do Sul" }).click();
-      assert.deepEqual((await menu.locator("#menu-br a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B", "Copa do Brasil"]);
+      assert.deepEqual((await menu.locator("#menu-br a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B", "Brasileirão Série C", "Copa do Brasil"]);
       await p.close();
     });
 
@@ -1490,9 +1490,9 @@ async function step(name, fn) {
     await step("About, Privacy and Contact pages in every language, linked from the footer", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       const titles = {
-        en: ["About Foot Simu", "Privacy policy", "Contact"],
-        pt: ["Sobre o Foot Simu", "Política de privacidade", "Contato"],
-        es: ["Acerca de Foot Simu", "Política de privacidad", "Contacto"],
+        en: ["About FootSimu", "Privacy policy", "Contact"],
+        pt: ["Sobre o FootSimu", "Política de privacidade", "Contato"],
+        es: ["Acerca de FootSimu", "Política de privacidad", "Contacto"],
       };
       for (const [locale, [about, privacy, contact]] of Object.entries(titles)) {
         for (const [page, heading] of [["about", about], ["privacy", privacy], ["contact", contact]]) {
@@ -1573,7 +1573,7 @@ async function step(name, fn) {
 
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
-      assert.match(await page.title(), /^Simulador do Brasileirão .* \| Foot Simu$/);
+      assert.match(await page.title(), /^Simulador do Brasileirão .* \| FootSimu$/);
       assert.equal(await page.locator("h1").count(), 1);
       assert.equal(await page.locator("html").getAttribute("lang"), "pt-BR");
       const types = (await page.locator('script[type="application/ld+json"]').allInnerTexts())
@@ -1604,7 +1604,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 43, "every competition once");
+      assert.equal(links.length, 44, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();
@@ -1634,7 +1634,7 @@ async function step(name, fn) {
       const h1 = (await p.locator("h1").innerText()).trim();
       assert.match(await p.getByTestId("club-subtitle").innerText(), /^\d{4}(\/\d{2})? · Title, Champions League and relegation chances$/);
       const title = await p.title();
-      assert.ok(title.startsWith(`${h1} `) && title.endsWith(": title, Champions League and relegation chances | Foot Simu"), title);
+      assert.ok(title.startsWith(`${h1} `) && title.endsWith(": title, Champions League and relegation chances | FootSimu"), title);
       // The card's three chances (a 0% one gives way to another place the club has a chance of).
       assert.match(await p.locator('meta[name="description"]').getAttribute("content"), /: [A-Z][^:%]+ \S+%, [A-Z][^%]+ \S+%, [A-Z][^%]+ \S+% in 10,000 simulated seasons/);
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${href}`);
@@ -1734,7 +1734,7 @@ async function step(name, fn) {
       assert.match((await p.locator("h1").innerText()).replace(/\s+/g, " ").trim(), /^\S.* vs \S.*$/);
       assert.equal(await p.locator("h1 img, h1 [aria-hidden]").count(), 2, "both crests");
       assert.match(await p.getByTestId("match-subtitle").innerText(), /^Prediction, odds and simulated scores · Premier League · Matchday \d+$/);
-      assert.match(await p.title(), /^.+ vs .+ prediction \(\d{1,2} [A-Z][a-z]{2} \d{4}\): odds and simulated scores \| Foot Simu$/);
+      assert.match(await p.title(), /^.+ vs .+ prediction \(\d{1,2} [A-Z][a-z]{2} \d{4}\): odds and simulated scores \| FootSimu$/);
       assert.match(await p.locator('meta[name="description"]').getAttribute("content"), / win \d+%, draw \d+%, .+ win \d+%\. Expected goals \d\.\d–\d\.\d/);
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${upcoming}`);
       for (const [lang, path] of [["en", "en"], ["pt-BR", "pt"], ["es", "es"]]) {
@@ -1798,7 +1798,7 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("match-final-score").innerText(), /^\d+–\d+$/);
       assert.match(await p.locator('[data-testid="match-prediction"] h2').innerText(), /^Pre-match prediction$/);
       assert.match(await p.getByTestId("match-subtitle").innerText(), /^Final score and pre-match prediction · Premier League · Matchday \d+$/);
-      assert.match(await p.title(), /^.+ \d+–\d+ .+ \(.+\): result and pre-match prediction \| Foot Simu$/);
+      assert.match(await p.title(), /^.+ \d+–\d+ .+ \(.+\): result and pre-match prediction \| FootSimu$/);
       assert.equal(await p.getByTestId("match-impact").count(), 0);
       assert.equal(await p.getByTestId("match-impact-loading").count(), 0, "played: no placeholder either");
       // Played: no dice (it has its real score).
@@ -1923,7 +1923,7 @@ async function step(name, fn) {
       assert.equal(await p.locator("h1").count(), 1);
       const h1 = await p.locator("h1").innerText();
       const round = Number(h1.match(/^Premier League title odds after Matchday (\d+)$/)[1]);
-      assert.match(await p.title(), new RegExp(`^Latest Premier League odds: what changed after Matchday ${round} \\| Foot Simu$`));
+      assert.match(await p.title(), new RegExp(`^Latest Premier League odds: what changed after Matchday ${round} \\| FootSimu$`));
       assert.match(await p.locator('meta[name="description"]').getAttribute("content"), /who rose and who fell after Matchday \d+\. .+ lead the title race at \d+%/);
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/premier-league/odds");
       assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/premier-league/odds");
@@ -1953,7 +1953,7 @@ async function step(name, fn) {
       const earlier = Number(archive[1].match(/matchday-(\d+)$/)[1]);
       assert.equal(await p.locator("h1").innerText(), `Premier League title odds after Matchday ${earlier}`);
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${archive[1]}`);
-      assert.match(await p.title(), new RegExp(`^Premier League title odds after Matchday ${earlier} \\(\\d{4}(/\\d{2})?\\) \\| Foot Simu$`));
+      assert.match(await p.title(), new RegExp(`^Premier League title odds after Matchday ${earlier} \\(\\d{4}(/\\d{2})?\\) \\| FootSimu$`));
       assert.equal((await p.request.get(`${BASE_URL}${archive[1]}/opengraph-image`)).headers()["content-type"], "image/png");
       // Indexable, unlike the season's first report.
       assert.equal(await p.locator('meta[name="robots"][content*="noindex"]').count(), 0);
@@ -2124,7 +2124,7 @@ async function step(name, fn) {
       await p.waitForURL(/\/en\/premier-league\/chances\/title$/);
       await p.getByTestId("chance-page").waitFor();
       assert.match(await p.locator("h1").innerText(), /^Premier League \d{4}(\/\d{2})? title odds$/);
-      await p.waitForFunction(() => /title odds: every club's chances \| Foot Simu$/.test(document.title));
+      await p.waitForFunction(() => /title odds: every club's chances \| FootSimu$/.test(document.title));
       assert.match(await p.getByTestId("chance-lead").innerText(), /^.+ win the title in (\d+|<1)% of 10,000 simulated seasons\. Next: .+ \((\d+|<1)%\)/);
       // Every club with a chance, likeliest first, each linking to its own title page.
       const rows = p.getByTestId("chance-row");
@@ -2475,6 +2475,28 @@ async function step(name, fn) {
       const outcomes = ["champions", "promoted", "playoffWinners", "playoffs", "relegated", "out", "championsLeague", "europaLeague", "conferenceLeague", "neutral", "nationalLeague"];
       for (const o of await path.evaluateAll((rows) => rows.map((r) => r.dataset.outcome))) assert.ok(outcomes.includes(o), o);
       assert.ok(!(await p.getByTestId("world-path").innerText()).includes("Stayed"));
+      // Any club's seasons, by country, league and club: England, the visitor's league and club to begin with.
+      const [country, leaguePick, clubPick] = ["world-path-country", "world-path-league", "world-path-club"].map((id) => p.getByTestId(id));
+      assert.equal(await country.inputValue(), "ENG");
+      assert.deepEqual(await country.locator("option").allInnerTexts(), ["England"]);
+      assert.deepEqual(await leaguePick.locator("option").allInnerTexts(), ["Premier League", "Championship", "League One", "League Two"]);
+      const myLeague = await leaguePick.inputValue();
+      const myId = await clubPick.inputValue();
+      assert.equal((await clubPick.locator("option:checked").innerText()).trim(), name);
+      const heading = () => p.getByTestId("world-path").locator("h2").innerText();
+      const myHeading = await heading();
+      // The Premier League's twenty clubs; another club's seasons.
+      await leaguePick.selectOption("PL");
+      assert.equal(await clubPick.locator("option").count(), 20);
+      const other = await clubPick.locator("option").nth(3).getAttribute("value");
+      await clubPick.selectOption(other);
+      assert.equal(await clubPick.inputValue(), other);
+      assert.notEqual(await heading(), myHeading);
+      assert.equal(await path.count(), 2, "its two seasons");
+      // The visitor's league again: its club again.
+      await leaguePick.selectOption(myLeague);
+      assert.equal(await clubPick.inputValue(), myId);
+      assert.equal(await heading(), myHeading);
       // A new world: asked first; cancelling keeps this one, confirming deletes it (for good, after a refresh too).
       await p.getByTestId("world-new-button").click();
       await p.getByTestId("world-new-cancel").click();

@@ -2,7 +2,7 @@ import { oddsCardImage } from "../../../../../lib/oddsCard.tsx";
 import { roundFromParam } from "../../../../../lib/oddsReports.ts";
 import { OG_SIZE } from "../../../../../lib/ogImage.tsx";
 
-export const alt = "Foot Simu odds report";
+export const alt = "FootSimu odds report";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

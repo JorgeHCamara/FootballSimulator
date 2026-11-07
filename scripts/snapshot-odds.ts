@@ -54,8 +54,9 @@ for (const league of LEAGUES.filter((l) => hasClubPages(l) && (!only.length || o
   try {
     const data = await getLeagueData(league);
     // ESPN only: its game ids and rebuilt rounds stay the same from run to run.
+    // A first-party league (Série C 2026) is a finished season of the site's own data: no rounds to follow.
     if (data.source !== "live" || data.provider !== "espn") {
-      console.warn(`${league.code}: skipped (no ESPN data)`);
+      console.warn(`${league.code}: skipped (${data.provider === "first-party" ? "first-party data" : "no ESPN data"})`);
       continue;
     }
     const file = await read(league.code);

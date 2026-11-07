@@ -1,6 +1,6 @@
 import type { LeagueConfig } from "../config/leagues.ts";
 import { playoffIds } from "../engine/playoffs.ts";
-import { allSplitFixtureIds } from "../engine/split.ts";
+import { allSplitFixtureIds, placedGroups } from "../engine/split.ts";
 import { sortFixtures } from "../engine/standings.ts";
 import type { Fixture, Team } from "../engine/types.ts";
 
@@ -53,9 +53,12 @@ export function splitRoundOf(league: LeagueConfig, fixtures: readonly Fixture[],
  * depends on the data, not on who qualifies.
  */
 export function shareFixtureList(league: LeagueConfig, fixtures: readonly Fixture[], teams: readonly Team[], groups: Groups): Fixture[] {
+  // Groups of named places (Série C) follow the predictions: any two clubs can meet in one.
+  const regroups = Boolean(league.split && placedGroups(league.split.groups));
+  const real = new Set(fixtures.map((f) => f.id));
   const extra = [
     ...(league.playoff ? playoffIds(league.playoff) : []),
-    ...(canGenerateSplit(league, fixtures, teams, groups) ? allSplitFixtureIds(teams.map((t) => t.id)) : []),
+    ...(regroups || canGenerateSplit(league, fixtures, teams, groups) ? allSplitFixtureIds(teams.map((t) => t.id)).filter((id) => !real.has(id)) : []),
   ];
   return [...fixtures, ...extra.map((id) => ({ id, matchday: 0, utcDate: "", homeId: 0, awayId: 0, result: null }))];
 }

@@ -7,7 +7,7 @@ import { ordinal, placeRange } from "../../../../../lib/clubText.ts";
 import { OG_SIZE } from "../../../../../lib/ogImage.tsx";
 import { crestDataUri, renderClubCard, renderGenericShareCard } from "../../../../../lib/shareCard.tsx";
 
-export const alt = "Foot Simu club chances";
+export const alt = "FootSimu club chances";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 /** As the club page: room for a cold render (see page.tsx). */
@@ -23,7 +23,7 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
     getTranslations({ locale: lang, namespace: "ShareCard" }),
     getTranslations({ locale: lang, namespace: "Simulator" }),
   ]);
-  const generic = () => renderGenericShareCard({ title: getLeagueBySlug(slug)?.name ?? "Foot Simu", subtitle: ts("genericSubtitle"), cta: ts("cta") });
+  const generic = () => renderGenericShareCard({ title: getLeagueBySlug(slug)?.name ?? "FootSimu", subtitle: ts("genericSubtitle"), cta: ts("cta") });
   const loaded = await loadClub(slug, teamSlug).catch(() => undefined);
   if (!loaded) return firstCardThatRenders([generic]);
   const { league, outlook, club, team, season } = loaded;

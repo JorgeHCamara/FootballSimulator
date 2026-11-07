@@ -346,9 +346,15 @@ describe("ESPN feed mapping", () => {
     assert.deepEqual(espnFixtures([leg2])[0]!.penalties, { home: 2, away: 4 });
   });
 
-  it("every league has an ESPN feed as fallback", () => {
-    // Domestic leagues ("eng.1"), or UEFA competitions ("uefa.champions").
-    for (const league of LEAGUES) assert.match(league.espn.slug, league.continental ? /^(uefa|conmebol)\.[a-z.]+$/ : /^[a-z]{3}\.\d$/, league.code);
+  it("every league has an ESPN feed as fallback, or is first-party", () => {
+    // Domestic leagues ("eng.1"), or UEFA competitions ("uefa.champions"); a first-party league (Série C) has none.
+    for (const league of LEAGUES) {
+      if (league.firstParty) {
+        assert.equal(league.espn, undefined, league.code);
+        continue;
+      }
+      assert.match(league.espn!.slug, league.continental ? /^(uefa|conmebol)\.[a-z.]+$/ : /^[a-z]{3}\.\d$/, league.code);
+    }
   });
 
   it("gives ESPN club names the same display names as football-data.org", () => {
@@ -522,7 +528,7 @@ describe("several tournaments a season (Colombia, Uruguay, Paraguay)", async () 
 
   it("gives Uruguay's Intermedio its own format", () => {
     const uru = getLeagueBySlug("uruguay-primera-division")!;
-    const stages = uru.espn.stages as readonly { table: string; gamesPerTeam?: number; playoff?: unknown }[];
+    const stages = uru.espn!.stages as readonly { table: string; gamesPerTeam?: number; playoff?: unknown }[];
     const intermedio = stages.find((s) => s.table === "torneo-intermedio")!;
     assert.equal(intermedio.gamesPerTeam, 7);
     assert.ok(intermedio.playoff);

@@ -14,6 +14,29 @@ export interface SplitGroupConfig {
   legs: 1 | 2;
   /** Share of the first phase's points the group starts with (Greece's Europe play-offs: 0.5, rounded up). */
   carryOver?: number;
+  /**
+   * The first phase's places that make up the group, when they aren't the next
+   * `size` (Série C: 1st, 4th, 5th and 8th in one group, 2nd, 3rd, 6th and 7th
+   * in the other). Clubs at places no group names are out after the first
+   * phase. Such groups always follow the first phase's table, predictions
+   * included (see buildSplitPhase).
+   */
+  places?: readonly number[];
+}
+
+/** The split's groups are named places (Série C), not the table cut in order. */
+export const placedGroups = (groups: readonly SplitGroupConfig[]) => groups.some((g) => g.places);
+
+/** The first phase's places of each group: named, or the next `size` (the last group takes the rest of `teams`). */
+export function groupPlaces(groups: readonly SplitGroupConfig[], teams: number): number[][] {
+  let start = 0;
+  return groups.map((group, i) => {
+    if (group.places) return [...group.places].sort((a, b) => a - b);
+    const size = i === groups.length - 1 ? teams - start : group.size;
+    const places = Array.from({ length: size }, (_, k) => start + k + 1);
+    start += group.size;
+    return places;
+  });
 }
 
 /**
@@ -35,6 +58,7 @@ export function allSplitFixtureIds(teamIds: readonly TeamId[]): FixtureId[] {
 /** The clubs of each group, in their order at the split; the last group takes the rest. */
 export function splitGroupsFrom(atSplit: readonly StandingRow[], groups: readonly SplitGroupConfig[]): TeamId[][] {
   const ids = [...atSplit].sort((a, b) => a.position - b.position).map((r) => r.teamId);
+  if (placedGroups(groups)) return groupPlaces(groups, ids.length).map((places) => places.flatMap((p) => (ids[p - 1] === undefined ? [] : [ids[p - 1]!])));
   let start = 0;
   return groups.map((group, i) => {
     const members = i === groups.length - 1 ? ids.slice(start) : ids.slice(start, start + group.size);
@@ -144,17 +168,26 @@ export function buildSplitPhase(input: SplitPhaseInput): SplitPhase {
   };
   let groupFixtures: Fixture[][];
   let generated = false;
+  // Named places (Série C): the groups follow the table, predictions
+  // included, so a group can hold other clubs than the real one. Its real
+  // games stand only while it is the real group (none of them is against a
+  // club outside it); otherwise its games are generated.
+  const regroup = placedGroups(groups);
   if (members && later.length) {
-    groupFixtures = members.map((ids, g) => numbered(g, later.filter((f) => ids.includes(f.homeId) && ids.includes(f.awayId))));
+    groupFixtures = members.map((ids, g) => {
+      const own = new Set(ids);
+      if (regroup && later.some((f) => own.has(f.homeId) !== own.has(f.awayId))) {
+        generated = true;
+        return numbered(g, splitFixtures([ids], [groups[g]!], afterRound, lastDate));
+      }
+      return numbered(g, later.filter((f) => own.has(f.homeId) && own.has(f.awayId)));
+    });
   } else if (members) {
     generated = true;
     groupFixtures = members.map((ids, g) => numbered(g, splitFixtures([ids], [groups[g]!], afterRound, lastDate)));
   } else {
     // Places at the split stand in for the clubs.
-    let place = 0;
-    const slots = groups.map((group, g) =>
-      Array.from({ length: g === groups.length - 1 ? teams.length - place : group.size }, () => slotTeamId(++place)),
-    );
+    const slots = groupPlaces(groups, teams.length).map((places) => places.map(slotTeamId));
     groupFixtures = slots.map((ids, g) =>
       numbered(
         g,

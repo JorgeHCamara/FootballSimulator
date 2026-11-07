@@ -73,7 +73,7 @@ export async function renderShareCard({
         <div style={{ width: 560, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "48px 40px 48px 56px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <BrandMark size={52} />
-            <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+            <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: -0.5 }}>FootSimu</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div style={{ display: "flex" }}>
@@ -160,7 +160,7 @@ export async function renderGenericShareCard({ title, subtitle, cta }: { title: 
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 72, background: PITCH_700, fontFamily: "Inter", color: "#ffffff" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <BrandMark size={72} />
-          <span style={{ fontSize: 44, fontWeight: 800 }}>Foot Simu</span>
+          <span style={{ fontSize: 44, fontWeight: 800 }}>FootSimu</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <span style={{ fontSize: 76, fontWeight: 800, lineHeight: 1.05, letterSpacing: -2 }}>{title}</span>
@@ -208,7 +208,7 @@ export async function renderClubCard(text: ClubCardText) {
         <div style={{ width: 560, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "48px 40px 48px 56px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <BrandMark size={52} />
-            <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+            <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: -0.5 }}>FootSimu</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div style={{ display: "flex" }}>
@@ -260,10 +260,18 @@ export async function renderClubCard(text: ClubCardText) {
 export async function crestDataUri(url: string | undefined): Promise<string | undefined> {
   if (!url) return undefined;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(2500), next: { revalidate: 604800 } });
-    const type = res.headers.get("content-type")?.split(";")[0]?.trim() ?? "";
-    if (!res.ok || !["image/png", "image/jpeg"].includes(type)) return undefined;
-    const bytes = Buffer.from(await res.arrayBuffer());
+    let type: string;
+    let bytes: Buffer;
+    if (/^\/crests\/serie-c\/\d+\.png$/.test(url)) {
+      // The site's own crest (Série C): read from the deployment, no request.
+      type = "image/png";
+      bytes = await readFile(join(process.cwd(), "public", url));
+    } else {
+      const res = await fetch(url, { signal: AbortSignal.timeout(2500), next: { revalidate: 604800 } });
+      type = res.headers.get("content-type")?.split(";")[0]?.trim() ?? "";
+      if (!res.ok || !["image/png", "image/jpeg"].includes(type)) return undefined;
+      bytes = Buffer.from(await res.arrayBuffer());
+    }
     // Only what it says it is: a PNG or JPEG by its first bytes (a broken image would break the card).
     const png = bytes.subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
     const jpeg = bytes[0] === 0xff && bytes[1] === 0xd8;
@@ -307,7 +315,7 @@ export async function renderMatchCard(text: MatchCardText) {
         <div style={{ width: 600, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "44px 36px 44px 56px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <BrandMark size={48} />
-            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>FootSimu</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div style={{ display: "flex" }}>
@@ -388,7 +396,7 @@ export async function renderOddsCard(text: OddsCardText) {
         <div style={{ width: 520, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "48px 32px 48px 56px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <BrandMark size={48} />
-            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>FootSimu</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div style={{ display: "flex" }}>
@@ -512,7 +520,7 @@ export async function renderMoversCard(text: MoversCardText) {
         <div style={{ width: 470, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "48px 28px 48px 56px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <BrandMark size={48} />
-            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>Foot Simu</span>
+            <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>FootSimu</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div style={{ display: "flex" }}>

@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "test": "node --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
-    "test:e2e": "node e2e/smoke.cjs",
+    "test:e2e": "node e2e/smoke.cjs && node e2e/serie-c.cjs",
     "typecheck": "tsc --noEmit",
     "priors": "NODE_USE_ENV_PROXY=1 node scripts/build-priors.ts",
     "backtest": "NODE_USE_ENV_PROXY=1 node scripts/backtest.ts",
