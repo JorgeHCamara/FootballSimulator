@@ -45,6 +45,31 @@ interface SimStore {
 
 const empty: SeasonState = { predictions: {}, overrides: [] };
 
+/**
+ * Cups: each slot's pairing now, against the one remembered for it. A slot
+ * whose pairing changed drops its prediction (it belonged to another tie). A
+ * slot not built just now (its round pending while an earlier score is being
+ * typed) keeps the pairing it had, so once it's built again with other clubs
+ * its old prediction still goes, and with the same clubs it stays.
+ */
+export function syncedPairings(
+  current: Pick<SeasonState, "predictions" | "pairings">,
+  pairings: Record<FixtureId, string>,
+): { predictions: ResultMap; pairings: Record<FixtureId, string>; removed: number; changed: boolean } {
+  const predictions = { ...current.predictions };
+  let removed = 0;
+  for (const [id, pairing] of Object.entries(pairings)) {
+    const previous = current.pairings?.[Number(id)];
+    if (previous !== undefined && previous !== pairing && predictions[Number(id)]) {
+      delete predictions[Number(id)];
+      removed++;
+    }
+  }
+  const remembered = { ...(current.pairings ?? {}), ...pairings };
+  const changed = removed > 0 || current.pairings === undefined || Object.entries(pairings).some(([id, p]) => current.pairings![Number(id)] !== p);
+  return { predictions, pairings: remembered, removed, changed };
+}
+
 export const useSimStore = create<SimStore>()(
   persist(
     (set, get) => {
@@ -92,22 +117,9 @@ export const useSimStore = create<SimStore>()(
 
         syncPairings: (key, pairings) => {
           const current = get().seasons[key] ?? empty;
-          const predictions = { ...current.predictions };
-          let removed = 0;
-          for (const [id, pairing] of Object.entries(pairings)) {
-            const previous = current.pairings?.[Number(id)];
-            if (previous !== undefined && previous !== pairing && predictions[Number(id)]) {
-              delete predictions[Number(id)];
-              removed++;
-            }
-          }
-          const unchanged =
-            removed === 0 &&
-            current.pairings !== undefined &&
-            Object.keys(current.pairings).length === Object.keys(pairings).length &&
-            Object.entries(pairings).every(([id, p]) => current.pairings![Number(id)] === p);
-          if (!unchanged) set((s) => ({ seasons: { ...s.seasons, [key]: { ...current, predictions, pairings } } }));
-          return removed;
+          const next = syncedPairings(current, pairings);
+          if (next.changed) set((s) => ({ seasons: { ...s.seasons, [key]: { ...current, predictions: next.predictions, pairings: next.pairings } } }));
+          return next.removed;
         },
 
         reset: (key) => commit(key, empty),
