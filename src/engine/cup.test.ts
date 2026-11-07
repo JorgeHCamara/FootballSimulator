@@ -6,6 +6,7 @@ import {
   bracketSides,
   bracketLines,
   bracketPairs,
+  bracketColumns,
   buildCup,
   clubsAlive,
   cupGameId,
@@ -82,6 +83,81 @@ describe("drawRound", () => {
     const kept = before.filter((p) => after.includes(p)).length;
     assert.ok(kept >= 10, `only ${kept} of 20 pairings kept`);
   });
+
+  it("with slots, draws the same pairings whichever club fills a slot", () => {
+    const clubs = firstRound.slice(0, 16);
+    const slot = new Map(clubs.map((id, i) => [id, `w${i}`] as const));
+    const before = drawRound(clubs, 3, (id) => slot.get(id)!);
+    // Another club wins slot 5's tie: it takes the same place in the same tie.
+    const other = clubs.map((id, i) => (i === 5 ? 1999 : id));
+    slot.set(1999, "w5");
+    const after = drawRound(other, 3, (id) => slot.get(id)!);
+    assert.deepEqual(after, before.map((pair) => pair.map((id) => (id === clubs[5] ? 1999 : id))));
+  });
+});
+
+describe("buildCup: a simulated draw follows the slots, not the clubs", () => {
+  /** Every round played to the final, the home club winning, except for `flips` (game id → away win). */
+  const play = (flips: readonly number[]) => {
+    const results: ResultMap = {};
+    let rounds = buildCup(faCup, realFirstRound, results, options);
+    for (let r = 0; r < rounds.length; r++) {
+      for (const tie of rounds[r]!.ties) results[tie.game.id] = flips.includes(tie.game.id) ? { home: 0, away: 1 } : { home: 1, away: 0 };
+      rounds = buildCup(faCup, realFirstRound, results, options);
+    }
+    return rounds;
+  };
+  const pairs = (rounds: ReturnType<typeof play>, from: number) => rounds.slice(from).map((round) => round.ties.map((t) => [t.homeId, t.awayId]));
+
+  it("knows each round's feeders before the results: the ties whose winners meet", () => {
+    const rounds = play([]);
+    for (const round of rounds.slice(3)) {
+      assert.ok(round.feeders, `${round.config.key}: feeders`);
+      const previous = rounds[round.index - 1]!;
+      round.ties.forEach((tie, j) => {
+        const winners = round.feeders![j]!.map((i) => previous.ties[i]!.homeId); // the home club wins every tie here
+        assert.deepEqual([tie.homeId, tie.awayId].sort(), [...winners].sort(), `${round.config.key} tie ${j}`);
+      });
+    }
+    // The third round has clubs entering: its draw isn't the slots' alone.
+    assert.equal(rounds[2]!.feeders, undefined);
+    // Known while the round itself is still waiting for results.
+    const waiting = buildCup(faCup, realFirstRound, {}, options);
+    assert.deepEqual(waiting[7]!.feeders, rounds[7]!.feeders);
+    assert.equal(waiting[7]!.drawn, "pending");
+  });
+
+  it("lays the bracket out the same, decided or not, whoever goes through", () => {
+    const before = play([]);
+    const last = (rounds: ReturnType<typeof play>, results: ResultMap) => bracketColumns(rounds.slice(5), results).map((col) => col.map((t) => t.index));
+    const results = (rounds: ReturnType<typeof play>) => Object.fromEntries(rounds.flatMap((r) => r.ties.map((t) => [t.game.id, { home: 1, away: 0 }])));
+    const layout = last(before, results(before));
+    // Another quarter-final winner: the same layout.
+    const flipped = play([before[5]!.ties[2]!.game.id]);
+    const flippedResults = { ...results(flipped), [before[5]!.ties[2]!.game.id]: { home: 0, away: 1 } };
+    assert.deepEqual(last(flipped, flippedResults), layout);
+    // The semi-finals not played yet (so no final drawn): the quarter-finals still sit where they did.
+    const open: ResultMap = { ...results(before) };
+    for (const tie of before[6]!.ties) delete open[tie.game.id];
+    const undecided = buildCup(faCup, realFirstRound, open, options);
+    assert.equal(undecided[7]!.ties.length, 0);
+    assert.deepEqual(last(undecided, open).slice(0, 2), layout.slice(0, 2));
+  });
+
+  for (const [name, round] of [["a fifth-round", 4], ["a quarter-final", 5]] as const) {
+    it(`another winner of ${name} tie only takes that club's place, round after round`, () => {
+      const before = play([]);
+      const tie = before[round]!.ties[1]!;
+      const after = play([tie.game.id]);
+      // Every round up to it is the same draw; from the next one, the same ties in the same order,
+      // with the tie's away club wherever its home club was.
+      assert.deepEqual(pairs(after, 0).slice(0, round + 1), pairs(before, 0).slice(0, round + 1));
+      const swapped = pairs(before, round + 1).map((ties) => ties.map((t) => t.map((id) => (id === tie.homeId ? tie.awayId : id))));
+      // Later rounds: the away club goes on winning at home, as the home club did; its later opponents and slots are unchanged.
+      assert.deepEqual(pairs(after, round + 1).map((ties) => ties.length), swapped.map((ties) => ties.length));
+      assert.deepEqual(pairs(after, round + 1)[0], swapped[0]);
+    });
+  }
 });
 
 describe("buildCup", () => {

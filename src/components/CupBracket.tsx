@@ -1,8 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { tieWinner, type CupRound, type CupTie } from "../engine/cup.ts";
-import type { ResultMap } from "../engine/types.ts";
+import { bracketColumns, type CupRound } from "../engine/cup.ts";
 import { PendingRound, TieCard, type CupViewProps } from "./CupRounds.tsx";
 
 interface Props extends CupViewProps {
@@ -22,7 +21,7 @@ interface Props extends CupViewProps {
 export function CupBracket(props: Props) {
   const { rounds, highlight, cup, fullRounds, predictions } = props;
   const t = useTranslations("Cup");
-  const columns = orderColumns(rounds, predictions);
+  const columns = bracketColumns(rounds, predictions);
   return (
     <div className="grid gap-4 lg:grid-cols-3" data-testid="cup-bracket">
       {rounds.map((round, column) => {
@@ -48,26 +47,4 @@ export function CupBracket(props: Props) {
       })}
     </div>
   );
-}
-
-/**
- * Orders each column by the draw of the round after it: for every tie of the
- * next round, the tie its home club came through, then its away club's. So
- * the two quarter-finals feeding a semi-final sit beside it. A column whose
- * next round isn't drawn keeps its draw order.
- */
-export function orderColumns(rounds: readonly CupRound[], results: ResultMap): CupTie[][] {
-  const columns = rounds.map((r) => [...r.ties]);
-  for (let c = columns.length - 2; c >= 0; c--) {
-    if (rounds[c + 1]!.ties.length === 0) continue;
-    const ordered: CupTie[] = [];
-    for (const next of columns[c + 1]!) {
-      for (const club of [next.homeId, next.awayId]) {
-        const feeder = columns[c]!.find((tie) => !ordered.includes(tie) && tieWinner(tie, results) === club);
-        if (feeder) ordered.push(feeder);
-      }
-    }
-    columns[c] = [...ordered, ...columns[c]!.filter((tie) => !ordered.includes(tie))];
-  }
-  return columns;
 }
