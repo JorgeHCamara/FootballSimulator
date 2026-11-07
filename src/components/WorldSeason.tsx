@@ -19,6 +19,7 @@ import {
   type DivisionState,
   type World,
 } from "../lib/myWorld.ts";
+import { isWorldCup, WORLD_CUPS, type WorldCupCode } from "../lib/worldCups.ts";
 import { worldWinners } from "../lib/worldWinners.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
@@ -28,12 +29,12 @@ import { useRealWinners } from "./PastWinnersProvider.tsx";
 import { PromotedClubs } from "./PromotedClubs.tsx";
 import { WorldTable } from "./WorldTable.tsx";
 
-/** A division picker: one button per league, as tabs. */
-export function DivisionTabs({ value, onChange, label, testId }: { value: DivisionCode; onChange: (code: DivisionCode) => void; label: string; testId: string }) {
+/** The season's competitions as tabs: one button per league, then the cups. */
+export function DivisionTabs({ value, onChange, label, testId }: { value: DivisionCode | WorldCupCode; onChange: (code: DivisionCode | WorldCupCode) => void; label: string; testId: string }) {
   const t = useTranslations("World");
   return (
-    <div role="tablist" aria-label={label} className="grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 sm:grid-cols-4 dark:bg-zinc-800" data-testid={testId}>
-      {ENGLAND.map((code) => (
+    <div role="tablist" aria-label={label} className="grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 sm:grid-cols-3 lg:grid-cols-6 dark:bg-zinc-800" data-testid={testId}>
+      {[...ENGLAND, ...WORLD_CUPS].map((code) => (
         <button
           key={code}
           type="button"
@@ -43,7 +44,7 @@ export function DivisionTabs({ value, onChange, label, testId }: { value: Divisi
           className={`min-h-9 rounded-md px-2 text-sm font-semibold ${value === code ? "bg-white shadow-sm dark:bg-zinc-900" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300"}`}
           data-league={code}
         >
-          {t(`leagues.${code}.name`)}
+          {t(isWorldCup(code) ? `cups.${code}.name` : `leagues.${code}.name`)}
         </button>
       ))}
     </div>
@@ -93,7 +94,7 @@ export function Picker({
 }
 
 /** The season picker: this season, then every finished one, newest first. */
-function SeasonPicker({ world, year, onYear }: { world: World; year: number; onYear: (year: number) => void }) {
+export function SeasonPicker({ world, year, onYear }: { world: World; year: number; onYear: (year: number) => void }) {
   const t = useTranslations("World");
   return (
     <Picker

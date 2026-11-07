@@ -56,8 +56,8 @@ export default async function Page({ params }: { params: Params }) {
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t("title")}</h1>
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("intro")}</p>
       </header>
-      {/* The game's own words, and the league simulator's (its fixtures and dice): the rest of the site's client messages aren't needed inside it. */}
-      <NextIntlClientProvider locale={locale} messages={{ World: messages.World, Simulator: messages.Simulator, PastWinners: messages.PastWinners }}>
+      {/* The game's own words, the league simulator's (its fixtures and dice) and the cups': the rest of the site's client messages aren't needed inside it. */}
+      <NextIntlClientProvider locale={locale} messages={{ World: messages.World, Simulator: messages.Simulator, PastWinners: messages.PastWinners, Cup: messages.Cup }}>
         <PastWinnersProvider value={realWinners}>
           <MyWorld pack={pack} locale={langOf(locale)} />
         </PastWinnersProvider>

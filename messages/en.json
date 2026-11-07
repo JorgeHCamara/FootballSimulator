@@ -1268,9 +1268,9 @@
   },
   "World": {
     "metaTitle": "My World: take your club up the English football pyramid",
-    "metaDescription": "Pick a club from the Premier League to League Two and play season after season of all four leagues, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
+    "metaDescription": "Pick a club from the Premier League to League Two and play season after season of all four leagues, with the play-offs, promotion and relegation, the FA Cup and the EFL Cup. Saved in your browser, with every season's tables.",
     "title": "My World",
-    "intro": "Pick a club, then play season after season of the English pyramid, from the Premier League to League Two, every result your way, as on the league pages: the play-offs, promotion and relegation included. Can you take a League Two club to the Premier League?",
+    "intro": "Pick a club, then play season after season of the English pyramid, from the Premier League to League Two, every result your way, as on the league pages: the play-offs, promotion and relegation, the FA Cup and the EFL Cup included. Can you take a League Two club to the Premier League?",
     "savedNote": "Your world is saved in this browser only.",
     "notSaved": "This browser isn't saving your world (private browsing, or storage full): it will be lost when you leave the page.",
     "reset": {
@@ -1308,6 +1308,18 @@
         "in": "in the National League"
       }
     },
+    "cups": {
+      "FAC": {
+        "name": "FA Cup",
+        "the": "the FA Cup",
+        "in": "in the FA Cup"
+      },
+      "EFC": {
+        "name": "EFL Cup",
+        "the": "the EFL Cup",
+        "in": "in the EFL Cup"
+      }
+    },
     "countries": {
       "ENG": "England"
     },
@@ -1325,10 +1337,10 @@
     "left": {
       "title": "Games left to play",
       "count": "{count, plural, =0 {All played} one {# game left} other {# games left}}",
-      "note": "Play each league's games by its fixtures below: the dice, Simulate matchday or Simulate rest of season, play-offs included. Then go to the next season here."
+      "note": "Play each league's games by its fixtures below (the dice, Simulate matchday or Simulate rest of season, play-offs included) and each cup round by round. Then go to the next season here."
     },
     "endSeason": "End season",
-    "endSeasonNote": "Every game has been played: end the {season} season to see its review, with the champions and who goes up and down.",
+    "endSeasonNote": "Every game has been played: end the {season} season to see its review, with the champions, the cup winners and who goes up and down.",
     "country": "Country",
     "seasonHeading": "The {season} season",
     "seasonSelect": "Season",
@@ -1337,11 +1349,18 @@
     "pastNoFixtures": "This season's results weren't kept (it was played before My World kept them): its final table is here.",
     "firstSeason": "This season started from the real one, with its results so far: from here, the world is yours. Change any result, roll the dice or simulate the rest, league by league.",
     "newSeason": "A new season: every club starts on 0 points.",
+    "cupFirst": "This season, {cup} started from the real one, with its draw and results so far: from here, the cup is yours. Change any result, roll the dice, or simulate the round or the rest of the cup.",
+    "cupNew": "A new season: {cup} is drawn round by round among this world's clubs{outsiders}, every game on the clubs' form this season.",
+    "cupOutsiders": " and {count} non-league sides from the real FA Cup",
+    "pastCup": "The {season} {cup}: every round and the final.",
     "tables": "Tables",
+    "competitions": "Leagues and cups",
     "resetTitle": "Reset this league's season?",
     "resetConfirm": "Every result typed in, rolled or simulated {in} this season will be cleared.",
     "resetConfirmFirst": "Every result typed in, rolled or simulated {in} this season will be cleared; the real results the season started with stay.",
     "resetAction": "Reset the league",
+    "resetCupTitle": "Reset this cup's season?",
+    "resetCupAction": "Reset the cup",
     "review": {
       "title": "{season} is over",
       "C": "Champions! {club} won {league}.",
@@ -1359,6 +1378,10 @@
       "in_": "Up from the National League",
       "final": "Play-off final: {winner} {score} {loser}",
       "penalties": "{score}, on penalties",
+      "cupFinal": "beat {loser} {score} in the final",
+      "cupFinalPens": "beat {loser} on penalties ({score}) in the final",
+      "cupWon": "Cup winners! {club} won {cup}, beating {loser} {score} in the final.",
+      "cupWonPens": "Cup winners! {club} won {cup}, beating {loser} on penalties ({score}) in the final.",
       "next": "Start next season"
     },
     "outNotice": "{club} are in the National League this season, after going down from League Two in {season}: they come back up to League Two at the end of it.",
@@ -1399,7 +1422,8 @@
       "europaLeague": "Europa League",
       "conferenceLeague": "Conference League",
       "neutral": "Neutral zone",
-      "nationalLeague": "Promoted"
+      "nationalLeague": "Promoted",
+      "cupWon": "{cup} winners"
     },
     "newWorld": {
       "button": "New world",

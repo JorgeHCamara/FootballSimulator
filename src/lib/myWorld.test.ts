@@ -165,7 +165,7 @@ describe("My World: a season", () => {
       assert.match(after.clubs[id]!.crest!, /^https:\/\/a\.espncdn\.com\/i\/teamlogos\/soccer\/500\/\d+\.png$/);
       assert.equal(next.get(id), "EL2");
     }
-    assert.equal(Object.keys(after.clubs).length, 94, "92 in the pyramid, 2 in the National League");
+    assert.equal(Object.keys(after.clubs).length, 126, "92 in the pyramid, 2 in the National League, 32 in the FA Cup's pool");
     assert.equal(after.newClubs, 0, "no fictional clubs");
     // The review's moves.
     const moves = seasonMoves(season);
@@ -268,8 +268,8 @@ describe("My World: a season", () => {
       assert.deepEqual(world.divisions[3]!.clubs.filter((id) => pool.includes(id)).sort(), [...pool].sort(), "back in League Two");
       for (const id of season.out) assert.equal(clubDivision(world, id), undefined);
     }
-    // Always the same 94 clubs: 92 in the Football League, 2 in the National League; no fictional ones.
-    assert.equal(Object.keys(world.clubs).length, 94);
+    // Always the same 126 clubs: 92 in the Football League, 2 in the National League, 32 in the FA Cup's pool; no fictional ones.
+    assert.equal(Object.keys(world.clubs).length, 126);
     assert.equal(world.newClubs, 0);
     assert.equal(world.divisions.flatMap((d) => d.clubs).length + world.nationalLeague.length, 94);
   });
