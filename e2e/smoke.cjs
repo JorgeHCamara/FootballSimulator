@@ -1644,10 +1644,10 @@ async function step(name, fn) {
       await p.waitForURL(/\/en\/premier-league#chances$/);
       await p.locator('[data-testid="chances"]').waitFor({ timeout: 20_000 });
       // A league without a history file: no tab, no page.
-      await p.goto(`${BASE_URL}/en/bundesliga`);
+      await p.goto(`${BASE_URL}/en/serie-a`);
       await p.locator('[role="tablist"]').first().waitFor();
       assert.equal(await p.getByTestId("past-winners-tab").count(), 0);
-      assert.equal((await p.request.get(`${BASE_URL}/en/bundesliga/past-winners`)).status(), 404);
+      assert.equal((await p.request.get(`${BASE_URL}/en/serie-a/past-winners`)).status(), 404);
       // The sitemap lists the page in every language.
       const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/premier-league/past-winners<`));

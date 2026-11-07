@@ -110,7 +110,8 @@ describe("the sitemap", () => {
       assert.equal(entry.changeFrequency, "monthly");
       assert.equal(entry.priority, 0.6);
     }
-    assert.ok(!entries.some((e) => e.url.endsWith("/en/bundesliga/past-winners")), "no page for a league without a history file");
+    assert.ok(entries.some((e) => e.url.endsWith("/en/bundesliga/past-winners")), "the Bundesliga's, from its history file");
+    assert.ok(!entries.some((e) => e.url.endsWith("/en/serie-a/past-winners")), "no page for a league without a history file");
   });
 
   it("lists the daily quiz in every language", async () => {
