@@ -23,6 +23,8 @@ export interface HistoryPlacing {
   footsimuPath: string | null;
   /** Final points, after any deduction; null when not known or not applicable (a final). */
   points: number | null;
+  /** Other clubs level in the same place (a shared position, as Italian tables list them); only on such placings. */
+  tiedWith?: HistoryPlacing[];
 }
 
 /** One season of a history file; a season with several champions (North and South, Apertura and Clausura) is one row per tournament. */
@@ -40,6 +42,8 @@ export interface HistorySeason {
   champion: HistoryPlacing | null;
   runnerUp: HistoryPlacing | null;
   third: HistoryPlacing | null;
+  /** The club that finished first but had the title revoked and not reassigned (the champion is null then). */
+  strippedChampion?: HistoryPlacing | null;
 }
 
 export interface LeagueHistory {
@@ -56,7 +60,7 @@ const isInt = (v: unknown): v is number => typeof v === "number" && Number.isInt
 const isText = (v: unknown): v is string => typeof v === "string" && v.trim().length > 0;
 const SEASON = /^\d{4}(-\d{2})?$/;
 
-function placing(value: unknown, where: string): HistoryPlacing | null {
+function placing(value: unknown, where: string, tied = true): HistoryPlacing | null {
   if (value === null) return null;
   if (!isRecord(value)) throw new Error(`${where} must be an object or null`);
   if (!isText(value.name) || !isText(value.currentName)) throw new Error(`${where} needs a name and a currentName`);
@@ -64,15 +68,27 @@ function placing(value: unknown, where: string): HistoryPlacing | null {
   if (value.footsimuSlug !== null && !isText(value.footsimuSlug)) throw new Error(`${where}: footsimuSlug must be text or null`);
   if (value.footsimuPath !== null && !(isText(value.footsimuPath) && value.footsimuPath.startsWith("/"))) throw new Error(`${where}: footsimuPath must be a path or null`);
   if (value.points !== null && !(isInt(value.points) && value.points >= 0)) throw new Error(`${where}: points must be a whole number or null`);
-  return { name: value.name, currentName: value.currentName, footsimuId: value.footsimuId, footsimuSlug: value.footsimuSlug, footsimuPath: value.footsimuPath, points: value.points };
+  const out: HistoryPlacing = { name: value.name, currentName: value.currentName, footsimuId: value.footsimuId, footsimuSlug: value.footsimuSlug, footsimuPath: value.footsimuPath, points: value.points };
+  if (value.tiedWith !== undefined) {
+    if (!tied || !Array.isArray(value.tiedWith) || value.tiedWith.length === 0) throw new Error(`${where}: tiedWith must be a non-empty list of placings`);
+    out.tiedWith = value.tiedWith.map((v, i) => placing(v, `${where} tiedWith ${i + 1}`, false)!);
+    if (out.tiedWith.some((p) => p === null)) throw new Error(`${where}: tiedWith must be a non-empty list of placings`);
+  }
+  return out;
 }
+
+/** A placing and the clubs level with it. */
+const withTied = (p: HistoryPlacing | null | undefined): HistoryPlacing[] => (p ? [p, ...(p.tiedWith ?? [])] : []);
 
 /**
  * A history file, checked field by field (every file is checked at build and
  * test time): throws naming the file and the season when something is wrong.
- * Seasons must be oldest first, listed once (per tournament), and a completed
- * season needs a champion and a runner-up (a third place is optional); a season
- * not held or abandoned has no placings. The same club can't take two places.
+ * Seasons must be oldest first, listed once (per tournament). A completed
+ * season needs a champion, or the club whose title was revoked and not
+ * reassigned (strippedChampion); the runner-up can be missing only when the
+ * final round was never finished, and the third place is optional. A season
+ * not held or abandoned has no placings. A placing can list the clubs level
+ * with it (tiedWith). The same club can't take two places.
  */
 export function parseLeagueHistory(value: unknown, file = "history"): LeagueHistory {
   if (!isRecord(value)) throw new Error(`${file}: not an object`);
@@ -93,12 +109,16 @@ export function parseLeagueHistory(value: unknown, file = "history"): LeagueHist
     const champion = placing(s.champion, `${where} champion`);
     const runnerUp = placing(s.runnerUp, `${where} runnerUp`);
     const third = placing(s.third, `${where} third`);
+    const stripped = s.strippedChampion === undefined ? null : placing(s.strippedChampion, `${where} strippedChampion`, false);
     if (s.status === "completed") {
-      if (!champion || !runnerUp) throw new Error(`${where}: a completed season needs a champion and a runner-up`);
-    } else if (champion || runnerUp || third) {
+      // A title revoked and not reassigned leaves no champion; a final round cut short can leave no runner-up.
+      if (!champion && !stripped) throw new Error(`${where}: a completed season needs a champion (or a revoked one)`);
+      if (champion && stripped) throw new Error(`${where}: a revoked title (strippedChampion) leaves no champion`);
+      if (!runnerUp && third) throw new Error(`${where}: a third place needs a runner-up`);
+    } else if (champion || runnerUp || third || stripped) {
       throw new Error(`${where}: a season ${s.status} has no placings`);
     }
-    const ids = [champion, runnerUp, third].filter((p): p is HistoryPlacing => p !== null).map((p) => p.footsimuId ?? `name:${fold(p.currentName)}`);
+    const ids = [stripped, champion, runnerUp, third].flatMap(withTied).map((p) => p.footsimuId ?? `name:${fold(p.currentName)}`);
     if (new Set(ids).size !== ids.length) throw new Error(`${where}: the same club in two places`);
     const key = `${s.season}|${s.tournament ?? ""}`;
     if (seen.has(key)) throw new Error(`${where}: listed twice`);
@@ -116,6 +136,7 @@ export function parseLeagueHistory(value: unknown, file = "history"): LeagueHist
       champion,
       runnerUp,
       third,
+      ...(stripped ? { strippedChampion: stripped } : {}),
     });
   });
   return { league: value.league as string, footsimuSlug: value.footsimuSlug as string, footsimuCode: value.footsimuCode as string, country: value.country as string, seasons };
@@ -138,6 +159,8 @@ export interface WinnerClub {
   /** A My World club's code, for the site's badge disc when it has no crest. */
   tla: string | null;
   points: number | null;
+  /** Other clubs level in the same place (a shared position). */
+  tiedWith?: WinnerClub[];
 }
 
 export interface WinnerRow {
@@ -153,6 +176,8 @@ export interface WinnerRow {
   champion: WinnerClub | null;
   runnerUp: WinnerClub | null;
   third: WinnerClub | null;
+  /** The club whose title was revoked and not reassigned (no champion that season). */
+  stripped?: WinnerClub | null;
   /** A season played in My World, not a real one. */
   world: boolean;
 }
@@ -166,8 +191,12 @@ export const clubKey = (p: HistoryPlacing) => (p.footsimuId !== null ? `espn:${p
  * "1929", before "1929-30"); a season's tournaments keep the file's order.
  */
 export function winnerRows(history: LeagueHistory, crest: (id: number | null, currentName: string) => string | null): WinnerRow[] {
-  const club = (p: HistoryPlacing | null): WinnerClub | null =>
-    p && { key: clubKey(p), id: p.footsimuId, name: p.name, currentName: p.currentName, crest: crest(p.footsimuId, p.currentName), tla: null, points: p.points };
+  const club = (p: HistoryPlacing | null | undefined): WinnerClub | null => {
+    if (!p) return null;
+    const out: WinnerClub = { key: clubKey(p), id: p.footsimuId, name: p.name, currentName: p.currentName, crest: crest(p.footsimuId, p.currentName), tla: null, points: p.points };
+    if (p.tiedWith) out.tiedWith = p.tiedWith.map((t) => club(t)!);
+    return out;
+  };
   return history.seasons
     .map((s, index) => ({ s, index }))
     .sort((a, b) => b.s.startYear - a.s.startYear || seasonEndYear(b.s.season, b.s.startYear) - seasonEndYear(a.s.season, a.s.startYear) || a.index - b.index)
@@ -184,6 +213,7 @@ export function winnerRows(history: LeagueHistory, crest: (id: number | null, cu
       champion: club(s.champion),
       runnerUp: club(s.runnerUp),
       third: club(s.third),
+      ...(s.strippedChampion ? { stripped: club(s.strippedChampion) } : {}),
       world: false,
     }));
 }
@@ -198,10 +228,19 @@ export interface Era {
 /** The competition's names over time, oldest first, from the real seasons (My World's seasons belong to the current name). */
 export function eras(rows: readonly WinnerRow[]): Era[] {
   const out: Era[] = [];
-  for (const r of rows.filter((x) => !x.world).sort((a, b) => a.startYear - b.startYear)) {
-    const last = out.at(-1);
-    if (last && last.name === r.competition) last.to = r.endYear;
-    else out.push({ name: r.competition, from: r.startYear, to: r.endYear });
+  const real = rows.filter((x) => !x.world).sort((a, b) => a.startYear - b.startYear || a.endYear - b.endYear);
+  for (let i = 0; i < real.length; ) {
+    // A season with several tournaments under different names (Italy's 1921-22): the one going on under the
+    // current name closes that era, the other opens the next, so the two eras overlap that season.
+    let j = i;
+    while (j < real.length && real[j]!.season === real[i]!.season) j++;
+    const current = out.at(-1)?.name;
+    for (const r of real.slice(i, j).sort((a, b) => Number(b.competition === current) - Number(a.competition === current))) {
+      const last = out.at(-1);
+      if (last && last.name === r.competition) last.to = r.endYear;
+      else out.push({ name: r.competition, from: r.startYear, to: r.endYear });
+    }
+    i = j;
   }
   const last = out.at(-1);
   if (last) last.to = null;
@@ -246,6 +285,9 @@ export interface WinnersFilter {
   query?: string;
 }
 
+/** Every club a row names: its placings, the clubs level with them and a revoked champion. */
+export const rowClubs = (r: WinnerRow): WinnerClub[] => [r.stripped, r.champion, r.runnerUp, r.third].flatMap((c) => (c ? [c, ...(c.tiedWith ?? [])] : []));
+
 /** The rows an era or decade chip and a club search leave (a search leaves out the seasons without placings). */
 export function filterRows(rows: readonly WinnerRow[], filter: WinnersFilter): WinnerRow[] {
   const q = fold(filter.query ?? "");
@@ -253,6 +295,6 @@ export function filterRows(rows: readonly WinnerRow[], filter: WinnersFilter): W
     (r) =>
       (!filter.era || inEra(r, filter.era)) &&
       (filter.decade === undefined || filter.decade === null || decadeOf(r.startYear) === filter.decade) &&
-      (!q || [r.champion, r.runnerUp, r.third].some((c) => c !== null && (fold(c.name).includes(q) || fold(c.currentName).includes(q)))),
+      (!q || rowClubs(r).some((c) => fold(c.name).includes(q) || fold(c.currentName).includes(q))),
   );
 }

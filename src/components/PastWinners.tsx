@@ -25,32 +25,64 @@ type Place = "champion" | "runnerUp" | "third";
 const RANK = ["bg-amber-400 text-amber-950", "bg-zinc-300 text-zinc-800", "bg-amber-700 text-amber-50"];
 const RANK_OTHER = "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300";
 
-/** One placing: the badge and the name used that season (with "now …" when the club is called something else today), and the points. */
-function Placing({ club, place }: { club: WinnerClub | null; place: Place }) {
+/** A club in a placing: the badge and the name used that season (with "now …" when the club is called something else today), and the points. */
+function ClubLine({ club, champion, revoked = false }: { club: WinnerClub; champion: boolean; revoked?: boolean }) {
   const t = useTranslations("PastWinners");
-  const champion = place === "champion";
-  const box = `flex min-h-11 min-w-0 items-center gap-2 rounded-md px-2 sm:min-h-9 ${champion ? "bg-pitch-50 dark:bg-pitch-900/30" : ""}`;
-  if (!club) {
-    return (
-      <div className={box} data-place={place}>
-        <span className="w-16 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-zinc-500 sm:hidden">{t(place)}</span>
-        <span className="text-zinc-400">–</span>
-      </div>
-    );
-  }
   const renamed = club.name !== club.currentName;
   const now = renamed ? t("now", { club: club.currentName }) : undefined;
   return (
-    <div className={box} data-place={place}>
-      <span className="w-16 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-zinc-500 sm:hidden">{t(place)}</span>
+    <span className="flex min-w-0 flex-1 items-center gap-2">
       <Badge club={{ id: club.id, crest: club.crest, tla: club.tla, name: club.currentName }} />
       <span
-        className={`min-w-0 truncate text-sm ${champion ? "font-semibold text-pitch-900 dark:text-pitch-100" : ""}`}
+        className={`min-w-0 truncate text-sm ${revoked ? "text-zinc-500 line-through" : champion ? "font-semibold text-pitch-900 dark:text-pitch-100" : ""}`}
         {...(now ? { title: now, "aria-label": `${club.name} (${now})` } : {})}
       >
         {club.name}
       </span>
       {club.points !== null && <span className="ml-auto shrink-0 text-xs tabular-nums text-zinc-500">{t("points", { points: club.points })}</span>}
+    </span>
+  );
+}
+
+/** One placing: its club, and the clubs level with it below; a revoked title shows the club struck through. */
+function Placing({ club, place, stripped = null }: { club: WinnerClub | null; place: Place; stripped?: WinnerClub | null }) {
+  const t = useTranslations("PastWinners");
+  const champion = place === "champion";
+  const box = `flex min-h-11 min-w-0 items-center gap-2 rounded-md px-2 sm:min-h-9 ${champion ? "bg-pitch-50 dark:bg-pitch-900/30" : ""}`;
+  const label = <span className="w-16 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-zinc-500 sm:hidden">{t(place)}</span>;
+  if (!club && stripped) {
+    return (
+      <div className={box} data-place={place} data-revoked="true">
+        {label}
+        <span className="flex min-w-0 flex-1 flex-col gap-0.5 py-1">
+          <ClubLine club={stripped} champion revoked />
+          <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">{t("revoked")}</span>
+        </span>
+      </div>
+    );
+  }
+  if (!club) {
+    return (
+      <div className={box} data-place={place}>
+        {label}
+        <span className="text-zinc-400">–</span>
+      </div>
+    );
+  }
+  const tied = club.tiedWith ?? [];
+  return (
+    <div className={box} data-place={place} {...(tied.length > 0 ? { "data-tied": String(tied.length + 1) } : {})}>
+      {label}
+      {tied.length === 0 ? (
+        <ClubLine club={club} champion={champion} />
+      ) : (
+        <span className="flex min-w-0 flex-1 flex-col gap-1 py-1" title={t("tied")}>
+          {[club, ...tied].map((c) => (
+            <ClubLine key={c.key} club={c} champion={champion} />
+          ))}
+          <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-500">{t("tied")}</span>
+        </span>
+      )}
     </div>
   );
 }
@@ -98,7 +130,7 @@ function Row({ row }: { row: WinnerRow }) {
       {...(row.world ? { "data-world": "true" } : {})}
     >
       {season}
-      <Placing club={row.champion} place="champion" />
+      <Placing club={row.champion} place="champion" stripped={row.stripped ?? null} />
       <Placing club={row.runnerUp} place="runnerUp" />
       <Placing club={row.third} place="third" />
     </li>

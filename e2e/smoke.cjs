@@ -1644,10 +1644,10 @@ async function step(name, fn) {
       await p.waitForURL(/\/en\/premier-league#chances$/);
       await p.locator('[data-testid="chances"]').waitFor({ timeout: 20_000 });
       // A league without a history file: no tab, no page.
-      await p.goto(`${BASE_URL}/en/serie-a`);
+      await p.goto(`${BASE_URL}/en/ligue-1`);
       await p.locator('[role="tablist"]').first().waitFor();
       assert.equal(await p.getByTestId("past-winners-tab").count(), 0);
-      assert.equal((await p.request.get(`${BASE_URL}/en/serie-a/past-winners`)).status(), 404);
+      assert.equal((await p.request.get(`${BASE_URL}/en/ligue-1/past-winners`)).status(), 404);
       // The sitemap lists the page in every language.
       const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/premier-league/past-winners<`));
@@ -1679,6 +1679,48 @@ async function step(name, fn) {
       assert.ok(boxes[0].y < boxes[1].y && boxes[1].y < boxes[2].y, "the placings stacked");
       assert.ok(boxes.every((b) => b.height >= 44), "tap-sized placings");
       assert.match(await first.locator('[data-place="champion"]').innerText(), /Champion[\s\S]*Arsenal/i);
+      await phone.close();
+    });
+
+    await step("Past Winners: Serie A's history (1898 on), with 1921-22's two championships, the two titles revoked and the places shared", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/en/serie-a/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Serie A past winners");
+      assert.equal(await p.getByText(/third place of Serie A since the 1898 season/).count(), 1, "\"of Serie A\", no article in English");
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 130);
+      assert.deepEqual(await p.getByTestId("past-winners-chip").allInnerTexts(), [
+        "All",
+        "Serie A (1929–)",
+        "Divisione Nazionale (1926–1929)",
+        "Prima Divisione (1921–1926)",
+        "Prima Categoria (1904–1922)",
+        "Campionato Italiano di Football (1898–1903)",
+      ]);
+      const titles = p.getByTestId("past-winners-title");
+      assert.deepEqual(await titles.evaluateAll((els) => els.map((e) => e.dataset.titles)), ["36", "21", "19", "9", "7"]);
+      // 2004-05: no champion, Juventus struck through as the title revoked.
+      const revoked = rows.filter({ hasText: "2004-05" });
+      assert.equal(await revoked.locator('[data-place="champion"][data-revoked="true"]').count(), 1);
+      assert.match(await revoked.locator('[data-place="champion"]').innerText(), /Juventus[\s\S]*Title revoked/i);
+      assert.equal(await p.locator('[data-revoked="true"]').count(), 2, "2004-05 and 1926-27");
+      // 1947-48: Milan, Juventus and Triestina second on 49 points, no third.
+      const shared = rows.filter({ hasText: "1947-48" });
+      assert.equal(await shared.locator('[data-place="runnerUp"]').getAttribute("data-tied"), "3");
+      assert.match(await shared.locator('[data-place="runnerUp"]').innerText(), /Milan[\s\S]*Juventus[\s\S]*Triestina[\s\S]*Shared place/i);
+      // 1921-22: the CCI's and the FIGC's champions, in their eras.
+      assert.deepEqual(await rows.filter({ hasText: "1921-22" }).locator('[data-place="champion"]').allInnerTexts(), ["Pro Vercelli", "Novese"]);
+      await p.getByTestId("past-winners-search").fill("Triestina");
+      assert.ok((await rows.count()) >= 1);
+      await p.goto(`${BASE_URL}/es/serie-a/past-winners`);
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores de la Serie A");
+      assert.match(await p.getByTestId("past-winners").innerText(), /Título revocado[\s\S]*Puesto compartido/i);
+      await p.close();
+      const phone = await browser.newPage({ viewport: { width: 390, height: 844 } });
+      await phone.goto(`${BASE_URL}/en/serie-a/past-winners`);
+      await phone.getByTestId("past-winners").waitFor();
+      assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth), 390, "no horizontal scroll");
       await phone.close();
     });
 
