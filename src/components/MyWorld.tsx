@@ -181,10 +181,14 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
               {t("setup.countries")}
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("setup.countriesHint")}</p>
-            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {/* One card per country, all the same size: the flag and the name, a tick once picked. */}
+            <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
               {WORLD_COUNTRIES.map((country) => {
                 const picked = countries.includes(country);
                 const ok = available(country);
+                const countryName = t(`countries.${country}`);
+                // A country whose live data didn't load can't be picked: why, on the card's tooltip.
+                const why = ok ? undefined : t("setup.unavailable", { leagues: [...COUNTRY_LEAGUES[country], ...COUNTRY_CUPS[country]].filter((code) => pack.missing.includes(code)).map(name).join(", ") });
                 return (
                   <li key={country}>
                     <button
@@ -192,19 +196,19 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
                       onClick={() => toggle(country)}
                       aria-pressed={picked}
                       disabled={!ok}
-                      className={cardButton(picked)}
+                      {...(why ? { title: why, "aria-description": why } : {})}
+                      className={`relative flex h-28 w-full flex-col items-center justify-center gap-2.5 rounded-xl border-2 px-2 text-sm font-semibold shadow-sm transition ${picked ? "border-pitch-600 bg-pitch-50 dark:bg-pitch-900/40" : "border-zinc-200 bg-white hover:-translate-y-0.5 hover:border-pitch-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:border-zinc-200 disabled:hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:disabled:hover:border-zinc-800"}`}
                       data-testid="world-country"
                       data-country={country}
                       data-picked={picked}
                     >
-                      <Flag code={COUNTRY_FLAG[country]} width={24} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate">{t(`countries.${country}`)}</span>
-                        <span className="block text-xs font-normal text-zinc-500">
-                          {ok ? t(`setup.countryLeagues.${country}`) : t("setup.unavailable", { leagues: [...COUNTRY_LEAGUES[country], ...COUNTRY_CUPS[country]].filter((code) => pack.missing.includes(code)).map(name).join(", ") })}
+                      <Flag code={COUNTRY_FLAG[country]} width={48} />
+                      <span className="block max-w-full truncate">{countryName}</span>
+                      {picked && (
+                        <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-pitch-600 text-white" aria-hidden="true">
+                          <Icon name="check" size={12} strokeWidth={3} />
                         </span>
-                      </span>
-                      {picked && <Icon name="check" size={16} strokeWidth={3} className="shrink-0 text-pitch-700" />}
+                      )}
                     </button>
                   </li>
                 );

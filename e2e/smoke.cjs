@@ -2474,6 +2474,9 @@ async function step(name, fn) {
       const countryCards = p.getByTestId("world-country");
       assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.picked, e.disabled])), [["ENG", "false", false], ["ESP", "false", false], ["GER", "false", false]]);
       assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England", "Spain", "Germany"]);
+      // Cards of the flag and the name alone, every one the same size.
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.trim())), ["England", "Spain", "Germany"], "no description, only the name");
+      assert.equal((await countryCards.evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().height)))])).length, 1, "country cards the same height");
       assert.equal(await p.getByTestId("world-league").count(), 0, "no leagues until a country is picked");
       await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
       assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["PD", "SD"], "Spain alone: its two leagues");
