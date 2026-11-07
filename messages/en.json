@@ -1252,7 +1252,7 @@
     "final": "Final",
     "playoff": "Play-offs",
     "mostTitles": "Most titles",
-    "titles": "{count, plural, one {# title} other {# titles}}",
+    "titlesWord": "{count, plural, one {title} other {titles}}",
     "filter": "Filter the seasons",
     "all": "All",
     "era": "{name} ({from}–{to})",
