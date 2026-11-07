@@ -58,12 +58,15 @@ describe("the Past Winners files", () => {
     for (const slug of slugs) {
       for (const row of leagueWinners(slug)!) {
         for (const club of rowClubs(row)) {
-          if (club.id === null) assert.equal(club.crest, null, `${slug} ${row.season}: ${club.name} has no id, so a shield`);
+          if (club.id === null) assert.ok(club.crest === null || club.crest.startsWith("/crests/serie-c/"), `${slug} ${row.season}: ${club.name} has no id, so a shield or its Série C crest`);
           else assert.ok(club.crest && (LOCAL.test(club.crest) || ESPN.test(club.crest)), `${slug} ${row.season}: ${club.name}'s badge`);
         }
       }
     }
     assert.equal(crestFor(null, "Leeds City"), null);
+    // No ESPN id, but a club of the site's own Série C: its crest there.
+    assert.equal(crestFor(null, "Paysandu"), "/crests/serie-c/20017.png");
+    assert.equal(crestFor(null, "Santa Cruz"), "/crests/serie-c/20039.png");
     assert.match(crestFor(364, "Liverpool")!, ESPN);
     assert.equal(crestFor(319, "Kidderminster Harriers"), "/crests/319.png");
   });
