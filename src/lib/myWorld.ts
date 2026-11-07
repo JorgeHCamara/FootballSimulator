@@ -39,7 +39,9 @@ import { divisionForm, seasonRng, shuffled, teamOf } from "./worldForm.ts";
 /*
  * My World: a fictional timeline of the English pyramid (Premier League to
  * League Two), started from the site's live data and played on season by
- * season in the visitor's browser (saved by src/lib/myWorldStorage.ts).
+ * season in the visitor's browser (saved by src/lib/myWorldStorage.ts). A
+ * world is set up with its countries (World.countries): England, Spain or
+ * both; Spain's leagues are still to come, so only England's play for now.
  *
  * A season plays all four leagues with the site's own engine: each game's score
  * from the club ratings (Dixon–Coles, as the season outlook draws them, with
@@ -85,6 +87,15 @@ export type DivisionCode = (typeof ENGLAND)[number];
 
 export const isDivision = (code: string): code is DivisionCode => (ENGLAND as readonly string[]).includes(code);
 export const divisionConfig = (code: DivisionCode): LeagueConfig => getLeagueByCode(code)!;
+
+/** The countries a world can be set up with: England, and Spain (whose leagues are still to come to My World). */
+export const WORLD_COUNTRIES = ["ENG", "ESP"] as const;
+export type WorldCountry = (typeof WORLD_COUNTRIES)[number];
+export const isWorldCountry = (code: string): code is WorldCountry => (WORLD_COUNTRIES as readonly string[]).includes(code);
+/** Each country's leagues, top first (league config codes): England's play; Spain's are listed at setup as coming soon. */
+export const COUNTRY_LEAGUES: Record<WorldCountry, readonly string[]> = { ENG: ENGLAND, ESP: ["PD", "SD"] };
+/** The countries whose leagues a world plays so far. */
+export const PLAYED_COUNTRIES: readonly WorldCountry[] = ["ENG"];
 
 /** "2026/27" for the season starting in 2026. */
 export const seasonLabel = (year: number) => `${year}/${String((year + 1) % 100).padStart(2, "0")}`;
@@ -228,6 +239,12 @@ export interface World {
   version: typeof WORLD_VERSION;
   /** Which pyramid (only England so far). */
   pyramid: "ENG";
+  /**
+   * The countries the world simulates, as chosen at setup: England, Spain or
+   * both. Only England's leagues play so far; Spain's join a world that has
+   * it once they come to My World.
+   */
+  countries: WorldCountry[];
   id: string;
   createdAt: string;
   seed: number;
@@ -335,6 +352,8 @@ export function upgradeWorld(world: World, pack?: StartPack): World {
     }
     upgraded = { ...upgraded, clubs, nationalLeague };
   }
+  // A world from before the countries were chosen: England's.
+  if (!Array.isArray((upgraded as Partial<World>).countries)) upgraded = { ...upgraded, countries: ["ENG"] };
   // A world from before Past Winners: its finished seasons' top three, from their saved tables.
   if (!Array.isArray((upgraded as Partial<World>).winners)) {
     const { clubs, history } = upgraded;
@@ -480,8 +499,11 @@ function inheritedCup(start: StartCup, year: number, idOf: (division: DivisionCo
  * real one, with its results, deductions and ratings. `user`: the visitor's
  * club, by its league and id in the live data.
  */
-export function createWorld(pack: StartPack, user: { league: DivisionCode; club: number }, seed = randomSeed(), now = new Date()): World {
+export function createWorld(pack: StartPack, user: { league: DivisionCode; club: number; countries?: readonly WorldCountry[] }, seed = randomSeed(), now = new Date()): World {
   if (!packReady(pack)) throw new Error("The live data for the four leagues isn't complete");
+  // The world's countries, England's leagues among them (the only ones that play so far), in the fixed order.
+  const countries = WORLD_COUNTRIES.filter((c) => (user.countries ?? ["ENG"]).includes(c));
+  if (!countries.includes("ENG")) throw new Error("A world needs England's leagues for now");
   const clubs: Record<number, WorldClub> = {};
   const ratings: Record<number, [number, number]> = {};
   const params = {} as Record<DivisionCode, DivisionParams>;
@@ -522,6 +544,7 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
   const world: World = {
     version: WORLD_VERSION,
     pyramid: "ENG",
+    countries,
     id: `${now.getTime().toString(36)}-${(seed >>> 0).toString(36)}`,
     createdAt: now.toISOString(),
     seed: seed >>> 0,

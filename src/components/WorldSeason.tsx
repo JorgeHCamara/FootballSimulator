@@ -69,7 +69,7 @@ export function Picker({
   icon: ReactNode;
   label: string;
   value: string;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; disabled?: boolean }[];
   onChange: (value: string) => void;
   testId: string;
 }) {
@@ -84,7 +84,7 @@ export function Picker({
         data-testid={testId}
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+          <option key={o.value} value={o.value} disabled={o.disabled} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
             {o.label}
           </option>
         ))}

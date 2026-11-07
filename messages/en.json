@@ -1321,14 +1321,25 @@
       }
     },
     "countries": {
-      "ENG": "England"
+      "ENG": "England",
+      "ESP": "Spain"
     },
     "setup": {
       "title": "Create your world",
+      "countries": "Pick your countries",
+      "countryBoth": "England and Spain",
+      "countryLeagues": {
+        "ENG": "Premier League to League Two, the FA Cup and the EFL Cup",
+        "ESP": "La Liga and Segunda División (coming soon)"
+      },
+      "comingSoon": "Coming soon",
+      "comingSoonNote": "{country}'s leagues aren't in My World yet: they join your world when they come. Pick a club from England to start.",
+      "comingSoonOnly": "{country}'s leagues aren't in My World yet. Pick England too to start a world now: {country}'s leagues join it when they come.",
       "league": "Pick a league",
       "club": "Pick your club",
       "create": "Create my world",
       "summary": "{club} {league}, starting with the {season} season.",
+      "summaryCountries": "Your world plays {countries}.",
       "clubs": "{count} clubs"
     },
     "season": "Season {season}",

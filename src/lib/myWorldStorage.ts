@@ -1,4 +1,4 @@
-import { ENGLAND, upgradeWorld, WORLD_VERSION, type StartPack, type World } from "./myWorld.ts";
+import { ENGLAND, isWorldCountry, upgradeWorld, WORLD_VERSION, type StartPack, type World } from "./myWorld.ts";
 import { isPackedCupTies, isWorldCup } from "./worldCups.ts";
 
 /*
@@ -78,6 +78,8 @@ export function isWorld(value: unknown): value is World {
   const { clubs, ratings, divisions, history, params } = value;
   if (!isNumber(value.year) || !isNumber(value.seed) || !isNumber(value.userClub) || !isNumber(value.newClubs) || typeof value.review !== "boolean") return false;
   if (!isRecord(clubs) || !isRecord(ratings) || !isRecord(params) || !Array.isArray(divisions) || !Array.isArray(history)) return false;
+  // The world's countries (absent from saves from before the choice: England's).
+  if (value.countries !== undefined && !(Array.isArray(value.countries) && value.countries.length > 0 && value.countries.every((c) => typeof c === "string" && isWorldCountry(c)))) return false;
   // The National League's clubs (absent from saves from before it: upgradeWorld adds it).
   if (value.nationalLeague !== undefined && !(Array.isArray(value.nationalLeague) && value.nationalLeague.every((id) => isRecord(clubs[String(id)])))) return false;
   // The cups and the FA Cup's non-league sides (absent from saves from before them: upgradeWorld draws them).

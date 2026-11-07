@@ -96,6 +96,12 @@ describe("My World: a new world", () => {
     assert.deepEqual(world.ratings[1], pack.leagues[0]!.model.strengths[first.id]);
     assert.equal(world.history.length, 0);
     assert.throws(() => createWorld(pack, { league: "PL", club: -1 }), /isn't in that league/);
+    // The world's countries, as chosen at setup: England's by default; Spain's leagues still to come, so England must be among them.
+    assert.deepEqual(world.countries, ["ENG"]);
+    assert.deepEqual(createWorld(pack, { league: "EL2", club: user.id, countries: ["ESP", "ENG"] }, 42).countries, ["ENG", "ESP"], "in the fixed order");
+    assert.throws(() => createWorld(pack, { league: "EL2", club: user.id, countries: ["ESP"] }), /England/);
+    const { countries: _c, ...before } = world;
+    assert.deepEqual(upgradeWorld(before as World).countries, ["ENG"], "a world from before the choice is England's");
     assert.throws(() => createWorld({ ...pack, missing: ["EL1"] }, { league: "EL2", club: user.id }), /isn't complete/);
   });
 });

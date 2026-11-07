@@ -2470,16 +2470,35 @@ async function step(name, fn) {
       assert.equal(await p.locator("h1").innerText(), "My World");
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/my-world");
       assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/my-world");
-      // Set up: League Two, a club, create.
+      // Set up: the countries (England and Spain, England, Spain: Spain's leagues coming soon), League Two, a club, create.
+      const countryChoices = p.getByTestId("world-countries");
+      assert.deepEqual(await countryChoices.evaluateAll((els) => els.map((e) => e.dataset.countries)), ["ENG,ESP", "ENG", "ESP"]);
+      assert.deepEqual(await countryChoices.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England and Spain", "England", "Spain"]);
+      assert.equal(await p.getByTestId("world-league").count(), 0, "no leagues until the countries are picked");
+      await p.locator('[data-testid="world-countries"][data-countries="ESP"]').click();
+      assert.equal(await p.getByTestId("world-league").count(), 0, "Spain only: nothing to pick yet");
+      assert.deepEqual(await p.getByTestId("world-league-soon").evaluateAll((els) => els.map((e) => e.dataset.league)), ["PD", "SD"]);
+      assert.ok(await p.getByTestId("world-league-soon").first().isDisabled());
+      assert.match(await p.getByTestId("world-coming-soon").innerText(), /Spain's leagues aren't in My World yet\. Pick England too/);
+      await p.locator('[data-testid="world-countries"][data-countries="ENG,ESP"]').click();
       assert.equal(await p.getByTestId("world-league").count(), 4);
+      assert.equal(await p.getByTestId("world-league-soon").count(), 2, "Spain's two leagues, coming soon");
+      assert.match(await p.getByTestId("world-coming-soon").innerText(), /join your world when they come/);
+      await p.locator('[data-testid="world-countries"][data-countries="ENG"]').click();
+      assert.equal(await p.getByTestId("world-league").count(), 4);
+      assert.equal(await p.getByTestId("world-league-soon").count(), 0);
+      assert.equal(await p.getByTestId("world-coming-soon").count(), 0);
       await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
       const clubs = p.getByTestId("world-club");
       assert.equal(await clubs.count(), 24);
       const name = (await clubs.nth(4).innerText()).trim();
       await clubs.nth(4).click();
+      assert.match(await p.getByTestId("world-summary").innerText(), /Your world plays England\.$/);
       await p.getByTestId("world-create").click();
       const world = p.getByTestId("world");
       await world.waitFor();
+      // The world's country picker lists its countries (England alone here).
+      assert.deepEqual(await p.getByTestId("world-season-country").locator("option").allInnerTexts(), ["England"]);
       assert.equal((await p.getByTestId("world-my-club").innerText()).trim(), name);
       const year = Number(await world.getAttribute("data-year"));
       const label = (y) => `${y}/${String((y + 1) % 100).padStart(2, "0")}`;
@@ -2721,6 +2740,7 @@ async function step(name, fn) {
           const width = phone ? 360 : 1280;
           assert.ok(await q.evaluate((w) => document.documentElement.scrollWidth <= w, width), `${locale} ${phone ? "phone" : "desktop"}: no sideways scroll`);
           if (phone && locale !== "en") {
+            await q.locator('[data-testid="world-countries"][data-countries="ENG,ESP"]').tap();
             await q.locator('[data-testid="world-league"][data-league="PL"]').tap();
             await q.getByTestId("world-club").first().tap();
             await q.getByTestId("world-create").tap();
@@ -2752,10 +2772,14 @@ async function step(name, fn) {
     await step("My World, every result your way, as on the league pages (no match previews): typed in, rolled, Simulate matchday, Undo, saved on reload, Reset, Simulate rest of season with the play-off, the games left counting down", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/my-world`);
+      await p.locator('[data-testid="world-countries"][data-countries="ENG,ESP"]').click();
       await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
       await p.getByTestId("world-club").nth(4).click();
       await p.getByTestId("world-create").click();
       await p.getByTestId("world").waitFor();
+      // A world set up with England and Spain: both in its country picker, Spain not yet pickable (its leagues are still to come).
+      assert.deepEqual(await p.getByTestId("world-season-country").locator("option").allInnerTexts(), ["England", "Spain (coming soon)"]);
+      assert.equal(await p.getByTestId("world-season-country").locator("option").nth(1).evaluate((o) => o.disabled), true, "Spain can't be picked yet");
       // Opens at the top: the club, and the games left in each league.
       assert.ok((await p.getByTestId("world-club-card").boundingBox()).y < 900, "the club card on screen");
       const leftOf = async (code) => Number(await p.locator(`[data-testid="world-left"][data-league="${code}"]`).getAttribute("data-left"));
