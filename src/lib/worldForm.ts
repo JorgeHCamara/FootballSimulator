@@ -5,6 +5,7 @@ import { createRng, type Rng } from "../engine/rng.ts";
 import type { Team, TeamId } from "../engine/types.ts";
 import type { DivisionSeason, World } from "./myWorld.ts";
 import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
+import { divisionCountry } from "./worldCountries.ts";
 
 /*
  * A My World season's form: what the leagues (src/lib/myWorld.ts) and the
@@ -53,11 +54,12 @@ export function divisionForm(world: World, d: DivisionSeason, index: number): { 
   return { model: { avgHomeGoals: p.avgHomeGoals, avgAwayGoals: p.avgAwayGoals, strengths, ...(p.rho ? { rho: p.rho } : {}) }, rng };
 }
 
-/** Every league club's form this season (divisionForm), with its division's tier (0 the top division), for the cups' model. */
+/** Every league club's form this season (divisionForm), with its division's tier in its country (0 the top division), for the cups' model. */
 export function seasonStrengths(world: World): Map<TeamId, TeamStrength & { tier: number }> {
   const out = new Map<TeamId, TeamStrength & { tier: number }>();
-  world.divisions.forEach((d, tier) => {
-    for (const [id, s] of divisionForm(world, d, tier).model.strengths) out.set(id, { attack: s.attack, defence: s.defence, tier });
+  world.divisions.forEach((d, i) => {
+    const tier = world.divisions.filter((x, j) => j < i && divisionCountry(x.code) === divisionCountry(d.code)).length;
+    for (const [id, s] of divisionForm(world, d, i).model.strengths) out.set(id, { attack: s.attack, defence: s.defence, tier });
   });
   return out;
 }

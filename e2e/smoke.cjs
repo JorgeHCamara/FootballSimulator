@@ -2470,16 +2470,29 @@ async function step(name, fn) {
       assert.equal(await p.locator("h1").innerText(), "My World");
       assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), "https://footsimu.com/en/my-world");
       assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/my-world");
-      // Set up: League Two, a club, create.
+      // Set up: the countries (one card each, every one picked is played: England, Spain), League Two, a club, create.
+      const countryCards = p.getByTestId("world-country");
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.picked, e.disabled])), [["ENG", "false", false], ["ESP", "false", false]]);
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England", "Spain"]);
+      assert.equal(await p.getByTestId("world-league").count(), 0, "no leagues until a country is picked");
+      await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
+      assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["PD", "SD"], "Spain alone: its two leagues");
+      await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
+      assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["PL", "ELC", "EL1", "EL2", "PD", "SD"], "both: every league, England's first");
+      await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.dataset.picked)), ["true", "false"], "Spain unpicked again");
       assert.equal(await p.getByTestId("world-league").count(), 4);
       await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
       const clubs = p.getByTestId("world-club");
       assert.equal(await clubs.count(), 24);
       const name = (await clubs.nth(4).innerText()).trim();
       await clubs.nth(4).click();
+      assert.match(await p.getByTestId("world-summary").innerText(), /Your world plays England\.$/);
       await p.getByTestId("world-create").click();
       const world = p.getByTestId("world");
       await world.waitFor();
+      // The world's country picker lists its countries (England alone here).
+      assert.deepEqual(await p.getByTestId("world-season-country").locator("option").allInnerTexts(), ["England"]);
       assert.equal((await p.getByTestId("world-my-club").innerText()).trim(), name);
       const year = Number(await world.getAttribute("data-year"));
       const label = (y) => `${y}/${String((y + 1) % 100).padStart(2, "0")}`;
@@ -2721,6 +2734,7 @@ async function step(name, fn) {
           const width = phone ? 360 : 1280;
           assert.ok(await q.evaluate((w) => document.documentElement.scrollWidth <= w, width), `${locale} ${phone ? "phone" : "desktop"}: no sideways scroll`);
           if (phone && locale !== "en") {
+            await q.locator('[data-testid="world-country"][data-country="ENG"]').tap();
             await q.locator('[data-testid="world-league"][data-league="PL"]').tap();
             await q.getByTestId("world-club").first().tap();
             await q.getByTestId("world-create").tap();
@@ -2749,9 +2763,89 @@ async function step(name, fn) {
       }
     });
 
+    await step("My World with England and Spain: a Segunda División club, Spain's tabs (La Liga, Segunda División, Copa del Rey) behind the country picker, the games left by country, both pyramids ended together (the Segunda's four down to the Primera Federación), Spain's past season and its Past Winners (the world's seasons only)", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
+      await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
+      await p.locator('[data-testid="world-league"][data-league="SD"]').click();
+      const clubs = p.getByTestId("world-club");
+      assert.equal(await clubs.count(), 22);
+      const name = (await clubs.nth(2).innerText()).trim();
+      await clubs.nth(2).click();
+      assert.match(await p.getByTestId("world-summary").innerText(), /in the Segunda División, starting with the \d{4}\/\d{2} season\. Your world plays England and Spain\.$/);
+      await p.getByTestId("world-create").click();
+      const world = p.getByTestId("world");
+      await world.waitFor();
+      const year = Number(await world.getAttribute("data-year"));
+      const label = (y) => `${y}/${String((y + 1) % 100).padStart(2, "0")}`;
+      assert.equal((await p.getByTestId("world-my-club").innerText()).trim(), name);
+      assert.ok((await p.getByTestId("world-season").innerText()).startsWith(`Season ${label(year)} · Segunda División`));
+      // The season opens on the club's country: Spain's three competitions as tabs; England's six behind the country picker.
+      const picker = p.getByTestId("world-season-country");
+      assert.equal(await picker.inputValue(), "ESP");
+      assert.deepEqual(await picker.locator("option").allInnerTexts(), ["England", "Spain"]);
+      assert.deepEqual(await p.locator('[data-testid="world-tabs"] [role="tab"]').allInnerTexts(), ["La Liga", "Segunda División", "Copa del Rey"]);
+      assert.equal(await p.locator('[data-testid="world-tabs"] [aria-selected="true"]').getAttribute("data-league"), "SD");
+      assert.equal(await p.locator('[data-testid="world-table"] [data-testid="world-row"]').count(), 22);
+      await picker.selectOption("ENG");
+      assert.deepEqual(await p.locator('[data-testid="world-tabs"] [role="tab"]').allInnerTexts(), ["Premier League", "Championship", "League One", "League Two", "FA Cup", "EFL Cup"]);
+      await picker.selectOption("ESP");
+      // The games left, by country: England's six, Spain's three.
+      assert.deepEqual(await p.getByTestId("world-left-country").evaluateAll((els) => els.map((e) => [e.dataset.country, e.querySelectorAll('[data-testid="world-left"]').length])), [["ENG", 6], ["ESP", 3]]);
+      const left = async () => Object.fromEntries(await p.getByTestId("world-left").evaluateAll((els) => els.map((e) => [e.dataset.league, Number(e.dataset.left)])));
+      assert.deepEqual(Object.keys(await left()), ["PL", "ELC", "EL1", "EL2", "FAC", "EFC", "PD", "SD", "CDR"]);
+      assert.deepEqual([(await left()).CDR], [137], "the Copa del Rey's games: a two-legged qualifying round to the final");
+      // Every competition played out from its games-left button (which opens it, country and tab); then the season ends for both countries.
+      for (const code of ["PL", "ELC", "EL1", "EL2", "FAC", "EFC", "PD", "SD", "CDR"]) {
+        await p.locator(`[data-testid="world-left"][data-league="${code}"]`).click();
+        assert.equal(await p.locator('[data-testid="world-tabs"] [aria-selected="true"]').getAttribute("data-league"), code);
+        if ((await left())[code] > 0) await p.getByTestId("world-simulate-rest").click();
+        await p.locator(`[data-testid="world-left"][data-league="${code}"][data-left="0"]`).waitFor();
+      }
+      await p.getByTestId("world-end-season").click();
+      const review = p.getByTestId("world-review");
+      await review.waitFor();
+      assert.equal(await p.locator('[data-testid="world-review"] li', { hasText: /^(La Liga|Segunda División):/ }).count(), 2, "Spain's champions with England's");
+      assert.equal(await p.getByTestId("world-review-cup").count(), 3);
+      assert.match(await p.getByTestId("world-review-cup").nth(2).innerText(), /^Copa del Rey:/);
+      assert.equal(await p.getByTestId("world-moves").count(), 6);
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="PD"] li').count(), 6, "three up, three down");
+      const segunda = await p.locator('[data-testid="world-moves"][data-upper="SD"]').innerText();
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="SD"] li').count(), 8, "four up from the Primera Federación, four down to it");
+      assert.ok(segunda.includes("UP FROM THE PRIMERA FEDERACIÓN") && segunda.includes("DOWN TO THE PRIMERA FEDERACIÓN") && !segunda.includes("NEW"), "real Copa del Rey sides come up");
+      await p.getByTestId("world-start-season").click();
+      await p.getByTestId("world-tables").waitFor();
+      assert.deepEqual(Object.values(await left()), [380, 559, 557, 557, 123, 93, 380, 468, 137], "both countries' new seasons: leagues, play-offs and cups");
+      // Last season's Segunda: its table (four relegated, the play-off final) and the club's seasons list.
+      await p.getByTestId("world-season-select").selectOption(String(year));
+      await p.locator('[data-testid="world-tabs"] [data-league="SD"]').click();
+      assert.equal(await p.locator('[data-testid="world-past-table"] [data-testid="world-row"]').count(), 22);
+      assert.equal(await p.locator('[data-testid="world-past-table"] [data-note="R"]').count(), 4);
+      assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
+      assert.equal(await p.getByTestId("world-path-step").count(), 1);
+      assert.deepEqual(await p.getByTestId("world-path-league").locator("option").allInnerTexts(), ["La Liga", "Segunda División"], "the club's seasons: Spain's leagues");
+      assert.equal(await p.getByTestId("world-path-country").inputValue(), "ESP");
+      // Spain's Past Winners: no real history yet, the world's season only.
+      await p.getByTestId("world-season-select").selectOption(String(year + 1));
+      await p.locator('[data-testid="world-tabs"] [data-league="PD"]').click();
+      await p.getByTestId("world-past-winners").click();
+      await p.getByTestId("past-winners-coming-soon").waitFor();
+      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]').count(), 1, "La Liga: the world's season only");
+      await p.getByTestId("world-table-view").click();
+      // Saved: a reload keeps both countries.
+      await p.reload();
+      await p.getByTestId("world-tables").waitFor();
+      assert.deepEqual(await p.getByTestId("world-season-country").locator("option").allInnerTexts(), ["England", "Spain"]);
+      assert.equal(await p.getByTestId("world-left").count(), 9);
+      await p.close();
+    });
+
     await step("My World, every result your way, as on the league pages (no match previews): typed in, rolled, Simulate matchday, Undo, saved on reload, Reset, Simulate rest of season with the play-off, the games left counting down", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/my-world`);
+      await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
       await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
       await p.getByTestId("world-club").nth(4).click();
       await p.getByTestId("world-create").click();
