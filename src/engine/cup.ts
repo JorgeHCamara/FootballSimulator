@@ -148,6 +148,15 @@ export function drawRoundRandom(clubs: readonly TeamId[], rng: Rng): [TeamId, Te
   return pairs;
 }
 
+/**
+ * What decides a level tie in a round, for the rule shown: "penalties" (no
+ * extra time) or "extraTime" (extra time, then penalties); undefined when the
+ * round's config says nothing (the engine plays no extra time either way).
+ */
+export function levelTieRule(config: Pick<CupRoundConfig, "noExtraTime">): "penalties" | "extraTime" | undefined {
+  return config.noExtraTime === undefined ? undefined : config.noExtraTime ? "penalties" : "extraTime";
+}
+
 /** Index of the round before the first fixed-bracket round, or -1 without a bracket. */
 export function bracketBase(config: CupConfig): number {
   const first = config.rounds.findIndex((r) => r.bracket);

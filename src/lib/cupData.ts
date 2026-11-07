@@ -8,7 +8,7 @@ import { buildCupStrengths, type FeederModel } from "../engine/cupModel.ts";
 import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
 import type { Fixture, Team, TeamId } from "../engine/types.ts";
-import { EspnError, espnFixtures, espnTeams, fetchEspnYear, type EspnEvent } from "./espn.ts";
+import { EspnError, espnFixtures, espnTeams, fetchEspnYear, type EspnCalendarEntry, type EspnEvent } from "./espn.ts";
 import { getLeagueData } from "./leagueData.ts";
 import { sampleCup } from "./sampleLeague.ts";
 
@@ -46,6 +46,28 @@ export function groupLegs(fixtures: readonly Fixture[]): Fixture[][] {
     ties.set(key, [...(ties.get(key) ?? []), f]);
   }
   return [...ties.values()];
+}
+
+/** ESPN's calendar label as a round slug: "Rd of 16" → "round-of-16", "Quarterfinals" → "quarterfinals". */
+export const calendarSlug = (label: string) => label.toLowerCase().replace(/^rd of/, "round of").replace(/\s+/g, "-");
+
+/**
+ * The round an event belongs to: the one whose ESPN slug is the event's season
+ * slug, or, when the feed gives no slug, the one whose calendar window holds
+ * the kick-off (the EFL Cup's board names the rounds in its calendar).
+ * Undefined for an event of no configured round.
+ */
+export function eventRound<R extends { key: CupRoundKey; espnSlug: string }>(
+  event: Pick<EspnEvent, "date" | "season">,
+  rounds: readonly R[],
+  calendar: readonly EspnCalendarEntry[] = [],
+): R | undefined {
+  const slug = event.season?.slug;
+  if (slug) return rounds.find((round) => round.espnSlug === slug);
+  const time = Date.parse(event.date);
+  if (Number.isNaN(time)) return undefined;
+  const entry = calendar.find((c) => Date.parse(c.startDate) <= time && time < Date.parse(c.endDate));
+  return entry ? rounds.find((round) => round.espnSlug === calendarSlug(entry.label)) : undefined;
 }
 
 /** Same request sharing as getLeagueData. */
@@ -113,15 +135,17 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
     const events = new Map<string, EspnEvent>();
     for (const e of boards.flatMap((b) => b.events ?? [])) if (e.season?.year === year) events.set(e.id, e);
     const all = [...events.values()];
-    const byRound = cup.rounds.map((round) => all.filter((e) => e.season?.slug === round.espnSlug));
-    // A new season counts once its first round is (at least half) drawn.
-    if (byRound[0]!.length < cup.rounds[0]!.ties / 2) continue;
+    // The season's own board carries the round calendar.
+    const calendar = boards.find((b) => b.leagues?.[0]?.season?.year === year)?.leagues?.[0]?.calendar?.[0]?.entries ?? [];
+    const byRound = cup.rounds.map((round) => all.filter((e) => eventRound(e, cup.rounds, calendar)?.key === round.key));
+    // A new season counts once a round is (at least half) drawn: the first,
+    // or a later one when a season skips its opening round (the EFL Cup's
+    // preliminary round is only held when the numbers need it).
+    if (!cup.rounds.some((round, r) => byRound[r]!.length >= round.ties / 2)) continue;
 
     const real: RealCupTie[] = cup.rounds.flatMap((round, r) =>
       groupLegs(espnFixtures(byRound[r]!)).map((legs) => ({ round: round.key, homeId: legs[0]!.homeId, awayId: legs[0]!.awayId, legs })),
     );
-    // The season's own board carries the round calendar.
-    const calendar = boards.find((b) => b.leagues?.[0]?.season?.year === year)?.leagues?.[0]?.calendar?.[0]?.entries ?? [];
     const roundDates: Partial<Record<CupRoundKey, string>> = {};
     cup.rounds.forEach((round, r) => {
       // Scheduled games (even with clubs still "TBD") carry the real kick-off;
@@ -132,8 +156,7 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
         roundDates[round.key] = new Date(kickoffs[0]).toISOString();
         return;
       }
-      const slug = (label: string) => label.toLowerCase().replace(/^rd of/, "round of").replace(/\s+/g, "-");
-      const entry = calendar.find((c) => slug(c.label) === round.espnSlug);
+      const entry = calendar.find((c) => calendarSlug(c.label) === round.espnSlug);
       if (entry) {
         const start = Date.parse(entry.startDate);
         const end = Date.parse(entry.endDate);
