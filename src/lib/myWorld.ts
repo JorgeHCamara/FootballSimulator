@@ -3,7 +3,7 @@ import type { LeagueConfig } from "../config/leagues.ts";
 import { NATIONAL_LEAGUE_CLUBS } from "../config/nationalLeague.ts";
 import { expectedGoals, expectedGoalsNeutral, sampleDixonColes, sampleLikelyScore, simulateFixtures } from "../engine/match.ts";
 import { tierStrength } from "../engine/cupModel.ts";
-import { clubPriors, seasonRatings, type SeasonRatings } from "../engine/offseason.ts";
+import { seasonRatings, type SeasonRatings } from "../engine/offseason.ts";
 import {
   buildBracket,
   isShootoutId,
@@ -46,6 +46,7 @@ import {
 } from "./worldCountries.ts";
 import { cupConfig, cupPlayable, finishCups, generateCup, outsidersNeeded, type SavedCup, type WorldCupSeason, type WorldCupTie } from "./worldCups.ts";
 import { divisionForm, seasonRng, shuffled, teamOf } from "./worldForm.ts";
+import { nextSeason } from "./worldLevels.ts";
 
 export {
   COUNTRY_CUPS,
@@ -99,12 +100,15 @@ export {
  * stand, every later one is drawn among the world's clubs, with the real cups'
  * non-league sides (World.cupPool) in the FA Cup and the Copa del Rey.
  *
- * Between seasons each club's rating carries over through the site's own
- * between-season rule (src/engine/offseason.ts, the one the real starting
- * ratings are built with): its rating from the season's results keeps most of
- * its difference from average, a promoted club becomes a below-average one in
- * its new league, a relegated club the reverse, and a new club starts below
- * average. Nothing here touches the live outlook, snapshots or SIM_VERSION.
+ * Between seasons each club's rating carries over through the world's own
+ * rule (src/lib/worldLevels.ts): every club has a level, where it stands over
+ * the years (its real rating when the world starts, then settling a little
+ * each season towards how it did), and a season's rating starts from that
+ * level keeping only part of the season just played; a promoted club becomes
+ * a below-average one in its new league, a relegated club the reverse, and a
+ * new club starts below average (the real starting ratings' values,
+ * src/engine/offseason.ts). Nothing here touches the live outlook, snapshots
+ * or SIM_VERSION.
  *
  * A season is played league by league as on the league pages: any score typed
  * in, a dice roll for one game, a matchday or the rest of a league simulated
@@ -283,6 +287,13 @@ export interface World {
   clubs: Record<number, WorldClub>;
   /** Each club's rating for the season in progress: [attack, defence] relative to its division (attack above 1 scores more, defence above 1 concedes more). */
   ratings: Record<number, [number, number]>;
+  /**
+   * Each club's level, where it stands over the years, on the same scale as
+   * its rating: its real rating when the world started, then settling a little
+   * each season towards how it did (src/lib/worldLevels.ts). Kept for clubs
+   * that left too (a club back from the league below returns at its old level).
+   */
+  levels: Record<number, [number, number]>;
   params: Record<DivisionCode, DivisionParams>;
   /** The season in progress: each country's divisions, top first (worldDivisions). */
   divisions: DivisionSeason[];
@@ -389,6 +400,10 @@ export function upgradeWorld(world: World, pack?: StartPack): World {
   }
   // A world from before the countries were chosen: England's.
   if (!Array.isArray((upgraded as Partial<World>).countries)) upgraded = { ...upgraded, countries: ["ENG"] };
+  // A world from before the club levels: each club's level is its rating as it stands.
+  if (typeof (upgraded as Partial<World>).levels !== "object" || (upgraded as Partial<World>).levels === null) {
+    upgraded = { ...upgraded, levels: Object.fromEntries(Object.entries(upgraded.ratings).map(([id, r]) => [id, [r[0], r[1]]])) };
+  }
   // A world from before Past Winners: its finished seasons' top three, from their saved tables.
   if (!Array.isArray((upgraded as Partial<World>).winners)) {
     const { clubs, history } = upgraded;
@@ -603,6 +618,7 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
     year,
     clubs: pool.clubs,
     ratings,
+    levels: Object.fromEntries(Object.entries(ratings).map(([id, r]) => [id, [r[0], r[1]]])),
     params,
     divisions,
     history: [],
@@ -1169,6 +1185,7 @@ export function playSeason(world: World): World {
   const arrivals: TeamId[] = [];
   const nextClubs: TeamId[][] = played.map(() => []);
   const ratings: Record<number, [number, number]> = {};
+  const levels: Record<number, [number, number]> = { ...world.levels };
 
   // Each country's pyramid moves on its own: promotion and relegation between its divisions, and the swap at the bottom.
   for (const country of world.countries) {
@@ -1213,15 +1230,11 @@ export function playSeason(world: World): World {
       if (nextClubs[at[k]!]!.length !== divisionConfig(p.code).teams) throw new Error(`${p.code}: ${nextClubs[at[k]!]!.length} clubs next season`);
     });
 
-    // Next season's ratings: each division's from this season's results, through the between-season rule.
+    // Next season's ratings and levels: each division's from this season's results, through the world's between-season rule.
     own.forEach((p, k) => {
-      const { strengths } = clubPriors(
-        nextClubs[at[k]!]!.map((id) => ({ id })),
-        p.ratings,
-        own[k + 1]?.ratings ?? null,
-        own[k - 1]?.ratings ?? null,
-      );
-      for (const [id, st] of strengths) ratings[id] = [st.attack, st.defence];
+      const next = nextSeason(nextClubs[at[k]!]!, p.ratings, own[k + 1]?.ratings ?? null, own[k - 1]?.ratings ?? null, world.levels);
+      for (const [id, st] of next.ratings) ratings[id] = [st.attack, st.defence];
+      for (const [id, st] of next.levels) levels[id] = [st.attack, st.defence];
     });
   }
 
@@ -1245,6 +1258,7 @@ export function playSeason(world: World): World {
     year: world.year + 1,
     clubs,
     ratings,
+    levels,
     divisions: nextClubs.map((ids, i) => ({ code: world.divisions[i]!.code, clubs: ids, calendar: 2 as const })),
     // Every result of the last FIXTURE_SEASONS seasons; older ones keep their final tables.
     history: [...world.history, record].map((season, i, all) =>
