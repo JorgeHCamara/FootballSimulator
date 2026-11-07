@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import type { TeamId } from "../engine/types.ts";
-import { divisionConfig, type DivisionCode, type RowNote, type TableRow, type WorldClub } from "../lib/myWorld.ts";
+import { divisionConfig, divisionCountry, LOWER_LEAGUE, neighbours, type DivisionCode, type RowNote, type TableRow, type WorldClub } from "../lib/myWorld.ts";
 import { Icon, type IconName } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { zoneHex } from "./zones.ts";
@@ -24,9 +24,10 @@ const NOTE_ICONS: Record<Exclude<RowNote, "">, { icon: IconName; className: stri
 export function WorldTable({ rows, code, clubs, highlight, final, testId }: { rows: TableRow[]; code: DivisionCode; clubs: Record<number, WorldClub>; highlight: TeamId; final: boolean; testId: string }) {
   const t = useTranslations("World");
   const zones = divisionConfig(code).zones;
-  const bottom = code === "EL2";
+  // The country's bottom division: relegation is out of the pyramid, into the league below.
+  const bottom = !neighbours(code).below;
   const zoneAt = (position: number) => zones.find((z) => position >= z.from && position <= z.to)?.kind;
-  const noteLabel = (note: RowNote) => (note === "R" && bottom ? t("notes.out") : note ? t(`notes.${note}`) : "");
+  const noteLabel = (note: RowNote) => (note === "R" && bottom ? t("notes.out", { league: t(`leagues.${LOWER_LEAGUE[divisionCountry(code)]}.the`) }) : note ? t(`notes.${note}`) : "");
   const used = final ? [...new Set(rows.map((r) => r.note).filter(Boolean))] : [];
   const cell = "px-1.5 py-2 text-right tabular-nums";
   return (

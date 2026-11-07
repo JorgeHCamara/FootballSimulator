@@ -1,4 +1,4 @@
-import { ENGLAND, upgradeWorld, WORLD_VERSION, type StartPack, type World } from "./myWorld.ts";
+import { isWorldCountry, upgradeWorld, WORLD_VERSION, worldDivisions, type StartPack, type World, type WorldCountry } from "./myWorld.ts";
 import { isPackedCupTies, isWorldCup } from "./worldCups.ts";
 
 /*
@@ -78,6 +78,8 @@ export function isWorld(value: unknown): value is World {
   const { clubs, ratings, divisions, history, params } = value;
   if (!isNumber(value.year) || !isNumber(value.seed) || !isNumber(value.userClub) || !isNumber(value.newClubs) || typeof value.review !== "boolean") return false;
   if (!isRecord(clubs) || !isRecord(ratings) || !isRecord(params) || !Array.isArray(divisions) || !Array.isArray(history)) return false;
+  // The world's countries (absent from saves from before the choice: England's).
+  if (value.countries !== undefined && !(Array.isArray(value.countries) && value.countries.length > 0 && value.countries.every((c) => typeof c === "string" && isWorldCountry(c)))) return false;
   // The National League's clubs (absent from saves from before it: upgradeWorld adds it).
   if (value.nationalLeague !== undefined && !(Array.isArray(value.nationalLeague) && value.nationalLeague.every((id) => isRecord(clubs[String(id)])))) return false;
   // The cups and the FA Cup's non-league sides (absent from saves from before them: upgradeWorld draws them).
@@ -100,8 +102,10 @@ export function isWorld(value: unknown): value is World {
   )
     return false;
   if (!isRecord(clubs[String(value.userClub)])) return false;
-  if (divisions.length !== ENGLAND.length || !divisions.every((d, i) => isRecord(d) && d.code === ENGLAND[i] && Array.isArray(d.clubs) && d.clubs.every((id) => isRecord(clubs[String(id)])) && isScores(d.scores) && (d.calendar === undefined || d.calendar === 2))) return false;
-  if (!ENGLAND.every((code) => isRecord(params[code]) && isNumber(params[code].avgHomeGoals) && isNumber(params[code].avgAwayGoals))) return false;
+  // The divisions of the world's countries (England's for a save from before the choice), in order.
+  const expected = worldDivisions((value.countries as WorldCountry[] | undefined) ?? ["ENG"]);
+  if (divisions.length !== expected.length || !divisions.every((d, i) => isRecord(d) && d.code === expected[i] && Array.isArray(d.clubs) && d.clubs.every((id) => isRecord(clubs[String(id)])) && isScores(d.scores) && (d.calendar === undefined || d.calendar === 2))) return false;
+  if (!expected.every((code) => isRecord(params[code]) && isNumber(params[code].avgHomeGoals) && isNumber(params[code].avgAwayGoals))) return false;
   return history.every(
     (s) =>
       isRecord(s) &&

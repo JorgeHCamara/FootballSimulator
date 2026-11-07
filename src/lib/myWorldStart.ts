@@ -1,17 +1,17 @@
 import { outlookSetup } from "./clubOutlook.ts";
 import { getCupData } from "./cupData.ts";
 import { getLeagueData } from "./leagueData.ts";
-import { divisionConfig, ENGLAND, isDivision, type DivisionCode, type StartCup, type StartLeague, type StartPack, type WorldGame, type WorldPlayoffGame } from "./myWorld.ts";
+import { divisionConfig, isDivision, WORLD_LEAGUES, type DivisionCode, type StartCup, type StartLeague, type StartPack, type WorldGame, type WorldPlayoffGame } from "./myWorld.ts";
 import { cupConfig, WORLD_CUPS, type WorldCupCode, type WorldCupTie } from "./worldCups.ts";
 
 /**
- * What a new world starts from (on the server): the four English leagues' live
+ * What a new world starts from (on the server): every country's leagues' live
  * data (clubs, results so far, the games left, deductions, any play-off games
  * played) and the same ratings the site's season odds use (the outlook's
- * model), and the FA Cup's and the EFL Cup's (their clubs, the draw so far
- * with its results, the clubs entering later). A league or cup whose data
- * doesn't load is listed in `missing`: no new world then, but a saved one
- * still plays (it needs nothing live).
+ * model), and every cup's (their clubs, the draw so far with its results, the
+ * clubs entering later). A league or cup whose data doesn't load is listed in
+ * `missing`: its country can't start a new world then, but a saved one still
+ * plays (it needs nothing live).
  */
 export async function worldStartPack(): Promise<StartPack> {
   const leagues: StartLeague[] = [];
@@ -46,7 +46,7 @@ export async function worldStartPack(): Promise<StartPack> {
   };
   await Promise.all([
     ...WORLD_CUPS.map(loadCup),
-    ...ENGLAND.map(async (code) => {
+    ...WORLD_LEAGUES.map(async (code) => {
       const league = divisionConfig(code);
       try {
         const data = await getLeagueData(league);
@@ -91,8 +91,8 @@ export async function worldStartPack(): Promise<StartPack> {
       }
     }),
   ]);
-  const order: readonly string[] = [...ENGLAND, ...WORLD_CUPS];
-  leagues.sort((a, b) => ENGLAND.indexOf(a.code) - ENGLAND.indexOf(b.code));
+  const order: readonly string[] = [...WORLD_LEAGUES, ...WORLD_CUPS];
+  leagues.sort((a, b) => WORLD_LEAGUES.indexOf(a.code) - WORLD_LEAGUES.indexOf(b.code));
   cups.sort((a, b) => WORLD_CUPS.indexOf(a.code) - WORLD_CUPS.indexOf(b.code));
   missing.sort((a, b) => order.indexOf(a) - order.indexOf(b));
   return { leagues, cups, missing };
