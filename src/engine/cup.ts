@@ -60,6 +60,13 @@ export interface CupRound {
   ties: CupTie[];
   /** Clubs in the round, once known. */
   participants: TeamId[];
+  /**
+   * The previous round's ties whose winners meet in each of this round's ties
+   * (by tie index, in the draw's order), when the draw is the slots' own (no
+   * real ties, no clubs entering, no fixed bracket): known before anyone has
+   * won, so a bracket can be laid out the same whatever the results.
+   */
+  feeders?: [number, number][];
 }
 
 /** A real tie from the data feed: one game, or both legs in date order. */
@@ -123,14 +130,16 @@ export function hashSeed(...parts: (string | number)[]): number {
 }
 
 /**
- * Draws a round: every club gets a key from the seed and its id, clubs are
- * sorted by key and paired in order, the first of each pair at home. Changing
- * one club (an earlier upset) moves only that club, so the rest of the draw
- * mostly stays as it was.
+ * Draws a round: every club gets a key from the seed and its slot, clubs are
+ * sorted by key and paired in order, the first of each pair at home. A club's
+ * slot is where it comes from (`slotOf`: "the winner of tie 3"), by default
+ * the club itself; so with slots the draw pairs the slots, and whoever wins a
+ * tie takes its place in the same tie of the next round, the round's ties in
+ * the same order.
  */
-export function drawRound(clubs: readonly TeamId[], seed: number): [TeamId, TeamId][] {
-  const keyed = clubs.map((id) => ({ id, key: hashSeed(seed, id) }));
-  keyed.sort((a, b) => a.key - b.key || a.id - b.id);
+export function drawRound(clubs: readonly TeamId[], seed: number, slotOf: (id: TeamId) => string | number = (id) => id): [TeamId, TeamId][] {
+  const keyed = clubs.map((id) => ({ id, slot: String(slotOf(id)), key: hashSeed(seed, slotOf(id)) }));
+  keyed.sort((a, b) => a.key - b.key || a.slot.localeCompare(b.slot) || a.id - b.id);
   const pairs: [TeamId, TeamId][] = [];
   for (let i = 0; i + 1 < keyed.length; i += 2) pairs.push([keyed[i]!.id, keyed[i + 1]!.id]);
   return pairs;
@@ -322,6 +331,17 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
       fromPrevious = winners.every((w): w is TeamId => w !== null) ? winners : null;
     }
 
+    // The slots' draw, whoever wins: which of the previous round's ties feed each of this round's.
+    const feeders: [number, number][] | undefined =
+      r > 0 && realTies.length === 0 && entrants.length === 0 && !roundConfig.bracket
+        ? drawRound(
+            Array.from({ length: config.rounds[r - 1]!.ties }, (_, i) => i),
+            hashSeed(config.code, r, options.drawSalt),
+            (i) => `w${i}`,
+          ).slice(0, roundConfig.ties)
+        : undefined;
+    const withFeeders = feeders ? { feeders } : {};
+
     const ties: CupTie[] = [];
     realTies.slice(0, roundConfig.ties).forEach((t, i) => ties.push(makeTie(r, i, t.homeId, t.awayId, roundConfig, t.legs, date)));
     const placed = new Set(ties.flatMap((t) => [t.homeId, t.awayId]));
@@ -331,18 +351,24 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     // Not drawable yet: the previous round is open, or clubs entering this round
     // aren't known from any feed (keep the real ties already published).
     if (!complete && (fromPrevious === null || participants.length < roundConfig.ties * 2)) {
-      rounds.push({ index: r, config: roundConfig, drawn: "pending", ties, participants });
+      rounds.push({ index: r, config: roundConfig, drawn: "pending", ties, participants, ...withFeeders });
       return;
     }
     const remaining = participants.filter((id) => !placed.has(id));
+    // A simulated draw pairs slots, not clubs: the winner of the previous
+    // round's tie i, or a club entering in this round. A result changing who
+    // goes through then changes only who fills that slot; the round's
+    // pairings and their order, and every later round's, stay as they were.
+    const winnerOf = new Map((fromPrevious ?? []).map((id, i) => [id, i] as const));
+    const slotOf = (id: TeamId) => (winnerOf.has(id) ? `w${winnerOf.get(id)}` : `e${id}`);
     let pairs: [TeamId, TeamId][];
     if (roundConfig.bracket && bracketBase(config) >= 0) {
       // Fixed bracket: neighbouring slots meet, no draw.
       const base = bracketBase(config);
       const fixed = bracketPairs(remaining, bracketLines(config, rounds[base]!.ties), r - base);
-      pairs = [...fixed.pairs, ...drawRound(fixed.rest, hashSeed(config.code, r, options.drawSalt))];
+      pairs = [...fixed.pairs, ...drawRound(fixed.rest, hashSeed(config.code, r, options.drawSalt), slotOf)];
     } else {
-      pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt));
+      pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt), slotOf);
     }
     for (const pair of pairs) {
       if (ties.length >= roundConfig.ties) break;
@@ -355,9 +381,47 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
       drawn: complete ? "real" : roundConfig.ties === 1 || roundConfig.bracket ? "determined" : "simulated",
       ties,
       participants,
+      ...withFeeders,
     });
   });
   return rounds;
+}
+
+/**
+ * Orders each column by the round after it, so the two quarter-finals feeding
+ * a semi-final sit beside it. A round drawn by slots (`feeders`: which ties'
+ * winners meet) sets the order whatever the results, decided or not, so the
+ * bracket stays put as scores change. Otherwise (a real draw, clubs entering,
+ * a fixed bracket) a drawn round orders it by its clubs: the tie its home
+ * club came through, then its away club's; a column whose next round isn't
+ * drawn keeps its draw order.
+ */
+export function bracketColumns(rounds: readonly CupRound[], results: ResultMap): CupTie[][] {
+  // Each column's tie indices, top to bottom; from the last column back.
+  const orders = rounds.map((r) => Array.from({ length: Math.max(r.config.ties, r.ties.length) }, (_, i) => i));
+  for (let c = rounds.length - 2; c >= 0; c--) {
+    const next = rounds[c + 1]!;
+    let ordered: number[];
+    if (next.feeders) {
+      ordered = orders[c + 1]!.flatMap((j) => next.feeders![j] ?? []);
+    } else if (next.ties.length) {
+      ordered = [];
+      for (const j of orders[c + 1]!) {
+        const tie = next.ties.find((t) => t.index === j);
+        if (!tie) continue;
+        for (const club of [tie.homeId, tie.awayId]) {
+          const feeder = rounds[c]!.ties.find((t) => !ordered.includes(t.index) && tieWinner(t, results) === club);
+          if (feeder) ordered.push(feeder.index);
+        }
+      }
+    } else continue;
+    const seen = new Set(ordered);
+    orders[c] = [...new Set(ordered), ...orders[c]!.filter((i) => !seen.has(i))];
+  }
+  return rounds.map((round, c) => {
+    const placed = orders[c]!.flatMap((i) => round.ties.filter((t) => t.index === i));
+    return [...placed, ...round.ties.filter((t) => !placed.includes(t))];
+  });
 }
 
 /** The cup winner, once the final is decided. */
