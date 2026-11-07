@@ -160,13 +160,17 @@ export interface WinnerRow {
 /** What a placing's titles count under: the club as it is today. */
 export const clubKey = (p: HistoryPlacing) => (p.footsimuId !== null ? `espn:${p.footsimuId}` : `name:${fold(p.currentName)}`);
 
-/** A history's rows, newest first (a season's tournaments in the file's order), with each club's badge from `crest`. */
+/**
+ * A history's rows, newest first, with each club's badge from `crest`. Two
+ * seasons starting the same year go by the year they end (La Liga's first,
+ * "1929", before "1929-30"); a season's tournaments keep the file's order.
+ */
 export function winnerRows(history: LeagueHistory, crest: (id: number | null, currentName: string) => string | null): WinnerRow[] {
   const club = (p: HistoryPlacing | null): WinnerClub | null =>
     p && { key: clubKey(p), id: p.footsimuId, name: p.name, currentName: p.currentName, crest: crest(p.footsimuId, p.currentName), tla: null, points: p.points };
   return history.seasons
     .map((s, index) => ({ s, index }))
-    .sort((a, b) => b.s.startYear - a.s.startYear || a.index - b.index)
+    .sort((a, b) => b.s.startYear - a.s.startYear || seasonEndYear(b.s.season, b.s.startYear) - seasonEndYear(a.s.season, a.s.startYear) || a.index - b.index)
     .map(({ s }) => ({
       id: `${s.season}${s.tournament ? `-${fold(s.tournament).replace(/\s+/g, "-")}` : ""}`,
       season: s.season,

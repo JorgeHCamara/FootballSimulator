@@ -1,0 +1,3208 @@
+{
+  "league": "La Liga",
+  "footsimuSlug": "la-liga",
+  "footsimuCode": "PD",
+  "country": "Spain",
+  "scope": "Spanish top flight (Primera División / La Liga), 1929 onward",
+  "source": [
+    "https://en.wikipedia.org/wiki/List_of_Spanish_football_champions (revision 1376379928; champion, runner-up, third and points)",
+    "https://www.rsssf.org/tabless/spanhist.html (RSSSF final tables 1929 to 1999-00, cross-check)",
+    "Wikipedia season articles (YYYY–YY La Liga) league tables, cross-check",
+    "https://site.api.espn.com/apis/v2/sports/soccer/esp.1/standings?season=YYYY (2002-03 to 2025-26, cross-check)"
+  ],
+  "retrievedAt": "2026-11-07T01:38:47+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id (the id FootSimu uses)",
+    "footsimuSlug": "club page slug on footsimu.com",
+    "footsimuPath": "club page path under the league the club plays in now (2026-27), without locale",
+    "points": "final points after deductions (2 points per win until 1994-95, 3 from 1995-96)",
+    "name": "club name as shown in the source list for that season (Wikipedia uses period names for Madrid FC and Atlético Aviación; other clubs appear under their modern short name)",
+    "currentName": "club as known today",
+    "tournament": "always null for La Liga"
+  },
+  "seasons": [
+    {
+      "season": "1929",
+      "startYear": 1929,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 25
+      },
+      "runnerUp": {
+        "name": "Madrid FC",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 23
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 20
+      },
+      "notes": [
+        "First La Liga season, played in calendar year 1929"
+      ]
+    },
+    {
+      "season": "1929-30",
+      "startYear": 1929,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 30
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 23
+      },
+      "third": {
+        "name": "Arenas",
+        "currentName": "Arenas Club de Getxo",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 20
+      },
+      "notes": []
+    },
+    {
+      "season": "1930-31",
+      "startYear": 1930,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 22
+      },
+      "runnerUp": {
+        "name": "Racing Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 22
+      },
+      "third": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 22
+      },
+      "notes": []
+    },
+    {
+      "season": "1931-32",
+      "startYear": 1931,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Madrid FC",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 28
+      },
+      "runnerUp": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 25
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 24
+      },
+      "notes": []
+    },
+    {
+      "season": "1932-33",
+      "startYear": 1932,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Madrid FC",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 28
+      },
+      "runnerUp": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 26
+      },
+      "third": {
+        "name": "Espanyol",
+        "currentName": "Espanyol",
+        "footsimuId": 88,
+        "footsimuSlug": "espanyol",
+        "footsimuPath": "/la-liga/team/espanyol",
+        "points": 22
+      },
+      "notes": []
+    },
+    {
+      "season": "1933-34",
+      "startYear": 1933,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 24
+      },
+      "runnerUp": {
+        "name": "Madrid FC",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 22
+      },
+      "third": {
+        "name": "Racing Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 19
+      },
+      "notes": []
+    },
+    {
+      "season": "1934-35",
+      "startYear": 1934,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 34
+      },
+      "runnerUp": {
+        "name": "Madrid FC",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 33
+      },
+      "third": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 26
+      },
+      "notes": []
+    },
+    {
+      "season": "1935-36",
+      "startYear": 1935,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 31
+      },
+      "runnerUp": {
+        "name": "Madrid FC",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 29
+      },
+      "third": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 28
+      },
+      "notes": []
+    },
+    {
+      "season": "1936-37",
+      "startYear": 1936,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not played due to the Spanish Civil War"
+      ]
+    },
+    {
+      "season": "1937-38",
+      "startYear": 1937,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not played due to the Spanish Civil War"
+      ]
+    },
+    {
+      "season": "1938-39",
+      "startYear": 1938,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not played due to the Spanish Civil War"
+      ]
+    },
+    {
+      "season": "1939-40",
+      "startYear": 1939,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Aviación",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 29
+      },
+      "runnerUp": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 28
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 26
+      },
+      "notes": []
+    },
+    {
+      "season": "1940-41",
+      "startYear": 1940,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Aviación",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 33
+      },
+      "runnerUp": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 31
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 27
+      },
+      "notes": []
+    },
+    {
+      "season": "1941-42",
+      "startYear": 1941,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 33
+      },
+      "third": {
+        "name": "Atlético Aviación",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 33
+      },
+      "notes": []
+    },
+    {
+      "season": "1942-43",
+      "startYear": 1942,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 36
+      },
+      "runnerUp": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 33
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 32
+      },
+      "notes": []
+    },
+    {
+      "season": "1943-44",
+      "startYear": 1943,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Atlético Aviación",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 34
+      },
+      "third": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 32
+      },
+      "notes": []
+    },
+    {
+      "season": "1944-45",
+      "startYear": 1944,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 39
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 38
+      },
+      "third": {
+        "name": "Atlético Aviación",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 31
+      },
+      "notes": []
+    },
+    {
+      "season": "1945-46",
+      "startYear": 1945,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 36
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 35
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 33
+      },
+      "notes": [
+        "Third-place points corrected from 35 (Wikipedia list) to 33 (RSSSF final table and Wikipedia season article agree)"
+      ]
+    },
+    {
+      "season": "1946-47",
+      "startYear": 1946,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 34
+      },
+      "runnerUp": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 34
+      },
+      "third": {
+        "name": "Atlético Aviación",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 32
+      },
+      "notes": []
+    },
+    {
+      "season": "1947-48",
+      "startYear": 1947,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 37
+      },
+      "runnerUp": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 34
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 33
+      },
+      "notes": []
+    },
+    {
+      "season": "1948-49",
+      "startYear": 1948,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 37
+      },
+      "runnerUp": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 35
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 34
+      },
+      "notes": []
+    },
+    {
+      "season": "1949-50",
+      "startYear": 1949,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 33
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 32
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 31
+      },
+      "notes": []
+    },
+    {
+      "season": "1950-51",
+      "startYear": 1950,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 38
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1951-52",
+      "startYear": 1951,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 40
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1952-53",
+      "startYear": 1952,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 40
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1953-54",
+      "startYear": 1953,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 36
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 34
+      },
+      "notes": []
+    },
+    {
+      "season": "1954-55",
+      "startYear": 1954,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 41
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1955-56",
+      "startYear": 1955,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 47
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1956-57",
+      "startYear": 1956,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 39
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1957-58",
+      "startYear": 1957,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 42
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1958-59",
+      "startYear": 1958,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 47
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 36
+      },
+      "notes": []
+    },
+    {
+      "season": "1959-60",
+      "startYear": 1959,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 46
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1960-61",
+      "startYear": 1960,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 40
+      },
+      "third": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 33
+      },
+      "notes": []
+    },
+    {
+      "season": "1961-62",
+      "startYear": 1961,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 40
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 36
+      },
+      "notes": []
+    },
+    {
+      "season": "1962-63",
+      "startYear": 1962,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 37
+      },
+      "third": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 33
+      },
+      "notes": []
+    },
+    {
+      "season": "1963-64",
+      "startYear": 1963,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 42
+      },
+      "third": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1964-65",
+      "startYear": 1964,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 43
+      },
+      "third": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 40
+      },
+      "notes": []
+    },
+    {
+      "season": "1965-66",
+      "startYear": 1965,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 43
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1966-67",
+      "startYear": 1966,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 42
+      },
+      "third": {
+        "name": "Espanyol",
+        "currentName": "Espanyol",
+        "footsimuId": 88,
+        "footsimuSlug": "espanyol",
+        "footsimuPath": "/la-liga/team/espanyol",
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1967-68",
+      "startYear": 1967,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 39
+      },
+      "third": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1968-69",
+      "startYear": 1968,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 38
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 36
+      },
+      "notes": []
+    },
+    {
+      "season": "1969-70",
+      "startYear": 1969,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 41
+      },
+      "third": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 35
+      },
+      "notes": []
+    },
+    {
+      "season": "1970-71",
+      "startYear": 1970,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 43
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 42
+      },
+      "notes": []
+    },
+    {
+      "season": "1971-72",
+      "startYear": 1971,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 45
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1972-73",
+      "startYear": 1972,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 46
+      },
+      "third": {
+        "name": "Espanyol",
+        "currentName": "Espanyol",
+        "footsimuId": 88,
+        "footsimuSlug": "espanyol",
+        "footsimuPath": "/la-liga/team/espanyol",
+        "points": 45
+      },
+      "notes": []
+    },
+    {
+      "season": "1973-74",
+      "startYear": 1973,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 42
+      },
+      "third": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 40
+      },
+      "notes": []
+    },
+    {
+      "season": "1974-75",
+      "startYear": 1974,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 37
+      },
+      "notes": []
+    },
+    {
+      "season": "1975-76",
+      "startYear": 1975,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 43
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 42
+      },
+      "notes": []
+    },
+    {
+      "season": "1976-77",
+      "startYear": 1976,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 45
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 38
+      },
+      "notes": []
+    },
+    {
+      "season": "1977-78",
+      "startYear": 1977,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 41
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 40
+      },
+      "notes": []
+    },
+    {
+      "season": "1978-79",
+      "startYear": 1978,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 43
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1979-80",
+      "startYear": 1979,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 52
+      },
+      "third": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 39
+      },
+      "notes": []
+    },
+    {
+      "season": "1980-81",
+      "startYear": 1980,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 45
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 42
+      },
+      "notes": []
+    },
+    {
+      "season": "1981-82",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 45
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 44
+      },
+      "notes": []
+    },
+    {
+      "season": "1982-83",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 49
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1983-84",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 49
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 48
+      },
+      "notes": []
+    },
+    {
+      "season": "1984-85",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 43
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 41
+      },
+      "notes": []
+    },
+    {
+      "season": "1985-86",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 45
+      },
+      "third": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1986-87",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 63
+      },
+      "third": {
+        "name": "Espanyol",
+        "currentName": "Espanyol",
+        "footsimuId": 88,
+        "footsimuSlug": "espanyol",
+        "footsimuPath": "/la-liga/team/espanyol",
+        "points": 51
+      },
+      "notes": [
+        "Two-phase season (first phase + championship group); points are final totals after the second phase"
+      ]
+    },
+    {
+      "season": "1987-88",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 51
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 48
+      },
+      "notes": []
+    },
+    {
+      "season": "1988-89",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 57
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1989-90",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 53
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 51
+      },
+      "notes": []
+    },
+    {
+      "season": "1990-91",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 47
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1991-92",
+      "startYear": 1991,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 54
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 53
+      },
+      "notes": []
+    },
+    {
+      "season": "1992-93",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 57
+      },
+      "third": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 54
+      },
+      "notes": []
+    },
+    {
+      "season": "1993-94",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 56
+      },
+      "third": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1994-95",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 51
+      },
+      "third": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1995-96",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 83
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 80
+      },
+      "notes": []
+    },
+    {
+      "season": "1996-97",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 92
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 90
+      },
+      "third": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 77
+      },
+      "notes": []
+    },
+    {
+      "season": "1997-98",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 74
+      },
+      "runnerUp": {
+        "name": "Athletic Bilbao",
+        "currentName": "Athletic Club",
+        "footsimuId": 93,
+        "footsimuSlug": "athletic-club",
+        "footsimuPath": "/la-liga/team/athletic-club",
+        "points": 65
+      },
+      "third": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "1998-99",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 68
+      },
+      "third": {
+        "name": "Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 66
+      },
+      "notes": []
+    },
+    {
+      "season": "1999-00",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 69
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 64
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 64
+      },
+      "notes": []
+    },
+    {
+      "season": "2000-01",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 73
+      },
+      "third": {
+        "name": "Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2001-02",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 75
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 68
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 66
+      },
+      "notes": []
+    },
+    {
+      "season": "2002-03",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 78
+      },
+      "runnerUp": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 76
+      },
+      "third": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 72
+      },
+      "notes": []
+    },
+    {
+      "season": "2003-04",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 77
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 72
+      },
+      "third": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2004-05",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 80
+      },
+      "third": {
+        "name": "Villarreal",
+        "currentName": "Villarreal",
+        "footsimuId": 102,
+        "footsimuSlug": "villarreal",
+        "footsimuPath": "/la-liga/team/villarreal",
+        "points": 65
+      },
+      "notes": []
+    },
+    {
+      "season": "2005-06",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 70
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 69
+      },
+      "notes": []
+    },
+    {
+      "season": "2006-07",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 76
+      },
+      "third": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2007-08",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 85
+      },
+      "runnerUp": {
+        "name": "Villarreal",
+        "currentName": "Villarreal",
+        "footsimuId": 102,
+        "footsimuSlug": "villarreal",
+        "footsimuPath": "/la-liga/team/villarreal",
+        "points": 77
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 67
+      },
+      "notes": []
+    },
+    {
+      "season": "2008-09",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 78
+      },
+      "third": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 70
+      },
+      "notes": []
+    },
+    {
+      "season": "2009-10",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 99
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 96
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2010-11",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 96
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 92
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2011-12",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 100
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 91
+      },
+      "third": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 61
+      },
+      "notes": []
+    },
+    {
+      "season": "2012-13",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 100
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 85
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 76
+      },
+      "notes": []
+    },
+    {
+      "season": "2013-14",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 87
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 87
+      },
+      "notes": []
+    },
+    {
+      "season": "2014-15",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 94
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 92
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2015-16",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 90
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 88
+      },
+      "notes": []
+    },
+    {
+      "season": "2016-17",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 93
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 90
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 78
+      },
+      "notes": []
+    },
+    {
+      "season": "2017-18",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 93
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 79
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 76
+      },
+      "notes": []
+    },
+    {
+      "season": "2018-19",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 76
+      },
+      "third": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 68
+      },
+      "notes": []
+    },
+    {
+      "season": "2019-20",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 82
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 70
+      },
+      "notes": []
+    },
+    {
+      "season": "2020-21",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 86
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 84
+      },
+      "third": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 79
+      },
+      "notes": []
+    },
+    {
+      "season": "2021-22",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 86
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 73
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2022-23",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 78
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 77
+      },
+      "notes": []
+    },
+    {
+      "season": "2023-24",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 95
+      },
+      "runnerUp": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 85
+      },
+      "third": {
+        "name": "Girona",
+        "currentName": "Girona",
+        "footsimuId": 9812,
+        "footsimuSlug": "girona",
+        "footsimuPath": "/segunda-division/team/girona",
+        "points": 81
+      },
+      "notes": []
+    },
+    {
+      "season": "2024-25",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 84
+      },
+      "third": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 76
+      },
+      "notes": []
+    },
+    {
+      "season": "2025-26",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "La Liga",
+      "format": "league",
+      "champion": {
+        "name": "Barcelona",
+        "currentName": "Barcelona",
+        "footsimuId": 83,
+        "footsimuSlug": "barcelona",
+        "footsimuPath": "/la-liga/team/barcelona",
+        "points": 94
+      },
+      "runnerUp": {
+        "name": "Real Madrid",
+        "currentName": "Real Madrid",
+        "footsimuId": 86,
+        "footsimuSlug": "real-madrid",
+        "footsimuPath": "/la-liga/team/real-madrid",
+        "points": 86
+      },
+      "third": {
+        "name": "Villarreal",
+        "currentName": "Villarreal",
+        "footsimuId": 102,
+        "footsimuSlug": "villarreal",
+        "footsimuPath": "/la-liga/team/villarreal",
+        "points": 72
+      },
+      "notes": []
+    }
+  ]
+}

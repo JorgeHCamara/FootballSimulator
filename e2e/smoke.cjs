@@ -2867,12 +2867,21 @@ async function step(name, fn) {
       assert.equal(await p.getByTestId("world-path-step").count(), 1);
       assert.deepEqual(await p.getByTestId("world-path-league").locator("option").allInnerTexts(), ["La Liga", "Segunda División"], "the club's seasons: Spain's leagues");
       assert.equal(await p.getByTestId("world-path-country").inputValue(), "ESP");
-      // Spain's Past Winners: no real history yet, the world's season only.
+      // Spain's Past Winners: La Liga's real history (1929 on) with the world's season on top; the Segunda's, the world's season only.
       await p.getByTestId("world-season-select").selectOption(String(year + 1));
       await p.locator('[data-testid="world-tabs"] [data-league="PD"]').click();
       await p.getByTestId("world-past-winners").click();
+      await p.getByTestId("world-winners").waitFor();
+      assert.equal(await p.getByTestId("past-winners-coming-soon").count(), 0);
+      const laLiga = p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]');
+      assert.equal(await laLiga.first().getAttribute("data-world"), "true", "the world's season first");
+      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"][data-world="true"]').count(), 1);
+      assert.ok((await laLiga.count()) > 90, "every real season since 1929");
+      await p.getByTestId("world-table-view").click();
+      await p.locator('[data-testid="world-tabs"] [data-league="SD"]').click();
+      await p.getByTestId("world-past-winners").click();
       await p.getByTestId("past-winners-coming-soon").waitFor();
-      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]').count(), 1, "La Liga: the world's season only");
+      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]').count(), 1, "the Segunda: the world's season only");
       await p.getByTestId("world-table-view").click();
       // Saved: a reload keeps both countries.
       await p.reload();
