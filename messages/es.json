@@ -45,7 +45,21 @@
     "tagline": "Simula la temporada antes de que ocurra",
     "quizTitle": "Quiz diario",
     "quizBody": "Seis preguntas al día sobre campeones del pasado y las opciones de esta temporada.",
-    "quizCta": "Jugar el quiz de hoy"
+    "quizCta": "Jugar el quiz de hoy",
+    "badge": "Simulador de fútbol gratis",
+    "headline": "El simulador de fútbol para todas las temporadas",
+    "simulateFeatured": "Simular LaLiga",
+    "startMyWorld": "Empezar Mi Mundo",
+    "trustCompetitions": "{count} competiciones",
+    "trustUpdated": "Resultados reales, actualizados cada hora",
+    "trustFree": "Gratis",
+    "trustNoSignup": "Sin registro",
+    "titleChances": "Probabilidades de título",
+    "simulating": "Simulando…",
+    "preseasonFavourites": "Favoritos de pretemporada",
+    "finalTable": "Tabla final de {season}",
+    "points": "{count} pts",
+    "cardCta": "Abrir el simulador"
   },
   "Simulator": {
     "regularSeasonShort": "Regular",

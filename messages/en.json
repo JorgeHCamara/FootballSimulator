@@ -45,7 +45,21 @@
     "tagline": "Simulate the season before it happens",
     "quizTitle": "Daily quiz",
     "quizBody": "Six questions a day on past champions and this season's chances.",
-    "quizCta": "Play today's quiz"
+    "quizCta": "Play today's quiz",
+    "badge": "Free football simulator",
+    "headline": "The football simulator for every season",
+    "simulateFeatured": "Simulate the Premier League",
+    "startMyWorld": "Start My World",
+    "trustCompetitions": "{count} competitions",
+    "trustUpdated": "Real results, updated hourly",
+    "trustFree": "Free",
+    "trustNoSignup": "No sign-up",
+    "titleChances": "Title chances",
+    "simulating": "Simulating…",
+    "preseasonFavourites": "Pre-season favourites",
+    "finalTable": "{season} final table",
+    "points": "{count} pts",
+    "cardCta": "Open the simulator"
   },
   "Simulator": {
     "regularSeasonShort": "Regular",
