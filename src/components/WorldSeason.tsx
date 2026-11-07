@@ -19,9 +19,12 @@ import {
   type DivisionState,
   type World,
 } from "../lib/myWorld.ts";
+import { worldWinners } from "../lib/worldWinners.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
 import { Icon } from "./Icon.tsx";
+import { PastWinners } from "./PastWinners.tsx";
+import { useRealWinners } from "./PastWinnersProvider.tsx";
 import { PromotedClubs } from "./PromotedClubs.tsx";
 import { WorldTable } from "./WorldTable.tsx";
 
@@ -190,7 +193,11 @@ export function WorldSeason({
 }) {
   const t = useTranslations("World");
   const sim = useTranslations("Simulator");
+  const pw = useTranslations("PastWinners");
   const [confirmReset, setConfirmReset] = useState(false);
+  // Past Winners instead of the table and fixtures: the league's real history with this world's finished seasons on top.
+  const [winners, setWinners] = useState(false);
+  const real = useRealWinners();
   const { code, league, picks } = state;
   const playoff = league.playoff;
   const teams = useMemo(() => new Map<TeamId, Team>(state.teams.map((team) => [team.id, team])), [state.teams]);
@@ -210,10 +217,39 @@ export function WorldSeason({
   // and the buttons on one row above the table and fixtures columns.
   const grid = "grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[auto_minmax(0,1fr)_400px] lg:items-start";
   const picker = (
-    <div className="min-w-0 lg:col-start-1 lg:row-start-1 lg:self-center">
-      <SeasonPicker world={world} year={year} onYear={onYear} />
+    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center lg:col-start-1 lg:row-start-1 lg:self-center">
+      <SeasonPicker
+        world={world}
+        year={year}
+        onYear={(y) => {
+          // A season picked: its table again.
+          setWinners(false);
+          onYear(y);
+        }}
+      />
+      <button
+        type="button"
+        aria-pressed={winners}
+        onClick={() => setWinners((v) => !v)}
+        className={`flex h-9 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-semibold ${winners ? "border-pitch-600 bg-pitch-600 text-white hover:bg-pitch-700" : "border-zinc-300 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"}`}
+        data-testid="world-past-winners"
+      >
+        <Icon name="trophy" size={16} className="shrink-0" />
+        {pw("title")}
+      </button>
     </div>
   );
+  if (winners) {
+    const rows = worldWinners(world, code, real[code] ?? null);
+    return (
+      <div className={grid}>
+        {picker}
+        <div className="min-w-0 lg:col-span-3 lg:col-start-1 lg:row-start-2" data-testid="world-winners">
+          <PastWinners key={code} rows={rows} comingSoon={!real[code]} />
+        </div>
+      </div>
+    );
+  }
   if (year !== world.year) {
     return (
       <div className={grid}>

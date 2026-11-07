@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
   staticPageGenerationTimeout: 180,
   // The share card reads Inter from src/assets/fonts (next/og needs the files).
   outputFileTracingIncludes: {
+    // Past Winners: the league pages, their past-winners pages, My World and the sitemap read the history files at run time (src/lib/winnersData.ts).
+    "/**/*": ["./src/data/history/**/*"],
     "/*/*/share/**": ["./src/assets/fonts/**/*"],
     "/*/*/team/**": ["./src/assets/fonts/**/*"],
     "/*/*/match/**": ["./src/assets/fonts/**/*"],

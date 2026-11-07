@@ -41,6 +41,22 @@ export function isWorld(value: unknown): value is World {
   if (!isRecord(clubs) || !isRecord(ratings) || !isRecord(params) || !Array.isArray(divisions) || !Array.isArray(history)) return false;
   // The National League's clubs (absent from saves from before it: upgradeWorld adds it).
   if (value.nationalLeague !== undefined && !(Array.isArray(value.nationalLeague) && value.nationalLeague.every((id) => isRecord(clubs[String(id)])))) return false;
+  // Past Winners (absent from saves from before it: upgradeWorld fills it from the finished seasons).
+  if (
+    value.winners !== undefined &&
+    !(
+      Array.isArray(value.winners) &&
+      value.winners.every(
+        (w) =>
+          isRecord(w) &&
+          isNumber(w.year) &&
+          typeof w.code === "string" &&
+          Array.isArray(w.top) &&
+          w.top.every((p) => Array.isArray(p) && p.length === 3 && isRecord(clubs[String(p[0])]) && typeof p[1] === "string" && isNumber(p[2])),
+      )
+    )
+  )
+    return false;
   if (!isRecord(clubs[String(value.userClub)])) return false;
   if (divisions.length !== ENGLAND.length || !divisions.every((d, i) => isRecord(d) && d.code === ENGLAND[i] && Array.isArray(d.clubs) && d.clubs.every((id) => isRecord(clubs[String(id)])) && isScores(d.scores) && (d.calendar === undefined || d.calendar === 2))) return false;
   if (!ENGLAND.every((code) => isRecord(params[code]) && isNumber(params[code].avgHomeGoals) && isNumber(params[code].avgAwayGoals))) return false;

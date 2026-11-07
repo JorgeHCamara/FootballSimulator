@@ -102,6 +102,17 @@ describe("the sitemap", () => {
     for (const locale of ["en", "pt", "es"]) for (const page of ["about", "privacy", "contact"]) assert.ok(urls.some((u) => u.endsWith(`/${locale}/${page}`)), `${locale}/${page}`);
   });
 
+  it("lists each league's past winners page in every language, as a page that changes once a season", async () => {
+    const entries = await sitemap();
+    for (const locale of ["en", "pt", "es"]) {
+      const entry = entries.find((e) => e.url.endsWith(`/${locale}/premier-league/past-winners`));
+      assert.ok(entry, `${locale}/premier-league/past-winners`);
+      assert.equal(entry.changeFrequency, "monthly");
+      assert.equal(entry.priority, 0.6);
+    }
+    assert.ok(!entries.some((e) => e.url.endsWith("/en/bundesliga/past-winners")), "no page for a league without a history file");
+  });
+
   it("lists the daily quiz in every language", async () => {
     const entries = await sitemap();
     for (const locale of ["en", "pt", "es"]) {
