@@ -12,7 +12,7 @@ import { TeamBadge } from "./TeamBadge.tsx";
  * buttons, the trust line and the featured league's live title-chances card
  * (src/lib/homeHero.ts), all server-rendered. Phones first: one column, the
  * card right under the buttons; two columns from 1024px. The background (the
- * glow and the faint pitch lines) is CSS, in globals.css (.home-hero).
+ * glow and the faint pitch lines) is CSS, in globals.css (.site-hero, shared with My World's hero).
  */
 
 export interface TitleCardLabels {
@@ -122,14 +122,14 @@ export async function HomeHero({ locale, subtitle }: { locale: SiteLocale; subti
   const linkLabel = (kind: "primary" | "secondary") => (kind === "primary" ? t("simulateFeatured") : t("startMyWorld"));
 
   return (
-    <section className="home-hero relative -mx-4 -mt-6 overflow-hidden text-white sm:mx-0 sm:mt-0 sm:rounded-3xl sm:ring-1 sm:ring-white/10" data-testid="home-hero">
+    <section className="site-hero relative -mx-4 -mt-6 overflow-hidden text-white sm:mx-0 sm:mt-0 sm:rounded-3xl sm:ring-1 sm:ring-white/10" data-testid="home-hero">
       <div className="relative mx-auto max-w-[40rem] px-5 pt-10 pb-8 sm:px-8 sm:py-14 lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center lg:gap-12 lg:px-12 lg:py-20">
         <div>
           <p className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300" data-testid="hero-badge">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden />
             {t("badge")}
           </p>
-          <h1 className="home-hero-title mt-4 font-extrabold tracking-tight text-pretty text-white" data-testid="hero-title">
+          <h1 className="site-hero-title mt-4 font-extrabold tracking-tight text-pretty text-white" data-testid="hero-title">
             {t("headline")}
           </h1>
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-zinc-300 text-pretty sm:text-base lg:text-lg" data-testid="hero-subtitle">
