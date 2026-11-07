@@ -3087,6 +3087,34 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("My World with England and Brazil: each country's seasons as it plays them (2026/27 in England, 2026 in Brazil)", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
+      await p.locator('[data-testid="world-country"][data-country="BRA"]').click();
+      await p.locator('[data-testid="world-league"][data-league="BSA"]').click();
+      await p.getByTestId("world-club").nth(0).click();
+      await p.getByTestId("world-create").click();
+      const world = p.getByTestId("world");
+      await world.waitFor();
+      const year = Number(await world.getAttribute("data-year"));
+      const split = `${year}/${String((year + 1) % 100).padStart(2, "0")}`;
+      // The club's own season, and Brazil's tables: calendar years.
+      assert.match(await p.getByTestId("world-season").innerText(), new RegExp(`\\b${year}\\b(?!/)`));
+      const seasonCountry = p.getByTestId("world-season-country");
+      await seasonCountry.selectOption("BRA");
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${year} (this season)`);
+      assert.match(await p.getByTestId("world-season-heading").innerText(), new RegExp(`The ${year} season`));
+      await p.locator('[data-testid="world-tabs"] [data-league="CDB"]').click();
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${year} (this season)`, "the Copa do Brasil too");
+      // England's: split years.
+      await seasonCountry.selectOption("ENG");
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${split} (this season)`);
+      assert.match(await p.getByTestId("world-season-heading").innerText(), new RegExp(`The ${split} season`));
+      await p.close();
+    });
+
     await step("My World with Brazil: a Série B club, Brazil's tabs (Série A, Série B, Série C, Copa do Brasil), calendar-year seasons, the real Série C 2026 already played with its stages, the season ended with Série C growing to 24 and six up from Série D, its new season's first stage, groups and final", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/my-world`);

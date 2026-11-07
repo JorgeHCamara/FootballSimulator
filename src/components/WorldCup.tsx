@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { tieWinner } from "../engine/cup.ts";
 import { worldSeasonLabel, type World } from "../lib/myWorld.ts";
+import { cupCountry } from "../lib/worldCountries.ts";
 import {
   pastCup,
   resetCup,
@@ -51,7 +52,7 @@ function PastCup({ world, year, code }: { world: World; year: number; code: Worl
           {t("pastNoFixtures")}
         </p>
       )}
-      <CupChampion cup={past.cup} rounds={past.rounds ?? []} winner={past.final[0]} predictions={{}} teams={past.teams} season={worldSeasonLabel(world, year)} />
+      <CupChampion cup={past.cup} rounds={past.rounds ?? []} winner={past.final[0]} predictions={{}} teams={past.teams} season={worldSeasonLabel(world, year, cupCountry(code))} />
     </div>
   );
 }
@@ -96,7 +97,7 @@ export function WorldCup({
 
   const picker = (
     <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center lg:col-start-1 lg:row-start-1 lg:self-center">
-      <SeasonPicker world={world} year={year} onYear={onYear} />
+      <SeasonPicker world={world} year={year} onYear={onYear} country={cupCountry(code)} />
     </div>
   );
   if (year !== world.year) {
@@ -157,7 +158,7 @@ export function WorldCup({
           kickOff={false}
           ownDraw
         />
-        <CupChampion cup={cup} rounds={rounds} winner={state.winner} predictions={picks} teams={state.teams} season={worldSeasonLabel(world, world.year)} />
+        <CupChampion cup={cup} rounds={rounds} winner={state.winner} predictions={picks} teams={state.teams} season={worldSeasonLabel(world, world.year, cupCountry(code))} />
       </div>
       <ConfirmDialog
         open={confirmReset}

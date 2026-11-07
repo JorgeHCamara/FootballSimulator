@@ -1093,6 +1093,10 @@ describe("My World: Brazil", () => {
     assert.deepEqual(movementCounts("BRA", 2028).at(-1), { up: 4, down: 6 });
     assert.equal(worldSeasonLabel(world, 2026), "2026", "Brazil's seasons are calendar years");
     assert.equal(worldSeasonLabel({ countries: ["ENG", "BRA"] }, 2026), "2026/27");
+    // About one country's leagues or cup: Brazil's own calendar years in any world.
+    assert.equal(worldSeasonLabel({ countries: ["ENG", "BRA"] }, 2027, "BRA"), "2027");
+    assert.equal(worldSeasonLabel({ countries: ["ENG", "BRA"] }, 2027, "ENG"), "2027/28");
+    assert.equal(worldSeasonLabel(world, 2027, "ENG"), "2027/28");
     assert.deepEqual([2026, 2027, 2028].map((y) => divisionTeams("BSC", y)), [20, 24, 28]);
   });
 

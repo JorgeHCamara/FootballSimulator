@@ -5,11 +5,12 @@
  * playSeason); the current season joins once it's ended.
  */
 
-import { divisionConfig, type DivisionCode, type World, type WorldPodium } from "./myWorld.ts";
+import { divisionConfig, divisionCountry, type DivisionCode, type World, type WorldPodium } from "./myWorld.ts";
+import { CALENDAR_YEAR } from "./worldCountries.ts";
 import type { WinnerClub, WinnerRow } from "./winners.ts";
 
-/** A world season's label in the history files' style: 2026 → "2026-27". */
-export const historySeason = (year: number) => `${year}-${String((year + 1) % 100).padStart(2, "0")}`;
+/** A world season's label in the history files' style: 2026 → "2026-27", or "2026" for a calendar-year country (Brazil). */
+export const historySeason = (year: number, calendar = false) => (calendar ? String(year) : `${year}-${String((year + 1) % 100).padStart(2, "0")}`);
 
 /** The world's finished seasons of one league as Past Winners rows, newest first, under the competition's current name. */
 export function worldRows(world: World, code: DivisionCode, competition: string): WinnerRow[] {
@@ -26,14 +27,15 @@ export function worldRows(world: World, code: DivisionCode, competition: string)
       points,
     };
   };
+  const calendar = CALENDAR_YEAR.includes(divisionCountry(code));
   return (world.winners ?? [])
     .filter((w) => w.code === code)
     .sort((a, b) => b.year - a.year)
     .map((w) => ({
       id: `world-${w.year}`,
-      season: historySeason(w.year),
+      season: historySeason(w.year, calendar),
       startYear: w.year,
-      endYear: w.year + 1,
+      endYear: calendar ? w.year : w.year + 1,
       tournament: null,
       status: "completed",
       competition,

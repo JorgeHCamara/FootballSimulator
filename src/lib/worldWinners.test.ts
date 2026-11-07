@@ -117,3 +117,10 @@ describe("My World's Past Winners", () => {
     assert.equal(isWorld({ ...world, winners: [{ year: world.year, code: "PL", top: [[world.userClub, 1, 1]] }] }), false);
   });
 });
+
+describe("historySeason", () => {
+  it("labels a world season as the history files do: split years in Europe, a calendar year in Brazil", () => {
+    assert.equal(historySeason(2026), "2026-27");
+    assert.equal(historySeason(2026, true), "2026");
+  });
+});

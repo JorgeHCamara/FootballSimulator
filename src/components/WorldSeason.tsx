@@ -10,6 +10,7 @@ import {
   bracketOpen,
   COUNTRY_CUPS,
   COUNTRY_LEAGUES,
+  divisionCountry,
   pastDivision,
   playoffConfigOf,
   playoutOf,
@@ -153,7 +154,7 @@ export function Picker({
 }
 
 /** The season picker: this season, then every finished one, newest first. */
-export function SeasonPicker({ world, year, onYear }: { world: World; year: number; onYear: (year: number) => void }) {
+export function SeasonPicker({ world, year, onYear, country }: { world: World; year: number; onYear: (year: number) => void; /** The country shown: its leagues' or cup's season labels. */ country?: WorldCountry }) {
   const t = useTranslations("World");
   return (
     <Picker
@@ -161,8 +162,8 @@ export function SeasonPicker({ world, year, onYear }: { world: World; year: numb
       label={t("seasonSelect")}
       value={String(year)}
       options={[
-        { value: String(world.year), label: t("seasonCurrent", { season: worldSeasonLabel(world, world.year) }) },
-        ...[...world.history].reverse().map((s) => ({ value: String(s.year), label: worldSeasonLabel(world, s.year) })),
+        { value: String(world.year), label: t("seasonCurrent", { season: worldSeasonLabel(world, world.year, country) }) },
+        ...[...world.history].reverse().map((s) => ({ value: String(s.year), label: worldSeasonLabel(world, s.year, country) })),
       ]}
       onChange={(y) => onYear(Number(y))}
       testId="world-season-select"
@@ -327,6 +328,7 @@ export function WorldSeason({
       <SeasonPicker
         world={world}
         year={year}
+        country={divisionCountry(code)}
         onYear={(y) => {
           // A season picked: its table again.
           setWinners(false);
@@ -382,7 +384,7 @@ export function WorldSeason({
             seasonComplete={state.playoffKnown}
             directPromotion={playoff.directPromotion ?? []}
             promotedTo={playoff.promotedTo}
-            nextSeason={worldSeasonLabel(world, world.year + 1)}
+            nextSeason={worldSeasonLabel(world, world.year + 1, divisionCountry(code))}
             cancelled={playoffOff}
             {...(playoff.directIfClear ? { clearPosition: playoff.directIfClear.position } : {})}
           />
