@@ -1,0 +1,4483 @@
+{
+  "league": "Championship",
+  "footsimuSlug": "championship",
+  "footsimuCode": "ELC",
+  "country": "England",
+  "scope": "English second tier: Football League Second Division (1892-93 to 1991-92), Football League First Division (1992-93 to 2003-04), Championship (2004-05 onward)",
+  "source": [
+    "https://en.wikipedia.org/wiki/List_of_winners_of_the_EFL_Championship_and_predecessors (champion and runner-up)",
+    "https://www.rsssf.org/engpaul/FLA/ (season final tables 1888-89 to 2007-08: third place, points, cross-check)",
+    "https://site.api.espn.com/apis/v2/sports/soccer/eng.2/standings?season=YYYY (2002-03 to 2025-26: third place, points, cross-check)"
+  ],
+  "retrievedAt": "2026-11-07T01:36:00+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id (the id FootSimu uses); null when the club is not in FootSimu/ESPN English data",
+    "footsimuSlug": "club page slug on footsimu.com",
+    "footsimuPath": "club page path under the league the club plays in now (2026-27), without locale",
+    "points": "final points after deductions (2 points per win until 1980-81, 3 from 1981-82)",
+    "name": "club name used that season",
+    "currentName": "club as known today",
+    "tournament": "\"North\"/\"South\" for the regional Third Division sections, otherwise null"
+  },
+  "seasons": [
+    {
+      "season": "1892-93",
+      "startYear": 1892,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Small Heath",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 36
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 35
+      },
+      "third": {
+        "name": "Darwen",
+        "currentName": "Darwen",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 30
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1893-94",
+      "startYear": 1893,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Small Heath",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 42
+      },
+      "third": {
+        "name": "Notts County",
+        "currentName": "Notts County",
+        "footsimuId": 340,
+        "footsimuSlug": "notts-county",
+        "footsimuPath": "/league-one/team/notts-county",
+        "points": 39
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1894-95",
+      "startYear": 1894,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Bury",
+        "currentName": "Bury",
+        "footsimuId": 354,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Notts County",
+        "currentName": "Notts County",
+        "footsimuId": 340,
+        "footsimuSlug": "notts-county",
+        "footsimuPath": "/league-one/team/notts-county",
+        "points": 39
+      },
+      "third": {
+        "name": "Newton Heath",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 38
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1895-96",
+      "startYear": 1895,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 46
+      },
+      "third": {
+        "name": "Grimsby Town",
+        "currentName": "Grimsby Town",
+        "footsimuId": 386,
+        "footsimuSlug": "grimsby-town",
+        "footsimuPath": "/league-two/team/grimsby-town",
+        "points": 42
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1896-97",
+      "startYear": 1896,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Notts County",
+        "currentName": "Notts County",
+        "footsimuId": 340,
+        "footsimuSlug": "notts-county",
+        "footsimuPath": "/league-one/team/notts-county",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Newton Heath",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 39
+      },
+      "third": {
+        "name": "Grimsby Town",
+        "currentName": "Grimsby Town",
+        "footsimuId": 386,
+        "footsimuSlug": "grimsby-town",
+        "footsimuPath": "/league-two/team/grimsby-town",
+        "points": 38
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1897-98",
+      "startYear": 1897,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 45
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 39
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1898-99",
+      "startYear": 1898,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Glossop North End",
+        "currentName": "Glossop North End",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "third": {
+        "name": "Leicester Fosse",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 45
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1899-00",
+      "startYear": 1899,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "The Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 52
+      },
+      "third": {
+        "name": "Small Heath",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 46
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1900-01",
+      "startYear": 1900,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Grimsby Town",
+        "currentName": "Grimsby Town",
+        "footsimuId": 386,
+        "footsimuSlug": "grimsby-town",
+        "footsimuPath": "/league-two/team/grimsby-town",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Small Heath",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 48
+      },
+      "third": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 44
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1901-02",
+      "startYear": 1901,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 51
+      },
+      "third": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 42
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1902-03",
+      "startYear": 1902,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Small Heath",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 51
+      },
+      "third": {
+        "name": "Woolwich Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 48
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1903-04",
+      "startYear": 1903,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Woolwich Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 49
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 48
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1904-05",
+      "startYear": 1904,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 56
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1905-06",
+      "startYear": 1905,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Bristol City",
+        "currentName": "Bristol City",
+        "footsimuId": 333,
+        "footsimuSlug": "bristol-city",
+        "footsimuPath": "/championship/team/bristol-city",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 62
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1906-07",
+      "startYear": 1906,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 57
+      },
+      "third": {
+        "name": "Leicester Fosse",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 48
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1907-08",
+      "startYear": 1907,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Bradford City",
+        "currentName": "Bradford City",
+        "footsimuId": 387,
+        "footsimuSlug": "bradford-city",
+        "footsimuPath": "/league-one/team/bradford-city",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Leicester Fosse",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 52
+      },
+      "third": {
+        "name": "Oldham Athletic",
+        "currentName": "Oldham Athletic",
+        "footsimuId": 332,
+        "footsimuSlug": "oldham-athletic",
+        "footsimuPath": "/league-two/team/oldham-athletic",
+        "points": 50
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1908-09",
+      "startYear": 1908,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 51
+      },
+      "third": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 51
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1909-10",
+      "startYear": 1909,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Oldham Athletic",
+        "currentName": "Oldham Athletic",
+        "footsimuId": 332,
+        "footsimuSlug": "oldham-athletic",
+        "footsimuPath": "/league-two/team/oldham-athletic",
+        "points": 53
+      },
+      "third": {
+        "name": "Hull City",
+        "currentName": "Hull City",
+        "footsimuId": 306,
+        "footsimuSlug": "hull-city",
+        "footsimuPath": "/premier-league/team/hull-city",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1910-11",
+      "startYear": 1910,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 51
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 49
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1911-12",
+      "startYear": 1911,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 54
+      },
+      "third": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1912-13",
+      "startYear": 1912,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 50
+      },
+      "third": {
+        "name": "Birmingham",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 46
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1913-14",
+      "startYear": 1913,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Notts County",
+        "currentName": "Notts County",
+        "footsimuId": 340,
+        "footsimuSlug": "notts-county",
+        "footsimuPath": "/league-one/team/notts-county",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Bradford Park Avenue",
+        "currentName": "Bradford Park Avenue",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "third": {
+        "name": "The Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 49
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1914-15",
+      "startYear": 1914,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 50
+      },
+      "third": {
+        "name": "Barnsley",
+        "currentName": "Barnsley",
+        "footsimuId": 397,
+        "footsimuSlug": "barnsley",
+        "footsimuPath": "/league-one/team/barnsley",
+        "points": 47
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1915-16",
+      "startYear": 1915,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War I"
+      ]
+    },
+    {
+      "season": "1916-17",
+      "startYear": 1916,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War I"
+      ]
+    },
+    {
+      "season": "1917-18",
+      "startYear": 1917,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War I"
+      ]
+    },
+    {
+      "season": "1918-19",
+      "startYear": 1918,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War I"
+      ]
+    },
+    {
+      "season": "1919-20",
+      "startYear": 1919,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 64
+      },
+      "third": {
+        "name": "Birmingham",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 56
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1920-21",
+      "startYear": 1920,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Cardiff City",
+        "currentName": "Cardiff City",
+        "footsimuId": 347,
+        "footsimuSlug": "cardiff-city",
+        "footsimuPath": "/championship/team/cardiff-city",
+        "points": 58
+      },
+      "third": {
+        "name": "Bristol City",
+        "currentName": "Bristol City",
+        "footsimuId": 333,
+        "footsimuSlug": "bristol-city",
+        "footsimuPath": "/championship/team/bristol-city",
+        "points": 51
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1921-22",
+      "startYear": 1921,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Stoke City",
+        "currentName": "Stoke City",
+        "footsimuId": 336,
+        "footsimuSlug": "stoke-city",
+        "footsimuPath": "/championship/team/stoke-city",
+        "points": 52
+      },
+      "third": {
+        "name": "Barnsley",
+        "currentName": "Barnsley",
+        "footsimuId": 397,
+        "footsimuSlug": "barnsley",
+        "footsimuPath": "/league-one/team/barnsley",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1922-23",
+      "startYear": 1922,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Notts County",
+        "currentName": "Notts County",
+        "footsimuId": 340,
+        "footsimuSlug": "notts-county",
+        "footsimuPath": "/league-one/team/notts-county",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "West Ham United",
+        "currentName": "West Ham United",
+        "footsimuId": 371,
+        "footsimuSlug": "west-ham-united",
+        "footsimuPath": "/championship/team/west-ham-united",
+        "points": 51
+      },
+      "third": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 51
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1923-24",
+      "startYear": 1923,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Bury",
+        "currentName": "Bury",
+        "footsimuId": 354,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 51
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1924-25",
+      "startYear": 1924,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 57
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 55
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1925-26",
+      "startYear": 1925,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "The Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 57
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1926-27",
+      "startYear": 1926,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Portsmouth",
+        "currentName": "Portsmouth",
+        "footsimuId": 385,
+        "footsimuSlug": "portsmouth",
+        "footsimuPath": "/championship/team/portsmouth",
+        "points": 54
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 54
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1927-28",
+      "startYear": 1927,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 57
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 54
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1928-29",
+      "startYear": 1928,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Grimsby Town",
+        "currentName": "Grimsby Town",
+        "footsimuId": 386,
+        "footsimuSlug": "grimsby-town",
+        "footsimuPath": "/league-two/team/grimsby-town",
+        "points": 53
+      },
+      "third": {
+        "name": "Bradford Park Avenue",
+        "currentName": "Bradford Park Avenue",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1929-30",
+      "startYear": 1929,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Blackpool",
+        "currentName": "Blackpool",
+        "footsimuId": 346,
+        "footsimuSlug": "blackpool",
+        "footsimuPath": "/league-one/team/blackpool",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 55
+      },
+      "third": {
+        "name": "Oldham Athletic",
+        "currentName": "Oldham Athletic",
+        "footsimuId": 332,
+        "footsimuSlug": "oldham-athletic",
+        "footsimuPath": "/league-two/team/oldham-athletic",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1930-31",
+      "startYear": 1930,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 54
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 51
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1931-32",
+      "startYear": 1931,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 54
+      },
+      "third": {
+        "name": "Stoke City",
+        "currentName": "Stoke City",
+        "footsimuId": 336,
+        "footsimuSlug": "stoke-city",
+        "footsimuPath": "/championship/team/stoke-city",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1932-33",
+      "startYear": 1932,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Stoke City",
+        "currentName": "Stoke City",
+        "footsimuId": 336,
+        "footsimuSlug": "stoke-city",
+        "footsimuPath": "/championship/team/stoke-city",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 55
+      },
+      "third": {
+        "name": "Fulham",
+        "currentName": "Fulham",
+        "footsimuId": 370,
+        "footsimuSlug": "fulham",
+        "footsimuPath": "/premier-league/team/fulham",
+        "points": 50
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1933-34",
+      "startYear": 1933,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Grimsby Town",
+        "currentName": "Grimsby Town",
+        "footsimuId": 386,
+        "footsimuSlug": "grimsby-town",
+        "footsimuPath": "/league-two/team/grimsby-town",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 52
+      },
+      "third": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 51
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1934-35",
+      "startYear": 1934,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Brentford",
+        "currentName": "Brentford",
+        "footsimuId": 337,
+        "footsimuSlug": "brentford",
+        "footsimuPath": "/premier-league/team/brentford",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 56
+      },
+      "third": {
+        "name": "West Ham United",
+        "currentName": "West Ham United",
+        "footsimuId": 371,
+        "footsimuSlug": "west-ham-united",
+        "footsimuPath": "/championship/team/west-ham-united",
+        "points": 56
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1935-36",
+      "startYear": 1935,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Charlton Athletic",
+        "currentName": "Charlton Athletic",
+        "footsimuId": 372,
+        "footsimuSlug": "charlton-athletic",
+        "footsimuPath": "/championship/team/charlton-athletic",
+        "points": 55
+      },
+      "third": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1936-37",
+      "startYear": 1936,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Blackpool",
+        "currentName": "Blackpool",
+        "footsimuId": 346,
+        "footsimuSlug": "blackpool",
+        "footsimuPath": "/league-one/team/blackpool",
+        "points": 55
+      },
+      "third": {
+        "name": "Bury",
+        "currentName": "Bury",
+        "footsimuId": 354,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1937-38",
+      "startYear": 1937,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 53
+      },
+      "third": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1938-39",
+      "startYear": 1938,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 54
+      },
+      "third": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1939-40",
+      "startYear": 1939,
+      "tournament": null,
+      "status": "abandoned",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Season abandoned after three matches on the outbreak of the Second World War; results expunged."
+      ]
+    },
+    {
+      "season": "1940-41",
+      "startYear": 1940,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War II"
+      ]
+    },
+    {
+      "season": "1941-42",
+      "startYear": 1941,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War II"
+      ]
+    },
+    {
+      "season": "1942-43",
+      "startYear": 1942,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War II"
+      ]
+    },
+    {
+      "season": "1943-44",
+      "startYear": 1943,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War II"
+      ]
+    },
+    {
+      "season": "1944-45",
+      "startYear": 1944,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War II"
+      ]
+    },
+    {
+      "season": "1945-46",
+      "startYear": 1945,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "League suspended due to World War II"
+      ]
+    },
+    {
+      "season": "1946-47",
+      "startYear": 1946,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 58
+      },
+      "third": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 55
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1947-48",
+      "startYear": 1947,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 56
+      },
+      "third": {
+        "name": "Southampton",
+        "currentName": "Southampton",
+        "footsimuId": 376,
+        "footsimuSlug": "southampton",
+        "footsimuPath": "/championship/team/southampton",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1948-49",
+      "startYear": 1948,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Fulham",
+        "currentName": "Fulham",
+        "footsimuId": 370,
+        "footsimuSlug": "fulham",
+        "footsimuPath": "/premier-league/team/fulham",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 56
+      },
+      "third": {
+        "name": "Southampton",
+        "currentName": "Southampton",
+        "footsimuId": 376,
+        "footsimuSlug": "southampton",
+        "footsimuPath": "/championship/team/southampton",
+        "points": 55
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1949-50",
+      "startYear": 1949,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 52
+      },
+      "third": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1950-51",
+      "startYear": 1950,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 52
+      },
+      "third": {
+        "name": "Cardiff City",
+        "currentName": "Cardiff City",
+        "footsimuId": 347,
+        "footsimuSlug": "cardiff-city",
+        "footsimuPath": "/championship/team/cardiff-city",
+        "points": 50
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1951-52",
+      "startYear": 1951,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Cardiff City",
+        "currentName": "Cardiff City",
+        "footsimuId": 347,
+        "footsimuSlug": "cardiff-city",
+        "footsimuPath": "/championship/team/cardiff-city",
+        "points": 51
+      },
+      "third": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 51
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1952-53",
+      "startYear": 1952,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 58
+      },
+      "third": {
+        "name": "Luton Town",
+        "currentName": "Luton Town",
+        "footsimuId": 301,
+        "footsimuSlug": "luton-town",
+        "footsimuPath": "/league-one/team/luton-town",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1953-54",
+      "startYear": 1953,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 56
+      },
+      "third": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 55
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1954-55",
+      "startYear": 1954,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Luton Town",
+        "currentName": "Luton Town",
+        "footsimuId": 301,
+        "footsimuSlug": "luton-town",
+        "footsimuPath": "/league-one/team/luton-town",
+        "points": 54
+      },
+      "third": {
+        "name": "Rotherham United",
+        "currentName": "Rotherham United",
+        "footsimuId": 402,
+        "footsimuSlug": "rotherham-united",
+        "footsimuPath": "/league-two/team/rotherham-united",
+        "points": 54
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1955-56",
+      "startYear": 1955,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 52
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 48
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1956-57",
+      "startYear": 1956,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 54
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1957-58",
+      "startYear": 1957,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "West Ham United",
+        "currentName": "West Ham United",
+        "footsimuId": 371,
+        "footsimuSlug": "west-ham-united",
+        "footsimuPath": "/championship/team/west-ham-united",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 56
+      },
+      "third": {
+        "name": "Charlton Athletic",
+        "currentName": "Charlton Athletic",
+        "footsimuId": 372,
+        "footsimuSlug": "charlton-athletic",
+        "footsimuPath": "/championship/team/charlton-athletic",
+        "points": 55
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1958-59",
+      "startYear": 1958,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Fulham",
+        "currentName": "Fulham",
+        "footsimuId": 370,
+        "footsimuSlug": "fulham",
+        "footsimuPath": "/premier-league/team/fulham",
+        "points": 60
+      },
+      "third": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1959-60",
+      "startYear": 1959,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Cardiff City",
+        "currentName": "Cardiff City",
+        "footsimuId": 347,
+        "footsimuSlug": "cardiff-city",
+        "footsimuPath": "/championship/team/cardiff-city",
+        "points": 58
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 50
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1960-61",
+      "startYear": 1960,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 58
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1961-62",
+      "startYear": 1961,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Leyton Orient",
+        "currentName": "Leyton Orient",
+        "footsimuId": 309,
+        "footsimuSlug": "leyton-orient",
+        "footsimuPath": "/league-one/team/leyton-orient",
+        "points": 54
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1962-63",
+      "startYear": 1962,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Stoke City",
+        "currentName": "Stoke City",
+        "footsimuId": 336,
+        "footsimuSlug": "stoke-city",
+        "footsimuPath": "/championship/team/stoke-city",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 52
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1963-64",
+      "startYear": 1963,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 63
+      },
+      "runnerUp": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 61
+      },
+      "third": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 56
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1964-65",
+      "startYear": 1964,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Northampton Town",
+        "currentName": "Northampton Town",
+        "footsimuId": 353,
+        "footsimuSlug": "northampton-town",
+        "footsimuPath": "/league-two/team/northampton-town",
+        "points": 56
+      },
+      "third": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 50
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1965-66",
+      "startYear": 1965,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Southampton",
+        "currentName": "Southampton",
+        "footsimuId": 376,
+        "footsimuSlug": "southampton",
+        "footsimuPath": "/championship/team/southampton",
+        "points": 54
+      },
+      "third": {
+        "name": "Coventry City",
+        "currentName": "Coventry City",
+        "footsimuId": 388,
+        "footsimuSlug": "coventry-city",
+        "footsimuPath": "/premier-league/team/coventry-city",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1966-67",
+      "startYear": 1966,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Coventry City",
+        "currentName": "Coventry City",
+        "footsimuId": 388,
+        "footsimuSlug": "coventry-city",
+        "footsimuPath": "/premier-league/team/coventry-city",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 58
+      },
+      "third": {
+        "name": "Carlisle United",
+        "currentName": "Carlisle United",
+        "footsimuId": 322,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1967-68",
+      "startYear": 1967,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Queens Park Rangers",
+        "currentName": "Queens Park Rangers",
+        "footsimuId": 334,
+        "footsimuSlug": "queens-park-rangers",
+        "footsimuPath": "/championship/team/queens-park-rangers",
+        "points": 58
+      },
+      "third": {
+        "name": "Blackpool",
+        "currentName": "Blackpool",
+        "footsimuId": 346,
+        "footsimuSlug": "blackpool",
+        "footsimuPath": "/league-one/team/blackpool",
+        "points": 58
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1968-69",
+      "startYear": 1968,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 63
+      },
+      "runnerUp": {
+        "name": "Crystal Palace",
+        "currentName": "Crystal Palace",
+        "footsimuId": 384,
+        "footsimuSlug": "crystal-palace",
+        "footsimuPath": "/premier-league/team/crystal-palace",
+        "points": 56
+      },
+      "third": {
+        "name": "Charlton Athletic",
+        "currentName": "Charlton Athletic",
+        "footsimuId": 372,
+        "footsimuSlug": "charlton-athletic",
+        "footsimuPath": "/championship/team/charlton-athletic",
+        "points": 50
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1969-70",
+      "startYear": 1969,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Blackpool",
+        "currentName": "Blackpool",
+        "footsimuId": 346,
+        "footsimuSlug": "blackpool",
+        "footsimuPath": "/league-one/team/blackpool",
+        "points": 53
+      },
+      "third": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 51
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1970-71",
+      "startYear": 1970,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 56
+      },
+      "third": {
+        "name": "Cardiff City",
+        "currentName": "Cardiff City",
+        "footsimuId": 347,
+        "footsimuSlug": "cardiff-city",
+        "footsimuPath": "/championship/team/cardiff-city",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1971-72",
+      "startYear": 1971,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 56
+      },
+      "third": {
+        "name": "Millwall",
+        "currentName": "Millwall",
+        "footsimuId": 391,
+        "footsimuSlug": "millwall",
+        "footsimuPath": "/championship/team/millwall",
+        "points": 55
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1972-73",
+      "startYear": 1972,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Queens Park Rangers",
+        "currentName": "Queens Park Rangers",
+        "footsimuId": 334,
+        "footsimuSlug": "queens-park-rangers",
+        "footsimuPath": "/championship/team/queens-park-rangers",
+        "points": 61
+      },
+      "third": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 50
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1973-74",
+      "startYear": 1973,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "Luton Town",
+        "currentName": "Luton Town",
+        "footsimuId": 301,
+        "footsimuSlug": "luton-town",
+        "footsimuPath": "/league-one/team/luton-town",
+        "points": 50
+      },
+      "third": {
+        "name": "Carlisle United",
+        "currentName": "Carlisle United",
+        "footsimuId": 322,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1974-75",
+      "startYear": 1974,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 58
+      },
+      "third": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1975-76",
+      "startYear": 1975,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Bristol City",
+        "currentName": "Bristol City",
+        "footsimuId": 333,
+        "footsimuSlug": "bristol-city",
+        "footsimuPath": "/championship/team/bristol-city",
+        "points": 53
+      },
+      "third": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1976-77",
+      "startYear": 1976,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 55
+      },
+      "third": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 52
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1977-78",
+      "startYear": 1977,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Southampton",
+        "currentName": "Southampton",
+        "footsimuId": 376,
+        "footsimuSlug": "southampton",
+        "footsimuPath": "/championship/team/southampton",
+        "points": 57
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 56
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1978-79",
+      "startYear": 1978,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Crystal Palace",
+        "currentName": "Crystal Palace",
+        "footsimuId": 384,
+        "footsimuSlug": "crystal-palace",
+        "footsimuPath": "/premier-league/team/crystal-palace",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Brighton & Hove Albion",
+        "currentName": "Brighton & Hove Albion",
+        "footsimuId": 331,
+        "footsimuSlug": "brighton-and-hove-albion",
+        "footsimuPath": "/premier-league/team/brighton-and-hove-albion",
+        "points": 56
+      },
+      "third": {
+        "name": "Stoke City",
+        "currentName": "Stoke City",
+        "footsimuId": 336,
+        "footsimuSlug": "stoke-city",
+        "footsimuPath": "/championship/team/stoke-city",
+        "points": 56
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1979-80",
+      "startYear": 1979,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 54
+      },
+      "third": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 53
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1980-81",
+      "startYear": 1980,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "West Ham United",
+        "currentName": "West Ham United",
+        "footsimuId": 371,
+        "footsimuSlug": "west-ham-united",
+        "footsimuPath": "/championship/team/west-ham-united",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Notts County",
+        "currentName": "Notts County",
+        "footsimuId": 340,
+        "footsimuSlug": "notts-county",
+        "footsimuPath": "/league-one/team/notts-county",
+        "points": 53
+      },
+      "third": {
+        "name": "Swansea City",
+        "currentName": "Swansea City",
+        "footsimuId": 318,
+        "footsimuSlug": "swansea-city",
+        "footsimuPath": "/championship/team/swansea-city",
+        "points": 50
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1981-82",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Luton Town",
+        "currentName": "Luton Town",
+        "footsimuId": 301,
+        "footsimuSlug": "luton-town",
+        "footsimuPath": "/league-one/team/luton-town",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "Watford",
+        "currentName": "Watford",
+        "footsimuId": 395,
+        "footsimuSlug": "watford",
+        "footsimuPath": "/championship/team/watford",
+        "points": 80
+      },
+      "third": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 71
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1982-83",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Queens Park Rangers",
+        "currentName": "Queens Park Rangers",
+        "footsimuId": 334,
+        "footsimuSlug": "queens-park-rangers",
+        "footsimuPath": "/championship/team/queens-park-rangers",
+        "points": 85
+      },
+      "runnerUp": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 75
+      },
+      "third": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 70
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1983-84",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 88
+      },
+      "third": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 80
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1984-85",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Oxford United",
+        "currentName": "Oxford United",
+        "footsimuId": 311,
+        "footsimuSlug": "oxford-united",
+        "footsimuPath": "/league-one/team/oxford-united",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 82
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 74
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1985-86",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Charlton Athletic",
+        "currentName": "Charlton Athletic",
+        "footsimuId": 372,
+        "footsimuSlug": "charlton-athletic",
+        "footsimuPath": "/championship/team/charlton-athletic",
+        "points": 77
+      },
+      "third": {
+        "name": "Wimbledon",
+        "currentName": "AFC Wimbledon",
+        "footsimuId": 3802,
+        "footsimuSlug": "afc-wimbledon",
+        "footsimuPath": "/league-one/team/afc-wimbledon",
+        "points": 76
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1986-87",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Portsmouth",
+        "currentName": "Portsmouth",
+        "footsimuId": 385,
+        "footsimuSlug": "portsmouth",
+        "footsimuPath": "/championship/team/portsmouth",
+        "points": 78
+      },
+      "third": {
+        "name": "Oldham Athletic",
+        "currentName": "Oldham Athletic",
+        "footsimuId": 332,
+        "footsimuSlug": "oldham-athletic",
+        "footsimuPath": "/league-two/team/oldham-athletic",
+        "points": 75
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1987-88",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Millwall",
+        "currentName": "Millwall",
+        "footsimuId": 391,
+        "footsimuSlug": "millwall",
+        "footsimuPath": "/championship/team/millwall",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 78
+      },
+      "third": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 78
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1988-89",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 99
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 82
+      },
+      "third": {
+        "name": "Crystal Palace",
+        "currentName": "Crystal Palace",
+        "footsimuId": 384,
+        "footsimuSlug": "crystal-palace",
+        "footsimuPath": "/premier-league/team/crystal-palace",
+        "points": 81
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1989-90",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 85
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 85
+      },
+      "third": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 80
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1990-91",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Oldham Athletic",
+        "currentName": "Oldham Athletic",
+        "footsimuId": 332,
+        "footsimuSlug": "oldham-athletic",
+        "footsimuPath": "/league-two/team/oldham-athletic",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "West Ham United",
+        "currentName": "West Ham United",
+        "footsimuId": 371,
+        "footsimuSlug": "west-ham-united",
+        "footsimuPath": "/championship/team/west-ham-united",
+        "points": 87
+      },
+      "third": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 82
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1991-92",
+      "startYear": 1991,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League Second Division",
+      "format": "league",
+      "champion": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 80
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 78
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1992-93",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 96
+      },
+      "runnerUp": {
+        "name": "West Ham United",
+        "currentName": "West Ham United",
+        "footsimuId": 371,
+        "footsimuSlug": "west-ham-united",
+        "footsimuPath": "/championship/team/west-ham-united",
+        "points": 88
+      },
+      "third": {
+        "name": "Portsmouth",
+        "currentName": "Portsmouth",
+        "footsimuId": 385,
+        "footsimuSlug": "portsmouth",
+        "footsimuPath": "/championship/team/portsmouth",
+        "points": 88
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1993-94",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Crystal Palace",
+        "currentName": "Crystal Palace",
+        "footsimuId": 384,
+        "footsimuSlug": "crystal-palace",
+        "footsimuPath": "/premier-league/team/crystal-palace",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 83
+      },
+      "third": {
+        "name": "Millwall",
+        "currentName": "Millwall",
+        "footsimuId": 391,
+        "footsimuSlug": "millwall",
+        "footsimuPath": "/championship/team/millwall",
+        "points": 74
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1994-95",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Reading",
+        "currentName": "Reading",
+        "footsimuId": 338,
+        "footsimuSlug": "reading",
+        "footsimuPath": "/league-one/team/reading",
+        "points": 79
+      },
+      "third": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 77
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1995-96",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 83
+      },
+      "runnerUp": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 79
+      },
+      "third": {
+        "name": "Crystal Palace",
+        "currentName": "Crystal Palace",
+        "footsimuId": 384,
+        "footsimuSlug": "crystal-palace",
+        "footsimuPath": "/premier-league/team/crystal-palace",
+        "points": 75
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1996-97",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 98
+      },
+      "runnerUp": {
+        "name": "Barnsley",
+        "currentName": "Barnsley",
+        "footsimuId": 397,
+        "footsimuSlug": "barnsley",
+        "footsimuPath": "/league-one/team/barnsley",
+        "points": 80
+      },
+      "third": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 76
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1997-98",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 94
+      },
+      "runnerUp": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 91
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 90
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1998-99",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 105
+      },
+      "runnerUp": {
+        "name": "Bradford City",
+        "currentName": "Bradford City",
+        "footsimuId": 387,
+        "footsimuSlug": "bradford-city",
+        "footsimuPath": "/league-one/team/bradford-city",
+        "points": 87
+      },
+      "third": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 86
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "1999-00",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Charlton Athletic",
+        "currentName": "Charlton Athletic",
+        "footsimuId": 372,
+        "footsimuSlug": "charlton-athletic",
+        "footsimuPath": "/championship/team/charlton-athletic",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 89
+      },
+      "third": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 87
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2000-01",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Fulham",
+        "currentName": "Fulham",
+        "footsimuId": 370,
+        "footsimuSlug": "fulham",
+        "footsimuPath": "/premier-league/team/fulham",
+        "points": 101
+      },
+      "runnerUp": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 91
+      },
+      "third": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 87
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2001-02",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 99
+      },
+      "runnerUp": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 89
+      },
+      "third": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 86
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2002-03",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Portsmouth",
+        "currentName": "Portsmouth",
+        "footsimuId": 385,
+        "footsimuSlug": "portsmouth",
+        "footsimuPath": "/championship/team/portsmouth",
+        "points": 98
+      },
+      "runnerUp": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 92
+      },
+      "third": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 80
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2003-04",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division (second tier)",
+      "format": "league",
+      "champion": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 94
+      },
+      "runnerUp": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 86
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 79
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2004-05",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 94
+      },
+      "runnerUp": {
+        "name": "Wigan Athletic",
+        "currentName": "Wigan Athletic",
+        "footsimuId": 350,
+        "footsimuSlug": "wigan-athletic",
+        "footsimuPath": "/league-one/team/wigan-athletic",
+        "points": 87
+      },
+      "third": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 85
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2005-06",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Reading",
+        "currentName": "Reading",
+        "footsimuId": 338,
+        "footsimuSlug": "reading",
+        "footsimuPath": "/league-one/team/reading",
+        "points": 106
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 90
+      },
+      "third": {
+        "name": "Watford",
+        "currentName": "Watford",
+        "footsimuId": 395,
+        "footsimuSlug": "watford",
+        "footsimuPath": "/championship/team/watford",
+        "points": 81
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2006-07",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 86
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 84
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2007-08",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 81
+      },
+      "runnerUp": {
+        "name": "Stoke City",
+        "currentName": "Stoke City",
+        "footsimuId": 336,
+        "footsimuSlug": "stoke-city",
+        "footsimuPath": "/championship/team/stoke-city",
+        "points": 79
+      },
+      "third": {
+        "name": "Hull City",
+        "currentName": "Hull City",
+        "footsimuId": 306,
+        "footsimuSlug": "hull-city",
+        "footsimuPath": "/premier-league/team/hull-city",
+        "points": 75
+      },
+      "notes": [
+        "Third place from RSSSF final table"
+      ]
+    },
+    {
+      "season": "2008-09",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Birmingham City",
+        "currentName": "Birmingham City",
+        "footsimuId": 392,
+        "footsimuSlug": "birmingham-city",
+        "footsimuPath": "/championship/team/birmingham-city",
+        "points": 83
+      },
+      "third": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 80
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2009-10",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 102
+      },
+      "runnerUp": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 91
+      },
+      "third": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 79
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2010-11",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Queens Park Rangers",
+        "currentName": "Queens Park Rangers",
+        "footsimuId": 334,
+        "footsimuSlug": "queens-park-rangers",
+        "footsimuPath": "/championship/team/queens-park-rangers",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 84
+      },
+      "third": {
+        "name": "Swansea City",
+        "currentName": "Swansea City",
+        "footsimuId": 318,
+        "footsimuSlug": "swansea-city",
+        "footsimuPath": "/championship/team/swansea-city",
+        "points": 80
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2011-12",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Reading",
+        "currentName": "Reading",
+        "footsimuId": 338,
+        "footsimuSlug": "reading",
+        "footsimuPath": "/league-one/team/reading",
+        "points": 89
+      },
+      "runnerUp": {
+        "name": "Southampton",
+        "currentName": "Southampton",
+        "footsimuId": 376,
+        "footsimuSlug": "southampton",
+        "footsimuPath": "/championship/team/southampton",
+        "points": 88
+      },
+      "third": {
+        "name": "West Ham United",
+        "currentName": "West Ham United",
+        "footsimuId": 371,
+        "footsimuSlug": "west-ham-united",
+        "footsimuPath": "/championship/team/west-ham-united",
+        "points": 86
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2012-13",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Cardiff City",
+        "currentName": "Cardiff City",
+        "footsimuId": 347,
+        "footsimuSlug": "cardiff-city",
+        "footsimuPath": "/championship/team/cardiff-city",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Hull City",
+        "currentName": "Hull City",
+        "footsimuId": 306,
+        "footsimuSlug": "hull-city",
+        "footsimuPath": "/premier-league/team/hull-city",
+        "points": 79
+      },
+      "third": {
+        "name": "Watford",
+        "currentName": "Watford",
+        "footsimuId": 395,
+        "footsimuSlug": "watford",
+        "footsimuPath": "/championship/team/watford",
+        "points": 77
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2013-14",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 102
+      },
+      "runnerUp": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 93
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 85
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2014-15",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Bournemouth",
+        "currentName": "Bournemouth",
+        "footsimuId": 349,
+        "footsimuSlug": "bournemouth",
+        "footsimuPath": "/premier-league/team/bournemouth",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Watford",
+        "currentName": "Watford",
+        "footsimuId": 395,
+        "footsimuSlug": "watford",
+        "footsimuPath": "/championship/team/watford",
+        "points": 89
+      },
+      "third": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 86
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2015-16",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 93
+      },
+      "runnerUp": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 89
+      },
+      "third": {
+        "name": "Brighton & Hove Albion",
+        "currentName": "Brighton & Hove Albion",
+        "footsimuId": 331,
+        "footsimuSlug": "brighton-and-hove-albion",
+        "footsimuPath": "/premier-league/team/brighton-and-hove-albion",
+        "points": 89
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2016-17",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 94
+      },
+      "runnerUp": {
+        "name": "Brighton & Hove Albion",
+        "currentName": "Brighton & Hove Albion",
+        "footsimuId": 331,
+        "footsimuSlug": "brighton-and-hove-albion",
+        "footsimuPath": "/premier-league/team/brighton-and-hove-albion",
+        "points": 93
+      },
+      "third": {
+        "name": "Reading",
+        "currentName": "Reading",
+        "footsimuId": 338,
+        "footsimuSlug": "reading",
+        "footsimuPath": "/league-one/team/reading",
+        "points": 85
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2017-18",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 99
+      },
+      "runnerUp": {
+        "name": "Cardiff City",
+        "currentName": "Cardiff City",
+        "footsimuId": 347,
+        "footsimuSlug": "cardiff-city",
+        "footsimuPath": "/championship/team/cardiff-city",
+        "points": 90
+      },
+      "third": {
+        "name": "Fulham",
+        "currentName": "Fulham",
+        "footsimuId": 370,
+        "footsimuSlug": "fulham",
+        "footsimuPath": "/premier-league/team/fulham",
+        "points": 88
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2018-19",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 94
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 89
+      },
+      "third": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 83
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2019-20",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 93
+      },
+      "runnerUp": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 83
+      },
+      "third": {
+        "name": "Brentford",
+        "currentName": "Brentford",
+        "footsimuId": 337,
+        "footsimuSlug": "brentford",
+        "footsimuPath": "/premier-league/team/brentford",
+        "points": 81
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2020-21",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 97
+      },
+      "runnerUp": {
+        "name": "Watford",
+        "currentName": "Watford",
+        "footsimuId": 395,
+        "footsimuSlug": "watford",
+        "footsimuPath": "/championship/team/watford",
+        "points": 91
+      },
+      "third": {
+        "name": "Brentford",
+        "currentName": "Brentford",
+        "footsimuId": 337,
+        "footsimuSlug": "brentford",
+        "footsimuPath": "/premier-league/team/brentford",
+        "points": 87
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2021-22",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Fulham",
+        "currentName": "Fulham",
+        "footsimuId": 370,
+        "footsimuSlug": "fulham",
+        "footsimuPath": "/premier-league/team/fulham",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Bournemouth",
+        "currentName": "Bournemouth",
+        "footsimuId": 349,
+        "footsimuSlug": "bournemouth",
+        "footsimuPath": "/premier-league/team/bournemouth",
+        "points": 88
+      },
+      "third": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 82
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2022-23",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 101
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 91
+      },
+      "third": {
+        "name": "Luton Town",
+        "currentName": "Luton Town",
+        "footsimuId": 301,
+        "footsimuSlug": "luton-town",
+        "footsimuPath": "/league-one/team/luton-town",
+        "points": 80
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2023-24",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 97
+      },
+      "runnerUp": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 96
+      },
+      "third": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 90
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2024-25",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 100
+      },
+      "runnerUp": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 100
+      },
+      "third": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 90
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2025-26",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Championship",
+      "format": "league",
+      "champion": {
+        "name": "Coventry City",
+        "currentName": "Coventry City",
+        "footsimuId": 388,
+        "footsimuSlug": "coventry-city",
+        "footsimuPath": "/premier-league/team/coventry-city",
+        "points": 95
+      },
+      "runnerUp": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 84
+      },
+      "third": {
+        "name": "Millwall",
+        "currentName": "Millwall",
+        "footsimuId": 391,
+        "footsimuSlug": "millwall",
+        "footsimuPath": "/championship/team/millwall",
+        "points": 83
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    }
+  ]
+}
