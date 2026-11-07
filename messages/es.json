@@ -1252,7 +1252,7 @@
     "final": "Final",
     "playoff": "Playoffs",
     "mostTitles": "Más títulos",
-    "titles": "{count, plural, one {# título} other {# títulos}}",
+    "titlesWord": "{count, plural, one {título} other {títulos}}",
     "filter": "Filtrar las temporadas",
     "all": "Todas",
     "era": "{name} ({from}–{to})",
@@ -1264,8 +1264,7 @@
     "points": "{points} pts",
     "now": "ahora {club}",
     "world": "My World",
-    "comingSoon": "Historial real próximamente",
-    "source": "Clasificaciones históricas recopiladas de RSSSF y Wikipedia."
+    "comingSoon": "Historial real próximamente"
   },
   "World": {
     "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés",

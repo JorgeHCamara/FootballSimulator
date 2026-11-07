@@ -21,6 +21,10 @@ function Badge({ club, size = 20 }: { club: BadgeClub; size?: number }) {
 
 type Place = "champion" | "runnerUp" | "third";
 
+/** The "Most titles" cards' rank discs: gold, silver and bronze, then plain. */
+const RANK = ["bg-amber-400 text-amber-950", "bg-zinc-300 text-zinc-800", "bg-amber-700 text-amber-50"];
+const RANK_OTHER = "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300";
+
 /** One placing: the badge and the name used that season (with "now …" when the club is called something else today), and the points. */
 function Placing({ club, place }: { club: WinnerClub | null; place: Place }) {
   const t = useTranslations("PastWinners");
@@ -147,18 +151,29 @@ export function PastWinners({ rows, comingSoon = false, testId = "past-winners" 
       )}
 
       {summary.length > 0 && (
-        <section aria-label={t("mostTitles")} className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900" data-testid="past-winners-titles">
-          <h3 className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-zinc-500">
+        <section aria-label={t("mostTitles")} className="space-y-2" data-testid="past-winners-titles">
+          <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-zinc-500">
             <Icon name="trophy" size={14} className="text-amber-500" />
             {t("mostTitles")}
           </h3>
-          <ol className="flex flex-wrap gap-x-5 gap-y-2">
+          {/* The top five as cards on one row; phones show the top three, side by side. */}
+          <ol className="grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3">
             {summary.map((c, i) => (
-              <li key={c.key} className="flex min-w-0 items-center gap-2 text-sm" data-testid="past-winners-title" data-titles={c.titles}>
-                <span className="w-3 text-xs font-semibold text-zinc-400">{i + 1}</span>
-                <Badge club={c} />
-                <span className="truncate font-semibold">{c.name}</span>
-                <span className="shrink-0 text-zinc-500">{t("titles", { count: c.titles })}</span>
+              <li
+                key={c.key}
+                className={`relative flex min-w-0 flex-col items-center gap-1.5 rounded-xl border px-2 pb-3 pt-4 text-center ${i >= 3 ? "hidden sm:flex" : ""} ${
+                  i === 0 ? "border-pitch-600/40 bg-pitch-50 dark:border-pitch-700/60 dark:bg-pitch-900/30" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+                }`}
+                data-testid="past-winners-title"
+                data-titles={c.titles}
+              >
+                <span className={`absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${RANK[i] ?? RANK_OTHER}`}>{i + 1}</span>
+                <Badge club={c} size={36} />
+                <span className="w-full truncate text-xs font-semibold sm:text-sm" title={c.name}>
+                  {c.name}
+                </span>
+                <span className="text-xl font-extrabold leading-none tabular-nums">{c.titles}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">{t("titlesWord", { count: c.titles })}</span>
               </li>
             ))}
           </ol>
@@ -220,8 +235,6 @@ export function PastWinners({ rows, comingSoon = false, testId = "past-winners" 
           ))}
         </div>
       )}
-
-      <p className="text-xs text-zinc-500">{t("source")}</p>
     </div>
   );
 }
