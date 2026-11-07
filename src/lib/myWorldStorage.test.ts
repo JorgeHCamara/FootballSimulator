@@ -36,7 +36,7 @@ describe("My World: the save", () => {
     assert.deepEqual(loadWorld(store), { world: null, reason: "none" });
     assert.equal(saveWorld(store, world), true);
     assert.deepEqual(loadWorld(store).world, world);
-    assert.ok(store.items.get(WORLD_KEY)!.length < 60_000, "a new world is small");
+    assert.ok(store.items.get(WORLD_KEY)!.length < 80_000, "a new world is small");
   });
 
   it("after seasons are played, a reload finds every season's tables and results (history lookup)", () => {
@@ -62,7 +62,7 @@ describe("My World: the save", () => {
     saveWorld(store, mid);
     assert.equal(loadWorld(store).world!.review, true);
     // The save stays small: about 14 KB a season, every result included.
-    assert.ok(store.items.get(WORLD_KEY)!.length < 15_000 * (mid.history.length + 1));
+    assert.ok(store.items.get(WORLD_KEY)!.length < 20_000 * (mid.history.length + 1));
   });
 
   it("a season in progress keeps every score through a reload: a matchday simulated, scores typed in, a league simulated", () => {

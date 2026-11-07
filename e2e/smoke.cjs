@@ -2453,7 +2453,7 @@ async function step(name, fn) {
       }
     });
 
-    await step("My World: from the home page and the menu (in the sitemap, indexed), set up a world, every league played by its own buttons, the games left in each, End season (promotion and relegation, the review), Start next season, saved on reload, past seasons' tables and results in the season picker, a new world; EN/PT/ES on phones and desktops", async () => {
+    await step("My World: from the home page and the menu (in the sitemap, indexed), set up a world, every league and cup played by its own buttons, the games left in each, End season (promotion and relegation, the cup winners, the review), Start next season, saved on reload, past seasons' tables, results and cups in the season picker, a new world; EN/PT/ES on phones and desktops", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       // Entry points: the home page (by the main features, on the first screen) and the menu; in the sitemap, and indexed.
       await p.goto(`${BASE_URL}/en`);
@@ -2495,8 +2495,31 @@ async function step(name, fn) {
       assert.equal(await p.getByTestId("world-round").count(), 0);
       const left = async () => Object.fromEntries(await p.getByTestId("world-left").evaluateAll((els) => els.map((e) => [e.dataset.league, Number(e.dataset.left)])));
       const before = await left();
-      assert.deepEqual(Object.keys(before), ["PL", "ELC", "EL1", "EL2"]);
+      assert.deepEqual(Object.keys(before), ["PL", "ELC", "EL1", "EL2", "FAC", "EFC"], "the four leagues and the two cups, part of the same season");
       assert.ok(Object.values(before).every((n) => n > 0));
+      assert.deepEqual([before.FAC, before.EFC], [123, 93], "the FA Cup's 123 games (40 first-round ties to the final), the EFL Cup's 93 (two-legged semi-finals)");
+      // The cups' tabs beside the leagues': the FA Cup's first round, its clubs tagged by division (non-league sides "NL"), every game with a dice; no "simulated draw" wording for the world's own draw.
+      assert.deepEqual(await p.locator('[data-testid="world-tabs"] [role="tab"]').allInnerTexts(), ["Premier League", "Championship", "League One", "League Two", "FA Cup", "EFL Cup"]);
+      await p.locator('[data-testid="world-tabs"] [data-league="FAC"]').click();
+      const cup = p.getByTestId("world-cup");
+      await cup.waitFor();
+      assert.equal(await cup.getAttribute("data-cup"), "FAC");
+      assert.equal(await p.getByTestId("world-table").count(), 0);
+      assert.equal(await cup.getByTestId("cup-tie").count(), 40, "the first round's ties");
+      assert.ok((await cup.getByTestId("cup-tie").first().innerText()).includes("NL") || (await cup.innerText()).includes("NL"), "non-league sides tagged");
+      assert.equal(await cup.getByTestId("simulated-draw-note").count(), 0);
+      assert.doesNotMatch(await p.getByTestId("round-bar").innerText(), /Simulated draw/);
+      assert.match(await p.getByTestId("round-bar").innerText(), /First Round[\s\S]*0\/40[\s\S]*Second Round[\s\S]*Draw pending/);
+      assert.equal(await cup.getByTestId("kickoff").count(), 0, "no kick-off dates: the world's own calendar");
+      assert.equal(await p.getByTestId("world-season-select").count(), 1, "the season picker, beside the cup's buttons");
+      // Simulate round: the first round decided, the second round drawn and shown; the count down.
+      await p.getByTestId("world-simulate-round").click();
+      await p.locator('[data-testid="cup-tie"][data-round="1"]').first().waitFor();
+      assert.equal(await cup.getByTestId("cup-tie").count(), 20, "the second round, just drawn");
+      assert.equal((await left()).FAC, 123 - 40);
+      await p.getByTestId("world-undo").click();
+      assert.equal((await left()).FAC, 123);
+      await p.locator('[data-testid="world-tabs"] [data-league="PL"]').click();
       assert.equal(await p.getByTestId("world-end-season").count(), 0);
       // The season picker: only this season so far.
       const picker = p.getByTestId("world-season-select");
@@ -2505,9 +2528,9 @@ async function step(name, fn) {
       await p.getByTestId("world-simulate-rest").click();
       assert.equal((await left()).PL, 0);
       assert.equal(await p.getByTestId("world-end-season").count(), 0, "not until every league is played");
-      /** Every league played out by its own "Simulate rest of season". */
+      /** Every league played out by its own "Simulate rest of season", every cup by its "Simulate to the final". */
       const playOut = async () => {
-        for (const code of ["PL", "ELC", "EL1", "EL2"]) {
+        for (const code of ["PL", "ELC", "EL1", "EL2", "FAC", "EFC"]) {
           await p.locator(`[data-testid="world-tabs"] [data-league="${code}"]`).click();
           if ((await left())[code] > 0) await p.getByTestId("world-simulate-rest").click();
           await p.locator(`[data-testid="world-left"][data-league="${code}"][data-left="0"]`).waitFor();
@@ -2530,6 +2553,11 @@ async function step(name, fn) {
       const nationalLeague = await p.locator('[data-testid="world-moves"][data-upper="EL2"]').innerText();
       assert.ok(nationalLeague.includes("Boreham Wood") && nationalLeague.includes("Harrogate"), "Boreham Wood and Harrogate Town up from the National League");
       assert.ok(nationalLeague.includes("UP FROM THE NATIONAL LEAGUE") && !nationalLeague.includes("NEW"), "real clubs, not new ones");
+      // The cup winners, with the leagues' champions: each final's result.
+      const cupLines = p.getByTestId("world-review-cup");
+      assert.equal(await cupLines.count(), 2);
+      assert.match(await cupLines.nth(0).innerText(), /^FA Cup:\s+.+\s+beat .+ (\d+–\d+|on penalties \(\d+–\d+\)) in the final$/);
+      assert.match(await cupLines.nth(1).innerText(), /^EFL Cup:\s+.+\s+beat .+ (\d+–\d+|on penalties \(\d+–\d+\)) in the final$/);
       // "Start next season", in the review's bottom-right corner.
       const start = p.getByTestId("world-start-season");
       assert.equal((await start.innerText()).trim(), "Start next season");
@@ -2543,7 +2571,7 @@ async function step(name, fn) {
       await start.click();
       assert.equal(await review.count(), 0);
       await p.getByTestId("world-tables").waitFor();
-      assert.deepEqual(Object.values(await left()), [380, 559, 557, 557], "the new season's games, play-offs included");
+      assert.deepEqual(Object.values(await left()), [380, 559, 557, 557, 123, 93], "the new season's games, play-offs and cups included");
       // The country, before the season's heading: England, the visitor's club's pyramid (the only one so far).
       const seasonCountry = p.getByTestId("world-season-country");
       assert.equal(await seasonCountry.inputValue(), "ENG");
@@ -2574,6 +2602,21 @@ async function step(name, fn) {
       await fixtures.getByTestId("matchday-select").selectOption("-1");
       assert.equal(await fixtures.getByTestId("playoff-tie").count(), 5, "the eliminators, the semi-finals and the final");
       assert.equal(await fixtures.getByTestId("playoff-result").count(), 5);
+      // Last season's FA Cup: every round with its scores (the final's bracket first), the winner and its road, nothing to change.
+      await p.locator('[data-testid="world-tabs"] [data-league="FAC"]').click();
+      const pastCup = p.getByTestId("world-past-cup");
+      await pastCup.waitFor();
+      assert.equal(await p.locator("h2", { hasText: `The ${label(year)} season` }).count(), 1);
+      assert.equal(await pastCup.getByTestId("cup-bracket").count(), 1, "opens on the final");
+      assert.equal(await pastCup.locator('[data-testid="cup-tie"][data-round="7"]').count(), 1);
+      assert.match(await pastCup.getByTestId("champion").innerText(), new RegExp(`FA Cup ${label(year)} winner[\\s\\S]*Road to the final[\\s\\S]*Final:`, "i"));
+      await p.locator('[data-testid="round-bar"] [role="tab"]').first().click();
+      assert.equal(await pastCup.getByTestId("cup-tie").count(), 40);
+      assert.equal(await pastCup.getByTestId("match-score").count(), 40, "every result");
+      assert.equal(await pastCup.locator("input").count(), 0, "nothing to change");
+      assert.equal(await pastCup.getByTestId("match-dice-button").count(), 0);
+      assert.equal(await p.getByTestId("world-actions").count(), 0);
+      await p.locator('[data-testid="world-tabs"] [data-league="ELC"]').click();
       // Back to this season, with its buttons.
       await picker.selectOption(String(year + 1));
       assert.equal(await p.getByTestId("world-actions").count(), 1);
@@ -2687,7 +2730,7 @@ async function step(name, fn) {
             assert.equal(Math.round((await q.getByTestId("match-dice-button").first().boundingBox()).height), 44);
             await q.getByTestId("match-dice-button").first().tap();
             assert.ok(await q.evaluate(() => document.documentElement.scrollWidth <= 360), `${locale}: the fixtures fit a phone`);
-            for (const code of ["PL", "ELC", "EL1", "EL2"]) {
+            for (const code of ["PL", "ELC", "EL1", "EL2", "FAC", "EFC"]) {
               await q.locator(`[data-testid="world-tabs"] [data-league="${code}"]`).tap();
               await q.getByTestId("world-simulate-rest").tap();
             }

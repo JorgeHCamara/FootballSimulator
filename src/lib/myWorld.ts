@@ -1,7 +1,7 @@
+import type { CupRoundKey } from "../config/cups.ts";
 import { getLeagueByCode, type LeagueConfig } from "../config/leagues.ts";
 import { NATIONAL_LEAGUE_CLUBS } from "../config/nationalLeague.ts";
-import { expectedGoals, expectedGoalsNeutral, sampleDixonColes, sampleLikelyScore, sampleNormal, simulateFixtures } from "../engine/match.ts";
-import { ratingNoiseSd } from "../engine/montecarlo.ts";
+import { expectedGoals, expectedGoalsNeutral, sampleDixonColes, sampleLikelyScore, simulateFixtures } from "../engine/match.ts";
 import { clubPriors, seasonRatings, type SeasonRatings } from "../engine/offseason.ts";
 import {
   buildBracket,
@@ -16,13 +16,25 @@ import {
   type BracketOptions,
   type PlayoffTie,
 } from "../engine/playoffs.ts";
-import type { LeagueModel, TeamStrength } from "../engine/ratings.ts";
+import type { LeagueModel } from "../engine/ratings.ts";
 import { effectiveResults, isValidScore } from "../engine/results.ts";
 import { createRng, randomSeed, type Rng } from "../engine/rng.ts";
 import { balancedDoubleRoundRobin, doubleRoundRobin } from "../engine/schedule.ts";
 import { computeStandings, sortFixtures } from "../engine/standings.ts";
 import type { Fixture, ResultMap, Score, StandingRow, Team, TeamId } from "../engine/types.ts";
-import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
+import {
+  cupConfig,
+  cupPlayable,
+  finishCups,
+  generateCup,
+  outsidersNeeded,
+  WORLD_CUPS,
+  type SavedCup,
+  type WorldCupCode,
+  type WorldCupSeason,
+  type WorldCupTie,
+} from "./worldCups.ts";
+import { divisionForm, seasonRng, shuffled, teamOf } from "./worldForm.ts";
 
 /*
  * My World: a fictional timeline of the English pyramid (Premier League to
@@ -36,7 +48,10 @@ import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
  * (their promotion and relegation places, and the play-off winner), applied to
  * all four at once. League Two's relegated clubs drop into the National League
  * for a season, and the National League's clubs (Boreham Wood and Harrogate
- * Town, the first time) come up in their place.
+ * Town, the first time) come up in their place. The FA Cup and the EFL Cup
+ * are part of every season too (src/lib/worldCups.ts): the first season takes
+ * the real cups where they stand, every later one is drawn among the world's
+ * clubs, with the real FA Cup's non-league sides (World.cupPool) in the FA Cup.
  *
  * Between seasons each club's rating carries over through the site's own
  * between-season rule (src/engine/offseason.ts, the one the real starting
@@ -52,11 +67,13 @@ import { SEASON_RATING_NOISE } from "./seasonNoise.ts";
  * full score distribution, from the season's form, as a whole season is, so
  * the tables look like real ones (likely rolls never let a club win a game it
  * has under a one-in-five chance of winning: over a season, a 106-point
- * champion and a 9-point bottom club). Every score is kept in the save (DivisionSeason.scores); once every
- * game of the four leagues is decided, playSeason finishes the season (it
- * would draw any game left from the season's form) and the next one starts.
- * Each finished season keeps its final tables and every result
- * (SavedDivision.games and .playoff), to look back at.
+ * champion and a 9-point bottom club). The cups are played round by round the
+ * same way. Every score is kept in the save (DivisionSeason.scores,
+ * WorldCupSeason.scores); once every game of the four leagues and the two
+ * cups is decided, playSeason finishes the season (it would draw any game
+ * left from the season's form) and the next one starts. Each finished season
+ * keeps its final tables and every result (SavedDivision.games and .playoff,
+ * SavedCup.ties), to look back at.
  */
 
 /** The save's format: a save of another version is set aside, not read (see myWorldStorage.ts). */
@@ -184,7 +201,7 @@ export function unpackGames(packed: string, rows: readonly SavedRow[]): { matchd
   }));
 }
 
-/** A finished season, as saved: every division's final table, who left the pyramid and who joined it. */
+/** A finished season, as saved: every division's final table, who left the pyramid and who joined it, and the cups. */
 export interface SeasonRecord {
   year: number;
   divisions: SavedDivision[];
@@ -192,6 +209,8 @@ export interface SeasonRecord {
   out: TeamId[];
   /** Clubs that came up into it for the next season: the National League's (they spent this season there). */
   in: TeamId[];
+  /** The FA Cup and the EFL Cup: their finals and every tie (absent from seasons finished before the cups). */
+  cups?: SavedCup[];
 }
 
 /** A place in a finished season's top three: [club, its name that season, its points]. */
@@ -237,14 +256,25 @@ export interface World {
   newClubs: number;
   /** Every finished season's top three in each division, oldest first: the world's own Past Winners. */
   winners: WorldWinners[];
+  /** The season's cups, the FA Cup first (src/lib/worldCups.ts). */
+  cups: WorldCupSeason[];
+  /**
+   * The non-league sides that play the FA Cup (the real cup's, when the world
+   * started): with the National League's clubs they fill its first round
+   * every season, in a new order each time. They play no league.
+   */
+  cupPool: TeamId[];
 }
 
 /** The National League clubs' world ids: clear of the real clubs' (numbered from 1) and the fictional ones'. */
 export const NATIONAL_LEAGUE_ID_BASE = 90_000;
 
+/** The FA Cup's non-league sides' world ids (World.cupPool). */
+export const CUP_POOL_ID_BASE = 80_000;
+
 /** The National League's clubs a world starts with (src/config/nationalLeague.ts), as world clubs. */
 export const nationalLeagueClubs = (): WorldClub[] =>
-  NATIONAL_LEAGUE_CLUBS.map((c, i) => ({ id: NATIONAL_LEAGUE_ID_BASE + i + 1, name: c.name, shortName: c.shortName, tla: c.tla, crest: c.crest, origin: "real" }));
+  NATIONAL_LEAGUE_CLUBS.map((c, i) => ({ id: NATIONAL_LEAGUE_ID_BASE + i + 1, name: c.name, shortName: c.shortName, tla: c.tla, crest: c.crest, origin: "real", realId: c.espnId }));
 
 /** One league as the live data has it (src/lib/myWorldStart.ts builds these on the server). */
 export interface StartLeague {
@@ -258,18 +288,36 @@ export interface StartLeague {
   model: DivisionParams & { strengths: Record<number, [number, number]> };
 }
 
-/** Everything a new world starts from; `missing`: leagues whose live data didn't load (no world can start then). */
+/** One cup as the live data has it (src/lib/myWorldStart.ts): the world's first season takes it over where it stands. */
+export interface StartCup {
+  code: WorldCupCode;
+  /** The cup season's starting year (2026 for 2026/27). */
+  year: number;
+  /** Every club in the competition: the league clubs and the non-league sides. */
+  teams: Pick<Team, "id" | "name" | "shortName" | "tla" | "crest">[];
+  /** Each league club's division; the others are non-league sides. */
+  divisions: Record<number, DivisionCode>;
+  /** The real draw so far, with its results (the live data's ids). */
+  real: WorldCupTie[];
+  /** Clubs entering in later rounds (the live data's ids). */
+  entrants: Partial<Record<CupRoundKey, number[]>>;
+}
+
+/** Everything a new world starts from; `missing`: leagues and cups whose live data didn't load (no world can start then). */
 export interface StartPack {
   leagues: StartLeague[];
-  missing: DivisionCode[];
+  cups: StartCup[];
+  missing: (DivisionCode | WorldCupCode)[];
 }
 
 /**
  * A saved world brought up to date when it loads: a generated season not yet
  * being played (no scores) takes calendar 2, the realistic home-and-away
  * rhythm; one already being played keeps the calendar its scores belong to.
+ * `pack`: the live data (for the FA Cup's non-league sides, when a world from
+ * before the cups gets them).
  */
-export function upgradeWorld(world: World): World {
+export function upgradeWorld(world: World, pack?: StartPack): World {
   let upgraded = world;
   if (world.divisions.some((d) => !d.games && d.calendar !== 2 && !d.scores)) {
     upgraded = { ...upgraded, divisions: upgraded.divisions.map((d) => (!d.games && d.calendar !== 2 && !d.scores ? { ...d, calendar: 2 as const } : d)) };
@@ -295,17 +343,135 @@ export function upgradeWorld(world: World): World {
       winners: history.flatMap((s) => s.divisions.map((d) => ({ year: s.year, code: d.code, top: d.rows.slice(0, 3).map((r): WorldPodium => [r[0], clubs[r[0]]?.name ?? "", r[7]]) }))),
     };
   }
+  // A world from before the cups: the FA Cup's non-league sides from the live data (fictional ones without it), and this
+  // season's cups drawn among the world's clubs. A cup whose season no longer fits its rounds (a changed format) is redrawn.
+  const partial = upgraded as Partial<World>;
+  if (!Array.isArray(partial.cups) || !Array.isArray(partial.cupPool)) {
+    const { clubs, cupPool } = worldPool(upgraded.clubs, pack?.cups.find((c) => c.code === "FAC"));
+    upgraded = withCups({ ...upgraded, clubs, cupPool, cups: [] }, WORLD_CUPS);
+  } else {
+    const redraw = upgraded.cups.filter((c) => !cupPlayable(c)).map((c) => c.code);
+    if (redraw.length) upgraded = withCups(upgraded, redraw);
+  }
   return upgraded;
 }
 
-/** Can a world start from this pack: all four leagues, with full clubs lists, in the same season. */
+/** Can a world start from this pack: all four leagues, with full clubs lists, in the same season, and both cups. */
 export function packReady(pack: StartPack): boolean {
   if (pack.missing.length) return false;
   const years = new Set(pack.leagues.map((l) => l.year));
-  return ENGLAND.every((code) => {
-    const league = pack.leagues.find((l) => l.code === code);
-    return league !== undefined && league.teams.length === divisionConfig(code).teams;
-  }) && years.size === 1;
+  return (
+    ENGLAND.every((code) => {
+      const league = pack.leagues.find((l) => l.code === code);
+      return league !== undefined && league.teams.length === divisionConfig(code).teams;
+    }) &&
+    years.size === 1 &&
+    WORLD_CUPS.every((code) => pack.cups.some((c) => c.code === code))
+  );
+}
+
+/** A club's quality from its rating: more goals scored and fewer conceded. */
+const quality = (world: Pick<World, "ratings">, id: TeamId) => (world.ratings[id]?.[0] ?? 1) / (world.ratings[id]?.[1] ?? 1);
+
+/**
+ * Each division's clubs this season from the weakest up, for the cups' entry
+ * rounds (src/lib/worldCups.ts): the clubs up from below, then last season's
+ * table from the bottom, then the clubs down from above; by rating when there
+ * is no last season (a world's first season).
+ */
+export function divisionRanking(world: World): TeamId[][] {
+  const last = world.history.at(-1);
+  return world.divisions.map((d, i) => {
+    if (!last) return [...d.clubs].sort((a, b) => quality(world, a) - quality(world, b) || a - b);
+    const placeIn = (code: DivisionCode | undefined) => new Map(last.divisions.find((x) => x.code === code)?.rows.map((r, p) => [r[0], p]) ?? []);
+    const here = placeIn(d.code);
+    const above = i > 0 ? placeIn(ENGLAND[i - 1]) : new Map<TeamId, number>();
+    const below = i < world.divisions.length - 1 ? placeIn(ENGLAND[i + 1]) : new Map(last.in.map((id, p) => [id, p]));
+    // Up from below (the weakest), stayed, down from above (the strongest); within each, the lowest-placed first.
+    const group = (id: TeamId) => (here.has(id) ? 1 : above.has(id) ? 2 : 0);
+    const place = (id: TeamId) => here.get(id) ?? above.get(id) ?? below.get(id) ?? -1;
+    return [...d.clubs].sort((a, b) => group(a) - group(b) || place(b) - place(a) || a - b);
+  });
+}
+
+/**
+ * The FA Cup's non-league sides (World.cupPool) from the live FA Cup's: every
+ * club of it in no league, as world clubs (a National League club among them
+ * is the world's own). Without the live data, no pool: fillPool makes it up.
+ */
+function worldPool(clubs: Readonly<Record<number, WorldClub>>, start: StartCup | undefined): { clubs: Record<number, WorldClub>; cupPool: TeamId[] } {
+  const out = { ...clubs };
+  const cupPool: TeamId[] = [];
+  const known = new Map(Object.values(clubs).flatMap((c) => (c.realId !== undefined ? [[c.realId, c.id] as const] : [])));
+  NATIONAL_LEAGUE_CLUBS.forEach((c, i) => {
+    if (clubs[NATIONAL_LEAGUE_ID_BASE + i + 1] && !known.has(c.espnId)) known.set(c.espnId, NATIONAL_LEAGUE_ID_BASE + i + 1);
+  });
+  let next = CUP_POOL_ID_BASE + 1;
+  for (const team of start?.teams ?? []) {
+    if (start!.divisions[team.id] || known.has(team.id)) continue;
+    const id = next++;
+    out[id] = { id, name: team.name, shortName: team.shortName, tla: team.tla, ...(team.crest ? { crest: team.crest } : {}), origin: "real", realId: team.id };
+    known.set(team.id, id);
+    cupPool.push(id);
+  }
+  return { clubs: out, cupPool };
+}
+
+/** The pool made up to what the cups need (the National League's clubs count), with fictional new clubs. */
+function fillPool(world: World): World {
+  const needed = Math.max(...WORLD_CUPS.map((code) => outsidersNeeded(cupConfig(code), world.divisions.reduce((n, d) => n + d.clubs.length, 0))));
+  if (world.nationalLeague.length + world.cupPool.length >= needed) return world;
+  const clubs = { ...world.clubs };
+  const cupPool = [...world.cupPool];
+  let newClubs = world.newClubs;
+  while (world.nationalLeague.length + cupPool.length < needed) {
+    const id = NEW_CLUB_ID_BASE + newClubs + 1;
+    const { name, shortName } = newClubName({ ...world, clubs }, newClubs);
+    clubs[id] = { id, name, shortName, tla: shortName.replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase(), origin: "new", joined: world.year };
+    cupPool.push(id);
+    newClubs++;
+  }
+  return { ...world, clubs, cupPool, newClubs };
+}
+
+/**
+ * The world with the given cups drawn for its season in progress (the others
+ * kept): the FA Cup's non-league entrants are the National League's clubs and
+ * then the pool, in the season's own order.
+ */
+function withCups(world: World, codes: readonly WorldCupCode[]): World {
+  const filled = fillPool(world);
+  const ranking = divisionRanking(filled);
+  const outsiders = [...filled.nationalLeague, ...shuffled(filled.cupPool, seasonRng(filled, 300))];
+  const cups = WORLD_CUPS.map((code) => (codes.includes(code) ? generateCup(code, ranking, outsiders) : filled.cups.find((c) => c.code === code) ?? generateCup(code, ranking, outsiders)));
+  return { ...filled, cups };
+}
+
+/**
+ * The real cup where it stands, for the world's first season: its draw so far
+ * and its results, with every club as a world club (by its league and id in
+ * the live data: a league's clubs, or the FA Cup's non-league sides). Nothing
+ * when the data isn't this season's, a club is unknown, or the cup couldn't
+ * be played to its final from there (a draw the data only had part of).
+ */
+function inheritedCup(start: StartCup, year: number, idOf: (division: DivisionCode | undefined, realId: number) => TeamId | undefined): WorldCupSeason | undefined {
+  if (start.year !== year) return undefined;
+  const map = (id: number) => idOf(start.divisions[id], id);
+  const real: WorldCupTie[] = [];
+  for (const t of start.real) {
+    const homeId = map(t.homeId);
+    const awayId = map(t.awayId);
+    if (homeId === undefined || awayId === undefined) return undefined;
+    real.push({ ...t, homeId, awayId });
+  }
+  const entrants: Partial<Record<CupRoundKey, TeamId[]>> = {};
+  for (const [key, ids] of Object.entries(start.entrants)) {
+    const mapped = ids.map(map);
+    if (mapped.some((id) => id === undefined)) return undefined;
+    entrants[key as CupRoundKey] = mapped as TeamId[];
+  }
+  const season: WorldCupSeason = { code: start.code, entrants, real };
+  return cupPlayable(season, year) ? season : undefined;
 }
 
 /**
@@ -350,15 +516,18 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
   // The National League, below League Two: its clubs come up after the first season.
   const nationalLeague = nationalLeagueClubs();
   for (const club of nationalLeague) clubs[club.id] = club;
-  return {
+  const year = pack.leagues[0]!.year;
+  // The FA Cup's non-league sides, from the real cup.
+  const pool = worldPool(clubs, pack.cups.find((c) => c.code === "FAC"));
+  const world: World = {
     version: WORLD_VERSION,
     pyramid: "ENG",
     id: `${now.getTime().toString(36)}-${(seed >>> 0).toString(36)}`,
     createdAt: now.toISOString(),
     seed: seed >>> 0,
     userClub,
-    year: pack.leagues[0]!.year,
-    clubs,
+    year,
+    clubs: pool.clubs,
     ratings,
     params,
     divisions,
@@ -367,29 +536,27 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
     nationalLeague: nationalLeague.map((c) => c.id),
     newClubs: 0,
     winners: [],
+    cups: [],
+    cupPool: pool.cupPool,
   };
+  // The cups where the real ones stand (their draws and results so far); a cup that can't be taken over is drawn among the world's clubs.
+  const byReal = new Map<string, TeamId>();
+  for (const club of Object.values(world.clubs)) if (club.realId !== undefined) byReal.set(`${clubDivision(world, club.id) ?? ""}:${club.realId}`, club.id);
+  const idOf = (division: DivisionCode | undefined, realId: number) => byReal.get(`${division ?? ""}:${realId}`);
+  const inherited = WORLD_CUPS.flatMap((code) => {
+    const start = pack.cups.find((c) => c.code === code);
+    const season = start && inheritedCup(start, year, idOf);
+    return season ? [season] : [];
+  });
+  return withCups(
+    { ...world, cups: inherited },
+    WORLD_CUPS.filter((code) => !inherited.some((c) => c.code === code)),
+  );
 }
-
-/** A season's own random stream: the same world and season always play out the same way. */
-const seasonRng = (world: World, salt: number) => createRng((world.seed ^ Math.imul(world.year + 1, 0x9e3779b1) ^ Math.imul(salt + 1, 0x85ebca6b)) >>> 0);
 
 const DAY = 86_400_000;
 /** Placeholder kick-off dates (only their order matters): a game a week from early August. */
 const gameDate = (year: number, matchday: number) => new Date(Date.UTC(year, 7, 8, 14) + (matchday - 1) * 7 * DAY).toISOString();
-
-const teamOf = (world: World, id: TeamId): Team => {
-  const c = world.clubs[id]!;
-  return { id, name: c.name, shortName: c.shortName, tla: c.tla, ...(c.crest ? { crest: c.crest } : {}) };
-};
-
-function shuffled<T>(items: readonly T[], rng: Rng): T[] {
-  const out = [...items];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [out[i], out[j]] = [out[j]!, out[i]!];
-  }
-  return out;
-}
 
 /**
  * A division's games this season: the first season's real calendar (each game
@@ -458,27 +625,6 @@ export function seasonScores(d: DivisionSeason): ResultMap {
   return out;
 }
 
-/**
- * The season's form: each club's rating with the season outlook's rating noise
- * (less for the games the season started with already played), drawn once
- * from the season's own random stream, so it is the same however the season
- * is played. `rng`: that stream, past the noise (playSeason draws the rest of
- * the season's games from it).
- */
-function seasonForm(world: World, d: DivisionSeason, index: number): { model: LeagueModel; rng: Rng } {
-  const rng = seasonRng(world, index);
-  const played = new Map<TeamId, number>();
-  for (const g of d.games ?? []) if (g[4] !== null && g[5] !== null) for (const id of [g[2], g[3]]) played.set(id, (played.get(id) ?? 0) + 1);
-  const strengths = new Map<TeamId, TeamStrength>();
-  for (const id of d.clubs) {
-    const [attack, defence] = world.ratings[id] ?? [1, 1];
-    const sd = ratingNoiseSd(SEASON_RATING_NOISE.sd, SEASON_RATING_NOISE.k, played.get(id) ?? 0);
-    strengths.set(id, { attack: attack * Math.exp(sd * sampleNormal(rng)), defence: defence * Math.exp(sd * sampleNormal(rng)) });
-  }
-  const p = world.params[d.code];
-  return { model: { avgHomeGoals: p.avgHomeGoals, avgAwayGoals: p.avgAwayGoals, strengths, ...(p.rho ? { rho: p.rho } : {}) }, rng };
-}
-
 const lastMatchday = (fixtures: readonly Fixture[]) => fixtures.reduce((m, f) => Math.max(m, f.matchday), 0);
 
 const standingsOf = (league: LeagueConfig, d: DivisionSeason, teams: readonly Team[], fixtures: readonly Fixture[], results: ResultMap) =>
@@ -545,7 +691,7 @@ export interface DivisionState {
    * or a level tie's shoot-out. Null once done.
    */
   nextRound: number | null;
-  /** The season's form (seasonForm). */
+  /** The season's form (divisionForm). */
   model: LeagueModel;
 }
 
@@ -572,7 +718,7 @@ function stateOf(world: World, index: number, picks: ResultMap = seasonScores(wo
     const level = ties.filter((tie) => tie.shootout && !tie.shootout.result && !picks[tie.shootout.id] && needsShootout(tie, picks));
     nextRound = legs.length ? Math.min(...legs.map((leg) => leg.matchday)) : level.length ? Math.max(...level.map((tie) => tie.legs.at(-1)!.matchday)) : null;
   }
-  return { code: d.code, index, league, teams, fixtures, picks, results, rows, leagueComplete, bracket, playoffOptions: options, done, nextRound, model: seasonForm(world, d, index).model };
+  return { code: d.code, index, league, teams, fixtures, picks, results, rows, leagueComplete, bracket, playoffOptions: options, done, nextRound, model: divisionForm(world, d, index).model };
 }
 
 const indexOf = (world: World, code: DivisionCode) => {
@@ -667,7 +813,7 @@ export function setScore(world: World, code: DivisionCode, fixture: Fixture, sco
 export function rollScore(world: World, code: DivisionCode, fixture: Fixture, rng: Rng = createRng(randomSeed())): World {
   const index = indexOf(world, code);
   const d = world.divisions[index]!;
-  const { model } = seasonForm(world, d, index);
+  const { model } = divisionForm(world, d, index);
   const xg = () => (fixture.neutral ? expectedGoalsNeutral(model, fixture.homeId, fixture.awayId) : expectedGoals(model, fixture.homeId, fixture.awayId));
   const score = isShootoutId(fixture.id) ? simulatePenalties(rng) : sampleLikelyScore(xg(), rng, model.rho ?? 0, seasonScores(d)[fixture.id]);
   return putScore(world, index, fixture.id, score);
@@ -740,7 +886,7 @@ function playDivision(world: World, d: DivisionSeason, index: number): PlayedDiv
   const teams = d.clubs.map((id) => teamOf(world, id));
   const { fixtures } = divisionFixtures(world, d);
   const picks = seasonScores(d);
-  const { model, rng } = seasonForm(world, d, index);
+  const { model, rng } = divisionForm(world, d, index);
   const all = effectiveResults(fixtures, picks);
   for (const f of fixtures) if (!all[f.id]) all[f.id] = sampleDixonColes(expectedGoals(model, f.homeId, f.awayId), model.rho ?? 0, rng);
   const rows = standingsOf(league, d, teams, fixtures, all);
@@ -838,6 +984,8 @@ export function playSeason(world: World): World {
     for (const [id, s] of strengths) ratings[id] = [s.attack, s.defence];
   });
 
+  // The cups played to their finals (what's left of them drawn from the season's form), for the season's record.
+  const cups = finishCups(world);
   const record: SeasonRecord = {
     year: world.year,
     divisions: played.map((p) => ({
@@ -849,8 +997,9 @@ export function playSeason(world: World): World {
     })),
     out,
     in: arrivals,
+    cups,
   };
-  return {
+  const next: World = {
     ...world,
     year: world.year + 1,
     clubs,
@@ -858,14 +1007,23 @@ export function playSeason(world: World): World {
     divisions: nextClubs.map((ids, i) => ({ code: ENGLAND[i]!, clubs: ids, calendar: 2 as const })),
     // Every result of the last FIXTURE_SEASONS seasons; older ones keep their final tables.
     history: [...world.history, record].map((season, i, all) =>
-      i < all.length - FIXTURE_SEASONS ? { ...season, divisions: season.divisions.map(({ games: _g, playoff: _p, ...rest }) => rest) } : season,
+      i < all.length - FIXTURE_SEASONS
+        ? {
+            ...season,
+            divisions: season.divisions.map(({ games: _g, playoff: _p, ...rest }) => rest),
+            ...(season.cups ? { cups: season.cups.map(({ rounds: _r, clubs: _c, ties: _t, ...rest }) => rest) } : {}),
+          }
+        : season,
     ),
     review: true,
     nationalLeague,
     newClubs,
     // The season's top three in each division, for Past Winners.
     winners: [...(world.winners ?? []), ...record.divisions.map((d) => ({ year: record.year, code: d.code, top: d.rows.slice(0, 3).map((r): WorldPodium => [r[0], clubs[r[0]]!.name, r[7]]) }))],
+    cups: [],
   };
+  // Next season's cups, drawn among its clubs.
+  return withCups(next, WORLD_CUPS);
 }
 
 /** The next season starts, from the last season's review: its tables and fixtures show. */
@@ -993,6 +1151,8 @@ export interface PathStep {
   move: "up" | "down" | "stay";
   note: RowNote;
   outcome: PathOutcome;
+  /** The cups it won that season. */
+  cups: WorldCupCode[];
 }
 
 /** What a final place in a division means: its note, or the league's zone for that place (a European place), or nothing. */
@@ -1009,15 +1169,16 @@ export function placeOutcome(code: DivisionCode, position: number, note: RowNote
 /** A club's path through the world's finished seasons, oldest first: each season's division, place and outcome, its National League seasons too. */
 export function clubPath(world: World, id: TeamId): PathStep[] {
   return world.history.flatMap((season): PathStep[] => {
+    const cups = (season.cups ?? []).filter((c) => c.final[0] === id).map((c) => c.code);
     const steps = season.divisions.flatMap((d, i): PathStep[] => {
       const at = d.rows.findIndex((r) => r[0] === id);
       if (at < 0) return [];
       const note = d.rows[at]![8];
       const move = note === "R" ? "down" : i > 0 && (note === "C" || note === "P" || note === "W") ? "up" : "stay";
-      return [{ year: season.year, code: d.code, position: at + 1, move, note, outcome: placeOutcome(d.code, at + 1, note) }];
+      return [{ year: season.year, code: d.code, position: at + 1, move, note, outcome: placeOutcome(d.code, at + 1, note), cups }];
     });
     // Not in the Football League this season, and up from the National League at its end: a season there.
-    if (!steps.length && season.in.includes(id)) return [{ year: season.year, code: "NL", position: null, move: "up", note: "", outcome: "nationalLeague" }];
+    if (!steps.length && season.in.includes(id)) return [{ year: season.year, code: "NL", position: null, move: "up", note: "", outcome: "nationalLeague", cups }];
     return steps;
   });
 }

@@ -1,19 +1,52 @@
 import { outlookSetup } from "./clubOutlook.ts";
+import { getCupData } from "./cupData.ts";
 import { getLeagueData } from "./leagueData.ts";
-import { divisionConfig, ENGLAND, type DivisionCode, type StartLeague, type StartPack, type WorldGame, type WorldPlayoffGame } from "./myWorld.ts";
+import { divisionConfig, ENGLAND, isDivision, type DivisionCode, type StartCup, type StartLeague, type StartPack, type WorldGame, type WorldPlayoffGame } from "./myWorld.ts";
+import { cupConfig, WORLD_CUPS, type WorldCupCode, type WorldCupTie } from "./worldCups.ts";
 
 /**
  * What a new world starts from (on the server): the four English leagues' live
  * data (clubs, results so far, the games left, deductions, any play-off games
  * played) and the same ratings the site's season odds use (the outlook's
- * model). A league whose data doesn't load is listed in `missing`: no new
- * world then, but a saved one still plays (it needs nothing live).
+ * model), and the FA Cup's and the EFL Cup's (their clubs, the draw so far
+ * with its results, the clubs entering later). A league or cup whose data
+ * doesn't load is listed in `missing`: no new world then, but a saved one
+ * still plays (it needs nothing live).
  */
 export async function worldStartPack(): Promise<StartPack> {
   const leagues: StartLeague[] = [];
-  const missing: DivisionCode[] = [];
-  await Promise.all(
-    ENGLAND.map(async (code) => {
+  const cups: StartCup[] = [];
+  const missing: (DivisionCode | WorldCupCode)[] = [];
+  const loadCup = async (code: WorldCupCode) => {
+    try {
+      const data = await getCupData(cupConfig(code));
+      const year = Number.parseInt(data.season, 10);
+      if (!Number.isFinite(year)) throw new Error(`${code}: no season`);
+      cups.push({
+        code,
+        year,
+        teams: data.teams.map((t) => ({ id: t.id, name: t.name, shortName: t.shortName, tla: t.tla, ...(t.crest ? { crest: t.crest } : {}) })),
+        divisions: Object.fromEntries(Object.entries(data.divisions).flatMap(([id, league]) => (isDivision(league) ? [[Number(id), league]] : []))),
+        real: data.real.map((t): WorldCupTie => {
+          const last = t.legs.at(-1);
+          return {
+            round: t.round,
+            homeId: t.homeId,
+            awayId: t.awayId,
+            legs: t.legs.map((leg) => (leg.result ? [leg.result.home, leg.result.away] : null)),
+            ...(last?.penalties ? { penalties: [last.penalties.home, last.penalties.away] } : {}),
+          };
+        }),
+        entrants: data.entrants,
+      });
+    } catch (error) {
+      console.warn(`my world: no ${code} data:`, error instanceof Error ? error.message : error);
+      missing.push(code);
+    }
+  };
+  await Promise.all([
+    ...WORLD_CUPS.map(loadCup),
+    ...ENGLAND.map(async (code) => {
       const league = divisionConfig(code);
       try {
         const data = await getLeagueData(league);
@@ -57,8 +90,10 @@ export async function worldStartPack(): Promise<StartPack> {
         missing.push(code);
       }
     }),
-  );
+  ]);
+  const order: readonly string[] = [...ENGLAND, ...WORLD_CUPS];
   leagues.sort((a, b) => ENGLAND.indexOf(a.code) - ENGLAND.indexOf(b.code));
-  missing.sort((a, b) => ENGLAND.indexOf(a) - ENGLAND.indexOf(b));
-  return { leagues, missing };
+  cups.sort((a, b) => WORLD_CUPS.indexOf(a.code) - WORLD_CUPS.indexOf(b.code));
+  missing.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  return { leagues, cups, missing };
 }

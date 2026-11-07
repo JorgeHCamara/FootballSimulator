@@ -26,10 +26,12 @@ import {
   type WorldClub,
 } from "../lib/myWorld.ts";
 import { browserStore, clearWorld, loadWorld, saveWorld } from "../lib/myWorldStorage.ts";
+import { cupGamesLeft, cupStates, isWorldCup, outsidersNeeded, type WorldCupCode } from "../lib/worldCups.ts";
 import { Flag } from "./Flag.tsx";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { zoneHex } from "./zones.ts";
+import { WorldCup } from "./WorldCup.tsx";
 import { DivisionTabs, openingMatchday, Picker, WorldSeason } from "./WorldSeason.tsx";
 
 type View = { kind: "loading" } | { kind: "setup"; reset?: "incompatible" | "unreadable" } | { kind: "world"; world: World; saved: boolean };
@@ -52,11 +54,11 @@ export function MyWorld({ pack, locale }: { pack: StartPack; locale: SiteLocale 
   // The worlds before each change in the season in progress, for Undo.
   const [past, setPast] = useState<World[]>([]);
 
-  // The saved world, once in the browser (the server has none).
+  // The saved world, once in the browser (the server has none); the live data is for a world from before the cups (see upgradeWorld).
   useEffect(() => {
-    const found = loadWorld(browserStore());
+    const found = loadWorld(browserStore(), pack);
     setView(found.world ? { kind: "world", world: found.world, saved: true } : { kind: "setup", ...(found.reason === "incompatible" || found.reason === "unreadable" ? { reset: found.reason } : {}) });
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const keep = (world: World) => setView({ kind: "world", world, saved: saveWorld(browserStore(), world) });
   /** A change in the season in progress: Undo can take it back. */
@@ -145,7 +147,7 @@ function Setup({ pack, locale, reset, onCreate }: { pack: StartPack; locale: Sit
       {!ready ? (
         <p className={`${card} flex gap-2 text-sm`} role="alert" data-testid="world-missing">
           <Icon name="info" size={18} className="mt-0.5 shrink-0 text-red-600" />
-          {t("missing", { leagues: (pack.missing.length ? pack.missing : ENGLAND).map((c) => t(`leagues.${c}.name`)).join(", ") })}
+          {t("missing", { leagues: (pack.missing.length ? pack.missing : ENGLAND).map((c) => t(isWorldCup(c) ? `cups.${c}.name` : `leagues.${c}.name`)).join(", ") })}
         </p>
       ) : (
         <>
@@ -243,7 +245,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const t = useTranslations("World");
   const me = world.clubs[world.userClub]!;
   const myDivision = clubDivision(world, world.userClub);
-  const [viewed, setViewed] = useState<DivisionCode>(myDivision ?? "EL2");
+  const [viewed, setViewed] = useState<DivisionCode | WorldCupCode>(myDivision ?? "EL2");
   // The matchday each league's fixtures show (else its next round).
   const [matchdays, setMatchdays] = useState<Partial<Record<DivisionCode, number>>>({});
   // The season the tables and fixtures show: this one, or a finished one picked to look back at.
@@ -258,15 +260,20 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
     setYear(world.year);
   }, [world.year, world.userClub]); // eslint-disable-line react-hooks/exhaustive-deps
   const states = useMemo(() => seasonStates(world), [world]);
-  const state = states.find((s) => s.code === viewed)!;
+  const cups = useMemo(() => cupStates(world), [world]);
+  // The competition shown: a league's season, or a cup's.
+  const state = states.find((s) => s.code === viewed);
+  const cupShown = cups.find((c) => c.code === viewed);
   const mine = states.find((s) => s.code === myDivision);
   const myRow = mine?.rows.find((r) => r.teamId === world.userClub);
   const firstSeason = world.divisions.some((d) => d.games);
   const season = seasonLabel(world.year);
-  // Games left to play in each league (play-offs included); the next season once there are none.
-  const left = states.map((s) => ({ code: s.code, games: gamesLeft(s) }));
-  const done = states.every((s) => s.done);
+  // Games left to play in each league (play-offs included) and each cup; the next season once there are none.
+  const left: { code: DivisionCode | WorldCupCode; games: number }[] = [...states.map((s) => ({ code: s.code, games: gamesLeft(s) })), ...cups.map((c) => ({ code: c.code, games: cupGamesLeft(c) }))];
+  const done = states.every((s) => s.done) && cups.every((c) => c.done);
   const shownSeason = seasonLabel(year);
+  /** A competition's name: a league's or a cup's. */
+  const name = (code: DivisionCode | WorldCupCode) => t(isWorldCup(code) ? `cups.${code}.name` : `leagues.${code}.name`);
 
   /** Every game is played: the season ends (promotion and relegation) and its review shows; the next season starts from there. */
   const endSeason = () => {
@@ -277,16 +284,16 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
       setPlaying(false);
     }, 30);
   };
-  /** A league's games left, tapped: its table and fixtures, this season. */
-  const showLeague = (code: DivisionCode) => {
+  /** A league's or a cup's games left, tapped: its table and fixtures (its rounds), this season. */
+  const showLeague = (code: DivisionCode | WorldCupCode) => {
     setViewed(code);
     setYear(world.year);
     document.querySelector('[data-testid="world-tables"]')?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   // The fixtures stay on the matchday shown while its scores change (as on the league pages), even once it's complete.
-  const shown = matchdays[viewed] ?? openingMatchday(state);
+  const shown = state ? (matchdays[state.code] ?? openingMatchday(state)) : 1;
   const changeShown = (changed: World) => {
-    setMatchdays((m) => (m[viewed] === undefined ? { ...m, [viewed]: shown } : m));
+    if (state) setMatchdays((m) => (m[state.code] === undefined ? { ...m, [state.code]: shown } : m));
     onChange(changed);
   };
 
@@ -312,7 +319,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
         {!world.review && (
           <div className="space-y-2 lg:w-[30rem] lg:shrink-0" data-testid="world-left-card">
             <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">{t("left.title")}</p>
-            <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+            <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
               {left.map(({ code, games }) => (
                 <li key={code}>
                   <button
@@ -323,7 +330,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
                     data-league={code}
                     data-left={games}
                   >
-                    <span className="w-full truncate font-semibold">{t(`leagues.${code}.name`)}</span>
+                    <span className="w-full truncate font-semibold">{name(code)}</span>
                     <span className="flex items-center gap-1 tabular-nums">
                       {games === 0 && <Icon name="check" size={12} strokeWidth={3} />}
                       {t("left.count", { count: games })}
@@ -386,19 +393,41 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
               {t("seasonHeading", { season: shownSeason })}
             </h2>
           </div>
-          <DivisionTabs value={viewed} onChange={setViewed} label={t("tables")} testId="world-tabs" />
-          <p className="text-xs text-zinc-500">{year !== world.year ? t("pastNote", { season: shownSeason }) : firstSeason ? t("firstSeason") : t("newSeason")}</p>
-          <WorldSeason
-            world={world}
-            state={state}
-            year={year}
-            onYear={setYear}
-            matchday={shown}
-            onMatchday={(md) => setMatchdays((m) => ({ ...m, [viewed]: md }))}
-            onChange={changeShown}
-            canUndo={canUndo}
-            onUndo={onUndo}
-          />
+          <DivisionTabs value={viewed} onChange={setViewed} label={t("competitions")} testId="world-tabs" />
+          <p className="text-xs text-zinc-500">
+            {cupShown
+              ? year !== world.year
+                ? t("pastCup", { season: shownSeason, cup: name(cupShown.code) })
+                : cupShown.season.real
+                  ? t("cupFirst", { cup: t(`cups.${cupShown.code}.the`) })
+                  : t("cupNew", {
+                      cup: t(`cups.${cupShown.code}.the`),
+                      outsiders: (() => {
+                        const count = outsidersNeeded(cupShown.cup, world.divisions.reduce((n, d) => n + d.clubs.length, 0));
+                        return count ? t("cupOutsiders", { count }) : "";
+                      })(),
+                    })
+              : year !== world.year
+                ? t("pastNote", { season: shownSeason })
+                : firstSeason
+                  ? t("firstSeason")
+                  : t("newSeason")}
+          </p>
+          {cupShown ? (
+            <WorldCup key={`${cupShown.code}-${world.year}`} world={world} state={cupShown} year={year} onYear={setYear} onChange={onChange} canUndo={canUndo} onUndo={onUndo} />
+          ) : state ? (
+            <WorldSeason
+              world={world}
+              state={state}
+              year={year}
+              onYear={setYear}
+              matchday={shown}
+              onMatchday={(md) => setMatchdays((m) => ({ ...m, [state.code]: md }))}
+              onChange={changeShown}
+              canUndo={canUndo}
+              onUndo={onUndo}
+            />
+          ) : null}
         </section>
       )}
 
@@ -474,6 +503,13 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
           {headline}
         </p>
       )}
+      {(record.cups ?? [])
+        .filter((c) => c.final[0] === world.userClub)
+        .map((c) => (
+          <p key={c.code} className="rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900 dark:bg-amber-900/30 dark:text-amber-100" data-testid="world-review-cup-won" data-cup={c.code}>
+            {t(c.final[4] ? "review.cupWonPens" : "review.cupWon", { club: name(world.userClub), cup: t(`cups.${c.code}.the`), loser: name(c.final[1]), score: `${c.final[2]}–${c.final[3]}` })}
+          </p>
+        ))}
       <div>
         <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-zinc-500">{t("review.champions")}</h3>
         <ul className="grid gap-1 sm:grid-cols-2">
@@ -482,6 +518,15 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
               <Icon name="trophy" size={14} className="shrink-0 text-amber-500" />
               <span className="text-zinc-500">{t(`leagues.${d.code}.name`)}:</span>
               <span className={`truncate font-semibold ${d.rows[0]![0] === world.userClub ? "text-pitch-700 dark:text-pitch-100" : ""}`}>{name(d.rows[0]![0])}</span>
+            </li>
+          ))}
+          {/* The cups: their winners and finals. */}
+          {(record.cups ?? []).map((c) => (
+            <li key={c.code} className="flex min-w-0 items-center gap-2 text-sm" data-testid="world-review-cup" data-cup={c.code} data-winner={c.final[0]}>
+              <Icon name="trophy" size={14} className="shrink-0 text-amber-500" />
+              <span className="shrink-0 text-zinc-500">{t(`cups.${c.code}.name`)}:</span>
+              <span className={`truncate font-semibold ${c.final[0] === world.userClub ? "text-pitch-700 dark:text-pitch-100" : ""}`}>{name(c.final[0])}</span>
+              <span className="truncate text-zinc-500">{t(c.final[4] ? "review.cupFinalPens" : "review.cupFinal", { loser: name(c.final[1]), score: `${c.final[2]}–${c.final[3]}` })}</span>
             </li>
           ))}
         </ul>
@@ -605,7 +650,21 @@ function Path({ world, locale }: { world: World; locale: SiteLocale }) {
               <li key={s.year} className="flex items-center gap-3 px-3 py-2.5 text-sm" data-testid="world-path-step" data-league={s.code} data-move={s.move} data-outcome={s.outcome}>
                 <span className="w-16 shrink-0 font-semibold tabular-nums">{seasonLabel(s.year)}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate">{t(`leagues.${s.code}.name`)}</span>
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span className="truncate">{t(`leagues.${s.code}.name`)}</span>
+                    {s.cups.map((code) => (
+                      <span
+                        key={code}
+                        className="inline-flex shrink-0 items-center gap-0.5 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-900 dark:bg-amber-900/40 dark:text-amber-100"
+                        title={t("path.cupWon", { cup: t(`cups.${code}.name`) })}
+                        data-testid="world-path-cup"
+                        data-cup={code}
+                      >
+                        <Icon name="trophy" size={10} strokeWidth={2.5} />
+                        {t(`cups.${code}.name`)}
+                      </span>
+                    ))}
+                  </span>
                   {/* Phones: the place under the league. */}
                   <span className="block text-xs tabular-nums text-zinc-500 sm:hidden">{place}</span>
                 </span>

@@ -285,8 +285,8 @@ export function CupSimulator({ cup, data }: Props) {
   );
 }
 
-/** The cup winner with its road to the final, once the final is decided. */
-function CupChampion({ cup, rounds, winner, predictions, teams, season }: { cup: CupConfig; rounds: ReturnType<typeof buildCup>; winner: TeamId | null; predictions: ResultMap; teams: Map<TeamId, import("../engine/types.ts").Team>; season: string }) {
+/** The cup winner with its road to the final, once the final is decided (My World's cups use it too). */
+export function CupChampion({ cup, rounds, winner, predictions, teams, season }: { cup: CupConfig; rounds: ReturnType<typeof buildCup>; winner: TeamId | null; predictions: ResultMap; teams: Map<TeamId, import("../engine/types.ts").Team>; season: string }) {
   const t = useTranslations("Cup");
   const team = winner !== null ? teams.get(winner) : undefined;
   const road = team
