@@ -230,14 +230,16 @@ export function eras(rows: readonly WinnerRow[]): Era[] {
   const out: Era[] = [];
   const real = rows.filter((x) => !x.world).sort((a, b) => a.startYear - b.startYear || a.endYear - b.endYear);
   for (let i = 0; i < real.length; ) {
-    // A season with several tournaments under different names (Italy's 1921-22): the one going on under the
-    // current name closes that era, the other opens the next, so the two eras overlap that season.
     let j = i;
     while (j < real.length && real[j]!.season === real[i]!.season) j++;
-    const current = out.at(-1)?.name;
-    for (const r of real.slice(i, j).sort((a, b) => Number(b.competition === current) - Number(a.competition === current))) {
+    const parallel = j - i > 1;
+    for (const r of real.slice(i, j)) {
+      // A name goes on from the latest era; in a season of parallel championships under different names
+      // (Italy's 1921-22, Brazil's Taça Brasil and Robertão in 1967 and 1968), also from an era that ran up
+      // to the season before, so each keeps its own era and the two overlap.
       const last = out.at(-1);
-      if (last && last.name === r.competition) last.to = r.endYear;
+      const going = last?.name === r.competition ? last : parallel ? [...out].reverse().find((e) => e.name === r.competition && e.to !== null && e.to >= r.startYear - 1) : undefined;
+      if (going) going.to = r.endYear;
       else out.push({ name: r.competition, from: r.startYear, to: r.endYear });
     }
     i = j;
