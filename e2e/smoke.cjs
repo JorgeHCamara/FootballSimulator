@@ -1760,6 +1760,22 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Past Winners: the Segunda División's history (1929 on), with its North and South groups named in each language", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/es/segunda-division/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores de la Segunda División");
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 117);
+      const groups = rows.filter({ hasText: /^1949-50/ });
+      assert.equal(await groups.count(), 2);
+      assert.match(await groups.nth(0).innerText(), /Norte[\s\S]*Racing Santander/);
+      assert.match(await groups.nth(1).innerText(), /Sur[\s\S]*Alcoyano/);
+      await p.goto(`${BASE_URL}/en/segunda-division/past-winners`);
+      assert.match(await p.getByTestId("past-winners-row").filter({ hasText: /^1949-50/ }).first().innerText(), /North/);
+      await p.close();
+    });
+
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       assert.match(await page.title(), /^Simulador do Brasileirão .* \| FootSimu$/);

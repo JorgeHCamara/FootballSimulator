@@ -1270,7 +1270,11 @@
     "world": "My World",
     "comingSoon": "Histórico real em breve",
     "revoked": "Título revogado",
-    "tied": "Posição dividida"
+    "tied": "Posição dividida",
+    "tournaments": {
+      "North": "Norte",
+      "South": "Sul"
+    }
   },
   "World": {
     "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol, alemão, italiano ou brasileiro",
