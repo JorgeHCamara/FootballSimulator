@@ -220,8 +220,6 @@ export function PastWinners({ rows, comingSoon = false, testId = "past-winners" 
           ))}
         </div>
       )}
-
-      <p className="text-xs text-zinc-500">{t("source")}</p>
     </div>
   );
 }

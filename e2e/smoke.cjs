@@ -1628,7 +1628,6 @@ async function step(name, fn) {
       await p.getByTestId("past-winners-empty").waitFor();
       await search.fill("");
       assert.equal(await rows.count(), 138);
-      assert.match(await p.getByTestId("past-winners").innerText(), /Historical placings compiled from RSSSF and Wikipedia\./);
       assert.equal(await p.url(), `${BASE_URL}/en/premier-league/past-winners`, "filters don't touch the URL");
       // Back to the table: the prediction as it was.
       await p.getByTestId("view-table").click();
@@ -2582,8 +2581,11 @@ async function step(name, fn) {
       // fixtures put away; a league without a real history yet says so; kept by the save.
       await picker.selectOption(String(year + 2));
       const winners = p.getByTestId("world-past-winners");
+      const tableView = p.getByTestId("world-table-view");
+      assert.deepEqual([await tableView.getAttribute("aria-pressed"), await winners.getAttribute("aria-pressed")], ["true", "false"], "the table shown, its button pressed");
       await winners.click();
       await p.getByTestId("world-winners").waitFor();
+      assert.deepEqual([await tableView.getAttribute("aria-pressed"), await winners.getAttribute("aria-pressed")], ["false", "true"]);
       for (const id of ["world-table", "world-fixtures", "world-actions"]) assert.equal(await p.getByTestId(id).count(), 0, id);
       const worldRows = p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]');
       assert.equal(await worldRows.count(), 2 + 138, "two world seasons, then every real one");
@@ -2598,14 +2600,17 @@ async function step(name, fn) {
       await p.locator('[data-testid="world-tabs"] [data-league="EL2"]').click();
       await p.getByTestId("past-winners-coming-soon").waitFor();
       assert.equal(await worldRows.count(), 2, "League Two: the world's seasons only");
-      await winners.click();
+      // The Table button brings the table and fixtures back.
+      await tableView.click();
       await p.getByTestId("world-table").waitFor();
       assert.equal(await p.getByTestId("world-winners").count(), 0);
+      assert.equal(await p.getByTestId("world-fixtures").count(), 1);
+      assert.equal(await tableView.getAttribute("aria-pressed"), "true");
       await p.reload();
       await p.getByTestId("world-past-winners").click();
       await p.locator('[data-testid="world-tabs"] [data-league="PL"]').click();
       assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"][data-world="true"]').count(), 2, "kept by the save");
-      await p.getByTestId("world-past-winners").click();
+      await p.getByTestId("world-table-view").click();
       await p.getByTestId("world-table").waitFor();
       // The club's path: two seasons, the latest first (the first in League Two), each with what came of it.
       const path = p.getByTestId("world-path-step");
