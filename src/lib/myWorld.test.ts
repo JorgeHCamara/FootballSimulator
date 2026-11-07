@@ -10,6 +10,7 @@ import {
   clubPath,
   createWorld,
   divisionState,
+  gamesInSeason,
   gamesLeft,
   playoffConfigOf,
   pyramidPlayoffOf,
@@ -362,6 +363,10 @@ describe("My World: a season played your way", () => {
     const world = startNextSeason(playSeason(start()));
     // A new season: 380 Premier League games; 552 in each EFL league, plus 7 play-off games in the Championship (eliminators too) and 5 below.
     assert.deepEqual(seasonStates(world).map(gamesLeft), [380, 552 + 7, 552 + 5, 552 + 5]);
+    // Nothing played yet: every game of the season is left (the games-left bars start empty).
+    assert.deepEqual(seasonStates(world).map(gamesInSeason), seasonStates(world).map(gamesLeft));
+    // Played out: none left, the season's games the same.
+    assert.deepEqual([gamesLeft(divisionState(simulateRest(world, "ELC", createRng(2)), "ELC")), gamesInSeason(divisionState(simulateRest(world, "ELC", createRng(2)), "ELC"))], [0, 552 + 7]);
     assert.equal(gamesLeft(divisionState(simulateMatchday(world, "PL", 1, createRng(1)), "PL")), 370);
     const elc = simulateRest(world, "ELC", createRng(2));
     assert.equal(gamesLeft(divisionState(elc, "ELC")), 0);

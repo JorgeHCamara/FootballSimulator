@@ -1384,6 +1384,7 @@
     "standing": "{position} · {points, plural, one {# pt} other {# pts}}",
     "left": {
       "title": "Jogos que faltam",
+      "countShort": "{count, plural, =0 {Concluído} one {# restante} other {# restantes}}",
       "count": "{count, plural, =0 {Todos disputados} one {Falta # jogo} other {Faltam # jogos}}",
       "note": "Jogue os jogos de cada liga nos jogos abaixo (os dados, Simular rodada ou Simular resto da temporada, com os playoffs) e cada copa fase a fase. Depois, vá para a próxima temporada aqui."
     },

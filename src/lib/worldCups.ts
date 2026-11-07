@@ -283,6 +283,11 @@ export function cupGamesLeft(state: WorldCupState): number {
   return left;
 }
 
+/** A cup's games in its season: every round's ties, one game or two legs each (a level tie's shoot-out comes on top), for the share played. */
+export function cupGamesInSeason(state: WorldCupState): number {
+  return state.rounds.reduce((sum, round) => sum + round.config.ties * (round.config.legs === 2 ? 2 : 1), 0);
+}
+
 /** The slot a cup game id belongs to: its round and tie. */
 function slotOf(id: number): { round: number; index: number } {
   const offset = id - CUP_ID_BASE;

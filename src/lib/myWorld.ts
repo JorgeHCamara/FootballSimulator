@@ -1060,6 +1060,12 @@ export function gamesLeft(state: DivisionState): number {
   return league + legs - played + shootouts;
 }
 
+/** A league's games in its season: every league game and its play-off's legs (a level tie's shoot-out comes on top), for the share played. */
+export function gamesInSeason(state: DivisionState): number {
+  const legs = state.playoff ? playoffIds(state.playoff).filter((id) => !isShootoutId(id)).length : 0;
+  return state.fixtures.length + legs;
+}
+
 interface PlayedDivision {
   code: DivisionCode;
   league: LeagueConfig;
