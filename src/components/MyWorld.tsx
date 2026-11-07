@@ -414,7 +414,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
         </div>
         {/* Games left in each league; the season's end once every league is played (not while its review shows). */}
         {!world.review && (
-          <div className="space-y-3 lg:w-[26rem] lg:shrink-0" data-testid="world-left-card">
+          <div className={`space-y-3 lg:shrink-0 ${left.length > 1 ? "lg:w-[36rem] xl:w-[42rem]" : "lg:w-[26rem]"}`} data-testid="world-left-card">
             {/* The season's games left, all countries: one count and a bar of the share played. */}
             <div className="space-y-1.5">
               <div className="flex items-baseline justify-between gap-3">
@@ -425,57 +425,62 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
               </div>
               <ProgressBar share={playedShare(leftAll, totalAll)} />
             </div>
-            {/* One row per country, its competitions under it: the club's country open, the others a tap away. */}
-            <ul className="divide-y divide-zinc-200 overflow-hidden rounded-xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
-              {left.map(({ country: c, items, games, total }) => {
-                const open = left.length === 1 || openLeft.includes(c);
-                const listId = `world-left-${c}`;
-                return (
-                  <li key={c} data-testid="world-left-country" data-country={c} data-open={open}>
-                    {left.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => toggleLeft(c)}
-                        aria-expanded={open}
-                        aria-controls={listId}
-                        className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
-                        data-testid="world-left-toggle"
-                      >
-                        <Flag code={COUNTRY_FLAG[c]} width={20} />
-                        <span className="min-w-0 flex-1 truncate font-semibold">{t(`countries.${c}`)}</span>
-                        <span className="hidden w-20 sm:block">
-                          <ProgressBar share={playedShare(games, total)} />
-                        </span>
-                        <span className={`shrink-0 whitespace-nowrap text-right text-xs tabular-nums ${games === 0 ? "font-semibold text-pitch-700 dark:text-pitch-100" : "text-zinc-600 dark:text-zinc-300"}`}>
-                          {t("left.countShort", { count: games })}
-                        </span>
-                        <Icon name="chevron-down" size={16} className={`shrink-0 text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`} />
-                      </button>
-                    )}
-                    <ul id={listId} hidden={!open} className="grid grid-cols-1 gap-x-3 px-1.5 pb-1.5 pt-0.5 sm:grid-cols-2">
-                      {items.map(({ code, games: n }) => (
-                        <li key={code}>
+            {/* One row per country, its competitions under it: the club's country open, the others a tap away.
+                On bigger screens, two columns: the first half of the countries, then the rest. */}
+            <div className={`grid items-start gap-3 ${left.length > 1 ? "lg:grid-cols-2" : ""}`}>
+              {(left.length > 1 ? [left.slice(0, Math.ceil(left.length / 2)), left.slice(Math.ceil(left.length / 2))] : [left]).map((column, k) => (
+                <ul key={k} className="divide-y divide-zinc-200 overflow-hidden rounded-xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800" data-testid="world-left-column">
+                  {column.map(({ country: c, items, games, total }) => {
+                    const open = left.length === 1 || openLeft.includes(c);
+                    const listId = `world-left-${c}`;
+                    return (
+                      <li key={c} data-testid="world-left-country" data-country={c} data-open={open}>
+                        {left.length > 1 && (
                           <button
                             type="button"
-                            onClick={() => showLeague(code)}
-                            className="flex w-full min-w-0 items-center gap-2 rounded-md px-1.5 py-1 text-left text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                            data-testid="world-left"
-                            data-league={code}
-                            data-left={n}
+                            onClick={() => toggleLeft(c)}
+                            aria-expanded={open}
+                            aria-controls={listId}
+                            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+                            data-testid="world-left-toggle"
                           >
-                            <span className="min-w-0 flex-1 truncate text-zinc-700 dark:text-zinc-200">{name(code)}</span>
-                            <span className={`flex shrink-0 items-center gap-1 tabular-nums ${n === 0 ? "font-semibold text-pitch-700 dark:text-pitch-100" : "text-zinc-500"}`}>
-                              {n === 0 && <Icon name="check" size={12} strokeWidth={3} />}
-                              {t("left.countShort", { count: n })}
+                            <Flag code={COUNTRY_FLAG[c]} width={20} />
+                            <span className="min-w-0 flex-1 truncate font-semibold">{t(`countries.${c}`)}</span>
+                            <span className="hidden w-14 shrink-0 sm:block lg:hidden xl:block">
+                              <ProgressBar share={playedShare(games, total)} />
                             </span>
+                            <span className={`shrink-0 whitespace-nowrap text-right text-xs tabular-nums sm:min-w-[4.75rem] ${games === 0 ? "font-semibold text-pitch-700 dark:text-pitch-100" : "text-zinc-600 dark:text-zinc-300"}`}>
+                              {t("left.countShort", { count: games })}
+                            </span>
+                            <Icon name="chevron-down" size={16} className={`shrink-0 text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`} />
                           </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                );
-              })}
-            </ul>
+                        )}
+                        <ul id={listId} hidden={!open} className={`grid grid-cols-1 gap-x-3 px-1.5 pb-1.5 pt-0.5 sm:grid-cols-2 ${left.length > 1 ? "lg:grid-cols-1" : ""}`}>
+                          {items.map(({ code, games: n }) => (
+                            <li key={code}>
+                              <button
+                                type="button"
+                                onClick={() => showLeague(code)}
+                                className="flex w-full min-w-0 items-center gap-2 rounded-md px-1.5 py-1 text-left text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                data-testid="world-left"
+                                data-league={code}
+                                data-left={n}
+                              >
+                                <span className="min-w-0 flex-1 truncate text-zinc-700 dark:text-zinc-200">{name(code)}</span>
+                                <span className={`flex shrink-0 items-center gap-1 tabular-nums ${n === 0 ? "font-semibold text-pitch-700 dark:text-pitch-100" : "text-zinc-500"}`}>
+                                  {n === 0 && <Icon name="check" size={12} strokeWidth={3} />}
+                                  {t("left.countShort", { count: n })}
+                                </span>
+                              </button>
+                            </li>
+                        ))}
+                        </ul>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ))}
+            </div>
             {done ? (
               <div className="space-y-1">
                 <button type="button" className={`${primary} w-full`} onClick={endSeason} disabled={playing} data-testid="world-end-season">
