@@ -128,8 +128,8 @@
     "promotedBarrage": "{winner} ganó el playoff y ahora juega contra el {position}.º de la {league} a ida y vuelta por una plaza en la {league}.",
     "playoffs": "Playoff",
     "playoffPlace": "{position}.º clasificado",
-    "playoffRound": "{round, select, eliminators {Eliminatorias} semiFinals {Semifinales} final {Final} wildCard {Comodín (wild card)} roundOne {Primera ronda} conferenceSemiFinals {Semifinales de conferencia} conferenceFinal {Final de conferencia} mlsCup {MLS Cup} preliminary {Ronda preliminar} playOff1 {Playoff 1} playOff2 {Playoff 2} knockoutPlayoff {Playoff de eliminatorias} roundOf16 {Octavos de final} quarterFinals {Cuartos de final} other {Playoff}}",
-    "playoffWinnerOf": "{round, select, eliminators {Ganador de la eliminatoria} semiFinals {Ganador de la semifinal} wildCard {Ganador del comodín} roundOne {Ganador de la primera ronda} conferenceSemiFinals {Ganador de la semifinal} conferenceFinal {Campeón de la conferencia} preliminary {Ganador de la preliminar} playOff1 {Ganador del playoff 1} playOff2 {Ganador del playoff 2} knockoutPlayoff {Ganador del playoff} roundOf16 {Ganador de octavos} quarterFinals {Ganador de cuartos} other {Ganador}}",
+    "playoffRound": "{round, select, eliminators {Eliminatorias} semiFinals {Semifinales} final {Final} wildCard {Comodín (wild card)} roundOne {Primera ronda} conferenceSemiFinals {Semifinales de conferencia} conferenceFinal {Final de conferencia} mlsCup {MLS Cup} preliminary {Ronda preliminar} playOff1 {Playoff 1} playOff2 {Playoff 2} knockoutPlayoff {Playoff de eliminatorias} roundOf16 {Octavos de final} quarterFinals {Cuartos de final} playOut {Playout} other {Playoff}}",
+    "playoffWinnerOf": "{round, select, eliminators {Ganador de la eliminatoria} semiFinals {Ganador de la semifinal} wildCard {Ganador del comodín} roundOne {Ganador de la primera ronda} conferenceSemiFinals {Ganador de la semifinal} conferenceFinal {Campeón de la conferencia} preliminary {Ganador de la preliminar} playOff1 {Ganador del playoff 1} playOff2 {Ganador del playoff 2} knockoutPlayoff {Ganador del playoff} roundOf16 {Ganador de octavos} quarterFinals {Ganador de cuartos} playOut {Ganador del playout} other {Ganador}}",
     "playoffRuleTwoLegs": "{higher} juega la vuelta en casa. Si el global termina empatado: prórroga y penaltis.",
     "playoffRuleOneLeg": "Partido único en el estadio de {higher}. Si hay empate: prórroga y penaltis.",
     "playoffRuleOneLegBetterPlaced": "Partido único en el estadio de {higher}. Si hay empate tras la prórroga, pasa {higher}.",
@@ -199,7 +199,9 @@
     "shareTitle": "Mi pronóstico de {league} {season}",
     "shareText": "Mi pronóstico de {league} {season} en FootSimu. Simula el tuyo:",
     "shareFailed": "No se pudo abrir el menú para compartir. Elige una opción abajo.",
-    "matchPreview": "Previa"
+    "matchPreview": "Previa",
+    "playOut": "Playout",
+    "playOutRule": "{higher} juega la vuelta en casa y se salva si el global termina empatado."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -1267,8 +1269,8 @@
     "comingSoon": "Historial real próximamente"
   },
   "World": {
-    "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés, español o alemán",
-    "metaDescription": "Elige un club de Inglaterra, España o Alemania y juega temporada tras temporada de sus ligas y copas, con playoffs, ascensos y descensos. Guardado en tu navegador, con las tablas de todas las temporadas.",
+    "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés, español, alemán o italiano",
+    "metaDescription": "Elige un club de Inglaterra, España, Alemania o Italia y juega temporada tras temporada de sus ligas y copas, con playoffs, ascensos y descensos. Guardado en tu navegador, con las tablas de todas las temporadas.",
     "hero": {
       "badge": "Modo de juego",
       "start": "Empezar tu mundo",
@@ -1353,6 +1355,21 @@
         "name": "3. Liga",
         "the": "la 3. Liga",
         "in": "en la 3. Liga"
+      },
+      "SA": {
+        "name": "Serie A",
+        "the": "la Serie A",
+        "in": "en la Serie A"
+      },
+      "SB": {
+        "name": "Serie B",
+        "the": "la Serie B",
+        "in": "en la Serie B"
+      },
+      "SC": {
+        "name": "Serie C",
+        "the": "la Serie C",
+        "in": "en la Serie C"
       }
     },
     "cups": {
@@ -1375,12 +1392,18 @@
         "name": "DFB-Pokal",
         "the": "la DFB-Pokal",
         "in": "en la DFB-Pokal"
+      },
+      "CIT": {
+        "name": "Coppa Italia",
+        "the": "la Coppa Italia",
+        "in": "en la Coppa Italia"
       }
     },
     "countries": {
       "ENG": "Inglaterra",
       "ESP": "España",
-      "GER": "Alemania"
+      "GER": "Alemania",
+      "ITA": "Italia"
     },
     "setup": {
       "title": "Crea tu mundo",
@@ -1498,6 +1521,7 @@
     },
     "homeTitle": "Mi mundo",
     "homeBody": "Elige un club y juega temporada tras temporada, cada resultado a tu manera: ligas, copas, playoffs, ascensos y descensos.",
-    "homeCta": "Empezar tu mundo"
+    "homeCta": "Empezar tu mundo",
+    "playOutCancelled": "Sin playout esta temporada: {lower} terminó {gap} puntos o más por detrás de {upper} y baja directamente."
   }
 }

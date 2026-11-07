@@ -12,6 +12,8 @@ import { Icon } from "./Icon.tsx";
 
 /** Value of the "Playoff" entry in the matchday selector (after the last matchday). */
 export const PLAYOFF_MATCHDAY = -1;
+/** Value of the "Play-out" entry (a relegation play-out beside the play-off: My World's Serie B), after it. */
+export const PLAYOUT_MATCHDAY = -2;
 
 export interface PlayoffView {
   bracket: PlayoffTie[][];
@@ -36,6 +38,8 @@ export interface PlayoffView {
   zoneSlots?: { ids: string[]; names: string[] };
   /** What to call a table place that isn't this league's own (My World's Bundesliga v 2. Bundesliga play-off: "16th in the Bundesliga"), by position. */
   slotLabels?: Record<number, string>;
+  /** The bracket isn't played this season, for another reason than `cancelled` (a play-out the table made unnecessary): the note to show instead. */
+  cancelledNote?: string;
 }
 
 interface Props {
@@ -48,6 +52,8 @@ interface Props {
   onScore: (fixture: Fixture, score: Score | null) => void;
   onSimulate: (fixture: Fixture) => void;
   playoff?: PlayoffView;
+  /** A relegation play-out beside the play-off (My World's Serie B), under its own entry after the play-off's. */
+  playout?: PlayoffView;
   /** A line above the matchday's games (generated fixtures: where they come from). */
   note?: string;
   /** Names of rounds that aren't plain matchdays (a split's groups: "Championship play-offs 3"). */
@@ -61,7 +67,7 @@ interface Props {
 }
 
 export function FixtureList(props: Props) {
-  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, note, roundLabels, matchPage, kickOff = true, readOnly = false } = props;
+  const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, playout, note, roundLabels, matchPage, kickOff = true, readOnly = false } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
   const navButton =
@@ -88,7 +94,7 @@ export function FixtureList(props: Props) {
         >
           {matchdays.map((md) => (
             <option key={md} value={md} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
-              {md === PLAYOFF_MATCHDAY ? t(playoff?.knockout ? "knockoutPhase" : "playoffs") : (roundLabels?.[md] ?? t("matchday", { number: md }))}
+              {md === PLAYOFF_MATCHDAY ? t(playoff?.knockout ? "knockoutPhase" : "playoffs") : md === PLAYOUT_MATCHDAY ? t("playOut") : (roundLabels?.[md] ?? t("matchday", { number: md }))}
             </option>
           ))}
         </select>
@@ -109,6 +115,8 @@ export function FixtureList(props: Props) {
       )}
       {matchday === PLAYOFF_MATCHDAY && playoff ? (
         <PlayoffTies {...props} playoff={playoff} />
+      ) : matchday === PLAYOUT_MATCHDAY && playout ? (
+        <PlayoffTies {...props} playoff={playout} />
       ) : (
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {fixtures.map((f) => (
@@ -187,6 +195,8 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff
     // Before an earlier round decides it, the host is just "the higher seed".
     const higher = tie.higher.teamId === null && tie.higher.from ? t("playoffHigherSeed") : label(tie.higher);
     if (config.bestOf) return t("playoffRuleSeries", { higher });
+    // A relegation play-out: the better-placed club hosts the return leg and stays up if level.
+    if (config.key === "playOut") return t("playOutRule", { higher });
     if (config.levelTie === "betterPlaced") {
       return config.legs === 2 ? t("playoffRule", { higher }) : t("playoffRuleOneLegBetterPlaced", { higher });
     }
@@ -231,6 +241,11 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff
       {playoff.cancelled && (
         <p className="px-3 py-3 text-sm text-zinc-600 dark:text-zinc-300" data-testid="playoff-cancelled">
           {t("playoffCancelled", { ...playoff.cancelled })}
+        </p>
+      )}
+      {playoff.cancelledNote && (
+        <p className="px-3 py-3 text-sm text-zinc-600 dark:text-zinc-300" data-testid="playoff-cancelled">
+          {playoff.cancelledNote}
         </p>
       )}
       {playoff.knockout && (

@@ -3,13 +3,16 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useState, type ReactNode } from "react";
 import type { SiteLocale } from "../config/leagues.ts";
+import { playoffCancelled } from "../engine/playoffs.ts";
 import type { Fixture, Score, Team, TeamId } from "../engine/types.ts";
 import { ordinal } from "../lib/clubText.ts";
 import {
+  bracketOpen,
   COUNTRY_CUPS,
   COUNTRY_LEAGUES,
   pastDivision,
   playoffConfigOf,
+  playoutOf,
   pyramidPlayoffOf,
   resetDivision,
   rollScore,
@@ -27,7 +30,7 @@ import {
 import { isWorldCup, type WorldCupCode } from "../lib/worldCups.ts";
 import { worldWinners } from "../lib/worldWinners.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
-import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
+import { FixtureList, PLAYOFF_MATCHDAY, PLAYOUT_MATCHDAY } from "./FixtureList.tsx";
 import { Icon } from "./Icon.tsx";
 import { PastWinners } from "./PastWinners.tsx";
 import { useRealWinners } from "./PastWinnersProvider.tsx";
@@ -58,10 +61,14 @@ export function DivisionTabs({ country, value, onChange, label, testId }: { coun
   );
 }
 
-/** The matchday a division's fixtures open on: its next round, the play-off once the league is complete, else its last matchday. */
+/** The matchday a division's fixtures open on: its next round; once the league is complete, the play-off, or the play-out (Serie B) once the play-off has no game left; else its last matchday. */
 export function openingMatchday(state: DivisionState): number {
-  if (state.nextRound !== null) return state.leagueComplete ? PLAYOFF_MATCHDAY : state.nextRound;
-  return state.playoff ? PLAYOFF_MATCHDAY : (state.fixtures.at(-1)?.matchday ?? 1);
+  if (state.nextRound !== null) {
+    if (!state.leagueComplete) return state.nextRound;
+    const playoffLeft = state.playoff !== undefined && (!state.playoffKnown || bracketOpen(state.bracket, state.picks));
+    return state.playout !== undefined && !playoffLeft && bracketOpen(state.playoutBracket, state.picks) ? PLAYOUT_MATCHDAY : PLAYOFF_MATCHDAY;
+  }
+  return state.playoff ? PLAYOFF_MATCHDAY : state.playout ? PLAYOUT_MATCHDAY : (state.fixtures.at(-1)?.matchday ?? 1);
 }
 
 /** A picker in the style of the page's buttons: an icon, then a select (labelled for screen readers). */
@@ -126,7 +133,10 @@ function PastSeason({ world, year, code }: { world: World; year: number; code: D
   const teams = useMemo(() => new Map<TeamId, Team>((past?.teams ?? []).map((team) => [team.id, team])), [past]);
   if (!past) return null;
   const playoff = playoffConfigOf(code);
-  const matchdays = [...new Set((past.fixtures ?? []).map((f) => f.matchday))].sort((a, b) => a - b).concat(past.bracket.length ? [PLAYOFF_MATCHDAY] : []);
+  const matchdays = [...new Set((past.fixtures ?? []).map((f) => f.matchday))]
+    .sort((a, b) => a - b)
+    .concat(past.bracket.length ? [PLAYOFF_MATCHDAY] : [])
+    .concat(past.playout.length ? [PLAYOUT_MATCHDAY] : []);
   const final = past.final;
   return (
     <>
@@ -159,6 +169,7 @@ function PastSeason({ world, year, code }: { world: World; year: number; code: D
             {...(playoff && past.bracket.length
               ? { playoff: { bracket: past.bracket, seasonComplete: true, ...(playoff.promotedTo ? { promotedTo: playoff.promotedTo } : {}) } }
               : {})}
+            {...(past.playout.length ? { playout: { bracket: past.playout, seasonComplete: true } } : {})}
           />
         ) : (
           <p className="rounded-xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300" data-testid="world-past-no-fixtures">
@@ -213,6 +224,12 @@ export function WorldSeason({
   // A pyramid play-off's places before its clubs are known: "16th in the Bundesliga" v "3rd in the 2. Bundesliga".
   const tie = pyramidPlayoffOf(code);
   const slotLabels = tie?.lower === code ? { [tie.upperPlace]: `${ordinal(tie.upperPlace, locale)} ${t(`leagues.${tie.upper}.in`)}`, [tie.lowerPlace]: `${ordinal(tie.lowerPlace, locale)} ${t(`leagues.${code}.in`)}` } : undefined;
+  // No play-off when the table makes it unnecessary (Serie B's 3rd more than 14 points clear of 4th): that club goes up directly.
+  const playoffOff = Boolean(playoff && state.playoffKnown && playoffCancelled(playoff, state.playoffRows));
+  // The relegation play-out (Serie B's 16th v 17th), and the note when the table has made it unnecessary.
+  const playoutRule = playoutOf(code);
+  const clubAt = (place: number) => world.clubs[state.rows.find((r) => r.position === place)?.teamId ?? -1]?.name ?? "";
+  const playoutNote = state.playoutCancelled && playoutRule ? t("playOutCancelled", { lower: clubAt(playoutRule.places[1]), upper: clubAt(playoutRule.places[0]), gap: playoutRule.gap }) : undefined;
   // The league's clubs, and a pyramid play-off's club from the division above (the Bundesliga's 16th in the 2. Bundesliga's tie).
   const teams = useMemo(() => {
     const map = new Map<TeamId, Team>(state.teams.map((team) => [team.id, team]));
@@ -223,10 +240,15 @@ export function WorldSeason({
     return map;
   }, [state.teams, state.playoffRows, world.clubs]);
   const matchdays = useMemo(
-    () => [...new Set(state.fixtures.map((f) => f.matchday))].sort((a, b) => a - b).concat(playoff ? [PLAYOFF_MATCHDAY] : []),
-    [state.fixtures, playoff],
+    () =>
+      [...new Set(state.fixtures.map((f) => f.matchday))]
+        .sort((a, b) => a - b)
+        .concat(playoff ? [PLAYOFF_MATCHDAY] : [])
+        .concat(state.playout ? [PLAYOUT_MATCHDAY] : []),
+    [state.fixtures, playoff, state.playout],
   );
   const onPlayoff = matchday === PLAYOFF_MATCHDAY;
+  const onPlayout = matchday === PLAYOUT_MATCHDAY;
   const games = useMemo(() => state.fixtures.filter((f) => f.matchday === matchday), [state.fixtures, matchday]);
   const picked = Object.keys(picks).length > 0;
 
@@ -297,6 +319,8 @@ export function WorldSeason({
             directPromotion={playoff.directPromotion ?? []}
             promotedTo={playoff.promotedTo}
             nextSeason={seasonLabel(world.year + 1)}
+            cancelled={playoffOff}
+            {...(playoff.directIfClear ? { clearPosition: playoff.directIfClear.position } : {})}
           />
         )}
       </div>
@@ -304,8 +328,8 @@ export function WorldSeason({
         <button
           type="button"
           className="grow rounded-lg bg-pitch-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-pitch-700 disabled:opacity-40 lg:grow-0"
-          onClick={() => onChange(onPlayoff ? simulatePlayoffs(world, code) : simulateMatchday(world, code, matchday))}
-          disabled={(onPlayoff && !state.playoffKnown) || state.done}
+          onClick={() => onChange(onPlayoff || onPlayout ? simulatePlayoffs(world, code) : simulateMatchday(world, code, matchday))}
+          disabled={(onPlayoff && !state.playoffKnown) || (onPlayout && !state.leagueComplete) || state.done}
           data-testid="world-simulate-matchday"
         >
           {sim("simulateMatchday")}
@@ -338,8 +362,12 @@ export function WorldSeason({
                   seasonComplete: state.playoffKnown,
                   ...(playoff.promotedTo ? { promotedTo: playoff.promotedTo } : {}),
                   ...(slotLabels ? { slotLabels } : {}),
+                  ...(playoffOff && playoff.directIfClear ? { cancelled: playoff.directIfClear } : {}),
                 },
               }
+            : {})}
+          {...(state.playout
+            ? { playout: { bracket: state.playoutBracket, seasonComplete: state.leagueComplete, ...(playoutNote ? { cancelledNote: playoutNote } : {}) } }
             : {})}
         />
       </div>
