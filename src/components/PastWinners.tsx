@@ -154,14 +154,15 @@ export function PastWinners({ rows, comingSoon = false, testId = "past-winners" 
   const byEra = eraList.length > 1;
   const decadeList = useMemo(() => (byEra ? [] : decades(rows)), [byEra, rows]);
   const shown = useMemo(() => filterRows(rows, { era, decade, query }), [rows, era, decade, query]);
-  const eraLabel = (e: Era) => (e.to === null ? t("eraOpen", { name: e.name, from: String(e.from) }) : t("era", { name: e.name, from: String(e.from), to: String(e.to) }));
+  const eraLabel = (e: Era) =>
+    e.to === null ? t("eraOpen", { name: e.name, from: String(e.from) }) : e.to === e.from ? t("eraYear", { name: e.name, year: String(e.from) }) : t("era", { name: e.name, from: String(e.from), to: String(e.to) });
   const eraOf = (row: WinnerRow) => eraList.find((e) => row.competition === e.name && row.startYear >= e.from && (e.to === null || row.endYear <= e.to));
-  // The rows in their eras, newest first.
+  // The rows in their eras, newest first; a season's parallel championships stay together, each named by its tournament.
   const groups: { label: string; rows: WinnerRow[] }[] = [];
   for (const row of shown) {
     const label = eraOf(row)?.name ?? row.competition;
     const last = groups.at(-1);
-    if (last && last.label === label) last.rows.push(row);
+    if (last && (last.label === label || last.rows.at(-1)!.season === row.season)) last.rows.push(row);
     else groups.push({ label, rows: [row] });
   }
   const chip = (active: boolean) =>
