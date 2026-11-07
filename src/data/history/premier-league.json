@@ -1,0 +1,4376 @@
+{
+  "league": "Premier League",
+  "footsimuSlug": "premier-league",
+  "footsimuCode": "PL",
+  "country": "England",
+  "scope": "English top flight: Football League (1888-89 to 1891-92), Football League First Division (1892-93 to 1991-92), Premier League (1992-93 onward)",
+  "source": [
+    "https://en.wikipedia.org/wiki/List_of_English_football_champions (revision 1383702812)",
+    "https://www.rsssf.org/tablese/engchamp.html",
+    "https://www.rsssf.org/engpaul/FLA/ (season final tables 1888-89 to 2007-08, points and cross-check)",
+    "https://site.api.espn.com/apis/v2/sports/soccer/eng.1/standings?season=YYYY (2002-03 to 2025-26, points and cross-check)"
+  ],
+  "retrievedAt": "2026-11-07T01:22:31+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id, the id FootSimu uses for clubs (same ids as src/data/history.json)",
+    "footsimuSlug": "club page slug on footsimu.com (slugify of current name)",
+    "footsimuPath": "club page path under the league the club plays in now (2026-27), without locale",
+    "points": "final points after any deductions; 2 points per win until 1980-81, 3 from 1981-82",
+    "name": "club name used that season",
+    "currentName": "club as it is known today",
+    "tournament": "always null for the Premier League"
+  },
+  "seasons": [
+    {
+      "season": "1888-89",
+      "startYear": 1888,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League",
+      "champion": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 29
+      },
+      "third": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 28
+      },
+      "format": "league",
+      "notes": [
+        "Football League founded 1888; 12 clubs."
+      ]
+    },
+    {
+      "season": "1889-90",
+      "startYear": 1889,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League",
+      "champion": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 33
+      },
+      "runnerUp": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 31
+      },
+      "third": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 27
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1890-91",
+      "startYear": 1890,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 29
+      },
+      "runnerUp": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 27
+      },
+      "third": {
+        "name": "Notts County",
+        "currentName": "Notts County",
+        "footsimuId": 340,
+        "footsimuSlug": "notts-county",
+        "footsimuPath": "/league-one/team/notts-county",
+        "points": 26
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1891-92",
+      "startYear": 1891,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 37
+      },
+      "third": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 36
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1892-93",
+      "startYear": 1892,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 37
+      },
+      "third": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 36
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1893-94",
+      "startYear": 1893,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 38
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 36
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1894-95",
+      "startYear": 1894,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 42
+      },
+      "third": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 39
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1895-96",
+      "startYear": 1895,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 41
+      },
+      "third": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 39
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1896-97",
+      "startYear": 1896,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 36
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 36
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1897-98",
+      "startYear": 1897,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 37
+      },
+      "third": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 35
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1898-99",
+      "startYear": 1898,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 43
+      },
+      "third": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 39
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1899-00",
+      "startYear": 1899,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Sheffield United",
+        "currentName": "Sheffield United",
+        "footsimuId": 398,
+        "footsimuSlug": "sheffield-united",
+        "footsimuPath": "/championship/team/sheffield-united",
+        "points": 48
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 41
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1900-01",
+      "startYear": 1900,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 43
+      },
+      "third": {
+        "name": "Notts County",
+        "currentName": "Notts County",
+        "footsimuId": 340,
+        "footsimuSlug": "notts-county",
+        "footsimuPath": "/league-one/team/notts-county",
+        "points": 40
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1901-02",
+      "startYear": 1901,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 41
+      },
+      "third": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 37
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1902-03",
+      "startYear": 1902,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "The Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 41
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 41
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1903-04",
+      "startYear": 1903,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "The Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 44
+      },
+      "third": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 43
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1904-05",
+      "startYear": 1904,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 47
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 46
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1905-06",
+      "startYear": 1905,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 47
+      },
+      "third": {
+        "name": "The Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 44
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1906-07",
+      "startYear": 1906,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Bristol City",
+        "currentName": "Bristol City",
+        "footsimuId": 333,
+        "footsimuSlug": "bristol-city",
+        "footsimuPath": "/championship/team/bristol-city",
+        "points": 48
+      },
+      "third": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 45
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1907-08",
+      "startYear": 1907,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 43
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 43
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1908-09",
+      "startYear": 1908,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 46
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 44
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1909-10",
+      "startYear": 1909,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 48
+      },
+      "third": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 45
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1910-11",
+      "startYear": 1910,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 51
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 45
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1911-12",
+      "startYear": 1911,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 46
+      },
+      "third": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 44
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1912-13",
+      "startYear": 1912,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 50
+      },
+      "third": {
+        "name": "The Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 49
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1913-14",
+      "startYear": 1913,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 44
+      },
+      "third": {
+        "name": "Middlesbrough",
+        "currentName": "Middlesbrough",
+        "footsimuId": 369,
+        "footsimuSlug": "middlesbrough",
+        "footsimuPath": "/championship/team/middlesbrough",
+        "points": 43
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1914-15",
+      "startYear": 1914,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Oldham Athletic",
+        "currentName": "Oldham Athletic",
+        "footsimuId": 332,
+        "footsimuSlug": "oldham-athletic",
+        "footsimuPath": "/league-two/team/oldham-athletic",
+        "points": 45
+      },
+      "third": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 43
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1915-16",
+      "startYear": 1915,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the First World War"
+      ]
+    },
+    {
+      "season": "1916-17",
+      "startYear": 1916,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the First World War"
+      ]
+    },
+    {
+      "season": "1917-18",
+      "startYear": 1917,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the First World War"
+      ]
+    },
+    {
+      "season": "1918-19",
+      "startYear": 1918,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the First World War"
+      ]
+    },
+    {
+      "season": "1919-20",
+      "startYear": 1919,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 51
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 49
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1920-21",
+      "startYear": 1920,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 54
+      },
+      "third": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1921-22",
+      "startYear": 1921,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 51
+      },
+      "third": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 49
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1922-23",
+      "startYear": 1922,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 54
+      },
+      "third": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 53
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1923-24",
+      "startYear": 1923,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Cardiff City",
+        "currentName": "Cardiff City",
+        "footsimuId": 347,
+        "footsimuSlug": "cardiff-city",
+        "footsimuPath": "/championship/team/cardiff-city",
+        "points": 57
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 53
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1924-25",
+      "startYear": 1924,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 56
+      },
+      "third": {
+        "name": "Bolton Wanderers",
+        "currentName": "Bolton Wanderers",
+        "footsimuId": 358,
+        "footsimuSlug": "bolton-wanderers",
+        "footsimuPath": "/championship/team/bolton-wanderers",
+        "points": 55
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1925-26",
+      "startYear": 1925,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 52
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 48
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1926-27",
+      "startYear": 1926,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 51
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 49
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1927-28",
+      "startYear": 1927,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 51
+      },
+      "third": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 48
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1928-29",
+      "startYear": 1928,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "The Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 51
+      },
+      "third": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 50
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1929-30",
+      "startYear": 1929,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 50
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 47
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1930-31",
+      "startYear": 1930,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 59
+      },
+      "third": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1931-32",
+      "startYear": 1931,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 54
+      },
+      "third": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 50
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1932-33",
+      "startYear": 1932,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 54
+      },
+      "third": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 51
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1933-34",
+      "startYear": 1933,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 56
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 49
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1934-35",
+      "startYear": 1934,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 54
+      },
+      "third": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 49
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1935-36",
+      "startYear": 1935,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 48
+      },
+      "third": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 48
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1936-37",
+      "startYear": 1936,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Charlton Athletic",
+        "currentName": "Charlton Athletic",
+        "footsimuId": 372,
+        "footsimuSlug": "charlton-athletic",
+        "footsimuPath": "/championship/team/charlton-athletic",
+        "points": 54
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1937-38",
+      "startYear": 1937,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 51
+      },
+      "third": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 49
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1938-39",
+      "startYear": 1938,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 55
+      },
+      "third": {
+        "name": "Charlton Athletic",
+        "currentName": "Charlton Athletic",
+        "footsimuId": 372,
+        "footsimuSlug": "charlton-athletic",
+        "footsimuPath": "/championship/team/charlton-athletic",
+        "points": 50
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1939-40",
+      "startYear": 1939,
+      "tournament": null,
+      "status": "abandoned",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "Season abandoned after three matches on the outbreak of the Second World War; results expunged, no champion."
+      ]
+    },
+    {
+      "season": "1940-41",
+      "startYear": 1940,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the Second World War"
+      ]
+    },
+    {
+      "season": "1941-42",
+      "startYear": 1941,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the Second World War"
+      ]
+    },
+    {
+      "season": "1942-43",
+      "startYear": 1942,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the Second World War"
+      ]
+    },
+    {
+      "season": "1943-44",
+      "startYear": 1943,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the Second World War"
+      ]
+    },
+    {
+      "season": "1944-45",
+      "startYear": 1944,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the Second World War"
+      ]
+    },
+    {
+      "season": "1945-46",
+      "startYear": 1945,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Football League First Division",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "format": "league",
+      "notes": [
+        "League suspended due to the Second World War"
+      ]
+    },
+    {
+      "season": "1946-47",
+      "startYear": 1946,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 56
+      },
+      "third": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 56
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1947-48",
+      "startYear": 1947,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 52
+      },
+      "third": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1948-49",
+      "startYear": 1948,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Portsmouth",
+        "currentName": "Portsmouth",
+        "footsimuId": 385,
+        "footsimuSlug": "portsmouth",
+        "footsimuPath": "/championship/team/portsmouth",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 53
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 53
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1949-50",
+      "startYear": 1949,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Portsmouth",
+        "currentName": "Portsmouth",
+        "footsimuId": 385,
+        "footsimuSlug": "portsmouth",
+        "footsimuPath": "/championship/team/portsmouth",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 53
+      },
+      "third": {
+        "name": "Sunderland",
+        "currentName": "Sunderland",
+        "footsimuId": 366,
+        "footsimuSlug": "sunderland",
+        "footsimuPath": "/premier-league/team/sunderland",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1950-51",
+      "startYear": 1950,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 56
+      },
+      "third": {
+        "name": "Blackpool",
+        "currentName": "Blackpool",
+        "footsimuId": 346,
+        "footsimuSlug": "blackpool",
+        "footsimuPath": "/league-one/team/blackpool",
+        "points": 50
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1951-52",
+      "startYear": 1951,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 53
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 53
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1952-53",
+      "startYear": 1952,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 54
+      },
+      "third": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 51
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1953-54",
+      "startYear": 1953,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 53
+      },
+      "third": {
+        "name": "Huddersfield Town",
+        "currentName": "Huddersfield Town",
+        "footsimuId": 335,
+        "footsimuSlug": "huddersfield-town",
+        "footsimuPath": "/league-one/team/huddersfield-town",
+        "points": 51
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1954-55",
+      "startYear": 1954,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 48
+      },
+      "third": {
+        "name": "Portsmouth",
+        "currentName": "Portsmouth",
+        "footsimuId": 385,
+        "footsimuSlug": "portsmouth",
+        "footsimuPath": "/championship/team/portsmouth",
+        "points": 48
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1955-56",
+      "startYear": 1955,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Blackpool",
+        "currentName": "Blackpool",
+        "footsimuId": 346,
+        "footsimuSlug": "blackpool",
+        "footsimuPath": "/league-one/team/blackpool",
+        "points": 49
+      },
+      "third": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 49
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1956-57",
+      "startYear": 1956,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 64
+      },
+      "runnerUp": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 56
+      },
+      "third": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 56
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1957-58",
+      "startYear": 1957,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 64
+      },
+      "runnerUp": {
+        "name": "Preston North End",
+        "currentName": "Preston North End",
+        "footsimuId": 394,
+        "footsimuSlug": "preston-north-end",
+        "footsimuPath": "/championship/team/preston-north-end",
+        "points": 59
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 51
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1958-59",
+      "startYear": 1958,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 55
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 50
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1959-60",
+      "startYear": 1959,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 54
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 53
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1960-61",
+      "startYear": 1960,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 58
+      },
+      "third": {
+        "name": "Wolverhampton Wanderers",
+        "currentName": "Wolverhampton Wanderers",
+        "footsimuId": 380,
+        "footsimuSlug": "wolverhampton-wanderers",
+        "footsimuPath": "/championship/team/wolverhampton-wanderers",
+        "points": 57
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1961-62",
+      "startYear": 1961,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 53
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1962-63",
+      "startYear": 1962,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 55
+      },
+      "third": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 54
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1963-64",
+      "startYear": 1963,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 53
+      },
+      "third": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1964-65",
+      "startYear": 1964,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 61
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 56
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1965-66",
+      "startYear": 1965,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 55
+      },
+      "third": {
+        "name": "Burnley",
+        "currentName": "Burnley",
+        "footsimuId": 379,
+        "footsimuSlug": "burnley",
+        "footsimuPath": "/championship/team/burnley",
+        "points": 55
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1966-67",
+      "startYear": 1966,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 56
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 56
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1967-68",
+      "startYear": 1967,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 56
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 55
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1968-69",
+      "startYear": 1968,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 67
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 61
+      },
+      "third": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 57
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1969-70",
+      "startYear": 1969,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 57
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 55
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1970-71",
+      "startYear": 1970,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 64
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1971-72",
+      "startYear": 1971,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 57
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 57
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1972-73",
+      "startYear": 1972,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 57
+      },
+      "third": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 53
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1973-74",
+      "startYear": 1973,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 57
+      },
+      "third": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 48
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1974-75",
+      "startYear": 1974,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Derby County",
+        "currentName": "Derby County",
+        "footsimuId": 374,
+        "footsimuSlug": "derby-county",
+        "footsimuPath": "/championship/team/derby-county",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 51
+      },
+      "third": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 51
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1975-76",
+      "startYear": 1975,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Queens Park Rangers",
+        "currentName": "Queens Park Rangers",
+        "footsimuId": 334,
+        "footsimuSlug": "queens-park-rangers",
+        "footsimuPath": "/championship/team/queens-park-rangers",
+        "points": 59
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 56
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1976-77",
+      "startYear": 1976,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 56
+      },
+      "third": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 52
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1977-78",
+      "startYear": 1977,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 64
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 57
+      },
+      "third": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 55
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1978-79",
+      "startYear": 1978,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 60
+      },
+      "third": {
+        "name": "West Bromwich Albion",
+        "currentName": "West Bromwich Albion",
+        "footsimuId": 383,
+        "footsimuSlug": "west-bromwich-albion",
+        "footsimuPath": "/championship/team/west-bromwich-albion",
+        "points": 59
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1979-80",
+      "startYear": 1979,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 58
+      },
+      "third": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 53
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1980-81",
+      "startYear": 1980,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 60
+      },
+      "runnerUp": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 56
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 53
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1981-82",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Ipswich Town",
+        "currentName": "Ipswich Town",
+        "footsimuId": 373,
+        "footsimuSlug": "ipswich-town",
+        "footsimuPath": "/premier-league/team/ipswich-town",
+        "points": 83
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 78
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1982-83",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Watford",
+        "currentName": "Watford",
+        "footsimuId": 395,
+        "footsimuSlug": "watford",
+        "footsimuPath": "/championship/team/watford",
+        "points": 71
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 70
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1983-84",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "Southampton",
+        "currentName": "Southampton",
+        "footsimuId": 376,
+        "footsimuSlug": "southampton",
+        "footsimuPath": "/championship/team/southampton",
+        "points": 77
+      },
+      "third": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 74
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1984-85",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 77
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 77
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1985-86",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 86
+      },
+      "third": {
+        "name": "West Ham United",
+        "currentName": "West Ham United",
+        "footsimuId": 371,
+        "footsimuSlug": "west-ham-united",
+        "footsimuPath": "/championship/team/west-ham-united",
+        "points": 84
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1986-87",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Everton",
+        "currentName": "Everton",
+        "footsimuId": 368,
+        "footsimuSlug": "everton",
+        "footsimuPath": "/premier-league/team/everton",
+        "points": 86
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 77
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 71
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1987-88",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 81
+      },
+      "third": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 73
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1988-89",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 76
+      },
+      "third": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 64
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1989-90",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 70
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 63
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1990-91",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 83
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 76
+      },
+      "third": {
+        "name": "Crystal Palace",
+        "currentName": "Crystal Palace",
+        "footsimuId": 384,
+        "footsimuSlug": "crystal-palace",
+        "footsimuPath": "/premier-league/team/crystal-palace",
+        "points": 69
+      },
+      "format": "league",
+      "notes": [
+        "Arsenal had 2 points deducted (83 shown is after the deduction)."
+      ]
+    },
+    {
+      "season": "1991-92",
+      "startYear": 1991,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Football League First Division",
+      "champion": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 78
+      },
+      "third": {
+        "name": "Sheffield Wednesday",
+        "currentName": "Sheffield Wednesday",
+        "footsimuId": 399,
+        "footsimuSlug": "sheffield-wednesday",
+        "footsimuPath": "/league-one/team/sheffield-wednesday",
+        "points": 75
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1992-93",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Aston Villa",
+        "currentName": "Aston Villa",
+        "footsimuId": 362,
+        "footsimuSlug": "aston-villa",
+        "footsimuPath": "/premier-league/team/aston-villa",
+        "points": 74
+      },
+      "third": {
+        "name": "Norwich City",
+        "currentName": "Norwich City",
+        "footsimuId": 381,
+        "footsimuSlug": "norwich-city",
+        "footsimuPath": "/championship/team/norwich-city",
+        "points": 72
+      },
+      "format": "league",
+      "notes": [
+        "First Premier League season (top flight left the Football League)."
+      ]
+    },
+    {
+      "season": "1993-94",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 92
+      },
+      "runnerUp": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 84
+      },
+      "third": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 77
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1994-95",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Blackburn Rovers",
+        "currentName": "Blackburn Rovers",
+        "footsimuId": 365,
+        "footsimuSlug": "blackburn-rovers",
+        "footsimuPath": "/championship/team/blackburn-rovers",
+        "points": 89
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 88
+      },
+      "third": {
+        "name": "Nottingham Forest",
+        "currentName": "Nottingham Forest",
+        "footsimuId": 393,
+        "footsimuSlug": "nottingham-forest",
+        "footsimuPath": "/premier-league/team/nottingham-forest",
+        "points": 77
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1995-96",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 78
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 71
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1996-97",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 75
+      },
+      "runnerUp": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 68
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 68
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1997-98",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 78
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 77
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 65
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1998-99",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 78
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 75
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "1999-00",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 73
+      },
+      "third": {
+        "name": "Leeds United",
+        "currentName": "Leeds United",
+        "footsimuId": 357,
+        "footsimuSlug": "leeds-united",
+        "footsimuPath": "/premier-league/team/leeds-united",
+        "points": 69
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2000-01",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 70
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 69
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2001-02",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 80
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 77
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2002-03",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 83
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 78
+      },
+      "third": {
+        "name": "Newcastle United",
+        "currentName": "Newcastle United",
+        "footsimuId": 361,
+        "footsimuSlug": "newcastle-united",
+        "footsimuPath": "/premier-league/team/newcastle-united",
+        "points": 69
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2003-04",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 79
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 75
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2004-05",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 95
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 83
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 77
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2005-06",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 83
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 82
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2006-07",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 89
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 83
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 68
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2007-08",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 85
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 83
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2008-09",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 90
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 86
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 83
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2009-10",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 86
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 85
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 75
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2010-11",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 71
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 71
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2011-12",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 89
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 89
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 70
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2012-13",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 89
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 78
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 75
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2013-14",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 86
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 84
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 82
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2014-15",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 79
+      },
+      "third": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 75
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2015-16",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Leicester City",
+        "currentName": "Leicester City",
+        "footsimuId": 375,
+        "footsimuSlug": "leicester-city",
+        "footsimuPath": "/league-one/team/leicester-city",
+        "points": 81
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 71
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 70
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2016-17",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 93
+      },
+      "runnerUp": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 86
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 78
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2017-18",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 100
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 81
+      },
+      "third": {
+        "name": "Tottenham Hotspur",
+        "currentName": "Tottenham Hotspur",
+        "footsimuId": 367,
+        "footsimuSlug": "tottenham-hotspur",
+        "footsimuPath": "/premier-league/team/tottenham-hotspur",
+        "points": 77
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2018-19",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 98
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 97
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 72
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2019-20",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 99
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 81
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 66
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2020-21",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 86
+      },
+      "runnerUp": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 74
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 69
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2021-22",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 93
+      },
+      "runnerUp": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 92
+      },
+      "third": {
+        "name": "Chelsea",
+        "currentName": "Chelsea",
+        "footsimuId": 363,
+        "footsimuSlug": "chelsea",
+        "footsimuPath": "/premier-league/team/chelsea",
+        "points": 74
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2022-23",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 89
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 84
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 75
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2023-24",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 89
+      },
+      "third": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 82
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2024-25",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Liverpool",
+        "currentName": "Liverpool",
+        "footsimuId": 364,
+        "footsimuSlug": "liverpool",
+        "footsimuPath": "/premier-league/team/liverpool",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 74
+      },
+      "third": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 71
+      },
+      "format": "league",
+      "notes": []
+    },
+    {
+      "season": "2025-26",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Premier League",
+      "champion": {
+        "name": "Arsenal",
+        "currentName": "Arsenal",
+        "footsimuId": 359,
+        "footsimuSlug": "arsenal",
+        "footsimuPath": "/premier-league/team/arsenal",
+        "points": 85
+      },
+      "runnerUp": {
+        "name": "Manchester City",
+        "currentName": "Manchester City",
+        "footsimuId": 382,
+        "footsimuSlug": "manchester-city",
+        "footsimuPath": "/premier-league/team/manchester-city",
+        "points": 78
+      },
+      "third": {
+        "name": "Manchester United",
+        "currentName": "Manchester United",
+        "footsimuId": 360,
+        "footsimuSlug": "manchester-united",
+        "footsimuPath": "/premier-league/team/manchester-united",
+        "points": 71
+      },
+      "format": "league",
+      "notes": []
+    }
+  ]
+}

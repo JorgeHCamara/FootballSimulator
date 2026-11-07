@@ -37,6 +37,7 @@ import { seasonRatingNoise } from "../lib/seasonNoise.ts";
 import { decodeResults, encodeResults } from "../lib/shareCodec.ts";
 import { canGenerateSplit, shareCardSupported, shareFixtureList, splitRoundOf } from "../lib/splitSetup.ts";
 import { ShareMenu } from "./ShareMenu.tsx";
+import { Link } from "../i18n/navigation.ts";
 import { emptySeason, useSimStore } from "../store/simStore.ts";
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { FixtureList, PLAYOFF_MATCHDAY } from "./FixtureList.tsx";
@@ -82,6 +83,8 @@ interface Props {
   matchParams?: MatchParams;
   /** Order of clubs level on every criterion the site counts (Série C: by cards), for the table. */
   fallbackOrder?: number[];
+  /** The league's Past Winners page (leagues with a history file): a third tab beside Table and Chances. */
+  pastWinners?: { href: string; label: string };
 }
 
 type Tab = "table" | "chances";
@@ -115,6 +118,7 @@ export function LeagueSimulator({
   scenario,
   matchParams,
   fallbackOrder,
+  pastWinners,
 }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
@@ -122,6 +126,11 @@ export function LeagueSimulator({
   const [hydrated, setHydrated] = useState(readOnly);
   const [tab, setTab] = useState<Tab>("table");
   const [notice, setNotice] = useState<string | null>(null);
+
+  // Linked from the Past Winners page's "Chances" tab (#chances).
+  useEffect(() => {
+    if (window.location.hash === "#chances") setTab("chances");
+  }, []);
 
   const stored = useSimStore((s) => (hydrated && !readOnly ? s.seasons[seasonKey] : undefined) ?? emptySeason);
   const shared = useMemo(() => (scenario ? { predictions: scenario, overrides: [] } : null), [scenario]);
@@ -649,6 +658,12 @@ export function LeagueSimulator({
             <button type="button" role="tab" aria-selected={tab === "chances"} className={tabButton(tab === "chances")} onClick={() => setTab("chances")}>
               {t("chances")}
             </button>
+            {pastWinners && (
+              // Its own page (every season's champion, runner-up and third place); the simulator and its predictions stay as they are.
+              <Link href={pastWinners.href} role="tab" aria-selected={false} className={tabButton(false)} data-testid="past-winners-tab">
+                {pastWinners.label}
+              </Link>
+            )}
           </div>
           {(groupTabs.length > 1 || regularTab) && !overallChances && (
             <div

@@ -194,6 +194,17 @@ export interface SeasonRecord {
   in: TeamId[];
 }
 
+/** A place in a finished season's top three: [club, its name that season, its points]. */
+export type WorldPodium = [TeamId, string, number];
+
+/** A finished season's top three in one division, for Past Winners (src/lib/worldWinners.ts). */
+export interface WorldWinners {
+  year: number;
+  code: DivisionCode;
+  /** 1st, 2nd, 3rd. */
+  top: WorldPodium[];
+}
+
 export interface World {
   version: typeof WORLD_VERSION;
   /** Which pyramid (only England so far). */
@@ -224,6 +235,8 @@ export interface World {
   nationalLeague: TeamId[];
   /** How many fictional new clubs have come up so far (worlds from before the National League; else only when it's short of clubs). */
   newClubs: number;
+  /** Every finished season's top three in each division, oldest first: the world's own Past Winners. */
+  winners: WorldWinners[];
 }
 
 /** The National League clubs' world ids: clear of the real clubs' (numbered from 1) and the fictional ones'. */
@@ -273,6 +286,14 @@ export function upgradeWorld(world: World): World {
       nationalLeague = nationalLeagueClubs().map((c) => c.id);
     }
     upgraded = { ...upgraded, clubs, nationalLeague };
+  }
+  // A world from before Past Winners: its finished seasons' top three, from their saved tables.
+  if (!Array.isArray((upgraded as Partial<World>).winners)) {
+    const { clubs, history } = upgraded;
+    upgraded = {
+      ...upgraded,
+      winners: history.flatMap((s) => s.divisions.map((d) => ({ year: s.year, code: d.code, top: d.rows.slice(0, 3).map((r): WorldPodium => [r[0], clubs[r[0]]?.name ?? "", r[7]]) }))),
+    };
   }
   return upgraded;
 }
@@ -345,6 +366,7 @@ export function createWorld(pack: StartPack, user: { league: DivisionCode; club:
     review: false,
     nationalLeague: nationalLeague.map((c) => c.id),
     newClubs: 0,
+    winners: [],
   };
 }
 
@@ -841,6 +863,8 @@ export function playSeason(world: World): World {
     review: true,
     nationalLeague,
     newClubs,
+    // The season's top three in each division, for Past Winners.
+    winners: [...(world.winners ?? []), ...record.divisions.map((d) => ({ year: record.year, code: d.code, top: d.rows.slice(0, 3).map((r): WorldPodium => [r[0], clubs[r[0]]!.name, r[7]]) }))],
   };
 }
 
