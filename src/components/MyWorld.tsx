@@ -612,7 +612,10 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
             {t(c.final[4] ? "review.cupWonPens" : "review.cupWon", { club: name(world.userClub), cup: t(`cups.${c.code}.the`), loser: name(c.final[1]), score: `${c.final[2]}–${c.final[3]}` })}
           </p>
         ))}
-      <CountryPicker world={world} value={shown} onChange={setShown} testId="world-review-country" />
+      {/* The country whose season shows below: the visitor's club's to begin with. */}
+      <div className="flex">
+        <CountryPicker world={world} value={shown} onChange={setShown} testId="world-review-country" />
+      </div>
       <div>
         <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-zinc-500">{t("review.champions")}</h3>
         <ul className="grid gap-1 sm:grid-cols-2">
