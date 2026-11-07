@@ -4,7 +4,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import type { CupConfig } from "../config/cups.ts";
 import type { CompetitionCode } from "../config/leagues.ts";
 import { LEAGUES } from "../config/leagues.ts";
-import { bracketSides, needsShootout, tieAggregate, tieWinner, type CupRound, type CupTie } from "../engine/cup.ts";
+import { bracketSides, levelTieRule, needsShootout, tieAggregate, tieWinner, type CupRound, type CupTie } from "../engine/cup.ts";
 import { useEffect, useState } from "react";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { CupBracket } from "./CupBracket.tsx";
@@ -200,6 +200,11 @@ export function CupRounds(props: RoundsProps) {
       </div>
 
       {round.config.venue && <p className="text-xs text-zinc-500">{t("atVenue", { venue: round.config.venue })}</p>}
+      {levelTieRule(round.config) && (
+        <p className="text-xs text-zinc-500" data-testid="level-rule">
+          {t(levelTieRule(round.config) === "penalties" ? (round.config.legs === 2 ? "levelPenaltiesTwoLegs" : "levelPenalties") : "levelExtraTime")}
+        </p>
+      )}
       {round.drawn === "simulated" && round.ties.length > 0 && (
         <p className="rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-900 dark:bg-sky-900/30 dark:text-sky-100" data-testid="simulated-draw-note">
           {t("simulatedDrawNote")}

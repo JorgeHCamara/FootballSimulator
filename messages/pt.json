@@ -633,14 +633,18 @@
       "CDB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Série A ou Série B), ajustada pela divisão; clubes da Série C, da Série D e dos estaduais ficam abaixo da Série B.",
       "CDR": "A força de cada clube vem do seu próprio campeonato nesta temporada (La Liga ou Segunda División), ajustada pela divisão; clubes da Primera Federación para baixo ficam abaixo da Segunda.",
       "CIT": "A força de cada clube vem do seu próprio campeonato nesta temporada (Serie A ou Serie B), ajustada pela divisão; clubes da Serie C ficam abaixo da Serie B. Não há sorteio: a Coppa Italia segue uma chave fixa.",
-      "DFB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Bundesliga ou 2. Bundesliga), ajustada pela divisão; clubes da 3. Liga e amadores ficam abaixo da 2. Bundesliga. Um clube amador sorteado contra um profissional joga em casa."
+      "DFB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Bundesliga ou 2. Bundesliga), ajustada pela divisão; clubes da 3. Liga e amadores ficam abaixo da 2. Bundesliga. Um clube amador sorteado contra um profissional joga em casa.",
+      "EFC": "A força de cada clube vem do seu próprio campeonato nesta temporada (Premier League, Championship, League One ou League Two), ajustada pela divisão. Não há prorrogação antes da final: um jogo empatado aos 90 minutos vai direto para os pênaltis, e as semifinais em dois jogos são decididas no placar agregado e, se empatadas, nos pênaltis."
     },
     "finalAfter": "Os vencedores das {round} se enfrentam aqui.",
     "bracketAfter": "Chave fixa, sem sorteio: os vencedores se enfrentam assim.",
     "versus": "x",
     "bracketWinnerOf": "Vencedor da {round} {n}",
     "chancesNoteBracket": "Não há sorteio: cada simulação segue a chave fixa.",
-    "bracketStatus": "Chave fixa"
+    "bracketStatus": "Chave fixa",
+    "levelPenalties": "Sem prorrogação: um jogo empatado aos 90 minutos vai direto para os pênaltis.",
+    "levelPenaltiesTwoLegs": "Dois jogos, decididos no placar agregado; empate após o segundo jogo: direto para os pênaltis, sem prorrogação.",
+    "levelExtraTime": "Empate aos 90 minutos: prorrogação e depois pênaltis."
   },
   "Continents": {
     "Europe": "Europa",
