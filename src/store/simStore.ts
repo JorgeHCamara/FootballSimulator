@@ -96,7 +96,8 @@ export const useSimStore = create<SimStore>()(
           } else {
             delete predictions[fixture.id];
           }
-          commit(key, { predictions, overrides });
+          // The rest of the season stays: a cup's draw ("New draw") and its slots' pairings.
+          commit(key, { ...current, predictions, overrides });
         },
 
         applyResults: (key, results) => {

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { syncedPairings } from "./simStore.ts";
+import type { Fixture } from "../engine/types.ts";
+import { syncedPairings, useSimStore } from "./simStore.ts";
 
 describe("cup predictions belong to their pairing", () => {
   const sf = 3000006002;
@@ -31,5 +32,30 @@ describe("cup predictions belong to their pairing", () => {
     assert.equal(after.removed, 0);
     assert.deepEqual(after.predictions[sf], { home: 3, away: 1 });
     assert.equal(after.changed, false);
+  });
+});
+
+describe("typing a cup score keeps the cup's draw and pairings", () => {
+  const leg: Fixture = { id: 3000005001, matchday: 0, utcDate: "", homeId: 50, awayId: 56, result: null };
+  const sf = 3000006002;
+
+  it("keeps the New draw: the bracket doesn't jump back to the first draw", () => {
+    const store = useSimStore.getState();
+    store.reset("CUP:a");
+    store.redraw("CUP:a");
+    store.setScore("CUP:a", leg, { home: 0, away: 2 });
+    assert.equal(useSimStore.getState().seasons["CUP:a"]!.drawSalt, 1);
+  });
+
+  it("keeps each slot's pairing, so a semi-final with another club loses its old scores", () => {
+    const store = useSimStore.getState();
+    store.reset("CUP:b");
+    store.applyResults("CUP:b", { [sf]: { home: 3, away: 1 }, [leg.id]: { home: 2, away: 1 } });
+    store.syncPairings("CUP:b", { [sf]: "87-50", [leg.id]: "50-56" });
+    // The quarter-final the other way: 56 goes through, and the semi-final is 87 v 56.
+    store.setScore("CUP:b", leg, { home: 0, away: 2 });
+    assert.equal(useSimStore.getState().seasons["CUP:b"]!.pairings?.[sf], "87-50");
+    assert.equal(store.syncPairings("CUP:b", { [sf]: "87-56", [leg.id]: "50-56" }), 1);
+    assert.equal(useSimStore.getState().seasons["CUP:b"]!.predictions[sf], undefined);
   });
 });
