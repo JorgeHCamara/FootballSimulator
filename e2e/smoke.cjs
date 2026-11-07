@@ -1724,6 +1724,28 @@ async function step(name, fn) {
       await phone.close();
     });
 
+    await step("Past Winners: the Brasileirão's history (1937 on), with the Taça Brasil and the Robertão both in 1967 and 1968, in PT and ES", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/pt/brasileirao/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores do Brasileirão Série A");
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 70);
+      const chips = await p.getByTestId("past-winners-chip").allInnerTexts();
+      for (const chip of ["Taça Brasil (1959–1968)", "Torneio Roberto Gomes Pedrosa (1967–1970)", "Torneio dos Campeões (1937)", "Campeonato Brasileiro Série A (2001–)"]) assert.ok(chips.includes(chip), chip);
+      assert.deepEqual(await p.getByTestId("past-winners-title").evaluateAll((els) => els.map((e) => e.dataset.titles)), ["12", "8", "8", "7", "6"]);
+      // 1967: both championships, one after the other, under one heading.
+      const both = rows.filter({ hasText: /^1967/ });
+      assert.equal(await both.count(), 2);
+      assert.match(await both.nth(0).innerText(), /Torneio Roberto Gomes Pedrosa/);
+      assert.match(await both.nth(1).innerText(), /Taça Brasil/);
+      const eras = await p.getByTestId("past-winners-era").allInnerTexts();
+      assert.equal(eras.filter((e) => e.startsWith("Torneio Roberto Gomes Pedrosa")).length, 1, "the Robertão's heading once");
+      await p.goto(`${BASE_URL}/es/brasileirao/past-winners`);
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores del Brasileirão Série A");
+      await p.close();
+    });
+
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       assert.match(await page.title(), /^Simulador do Brasileirão .* \| FootSimu$/);
