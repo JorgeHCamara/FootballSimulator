@@ -367,6 +367,20 @@ describe("the Brasileirão Série B's past winners", () => {
   });
 });
 
+describe("the Brasileirão Série C's past winners", () => {
+  const rows = leagueWinners("brasileirao-serie-c")!;
+
+  it("runs from 1981 to 2025, with the years no Série C was played", () => {
+    assert.equal(rows.length, 45);
+    assert.equal(rows[0]!.season, "2025");
+    assert.equal(rows[0]!.champion!.name, "Ponte Preta");
+    assert.equal(rows.at(-1)!.season, "1981");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 10);
+    assert.deepEqual(eras(rows), [{ name: "Campeonato Brasileiro Série C", from: 1981, to: null }]);
+    assert.deepEqual(mostTitles(rows, 1).map((c) => [c.name, c.titles]), [["Vila Nova", 3]]);
+  });
+});
+
 describe("parseLeagueHistory", () => {
   const placing = (id: number, name: string) => ({ name, currentName: name, footsimuId: id, footsimuSlug: name.toLowerCase(), footsimuPath: `/x/team/${name.toLowerCase()}`, points: 40 });
   const season = (over: Partial<HistorySeason> = {}): HistorySeason => ({
