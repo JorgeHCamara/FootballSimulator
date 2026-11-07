@@ -174,7 +174,7 @@ describe("Série C 2026 (first-party data)", () => {
   });
 
   it("lets a changed first-phase result change the groups, and the final follows", () => {
-    // Ypiranga (9th, 29 points) beats Santa Cruz (8th) instead of losing: Ypiranga goes into group B, Santa Cruz is out.
+    // Ypiranga (9th, 29 points) beats Santa Cruz (8th) instead of losing: Ypiranga goes into group A, Santa Cruz is out.
     const game = data.fixtures.find((f) => f.matchday <= 19 && [f.homeId, f.awayId].includes(id("Ypiranga")) && [f.homeId, f.awayId].includes(id("Santa Cruz")))!;
     const ypirangaHome = game.homeId === id("Ypiranga");
     const predictions: ResultMap = { [game.id]: ypirangaHome ? { home: 3, away: 0 } : { home: 0, away: 3 } };
