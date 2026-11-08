@@ -46,7 +46,7 @@ const pageSeason = (data: { season: string; tournaments?: unknown[] }) => (data.
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
 /** Which set of texts a page uses: league, play-off league, continental competition, or cup. */
-type Wording = "league" | "stages" | "leagueAmericas" | "leagueAsia" | "zones" | "tournaments" | "liguilla" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
+type Wording = "league" | "stages" | "reducido" | "leagueAmericas" | "leagueAsia" | "zones" | "tournaments" | "liguilla" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
 
 type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
@@ -65,6 +65,8 @@ async function load(slug: string): Promise<Loaded | undefined> {
       : "continental"
     : league.split && league.playoff?.seedFromGroups
       ? "stages" // Série C: a first stage, promotion groups and a final
+      : league.playoff?.titleRound !== undefined
+      ? "reducido" // Primera Nacional: zone tables, the zone winners' final and the Reducido
       : league.playoff?.seedFromGroups
       ? "zones" // Argentina: zone tables and a title play-off
       : league.annual
@@ -92,6 +94,7 @@ const META_KEYS: Record<
       | "leagueDescriptionAsia"
       | "zonesDescription"
       | "stagesDescription"
+      | "reducidoDescription"
       | "tournamentsDescription"
       | "liguillaDescription"
       | "continentalDescription"
@@ -105,6 +108,7 @@ const META_KEYS: Record<
   leagueAsia: { title: "leagueTitle", description: "leagueDescriptionAsia" },
   zones: { title: "leagueTitle", description: "zonesDescription" },
   stages: { title: "leagueTitle", description: "stagesDescription" },
+  reducido: { title: "leagueTitle", description: "reducidoDescription" },
   tournaments: { title: "leagueTitle", description: "tournamentsDescription" },
   liguilla: { title: "leagueTitle", description: "liguillaDescription" },
   continental: { title: "continentalTitle", description: "continentalDescription" },
@@ -165,6 +169,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
     wording === "continental" ||
     wording === "continentalGroups" ||
     wording === "zones" ||
+    wording === "reducido" ||
     wording === "tournaments" ||
     wording === "liguilla"
       ? wording
@@ -193,6 +198,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
               ? "introZones"
               : wording === "stages"
                 ? "introStages"
+              : wording === "reducido"
+                ? "introReducido"
               : wording === "tournaments"
                 ? "introTournaments"
                 : wording === "liguilla"
@@ -231,6 +238,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
                 ? "step3Zones"
                 : step === "step3" && wording === "stages"
                   ? "step3Stages"
+                : step === "step3" && wording === "reducido"
+                  ? "step3Reducido"
                 : step === "step3" && wording === "tournaments"
                   ? "step3Tournaments"
                   : step === "step3" && wording === "liguilla"

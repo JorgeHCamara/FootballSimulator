@@ -19,7 +19,8 @@
     "stagesDescription": "{simulator} grátis da temporada {season} ({aka}). Jogue de novo a primeira fase, os grupos do acesso e a final, mude qualquer resultado e veja quem sobe, quem é campeão e quem cai.",
     "tournamentsDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule cada torneio do ano, jogue os playoffs quando houver e veja a tabela anual com as vagas na Libertadores e na Sul-Americana.",
     "liguillaDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela ao vivo e jogue a Liguilla até a final, com as chances de cada clube de chegar à Liguilla e de ser campeão.",
-    "leagueDescriptionAsia": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela ao vivo e as chances de título, Liga dos Campeões da AFC e rebaixamento."
+    "leagueDescriptionAsia": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela ao vivo e as chances de título, Liga dos Campeões da AFC e rebaixamento.",
+    "reducidoDescription": "{simulator} grátis da temporada {season} ({aka}). Digite seus placares ou simule os jogos restantes, veja as duas zonas atualizarem ao vivo e jogue a final e o Reducido, com as chances de título, acesso e rebaixamento de cada clube."
   },
   "Nav": {
     "home": "Início",
@@ -128,8 +129,8 @@
     "promotedBarrage": "{winner} venceu o playoff e agora enfrenta o {position}º da {league} em ida e volta por uma vaga na {league}.",
     "playoffs": "Playoff",
     "playoffPlace": "{position}º colocado",
-    "playoffRound": "{round, select, eliminators {Eliminatórias} semiFinals {Semifinais} final {Final} wildCard {Repescagem (wild card)} roundOne {Primeira fase} conferenceSemiFinals {Semifinais de conferência} conferenceFinal {Final de conferência} mlsCup {MLS Cup} preliminary {Fase preliminar} playOff1 {Playoff 1} playOff2 {Playoff 2} knockoutPlayoff {Playoff da fase eliminatória} roundOf16 {Oitavas de final} quarterFinals {Quartas de final} playOut {Playout} other {Playoff}}",
-    "playoffWinnerOf": "{round, select, eliminators {Vencedor da eliminatória} semiFinals {Vencedor da semifinal} wildCard {Vencedor da repescagem} roundOne {Vencedor da primeira fase} conferenceSemiFinals {Vencedor da semifinal} conferenceFinal {Campeão da conferência} preliminary {Vencedor da preliminar} playOff1 {Vencedor do playoff 1} playOff2 {Vencedor do playoff 2} knockoutPlayoff {Vencedor do playoff} roundOf16 {Vencedor das oitavas} quarterFinals {Vencedor das quartas} playOut {Vencedor do playout} other {Vencedor}}",
+    "playoffRound": "{round, select, eliminators {Eliminatórias} semiFinals {Semifinais} final {Final} wildCard {Repescagem (wild card)} roundOne {Primeira fase} conferenceSemiFinals {Semifinais de conferência} conferenceFinal {Final de conferência} mlsCup {MLS Cup} preliminary {Fase preliminar} playOff1 {Playoff 1} playOff2 {Playoff 2} knockoutPlayoff {Playoff da fase eliminatória} roundOf16 {Oitavas de final} quarterFinals {Quartas de final} playOut {Playout} reducidoFirstRound {Reducido: primeira fase} reducidoSecondRound {Reducido: segunda fase} reducidoSemiFinals {Reducido: semifinais} reducidoFinal {Reducido: final} other {Playoff}}",
+    "playoffWinnerOf": "{round, select, eliminators {Vencedor da eliminatória} semiFinals {Vencedor da semifinal} wildCard {Vencedor da repescagem} roundOne {Vencedor da primeira fase} conferenceSemiFinals {Vencedor da semifinal} conferenceFinal {Campeão da conferência} preliminary {Vencedor da preliminar} playOff1 {Vencedor do playoff 1} playOff2 {Vencedor do playoff 2} knockoutPlayoff {Vencedor do playoff} roundOf16 {Vencedor das oitavas} quarterFinals {Vencedor das quartas} playOut {Vencedor do playout} reducidoFirstRound {Vencedor da 1ª fase do Reducido} reducidoSecondRound {Vencedor da 2ª fase do Reducido} reducidoSemiFinals {Vencedor da semifinal do Reducido} reducidoFinal {Vencedor do Reducido} other {Vencedor}}",
     "playoffRuleTwoLegs": "{higher} faz o jogo de volta em casa. Empate no agregado: prorrogação e pênaltis.",
     "playoffRuleOneLeg": "Jogo único no estádio do {higher}. Empate: prorrogação e pênaltis.",
     "playoffRuleOneLegBetterPlaced": "Jogo único no estádio do {higher}. Empate após a prorrogação: o {higher} avança.",
@@ -201,7 +202,12 @@
     "shareFailed": "Não deu para abrir o compartilhamento. Escolha uma opção abaixo.",
     "matchPreview": "Prévia",
     "playOut": "Playout",
-    "playOutRule": "{higher} faz o jogo de volta em casa e fica com empate no agregado."
+    "playOutRule": "{higher} faz o jogo de volta em casa e fica com empate no agregado.",
+    "playoffLoserOf": "{round, select, final {Perdedor da final} other {Perdedor}}",
+    "reducidoChance": "Reducido",
+    "championChance": "Campeão",
+    "promotedChance": "Acesso",
+    "playoffRuleOneLegBetterPlacedNoExtraTime": "Jogo único no estádio do {higher}. Empate: o {higher} avança (sem prorrogação)."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -234,7 +240,8 @@
     "aclElite": "Liga dos Campeões da AFC Elite",
     "aclEliteQualifying": "Fase preliminar da ACL Elite",
     "aclTwo": "Liga dos Campeões da AFC Two",
-    "gulfClub": "Liga dos Campeões do Golfo"
+    "gulfClub": "Liga dos Campeões do Golfo",
+    "promotionFinal": "Final: título e acesso"
   },
   "Footer": {
     "attribution": "Dados: football-data.org",
@@ -285,7 +292,9 @@
     "introLiguilla": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: a tabela é atualizada na hora com os critérios oficiais. Os 8 primeiros vão à Liguilla, disputada em ida e volta até a final.",
     "step3Liguilla": "Abra a aba Chances para ver as chances de cada clube de terminar em primeiro, de chegar à Liguilla e de ser campeão.",
     "step3Asia": "Abra a aba Chances para ver as chances de cada time de título, Liga dos Campeões da AFC Elite e rebaixamento.",
-    "breadcrumb": "Trilha de navegação"
+    "breadcrumb": "Trilha de navegação",
+    "introReducido": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: as duas zonas se atualizam na hora com os critérios de desempate oficiais. Os líderes das duas zonas fazem uma final única pelo título e pelo primeiro acesso à Liga Profesional; do 2º ao 8º de cada zona, mais o perdedor da final, disputam o Reducido pelo segundo. Os dois últimos de cada zona caem.",
+    "step3Reducido": "Abra a aba Chances para ver a chance de cada clube de vencer sua zona, de chegar ao Reducido, de ser campeão, de subir e de cair."
   },
   "Faq": {
     "league": [
@@ -339,7 +348,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A, B e C, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Coupe de France, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A, B e C, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Campeonato Argentino, Primera Nacional argentina, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Coupe de France, Copa Argentina, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -379,7 +388,7 @@
       },
       {
         "q": "Há sorteio?",
-        "a": "Não. A {league} é disputada numa chave fixa definida antes da temporada, então todos os confrontos das oitavas à final já são conhecidos: os vencedores de cada fase enfrentam os vencedores do confronto vizinho."
+        "a": "Não. A {league} é disputada numa chave fixa definida antes da temporada, então todos os confrontos até a final já são conhecidos: os vencedores de cada fase enfrentam os vencedores do confronto vizinho."
       },
       {
         "q": "Como as chances são calculadas?",
@@ -527,6 +536,28 @@
         "q": "O FootSimu é grátis?",
         "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
       }
+    ],
+    "reducido": [
+      {
+        "q": "Como funciona o {simulator}?",
+        "a": "Ele parte das zonas e dos jogos reais da {league} {season}. Digite um placar para qualquer jogo restante ou aperte Simular: cada resultado sai do ataque e da defesa que cada time mostrou nesta temporada, com o fator casa, e as tabelas se atualizam na hora. Com as zonas completas, a final e o Reducido podem ser jogados até o fim."
+      },
+      {
+        "q": "Como funcionam a final e o Reducido?",
+        "a": "Os líderes das duas zonas fazem uma final única em campo neutro, com prorrogação e pênaltis se empatar: o vencedor é campeão e sobe. A primeira fase do Reducido cruza as zonas em jogo único (2º x 8º, 3º x 7º, 4º x 6º, 5º x 5º) na casa do melhor colocado, que avança com empate. O perdedor da final se junta aos sete classificados na segunda fase, reordenados pela posição na zona (1 x 8, 2 x 7…). A segunda fase e as semifinais são em ida e volta, o melhor colocado decide em casa e avança com empate no agregado; a final também é em ida e volta, com pênaltis se empatar. O vencedor também sobe."
+      },
+      {
+        "q": "Quantos clubes caem?",
+        "a": "Quatro: os dois últimos de cada zona, para a terceira divisão (Primera B Metropolitana ou Torneo Federal A, conforme a filiação do clube)."
+      },
+      {
+        "q": "Como as chances são calculadas?",
+        "a": "A aba Chances simula o resto da temporada, a final e o Reducido 5.000 vezes a partir dos resultados atuais, incluindo seus palpites, e conta quantas vezes cada clube vence sua zona, chega ao Reducido, é campeão, sobe e cai."
+      },
+      {
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
+      }
     ]
   },
   "Countries": {
@@ -627,7 +658,9 @@
       "BL1": "BL",
       "BL2": "2BL",
       "FL1": "L1",
-      "FL2": "L2"
+      "FL2": "L2",
+      "ARG": "LP",
+      "PN": "PN"
     },
     "basedOn": "Com base em {count} copas simuladas a partir dos resultados atuais, incluindo seus palpites nos confrontos reais.",
     "chancesNote": "As fases ainda não sorteadas são sorteadas de novo em cada simulação, então as chances incluem a sorte do sorteio.",
@@ -647,7 +680,8 @@
       "CIT": "A força de cada clube vem do seu próprio campeonato nesta temporada (Serie A ou Serie B), ajustada pela divisão; clubes da Serie C ficam abaixo da Serie B. Não há sorteio: a Coppa Italia segue uma chave fixa.",
       "DFB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Bundesliga ou 2. Bundesliga), ajustada pela divisão; clubes da 3. Liga e amadores ficam abaixo da 2. Bundesliga. Um clube amador sorteado contra um profissional joga em casa.",
       "EFC": "A força de cada clube vem do seu próprio campeonato nesta temporada (Premier League, Championship, League One ou League Two), ajustada pela divisão. Não há prorrogação antes da final: um jogo empatado aos 90 minutos vai direto para os pênaltis, e as semifinais em dois jogos são decididas no placar agregado e, se empatadas, nos pênaltis.",
-      "CDF": "A força de cada clube vem da sua própria liga nesta temporada (Ligue 1 ou Ligue 2), ajustada pela divisão; os clubes do National e amadores ficam abaixo da Ligue 2. Um clube sorteado contra outro pelo menos duas divisões acima joga em casa, e antes da final um jogo empatado após 90 minutos vai direto para os pênaltis."
+      "CDF": "A força de cada clube vem da sua própria liga nesta temporada (Ligue 1 ou Ligue 2), ajustada pela divisão; os clubes do National e amadores ficam abaixo da Ligue 2. Um clube sorteado contra outro pelo menos duas divisões acima joga em casa, e antes da final um jogo empatado após 90 minutos vai direto para os pênaltis.",
+      "CAR": "A força de cada clube vem do seu próprio campeonato nesta temporada (Liga Profesional ou Primera Nacional), ajustada pela divisão; clubes da Primera B, do Federal A e da Primera C ficam abaixo da Primera Nacional. Todos os jogos são em partida única em campo neutro, e um empate nos 90 minutos vai direto para os pênaltis. Não há sorteio: a Copa Argentina segue uma chave fixa."
     },
     "finalAfter": "Os vencedores das {round} se enfrentam aqui.",
     "bracketAfter": "Chave fixa, sem sorteio: os vencedores se enfrentam assim.",
@@ -689,7 +723,8 @@
     "range": "{from}–{to}",
     "placesNote": "O caso mais comum: campeões das copas e rankings continentais podem mudar essas vagas.",
     "gamesTournament": "Em cada torneio, cada clube faz {games} jogos.",
-    "titlePlayoffTournament": "Em cada torneio, um mata-mata depois da fase de classificação decide o campeão."
+    "titlePlayoffTournament": "Em cada torneio, um mata-mata depois da fase de classificação decide o campeão.",
+    "finalAndReducido": "Os dois líderes de zona fazem uma final única em campo neutro pelo título e pelo primeiro acesso. Do 2º ao 8º de cada zona, mais o perdedor da final, disputam o Reducido pelo segundo."
   },
   "Legal": {
     "about": {

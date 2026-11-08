@@ -37,6 +37,10 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
   const sudamericana = league.zones.find((z) => z.kind === "sudamericana");
   // MLS: the chance of any playoff place, wild card included.
   const playoffZones = league.zones.filter((z) => z.kind === "playoffs" || z.kind === "playoffWildCard" || z.kind === "titlePlayoffs");
+  // A title won in an earlier round than the last (Primera Nacional's final): champion, and promoted by either route.
+  const titleRound = league.playoff?.titleRound !== undefined;
+  // Its promotion play-off (the Reducido) places.
+  const reducido = titleRound ? league.zones.find((z) => z.kind === "promotionPlayoff") : undefined;
   const playoffs = playoffZones.length
     ? { from: Math.min(...playoffZones.map((z) => z.from)), to: Math.max(...playoffZones.map((z) => z.to)) }
     : undefined;
@@ -84,12 +88,20 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                 <th className="px-2 text-right">{(league.groups && !titleZone) || result.playoffWins ? t("firstPlaceChance") : t("titleChance")}</th>
               ) : null}
               {playoffs && <th className="px-2 text-right">{t("playoffChance")}</th>}
+              {reducido && <th className="px-2 text-right">{t("reducidoChance")}</th>}
               {libertadores && <th className="px-2 text-right">{tz("libertadores")}</th>}
               {aclElite && <th className="px-2 text-right">{t("aclEliteChance")}</th>}
               {sudamericana && <th className="px-2 text-right">{tz("sudamericana")}</th>}
               {relegation && <th className="px-2 text-right">{t("relegationChance")}</th>}
               {/* A title play-off simulated with the table (Argentina): the chance of winning it. */}
-              {!continental && result.playoffWins && <th className="px-2 text-right">{t("winChance")}</th>}
+              {!continental && result.playoffWins && titleRound ? (
+                <>
+                  <th className="px-2 text-right">{t("championChance")}</th>
+                  <th className="px-2 text-right">{t("promotedChance")}</th>
+                </>
+              ) : (
+                !continental && result.playoffWins && <th className="px-2 text-right">{t("winChance")}</th>
+              )}
               <th className="hidden pr-3 pl-4 text-left md:table-cell">{t("positionHeatmap")}</th>
             </tr>
           </thead>
@@ -133,6 +145,11 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                       {pct(probabilityInRange(result, row.teamId, playoffs.from, playoffs.to))}
                     </td>
                   )}
+                  {reducido && (
+                    <td className="px-2 text-right tabular-nums text-sky-700 dark:text-sky-300" data-testid="reducido-chance">
+                      {pct(probabilityInRange(result, row.teamId, reducido.from, reducido.to))}
+                    </td>
+                  )}
                   {libertadores && (
                     <td className="px-2 text-right tabular-nums text-blue-700 dark:text-blue-300" data-testid="libertadores-chance">
                       {passDown?.has(row.teamId) ? <Icon name="check" size={14} strokeWidth={3} className="ml-auto" /> : pct(probabilityInRange(result, row.teamId, libertadores.from, libertadores.to, true))}
@@ -153,10 +170,23 @@ export function ProbabilityGrid({ league, input, rows, teams }: Props) {
                       {pct(probabilityInRange(result, row.teamId, relegation.from, relegation.to))}
                     </td>
                   )}
-                  {!continental && result.playoffWins && (
-                    <td className="px-2 text-right font-semibold tabular-nums" data-testid="win-chance">
-                      {pct((result.playoffWins[row.teamId] ?? 0) / result.iterations)}
-                    </td>
+                  {!continental && result.playoffWins && titleRound ? (
+                    <>
+                      <td className="px-2 text-right font-semibold tabular-nums" data-testid="champion-chance">
+                        {pct((result.playoffTitles?.[row.teamId] ?? 0) / result.iterations)}
+                      </td>
+                      {/* The champion and the Reducido's winner both go up (never the same club). */}
+                      <td className="px-2 text-right font-semibold tabular-nums text-emerald-700 dark:text-emerald-300" data-testid="promoted-chance">
+                        {pct(((result.playoffTitles?.[row.teamId] ?? 0) + (result.playoffWins[row.teamId] ?? 0)) / result.iterations)}
+                      </td>
+                    </>
+                  ) : (
+                    !continental &&
+                    result.playoffWins && (
+                      <td className="px-2 text-right font-semibold tabular-nums" data-testid="win-chance">
+                        {pct((result.playoffWins[row.teamId] ?? 0) / result.iterations)}
+                      </td>
+                    )
                   )}
                   <td className="hidden py-1.5 pr-3 pl-4 md:table-cell">
                     <span className="flex gap-px">

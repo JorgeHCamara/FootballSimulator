@@ -19,14 +19,18 @@ interface Props {
   clearPosition?: number;
   /** The play-off winner still has to beat another league's club (Ligue 2 v Ligue 1's 16th). */
   winnerPlays?: { league: string; position: number };
+  /** An earlier round's winner is champion and goes up too (Primera Nacional's final), before the last round's. */
+  titleRound?: number;
 }
 
 /** The clubs going up: direct promotion places plus the play-off winners. */
 export function PromotedClubs(props: Props) {
-  const { bracket, rows, teams, predictions, seasonComplete, directPromotion, promotedTo, nextSeason, cancelled, clearPosition, winnerPlays } = props;
+  const { bracket, rows, teams, predictions, seasonComplete, directPromotion, promotedTo, nextSeason, cancelled, clearPosition, winnerPlays, titleRound } = props;
   const t = useTranslations("Simulator");
   const winners = seasonComplete && !cancelled ? playoffWinners(bracket, predictions) : [];
-  const decided = seasonComplete && (cancelled || (winners.length > 0 && winners.every((w) => w !== null)));
+  // The champion (the title round's winner) goes up first.
+  const champions = seasonComplete && titleRound !== undefined ? playoffWinners(bracket.slice(0, titleRound + 1), predictions) : [];
+  const decided = seasonComplete && (cancelled || (winners.length > 0 && [...winners, ...champions].every((w) => w !== null)));
   const directPositions = cancelled && clearPosition ? [...directPromotion, clearPosition] : directPromotion;
   const direct = directPositions
     .map((position) => rows.find((r) => r.position === position))
@@ -37,7 +41,11 @@ export function PromotedClubs(props: Props) {
     }));
   // A winner that still faces another league's club isn't promoted yet.
   const promoted = decided
-    ? [...direct, ...(winnerPlays ? [] : winners.map((teamId) => ({ teamId: teamId!, label: t("promotedPlayoff") })))]
+    ? [
+        ...direct,
+        ...champions.map((teamId) => ({ teamId: teamId!, label: t("promotedChampion") })),
+        ...(winnerPlays ? [] : winners.map((teamId) => ({ teamId: teamId!, label: t("promotedPlayoff") }))),
+      ]
     : null;
   const contender = decided && winnerPlays && winners[0] != null ? teams.get(winners[0]) : undefined;
 

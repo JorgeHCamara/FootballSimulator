@@ -15,7 +15,7 @@ import type { Fixture, ResultMap, Team, TeamId } from "../src/engine/types.ts";
 import { espnFixtures, espnTeams, fetchEspnSeason } from "../src/lib/espn.ts";
 
 /** The league below each one the site covers (promotion and relegation between them). */
-export const LOWER: Partial<Record<string, string>> = { PL: "ELC", ELC: "EL1", EL1: "EL2", PD: "SD", BL1: "BL2", SA: "SB", FL1: "FL2", DED: "DJL", BSA: "BSB" };
+export const LOWER: Partial<Record<string, string>> = { PL: "ELC", ELC: "EL1", EL1: "EL2", PD: "SD", BL1: "BL2", SA: "SB", FL1: "FL2", DED: "DJL", BSA: "BSB", ARG: "PN" };
 export const UPPER: Partial<Record<string, string>> = Object.fromEntries(Object.entries(LOWER).map(([up, down]) => [down!, up]));
 
 // The rule from one season's ratings to the next (CARRY, PROMOTED, RELEGATED…) is in src/engine/offseason.ts,

@@ -31,6 +31,7 @@ export type ZoneKind =
   | "qualificationGroup"
   | "conferenceLeaguePlayoff"
   | "titlePlayoffs"
+  | "promotionFinal"
   | "knockoutRoundOf16"
   | "knockoutPlayoff"
   | "eliminated";
@@ -43,7 +44,7 @@ export interface Zone {
 }
 
 /** Competition codes (football-data.org codes, plus BSB and BSC for Brasileirão Séries B and C, and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "BSC" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL" | "ABL";
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "BSC" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "PN" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL" | "ABL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -64,6 +65,12 @@ export interface EspnFeed {
   stages?: EspnStages | readonly EspnStages[];
   /** Apply the points deductions in ESPN's standings (current table only; Peru). */
   deductions?: boolean;
+  /**
+   * ESPN event ids of abandoned games whose score at the stoppage stood: ESPN
+   * keeps them "abandoned", without a result, but counts them in its standings
+   * (Primera Nacional 2026: Güemes 1–3 Tristán Suárez, stopped in stoppage time).
+   */
+  resultsStand?: readonly string[];
 }
 
 /**
@@ -1125,6 +1132,75 @@ export const LEAGUES: readonly LeagueConfig[] = [
         { key: "final", legs: 1, levelTie: "penalties", neutral: true },
       ],
       title: "Liga Profesional",
+    },
+  },
+  {
+    code: "PN",
+    slug: "argentina-primera-nacional",
+    name: "Primera Nacional",
+    country: "Argentina",
+    flag: "ar",
+    simulatorName: {
+      en: "Primera Nacional Simulator",
+      pt: "Simulador da Primera Nacional",
+      es: "Simulador de la Primera Nacional",
+    },
+    aka: { en: "Argentine second division", pt: "Segunda divisão argentina", es: "Ascenso argentino" },
+    teams: 36,
+    // Primera Nacional 2026 (AFA): two zones of 18, home and away within the
+    // zone plus two interzonal games (one each half): 36 games, every one in
+    // the club's zone table.
+    gamesPerTeam: 36,
+    groups: [
+      { id: "A", espnName: "Group A", name: { en: "Zone A", pt: "Zona A", es: "Zona A" }, shortName: { en: "Zone A", pt: "Zona A", es: "Zona A" } },
+      { id: "B", espnName: "Group B", name: { en: "Zone B", pt: "Zona B", es: "Zona B" }, shortName: { en: "Zone B", pt: "Zona B", es: "Zona B" } },
+    ],
+    espn: {
+      slug: "arg.2",
+      seasons: "calendar",
+      // Güemes 1–3 Tristán Suárez (3 August), abandoned at 90+44': the score stood.
+      resultsStand: ["401844023"],
+      stages: {
+        table: "regular-season",
+        knockout: [
+          "championship-final",
+          "torneo-reducido---first-round",
+          "torneo-reducido---quarterfinals",
+          "torneo-reducido---semifinals",
+          "torneo-reducido---finals",
+        ],
+      },
+    },
+    espnOnly: true,
+    tiebreakers: ["points", "goalDifference", "goalsFor", "headToHeadPoints", "headToHeadGoalDifference"],
+    // Per zone: the winner plays the final (title and the first promotion),
+    // 2nd–8th the Reducido (the second), the bottom two go down to the third
+    // tier (Primera B Metropolitana or Torneo Federal A, by affiliation).
+    zones: [
+      { kind: "promotionFinal", from: 1, to: 1 },
+      { kind: "promotionPlayoff", from: 2, to: 8 },
+      { kind: "relegation", from: 17, to: 18 },
+    ],
+    // The zone winners' final: one game at a neutral ground, extra time and
+    // penalties; the winner is champion and goes up, the loser joins the
+    // Reducido's second round. The Reducido: a first round of single games
+    // across the zones (2nd v 8th, 3rd v 7th, 4th v 6th, 5th v 5th) at the
+    // better-placed club, who goes through on a draw; then two-legged rounds
+    // re-seeded by zone place, then points (1 v 8, 2 v 7…), the better-seeded
+    // club at home second and through on a level aggregate; the final over two
+    // legs, level: penalties. Its winner goes up too.
+    playoff: {
+      seedFromGroups: { places: 8 },
+      titleRound: 0,
+      title: "Primera Nacional",
+      promotedTo: "Liga Profesional",
+      rounds: [
+        { key: "final", legs: 1, levelTie: "penalties", neutral: true, zonePairs: [[1, 1]] },
+        { key: "reducidoFirstRound", legs: 1, levelTie: "betterPlaced", noExtraTime: true, zonePairs: [[2, 8], [3, 7], [4, 6], [5, 5]] },
+        { key: "reducidoSecondRound", legs: 2, levelTie: "betterPlaced", losersOf: 0 },
+        { key: "reducidoSemiFinals", legs: 2, levelTie: "betterPlaced" },
+        { key: "reducidoFinal", legs: 2, levelTie: "penalties", noExtraTime: true },
+      ],
     },
   },
   {

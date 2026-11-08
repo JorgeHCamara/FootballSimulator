@@ -909,6 +909,34 @@ async function step(name, fn) {
       await pt.close();
     });
 
+    await step("Copa Argentina: 64 clubs on a fixed bracket, every game at a neutral ground, straight to penalties", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/copa-argentina`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["Round of 64", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 32, "32 round-of-64 ties");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /\b(LP|PN)\b/, "Liga Profesional and Primera Nacional tags");
+      assert.match(await p.locator("main").innerText(), /straight to penalties/i);
+      assert.match(await p.locator("main").innerText(), /fixed bracket/i);
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      // The bracket: each round's ties are between the winners of neighbouring ties.
+      await bar.nth(0).click();
+      const r64Winners = await ties.evaluateAll((els) => els.map((e) => e.dataset.winner));
+      await bar.nth(1).click();
+      const r32 = await ties.evaluateAll((els) => els.map((e) => [e.dataset.home, e.dataset.away]));
+      assert.deepEqual(r32.flat(), r64Winners, "the round of 32 follows the bracket");
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Copa Argentina \d{4} winner/);
+      const menu = p.locator('[data-testid="league-menu"]');
+      await menu.getByRole("button", { name: "South America" }).click();
+      assert.deepEqual((await menu.locator("#menu-ar a").allInnerTexts()).map((x) => x.trim()), ["Liga Profesional", "Primera Nacional", "Copa Argentina"]);
+      await p.close();
+    });
+
     await step("Champions League: 36-club league phase, knockout phase to the final, win chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/champions-league`);
@@ -1068,6 +1096,43 @@ async function step(name, fn) {
       await p.getByRole("tab", { name: "Chances" }).click();
       await p.locator('[data-testid="libertadores-chance"]').first().waitFor({ timeout: 90000 });
       assert.match(await p.locator('[data-testid="chances"] thead').innerText(), /Libertadores[\s\S]*Sudamericana[\s\S]*Relegation/);
+      await p.close();
+    });
+
+    await step("Primera Nacional: two zones, the zone winners' final and the Reducido, champion and promotion chances", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/argentina-primera-nacional`);
+      const rows = p.locator('[data-testid="standings-row"]');
+      assert.equal(await rows.count(), 18, "one zone at a time");
+      const zones = await rows.evaluateAll((r) => r.map((x) => x.dataset.zone));
+      assert.deepEqual([zones[0], zones[1], zones[7], zones[8], zones[16], zones[17]], ["promotionFinal", "promotionPlayoff", "promotionPlayoff", "", "relegation", "relegation"]);
+      assert.deepEqual(await p.locator('[data-testid="group-switch"] button').allInnerTexts(), ["Zone A", "Zone B"]);
+      assert.match(await p.locator('[data-testid="league-facts"]').innerText(), /one-off final[\s\S]*Reducido/);
+      const options = await p.locator('[data-testid="matchday-select"] option').allInnerTexts();
+      assert.equal(options.length, 37, "36 rounds and the play-offs");
+      // Before the zones are complete: slots by zone place, the final's loser joining the Reducido's second round.
+      await p.locator('[data-testid="matchday-select"]').selectOption({ label: "Play-off" });
+      const playoff = p.locator('[data-testid="playoff"]');
+      const roundsText = await p.locator('[data-testid="playoff-round"]').allInnerTexts();
+      assert.match(roundsText[0], /^Final[\s\S]*1st in Zone A[\s\S]*1st in Zone B/i);
+      assert.match(roundsText[1], /^Reducido: first round[\s\S]*2nd in Zone A[\s\S]*8th in Zone B/i);
+      assert.match(roundsText[2], /^Reducido: second round[\s\S]*Final loser/i);
+      await p.getByRole("button", { name: "Simulate rest of season" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      assert.match(await playoff.innerText(), /neutral ground/);
+      assert.match(await playoff.innerText(), /wins the Primera Nacional! .+ goes up to Liga Profesional\./);
+      // Two clubs go up: the champion and the Reducido's winner.
+      const promoted = p.locator('[data-testid="promoted-team"]');
+      assert.equal(await promoted.count(), 2);
+      assert.match(await promoted.nth(0).innerText(), /Champion/);
+      assert.match(await promoted.nth(1).innerText(), /Play-off winner/);
+      assert.notEqual(await promoted.nth(0).innerText(), await promoted.nth(1).innerText());
+      assert.ok((await p.locator('[data-testid="champion-team"]').innerText()).includes((await promoted.nth(0).innerText()).split("\n")[0].trim()));
+      await p.getByRole("button", { name: "Reset" }).click();
+      await p.getByRole("button", { name: "Reset predictions" }).click();
+      await p.getByRole("tab", { name: "Chances" }).click();
+      await p.locator('[data-testid="promoted-chance"]').first().waitFor({ timeout: 90000 });
+      assert.match(await p.locator('[data-testid="chances"] thead').innerText(), /1st place[\s\S]*Reducido[\s\S]*Relegation[\s\S]*Champion[\s\S]*Promoted/);
       await p.close();
     });
 
@@ -1918,7 +1983,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 46, "every competition once");
+      assert.equal(links.length, 48, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();
@@ -2879,7 +2944,7 @@ async function step(name, fn) {
       await cupWinners.waitFor();
       assert.equal(await cupWinners.getByTestId("past-winners-coming-soon").count(), 1);
       assert.equal(await cupWinners.getByTestId("past-winners-row").count(), 2);
-      assert.match(await cupWinners.getByTestId("past-winners-row").first().innerText(), new RegExp(`${worldSeason(year + 1)}[\\s\\S]*Final[\\s\\S]*My World`, "i"));
+      assert.match(await cupWinners.getByTestId("past-winners-row").first().innerText(), new RegExp(`${worldSeason(year + 1)}[\\s\\S]*My World`, "i"));
       assert.equal(await p.getByTestId("world-actions").count(), 0, "the rounds and their buttons put away");
       await p.getByTestId("world-table-view").click();
       await p.getByTestId("world-actions").waitFor();
