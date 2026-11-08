@@ -19,7 +19,8 @@
     "stagesDescription": "Free {simulator} for the {season} season ({aka}). Replay the first stage, the promotion groups and the final, change any result and see who goes up, who wins the title and who goes down.",
     "tournamentsDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate each tournament of the year, play its play-offs where it has them, and see the annual table with the Copa Libertadores and Sudamericana places.",
     "liguillaDescription": "Free {simulator} for the {season} tournament ({aka}). Enter your scores or simulate the remaining matches, watch the table update live, then play the Liguilla to the final, with every club's chance of the Liguilla and the title.",
-    "leagueDescriptionAsia": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, AFC Champions League and relegation chances."
+    "leagueDescriptionAsia": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch the table update live and see title, AFC Champions League and relegation chances.",
+    "reducidoDescription": "Free {simulator} for the {season} season ({aka}). Enter your scores or simulate the remaining matches, watch both zone tables update live, then play the final and the Reducido, with every club's chance of the title, promotion and relegation."
   },
   "Nav": {
     "home": "Home",
@@ -128,8 +129,8 @@
     "promotedBarrage": "{winner} won the play-off and now plays {league}'s {position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} over two legs for a place in {league}.",
     "playoffs": "Play-off",
     "playoffPlace": "{position, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} place",
-    "playoffRound": "{round, select, eliminators {Eliminators} semiFinals {Semi-finals} final {Final} wildCard {Wild card} roundOne {Round One} conferenceSemiFinals {Conference semifinals} conferenceFinal {Conference final} mlsCup {MLS Cup} preliminary {Preliminary round} playOff1 {Play-off 1} playOff2 {Play-off 2} knockoutPlayoff {Knockout play-off} roundOf16 {Round of 16} quarterFinals {Quarter-finals} playOut {Play-out} other {Play-off}}",
-    "playoffWinnerOf": "{round, select, eliminators {Eliminator winner} semiFinals {Semi-final winner} wildCard {Wild-card winner} roundOne {Round One winner} conferenceSemiFinals {Semifinal winner} conferenceFinal {Conference champion} preliminary {Preliminary winner} playOff1 {Play-off 1 winner} playOff2 {Play-off 2 winner} knockoutPlayoff {Play-off winner} roundOf16 {Round-of-16 winner} quarterFinals {Quarter-final winner} playOut {Play-out winner} other {Winner}}",
+    "playoffRound": "{round, select, eliminators {Eliminators} semiFinals {Semi-finals} final {Final} wildCard {Wild card} roundOne {Round One} conferenceSemiFinals {Conference semifinals} conferenceFinal {Conference final} mlsCup {MLS Cup} preliminary {Preliminary round} playOff1 {Play-off 1} playOff2 {Play-off 2} knockoutPlayoff {Knockout play-off} roundOf16 {Round of 16} quarterFinals {Quarter-finals} playOut {Play-out} reducidoFirstRound {Reducido: first round} reducidoSecondRound {Reducido: second round} reducidoSemiFinals {Reducido: semi-finals} reducidoFinal {Reducido: final} other {Play-off}}",
+    "playoffWinnerOf": "{round, select, eliminators {Eliminator winner} semiFinals {Semi-final winner} wildCard {Wild-card winner} roundOne {Round One winner} conferenceSemiFinals {Semifinal winner} conferenceFinal {Conference champion} preliminary {Preliminary winner} playOff1 {Play-off 1 winner} playOff2 {Play-off 2 winner} knockoutPlayoff {Play-off winner} roundOf16 {Round-of-16 winner} quarterFinals {Quarter-final winner} playOut {Play-out winner} reducidoFirstRound {Reducido first-round winner} reducidoSecondRound {Reducido second-round winner} reducidoSemiFinals {Reducido semi-final winner} reducidoFinal {Reducido winner} other {Winner}}",
     "playoffRuleTwoLegs": "{higher} hosts the 2nd leg. Level on aggregate: extra time and penalties.",
     "playoffRuleOneLeg": "Single match at {higher}'s ground. If level: extra time and penalties.",
     "playoffRuleOneLegBetterPlaced": "Single match at {higher}'s ground. If level after extra time, {higher} goes through.",
@@ -201,7 +202,12 @@
     "shareFailed": "Couldn't open the share sheet. Pick an option below.",
     "matchPreview": "Match preview",
     "playOut": "Play-out",
-    "playOutRule": "{higher} hosts the 2nd leg and stays up if the aggregate is level."
+    "playOutRule": "{higher} hosts the 2nd leg and stays up if the aggregate is level.",
+    "playoffLoserOf": "{round, select, final {Final loser} other {Loser}}",
+    "reducidoChance": "Reducido",
+    "championChance": "Champion",
+    "promotedChance": "Promoted",
+    "playoffRuleOneLegBetterPlacedNoExtraTime": "Single match at {higher}'s ground. If level, {higher} goes through (no extra time)."
   },
   "Zones": {
     "championsLeague": "Champions League",
@@ -234,7 +240,8 @@
     "aclElite": "AFC Champions League Elite",
     "aclEliteQualifying": "ACL Elite preliminary stage",
     "aclTwo": "AFC Champions League Two",
-    "gulfClub": "Gulf Club Champions League"
+    "gulfClub": "Gulf Club Champions League",
+    "promotionFinal": "Final: title and promotion"
   },
   "Footer": {
     "attribution": "Data: football-data.org",
@@ -285,7 +292,9 @@
     "introLiguilla": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the remaining matches: the table updates instantly with the official tiebreakers. The top 8 go to the Liguilla, played over two legs down to the final.",
     "step3Liguilla": "Open the Chances tab to see every club's chance of finishing first, of reaching the Liguilla and of winning the title.",
     "step3Asia": "Open the Chances tab to see every team's chances of the title, the AFC Champions League Elite and relegation.",
-    "breadcrumb": "Breadcrumb"
+    "breadcrumb": "Breadcrumb",
+    "introReducido": "Use the {simulator} to predict the rest of the {league} {season} ({aka}). Type your own scores or simulate the remaining matches: both zone tables update instantly with the official tiebreakers. The two zone winners meet in a one-off final for the title and the first promotion to the Liga Profesional; the clubs placed 2nd to 8th in each zone, joined by the final's loser, play the Reducido for the second. The bottom two of each zone go down.",
+    "step3Reducido": "Open the Chances tab to see every club's chance of winning its zone, of reaching the Reducido, of the title, of promotion and of relegation."
   },
   "Faq": {
     "league": [
@@ -339,7 +348,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Belgian Pro League, Greek Super League, Austrian Bundesliga, Brasileirão Série A, Série B and Série C, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the Saudi Pro League, the J1 League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Coupe de France, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
+        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Belgian Pro League, Greek Super League, Austrian Bundesliga, Brasileirão Série A, Série B and Série C, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Argentina's Primera Nacional, Liga MX, MLS, the Saudi Pro League, the J1 League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Coupe de France, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",
@@ -527,6 +536,28 @@
         "q": "Is FootSimu free?",
         "a": "Yes. FootSimu is completely free and you don't need an account."
       }
+    ],
+    "reducido": [
+      {
+        "q": "How does the {simulator} work?",
+        "a": "It starts from the real {league} {season} zone tables and fixtures. Type a score for any remaining match or press Simulate: each result is drawn from the attack and defence each team has shown this season, with home advantage, and the tables update instantly. Once the zones are complete, the final and the Reducido can be played to the end."
+      },
+      {
+        "q": "How do the final and the Reducido work?",
+        "a": "The two zone winners play a one-off final at a neutral ground, with extra time and penalties if level: the winner is champion and goes up. The Reducido's first round crosses the zones in single matches (2nd v 8th, 3rd v 7th, 4th v 6th, 5th v 5th) at the better-placed club, who goes through on a draw. The final's loser joins the seven winners for the second round, re-seeded by zone place (1 v 8, 2 v 7…). The second round and the semi-finals are over two legs, the better-placed club at home second and through on a level aggregate; the final is over two legs too, with penalties if level. Its winner is promoted as well."
+      },
+      {
+        "q": "How many clubs go down?",
+        "a": "Four: the bottom two of each zone, to the third tier (the Primera B Metropolitana or the Torneo Federal A, depending on the club's affiliation)."
+      },
+      {
+        "q": "How are the chances calculated?",
+        "a": "The Chances tab plays out the rest of the season, the final and the Reducido 5,000 times from the current results, including your predictions, and counts how often each club wins its zone, reaches the Reducido, wins the title, goes up and goes down."
+      },
+      {
+        "q": "Is FootSimu free?",
+        "a": "Yes. FootSimu is completely free and you don't need an account."
+      }
     ]
   },
   "Countries": {
@@ -689,7 +720,8 @@
     "range": "{from}–{to}",
     "placesNote": "The usual case: cup winners and continental rankings can shift these places.",
     "gamesTournament": "In each tournament, each club plays {games} games.",
-    "titlePlayoffTournament": "In each tournament, a play-off after the regular phase decides the champion."
+    "titlePlayoffTournament": "In each tournament, a play-off after the regular phase decides the champion.",
+    "finalAndReducido": "The two zone winners meet in a one-off final at a neutral ground for the title and the first promotion. The clubs placed 2nd to 8th in each zone, joined by the final's loser, play the Reducido for the second."
   },
   "Legal": {
     "about": {

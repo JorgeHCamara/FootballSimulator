@@ -85,8 +85,10 @@ export interface MonteCarloResult {
   zonePositionCounts?: Record<TeamId, number[]>;
   /** With `playoff`: playoffReached[teamId][r] = runs the club played in knockout round r. */
   playoffReached?: Record<TeamId, number[]>;
-  /** With `playoff`: runs the club won the knockout phase. */
+  /** With `playoff`: runs the club won the knockout phase (its last round). */
   playoffWins?: Record<TeamId, number>;
+  /** With a play-off whose title is won in an earlier round (`titleRound`, Primera Nacional's final): runs the club won that round. */
+  playoffTitles?: Record<TeamId, number>;
   /** With a play-off that isn't held when a club is far enough clear (`directIfClear`, Serie B): runs that club went up instead. */
   playoffSkips?: Record<TeamId, number>;
 }
@@ -191,6 +193,7 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
       zonePositionCounts,
       playoffReached: {} as Record<TeamId, number[]>,
       playoffWins: {} as Record<TeamId, number>,
+      playoffTitles: {} as Record<TeamId, number>,
       playoffSkips: {} as Record<TeamId, number>,
     };
   });
@@ -296,7 +299,10 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
           : grouped
             ? seedByGroupPlace(groupRows, playoff.external, seeding?.places, seeding?.interleave, seeding?.campaign ? playoff.campaign : undefined)
             : groupRows[0]!;
-        const options = groupStage ? { ...playoff.options, groups: groupRows } : playoff.options;
+        // The groups' tables: for a group stage's rounds, or a knockout paired by place within the zones (`zonePairs`).
+        const options = grouped ? { ...playoff.options, groups: groupRows } : playoff.options;
+        const titleRound = playoff.config.titleRound;
+        let titleTie: PlayoffTie | undefined;
         // The bracket only needs the table and knockout results (real ones come with the options).
         const roundCount = playoff.config.rounds.length;
         let final: PlayoffTie | undefined;
@@ -307,10 +313,14 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
             }
           }
           if (r === roundCount - 1) final = ties[0];
+          if (r === titleRound) titleTie = ties[0];
         });
         const decided: PlayoffTie | undefined = final;
         const winner = decided ? tieOutcome(decided, playoff.known ? { ...playoff.known, ...played } : played)?.winner : undefined;
         if (winner !== undefined) count.playoffWins[winner] = (count.playoffWins[winner] ?? 0) + 1;
+        const champion: PlayoffTie | undefined = titleTie;
+        const titleWinner = champion ? tieOutcome(champion, playoff.known ? { ...playoff.known, ...played } : played)?.winner : undefined;
+        if (titleWinner !== undefined) count.playoffTitles[titleWinner] = (count.playoffTitles[titleWinner] ?? 0) + 1;
         if (decided && winner !== undefined) {
           const loser = winner === decided.higher.teamId ? decided.lower.teamId : decided.higher.teamId;
           if (loser !== null) finalTie = { winner, loser };
@@ -335,7 +345,7 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
     }
   }
 
-  return counts.map(({ positionCounts, pointsTotal, zonePositionCounts, playoffReached, playoffWins, playoffSkips }) => {
+  return counts.map(({ positionCounts, pointsTotal, zonePositionCounts, playoffReached, playoffWins, playoffTitles, playoffSkips }) => {
     const averagePoints: Record<TeamId, number> = {};
     for (const t of teams) averagePoints[t.id] = iterations > 0 ? pointsTotal[t.id]! / iterations : 0;
     return {
@@ -343,7 +353,14 @@ export function runMonteCarloVariants(input: Omit<MonteCarloInput, "override">, 
       positionCounts,
       averagePoints,
       ...(passDown.size ? { zonePositionCounts } : {}),
-      ...(playoff ? { playoffReached, playoffWins, ...(playoff.config.directIfClear ? { playoffSkips } : {}) } : {}),
+      ...(playoff
+        ? {
+            playoffReached,
+            playoffWins,
+            ...(playoff.config.titleRound !== undefined ? { playoffTitles } : {}),
+            ...(playoff.config.directIfClear ? { playoffSkips } : {}),
+          }
+        : {}),
     };
   });
 }

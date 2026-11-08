@@ -32,6 +32,7 @@ export const ZONE_STYLES: Record<ZoneKind, { row: string; dot: string }> = {
   qualificationGroup: { row: "bg-red-50 dark:bg-red-950/40", dot: "bg-red-400" },
   conferenceLeaguePlayoff: { row: "bg-teal-50 dark:bg-teal-900/35", dot: "bg-teal-500" },
   titlePlayoffs: { row: "bg-blue-100 dark:bg-blue-900/45", dot: "bg-blue-600" },
+  promotionFinal: { row: "bg-yellow-100 dark:bg-yellow-900/35", dot: "bg-yellow-500" },
   knockoutRoundOf16: { row: "bg-blue-100 dark:bg-blue-900/45", dot: "bg-blue-600" },
   knockoutPlayoff: { row: "bg-sky-50 dark:bg-sky-700/35", dot: "bg-sky-400" },
   eliminated: { row: "bg-red-50 dark:bg-red-950/40", dot: "bg-red-400" },

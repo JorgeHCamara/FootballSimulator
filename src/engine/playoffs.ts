@@ -11,7 +11,10 @@ import type { Fixture, ResultMap, Score, StandingRow, TeamId } from "./types.ts"
 //   level ties go to extra time and penalties;
 // - MLS Cup: within each conference a wild card (8th v 9th), best-of-three
 //   Round One series, then single-game semifinals and final along a fixed
-//   bracket; the two conference champions meet in MLS Cup.
+//   bracket; the two conference champions meet in MLS Cup;
+// - Primera Nacional (Argentina): the two zone winners play a final for the
+//   title and the first promotion; the Reducido (2nd–8th of each zone, crossed
+//   between the zones, then the final's loser) gives the second.
 
 export type PlayoffRoundKey =
   | "preliminary"
@@ -28,7 +31,11 @@ export type PlayoffRoundKey =
   | "knockoutPlayoff"
   | "roundOf16"
   | "quarterFinals"
-  | "playOut";
+  | "playOut"
+  | "reducidoFirstRound"
+  | "reducidoSecondRound"
+  | "reducidoSemiFinals"
+  | "reducidoFinal";
 
 export interface PlayoffRoundConfig {
   key: PlayoffRoundKey;
@@ -49,8 +56,18 @@ export interface PlayoffRoundConfig {
   neutral?: boolean;
   /** Fixed pairings by table position (first round). */
   pairs?: readonly (readonly [number, number])[];
+  /**
+   * Fixed pairings by place within two zones (BracketOptions.groups), each
+   * played both ways across them: [2, 8] is the 2nd of the first zone v the
+   * 8th of the second, and the 2nd of the second v the 8th of the first; [5, 5]
+   * once (Primera Nacional's Reducido). Sides are then placed by the seeding
+   * table (`rows`), so the better-seeded one hosts.
+   */
+  zonePairs?: readonly (readonly [number, number])[];
   /** Positions that join in this round, alongside the previous round's winners. */
   entrants?: readonly number[];
+  /** The losers of an earlier round (its index) join this one too (Primera Nacional: the title final's loser, in the Reducido's second round). */
+  losersOf?: number;
   /**
    * Previous winners keep their bracket path (first tie's winner v last tie's
    * winner, and so on) instead of being re-seeded by table position.
@@ -83,6 +100,12 @@ export interface PlayoffConfig {
   promotedTo?: string;
   /** Competition the winner is champion of (title play-offs, e.g. "MLS Cup"). */
   title?: string;
+  /**
+   * The round whose winner is champion, when it isn't the last (Primera
+   * Nacional: the zone winners' final, round 0); its winner is promoted
+   * (`promotedTo`) along with the last round's.
+   */
+  titleRound?: number;
   /**
    * The play-off isn't held when `position` finishes more than `points` points
    * clear of `over`: that club goes up directly (Serie B: 3rd more than 14
@@ -210,7 +233,13 @@ function tieCounts(config: PlayoffConfig): number[] {
     const sets = inGroups ? groups.count : 1;
     const previous = r === 0 ? 0 : counts[r - 1]!;
     const previousPerSet = inGroups ? previous / groups.count : previous;
-    const participants = (round.pairs?.length ?? 0) * 2 + (round.entrants?.length ?? 0) + previousPerSet;
+    // Zone pairs: each tie both ways across the two zones, once for a place against the same place.
+    if (round.zonePairs) {
+      counts.push(round.zonePairs.reduce((n, [a, b]) => n + (a === b ? 1 : 2), 0));
+      return;
+    }
+    const losers = round.losersOf !== undefined ? (counts[round.losersOf] ?? 0) : 0;
+    const participants = (round.pairs?.length ?? 0) * 2 + (round.entrants?.length ?? 0) + previousPerSet + losers;
     counts.push(Math.floor(participants / 2) * sets);
   });
   return counts;
@@ -242,6 +271,8 @@ export interface PlayoffSide {
   position: number | null;
   /** For an undecided winner of an earlier tie: which one. */
   from?: { round: number; tie: number };
+  /** With `from`: the tie's loser rather than its winner (see PlayoffRoundConfig.losersOf). */
+  lost?: boolean;
   /** Group (conference) the slot or the earlier tie belongs to. */
   group?: number;
 }
@@ -447,6 +478,15 @@ export function buildBracket(
       let pairs: [PlayoffSide, PlayoffSide][];
       if (round.pairs) {
         pairs = round.pairs.map(([a, b]) => [bySlot(a), bySlot(b)]);
+      } else if (round.zonePairs) {
+        // A place in one of two zones: the club once the season is over, placed by the seeding; before, the slot.
+        const zoneSide = (zone: number, place: number): PlayoffSide => {
+          const id = options.seasonComplete ? (options.groups?.[zone]?.find((row) => row.position === place)?.teamId ?? null) : null;
+          return id !== null ? { teamId: id, position: positionOf.get(id) ?? null } : { teamId: null, position: place, group: zone };
+        };
+        pairs = round.zonePairs.flatMap(([a, b]): [PlayoffSide, PlayoffSide][] =>
+          a === b ? [[zoneSide(0, a), zoneSide(1, b)]] : [[zoneSide(0, a), zoneSide(1, b)], [zoneSide(1, a), zoneSide(0, b)]],
+        );
       } else {
         const winners: PlayoffSide[] = previous.map((tie) => {
           const outcome = tieOutcome(tie, results);
@@ -455,7 +495,13 @@ export function buildBracket(
             ? { teamId: outcome.winner, position: positionOf.get(outcome.winner) ?? null, ...tieGroup }
             : { teamId: null, position: null, from: { round: r - 1, tie: tie.index }, ...tieGroup };
         });
-        const all = [...(round.entrants ?? []).map(bySlot), ...winners];
+        // An earlier round's losers (Primera Nacional: the title final's, into the Reducido).
+        const losers: PlayoffSide[] = (round.losersOf !== undefined ? (rounds[round.losersOf] ?? []) : []).map((tie) => {
+          const outcome = tieOutcome(tie, results);
+          const loser = outcome ? (outcome.winner === tie.higher.teamId ? tie.lower.teamId : tie.higher.teamId) : null;
+          return loser !== null ? { teamId: loser, position: positionOf.get(loser) ?? null } : { teamId: null, position: null, from: { round: tie.round, tie: tie.index }, lost: true };
+        });
+        const all = [...(round.entrants ?? []).map(bySlot), ...winners, ...losers];
         // Re-seed once everyone is known (best-placed v lowest-placed), unless the bracket is fixed.
         const known = all.every((s) => s.teamId !== null);
         const ordered = known && !round.fixedBracket ? [...all].sort((a, b) => a.position! - b.position!) : all;

@@ -459,6 +459,34 @@ describe("continental competitions (UEFA, CONMEBOL)", async () => {
     for (const ids of groups) assert.equal(ids.reduce((n, id) => n + (result.playoffReached![id]?.[0] ?? 0), 0), 400);
   });
 
+  it("plays a sample Primera Nacional: the zone winners' final for the title, the Reducido for the second promotion", () => {
+    const pn = getLeagueBySlug("argentina-primera-nacional")!;
+    const { teams, fixtures } = sampleLeague(pn);
+    assert.equal(teams.length, 36);
+    for (const team of teams) assert.equal(fixtures.filter((f) => f.homeId === team.id || f.awayId === team.id).length, 36);
+    const fixed = realResults(fixtures);
+    const groups = [teams.slice(0, 18).map((t) => t.id), teams.slice(18).map((t) => t.id)];
+    const result = runMonteCarlo({
+      teams,
+      fixtures,
+      fixed,
+      model: buildLeagueModel(teams, fixtures, fixed),
+      standings: { tiebreakers: pn.tiebreakers },
+      iterations: 200,
+      seed: 3,
+      groups,
+      playoff: { config: pn.playoff!, options: { afterMatchday: 36, afterDate: "2026-11-02T20:00:00Z" } },
+    });
+    const sum = (counts: Record<number, number>) => Object.values(counts).reduce((a, b) => a + b, 0);
+    assert.equal(sum(result.playoffTitles!), 200, "a champion every run");
+    assert.equal(sum(result.playoffWins!), 200, "a Reducido winner every run");
+    const reached = Object.values(result.playoffReached!);
+    // 2 in the final, 14 in the Reducido's first round, 8 (the final's loser too) in its second.
+    assert.deepEqual([0, 1, 2, 3, 4].map((r) => reached.reduce((n, x) => n + x[r]!, 0)), [400, 2800, 1600, 800, 400]);
+    // One club from each zone in the final.
+    for (const ids of groups) assert.equal(ids.reduce((n, id) => n + (result.playoffReached![id]?.[0] ?? 0), 0), 200);
+  });
+
   it("groups the menu by continent, UEFA under Europe and CONMEBOL under South America", () => {
     const groups = continents();
     assert.deepEqual(groups.map((g) => g.continent), ["Europe", "South America", "North America", "Asia"]);
@@ -564,5 +592,32 @@ describe("points deductions from ESPN's standings (Peru)", async () => {
     assert.equal(computeStandings(teams, fixtures, results, { tiebreakers: ["points"] })[0]!.teamId, 1);
     const docked = computeStandings(teams, fixtures, results, { tiebreakers: ["points"], deductions: { 1: 5 } });
     assert.deepEqual(docked.map((r) => [r.teamId, r.points]), [[2, 0], [1, -2]]);
+  });
+});
+
+describe("abandoned games whose score stood (Primera Nacional)", async () => {
+  const { standingResults } = await import("./leagueData.ts");
+  const { espnFixtures } = await import("./espn.ts");
+
+  it("counts the listed game with its score, and leaves other abandoned games without a result", () => {
+    const event = (id: string) => ({
+      id,
+      date: "2026-08-03T19:00Z",
+      name: "Tristán Suárez at Güemes",
+      status: { type: { name: "STATUS_ABANDONED", state: "post", completed: false } },
+      competitions: [
+        {
+          competitors: [
+            { homeAway: "home", score: "1", team: { id: "18284", displayName: "Güemes" } },
+            { homeAway: "away", score: "3", team: { id: "10163", displayName: "Tristán Suárez" } },
+          ],
+        },
+      ],
+    });
+    const events = standingResults([event("401844023"), event("401844024")] as never, ["401844023"]);
+    const fixtures = espnFixtures(events);
+    assert.deepEqual(fixtures.find((f) => f.id === 401844023)?.result, { home: 1, away: 3 });
+    assert.equal(fixtures.find((f) => f.id === 401844024)?.result, null);
+    assert.equal(standingResults(events, undefined), events);
   });
 });
