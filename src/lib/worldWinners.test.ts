@@ -135,3 +135,10 @@ describe("My World's cup Past Winners", () => {
     assert.equal(worldCupWinners(world, "EFC").length, 2, "each cup its own");
   });
 });
+
+describe("historySeason", () => {
+  it("labels a world season as the history files do: split years in Europe, a calendar year in Brazil", () => {
+    assert.equal(historySeason(2026), "2026-27");
+    assert.equal(historySeason(2026, true), "2026");
+  });
+});
