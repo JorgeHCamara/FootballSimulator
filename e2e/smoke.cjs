@@ -618,6 +618,30 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Past Winners for the cups: a third tab beside Fixtures and Chances, a page saying the history is coming (out of search results), its Fixtures and Chances tabs back", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      for (const slug of ["fa-cup", "efl-cup", "copa-del-rey", "dfb-pokal", "coppa-italia", "copa-do-brasil"]) {
+        await p.goto(`${BASE_URL}/en/${slug}`);
+        assert.deepEqual((await p.locator('[role="tablist"]').first().locator('[role="tab"]').allInnerTexts()).map((x) => x.trim()), ["Fixtures", "Chances", "Past Winners"], slug);
+      }
+      await p.goto(`${BASE_URL}/en/fa-cup`);
+      await p.getByTestId("past-winners-tab").click();
+      await p.waitForURL(/\/en\/fa-cup\/past-winners$/);
+      assert.equal((await p.locator("h1").innerText()).trim(), "FA Cup past winners");
+      await p.getByTestId("past-winners-coming-soon").waitFor();
+      assert.equal(await p.getByTestId("past-winners-row").count(), 0);
+      assert.match(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex/);
+      assert.equal((await p.getByTestId("view-table").innerText()).trim(), "Fixtures");
+      await p.getByTestId("view-chances").click();
+      await p.waitForURL(/\/en\/fa-cup#chances$/);
+      await p.locator('[role="tab"][aria-selected="true"]', { hasText: "Chances" }).waitFor();
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      assert.doesNotMatch(sitemap, /fa-cup\/past-winners/, "not in the sitemap until it has its history");
+      await p.goto(`${BASE_URL}/pt/copa-do-brasil/past-winners`);
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores da Copa do Brasil");
+      await p.close();
+    });
+
     await step("FA Cup: round cards, simulated draws, bracket, champion, chances, share", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/fa-cup`);
@@ -2847,6 +2871,19 @@ async function step(name, fn) {
       await p.locator('[data-testid="world-tabs"] [data-league="EL2"]').click();
       await p.getByTestId("past-winners-coming-soon").waitFor();
       assert.equal(await worldRows.count(), 2, "League Two: the world's seasons only");
+      // A cup has its Past Winners beside the season picker too: this world's two finals (winner and runner-up), its real history to come.
+      await p.locator('[data-testid="world-tabs"] [data-league="FAC"]').click();
+      assert.equal(await p.getByTestId("world-table-view").innerText(), "Fixtures");
+      await p.getByTestId("world-past-winners").click();
+      const cupWinners = p.locator('[data-testid="world-winners"][data-cup="FAC"]');
+      await cupWinners.waitFor();
+      assert.equal(await cupWinners.getByTestId("past-winners-coming-soon").count(), 1);
+      assert.equal(await cupWinners.getByTestId("past-winners-row").count(), 2);
+      assert.match(await cupWinners.getByTestId("past-winners-row").first().innerText(), new RegExp(`${worldSeason(year + 1)}[\\s\\S]*Final[\\s\\S]*My World`, "i"));
+      assert.equal(await p.getByTestId("world-actions").count(), 0, "the rounds and their buttons put away");
+      await p.getByTestId("world-table-view").click();
+      await p.getByTestId("world-actions").waitFor();
+      await p.locator('[data-testid="world-tabs"] [data-league="EL2"]').click();
       // The Table button brings the table and fixtures back.
       await tableView.click();
       await p.getByTestId("world-table").waitFor();
@@ -3205,6 +3242,34 @@ async function step(name, fn) {
         assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
         assert.equal(await fixtures.getByTestId("match-score").count(), 2);
       }
+      await p.close();
+    });
+
+    await step("My World with England and Brazil: each country's seasons as it plays them (2026/27 in England, 2026 in Brazil)", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
+      await p.locator('[data-testid="world-country"][data-country="BRA"]').click();
+      await p.locator('[data-testid="world-league"][data-league="BSA"]').click();
+      await p.getByTestId("world-club").nth(0).click();
+      await p.getByTestId("world-create").click();
+      const world = p.getByTestId("world");
+      await world.waitFor();
+      const year = Number(await world.getAttribute("data-year"));
+      const split = `${year}/${String((year + 1) % 100).padStart(2, "0")}`;
+      // The club's own season, and Brazil's tables: calendar years.
+      assert.match(await p.getByTestId("world-season").innerText(), new RegExp(`\\b${year}\\b(?!/)`));
+      const seasonCountry = p.getByTestId("world-season-country");
+      await seasonCountry.selectOption("BRA");
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${year} (this season)`);
+      assert.match(await p.getByTestId("world-season-heading").innerText(), new RegExp(`The ${year} season`));
+      await p.locator('[data-testid="world-tabs"] [data-league="CDB"]').click();
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${year} (this season)`, "the Copa do Brasil too");
+      // England's: split years.
+      await seasonCountry.selectOption("ENG");
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${split} (this season)`);
+      assert.match(await p.getByTestId("world-season-heading").innerText(), new RegExp(`The ${split} season`));
       await p.close();
     });
 
