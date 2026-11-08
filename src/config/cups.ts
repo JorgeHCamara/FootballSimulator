@@ -3,7 +3,7 @@ import type { CompetitionCode, FlagCode, SiteLocale } from "./leagues.ts";
 // Knockout cups. Unlike a league, a cup has no table: each round's pairings are
 // drawn, and clubs from several divisions (and outside the league system) meet.
 
-export type CupCode = "FAC" | "CDB" | "CDR" | "CIT" | "DFB" | "EFC";
+export type CupCode = "FAC" | "CDB" | "CDR" | "CIT" | "DFB" | "EFC" | "CDF";
 
 export type CupRoundKey =
   | "preliminaryRound"
@@ -13,6 +13,9 @@ export type CupRoundKey =
   | "thirdRound"
   | "fourthRound"
   | "fifthRound"
+  | "seventhRound"
+  | "eighthRound"
+  | "roundOf64"
   | "roundOf32"
   | "roundOf16"
   | "quarterFinals"
@@ -82,6 +85,11 @@ export interface CupConfig {
    * ones; otherwise the draw order stands). Without it, the lower club hosts.
    */
   hostTier?: number;
+  /**
+   * With `lowerHosts`: a club hosts only when it is at least this many tiers
+   * below its opponent (Coupe de France: two divisions); else the draw order.
+   */
+  hostGap?: number;
   /** What the winner is champion of, for the champion box. */
   title: string;
   /**
@@ -276,6 +284,41 @@ export const CUPS: readonly CupConfig[] = [
     outsiderTier: 4.5,
     tagOutsiders: false,
     title: "EFL Cup",
+  },
+  {
+    kind: "cup",
+    code: "CDF",
+    slug: "coupe-de-france",
+    name: "Coupe de France",
+    country: "France",
+    flag: "fr",
+    simulatorName: { en: "Coupe de France Simulator", pt: "Simulador da Coupe de France", es: "Simulador de la Coupe de France" },
+    aka: { en: "French Cup", pt: "Copa da França", es: "Copa de Francia" },
+    espn: { slug: "fra.coupe_de_france", seasons: "split" },
+    // 2026/27 from the seventh round, the first one ESPN lists: the 18 Ligue 2
+    // clubs, 155 from the regional rounds and 11 from overseas (92 ties). The
+    // seventh and eighth rounds were drawn together, so the real eighth round
+    // follows the seventh; the 18 Ligue 1 clubs join the 46 left in the round
+    // of 64. Single games, a draw every round, a club at least two divisions
+    // below its opponent plays at home up to the semi-finals, and a game level
+    // after 90 minutes goes straight to penalties, except in the final (extra
+    // time first) at the Stade de France.
+    rounds: [
+      { key: "seventhRound", espnSlug: "seventh-round", ties: 92, lowerHosts: true, noExtraTime: true },
+      { key: "eighthRound", espnSlug: "eighth-round", ties: 46, lowerHosts: true, noExtraTime: true },
+      { key: "roundOf64", espnSlug: "round-of-64", ties: 32, entrantsFrom: ["FL1"], entrantsNotYetIn: true, lowerHosts: true, noExtraTime: true },
+      { key: "roundOf32", espnSlug: "round-of-32", ties: 16, lowerHosts: true, noExtraTime: true },
+      { key: "roundOf16", espnSlug: "round-of-16", ties: 8, lowerHosts: true, noExtraTime: true },
+      { key: "quarterFinals", espnSlug: "quarterfinals", ties: 4, lowerHosts: true, noExtraTime: true },
+      { key: "semiFinals", espnSlug: "semifinals", ties: 2, lowerHosts: true, noExtraTime: true },
+      { key: "final", espnSlug: "final", ties: 1, neutral: true, venue: "Stade de France", noExtraTime: false },
+    ],
+    feederLeagues: ["FL1", "FL2"],
+    // National, National 2, National 3 and the regional leagues.
+    outsiderTier: 3,
+    hostGap: 2,
+    tagOutsiders: false,
+    title: "Coupe de France",
   },
 ];
 
