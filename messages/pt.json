@@ -600,6 +600,7 @@
     "roundComplete": "Completa",
     "simulatedDraw": "Sorteio simulado",
     "simulatedDrawNote": "Estes confrontos são um sorteio simulado. O sorteio real substitui o simulado assim que for feito.",
+    "byes": "Passa{count, plural, one {} other {m}} sem jogar: {clubs}. A fonte lista a fase anterior incompleta, então seus vencedores não completam este sorteio; o sorteio real o substitui assim que for listado.",
     "drawAfter": "O sorteio acontece depois da {round}.",
     "drawClubs": "{count} clubes estarão no sorteio.",
     "drawClubsEntering": "{count} clubes estarão no sorteio{entering}.",
