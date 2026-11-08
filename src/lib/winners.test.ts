@@ -58,12 +58,15 @@ describe("the Past Winners files", () => {
     for (const slug of slugs) {
       for (const row of leagueWinners(slug)!) {
         for (const club of rowClubs(row)) {
-          if (club.id === null) assert.equal(club.crest, null, `${slug} ${row.season}: ${club.name} has no id, so a shield`);
+          if (club.id === null) assert.ok(club.crest === null || club.crest.startsWith("/crests/serie-c/"), `${slug} ${row.season}: ${club.name} has no id, so a shield or its Série C crest`);
           else assert.ok(club.crest && (LOCAL.test(club.crest) || ESPN.test(club.crest)), `${slug} ${row.season}: ${club.name}'s badge`);
         }
       }
     }
     assert.equal(crestFor(null, "Leeds City"), null);
+    // No ESPN id, but a club of the site's own Série C: its crest there.
+    assert.equal(crestFor(null, "Paysandu"), "/crests/serie-c/20017.png");
+    assert.equal(crestFor(null, "Santa Cruz"), "/crests/serie-c/20039.png");
     assert.match(crestFor(364, "Liverpool")!, ESPN);
     assert.equal(crestFor(319, "Kidderminster Harriers"), "/crests/319.png");
   });
@@ -231,7 +234,7 @@ describe("the Brasileirão's past winners", () => {
   const rows = leagueWinners("brasileirao")!;
 
   it("runs from 1937 to 2025, calendar years, with the Taça Brasil and the Robertão both in 1967 and 1968", () => {
-    assert.equal(rows.length, 70);
+    assert.equal(rows.length, 71);
     assert.equal(rows[0]!.season, "2025");
     assert.deepEqual([rows[0]!.champion!.name, rows[0]!.runnerUp!.name, rows[0]!.third!.name], ["Flamengo", "Palmeiras", "Cruzeiro"]);
     assert.equal(rows.at(-1)!.season, "1937");
@@ -241,18 +244,22 @@ describe("the Brasileirão's past winners", () => {
     ]);
   });
 
-  it("counts the titles the CBF recognises, both of 1967's and 1968's among them", () => {
+  it("counts the titles, both of 1967's and 1968's and both of 1987's among them", () => {
     assert.deepEqual(
       mostTitles(rows, 5).map((c) => [c.name, c.titles]),
       [
         ["Palmeiras", 12],
-        ["Flamengo", 8],
+        ["Flamengo", 9],
         ["Santos", 8],
         ["Corinthians", 7],
         ["São Paulo", 6],
       ],
     );
-    assert.equal(rows.find((r) => r.season === "1987")!.champion!.name, "Sport Recife", "the CBF's 1987 champion");
+    // 1987: the CBF's champion and the Copa União's, each without a third place.
+    assert.deepEqual(rows.filter((r) => r.season === "1987").map((r) => [r.tournament, r.champion!.name, r.runnerUp!.name, r.third]), [
+      ["CBF", "Sport Recife", "Guarani", null],
+      ["Copa União", "Flamengo", "Internacional", null],
+    ]);
   });
 
   it("keeps each parallel championship in its own era, and an era of one season", () => {

@@ -100,20 +100,23 @@ export function clubTiers(config: CupConfig, divisions: Readonly<Record<TeamId, 
 
 /**
  * Draw order, unless the round is played at the lower-division club: then the
- * lower club hosts. With `hostTier` only clubs at or below that tier get the
- * home game, and only against a club above it (DFB-Pokal: amateurs v pros).
+ * lower club hosts. The cup can narrow that: with `hostTier` only clubs at or
+ * below that tier get the home game, against a club above it (DFB-Pokal:
+ * amateurs v professionals); with `hostGap` only a club that many tiers or
+ * more below its opponent (Coupe de France: two divisions).
  */
 export function hostFirst(
   config: CupRoundConfig,
   home: TeamId,
   away: TeamId,
   tiers: Readonly<Record<TeamId, number>> | undefined,
-  hostTier?: number,
+  rule: Pick<CupConfig, "hostTier" | "hostGap"> = {},
 ): [TeamId, TeamId] {
   if (!config.lowerHosts || !tiers || config.legs === 2) return [home, away];
   const th = tiers[home] ?? Infinity;
   const ta = tiers[away] ?? Infinity;
-  const swap = hostTier === undefined ? ta > th : ta >= hostTier && th < hostTier;
+  const swap =
+    rule.hostTier !== undefined ? ta >= rule.hostTier && th < rule.hostTier : rule.hostGap !== undefined ? ta - th >= rule.hostGap : ta > th;
   return swap ? [away, home] : [home, away];
 }
 
@@ -312,6 +315,19 @@ function makeTie(
  * the remaining clubs are drawn among themselves, and a round whose previous
  * round isn't decided (or whose entrants aren't known) is pending.
  */
+/**
+ * How many of the first round's ties the feed may miss and the round still be
+ * played as listed: ESPN can leave out a tie of an early round (the Coupe de
+ * France's seventh round, with its overseas clubs). The next round then waits
+ * for its real draw, as it can't be drawn from the clubs left.
+ */
+export const FIRST_ROUND_SLACK = 2;
+
+/** The ties a round is played with: its own, or, for a first round the feed lists a tie or two short, the listed ones. */
+export function roundTies(round: CupRoundConfig, r: number, listed: number, entering: number): number {
+  return r === 0 && entering === 0 && listed < round.ties && listed >= round.ties - FIRST_ROUND_SLACK ? listed : round.ties;
+}
+
 export function buildCup(config: CupConfig, real: readonly RealCupTie[], results: ResultMap, options: CupBuildOptions): CupRound[] {
   const rounds: CupRound[] = [];
   config.rounds.forEach((roundConfig, r) => {
@@ -345,7 +361,7 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     const ties: CupTie[] = [];
     realTies.slice(0, roundConfig.ties).forEach((t, i) => ties.push(makeTie(r, i, t.homeId, t.awayId, roundConfig, t.legs, date)));
     const placed = new Set(ties.flatMap((t) => [t.homeId, t.awayId]));
-    const complete = ties.length >= roundConfig.ties;
+    const complete = ties.length >= roundTies(roundConfig, r, realTies.length, entrants.length);
 
     const participants = fromPrevious === null ? [...placed] : [...new Set([...fromPrevious, ...entrants, ...placed])];
     // Not drawable yet: the previous round is open, or clubs entering this round
@@ -372,7 +388,7 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     }
     for (const pair of pairs) {
       if (ties.length >= roundConfig.ties) break;
-      const [home, away] = hostFirst(roundConfig, pair[0], pair[1], options.tiers, config.hostTier);
+      const [home, away] = hostFirst(roundConfig, pair[0], pair[1], options.tiers, config);
       ties.push(makeTie(r, ties.length, home, away, roundConfig, undefined, date));
     }
     rounds.push({
