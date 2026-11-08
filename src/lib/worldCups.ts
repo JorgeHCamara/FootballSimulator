@@ -173,8 +173,9 @@ export const cupClubs = (season: WorldCupSeason): TeamId[] => [
 
 /**
  * Can the season be played to its final: every round drawable from the round
- * before it and its entrants (a real draw the data only had part of couldn't
- * be). Checked when a world takes the real cup over, and when a save loads.
+ * before it and its entrants, with no club through without a game (a real
+ * draw the data only had part of isn't taken). Checked when a world takes the
+ * real cup over, and when a save loads.
  */
 export function cupPlayable(season: WorldCupSeason, year = 2000, seed = 1): boolean {
   const cup = cupConfig(season.code);
@@ -182,7 +183,9 @@ export function cupPlayable(season: WorldCupSeason, year = 2000, seed = 1): bool
   const options = buildOptions(cup, season, year, seed);
   const model = cupModelFor(new Map(), cupClubs(season), 0);
   const results = simulateCup(cup, real, {}, model, createRng(seed), options);
-  return cupWinner(buildCup(cup, real, results, options), results) !== null;
+  const rounds = buildCup(cup, real, results, options);
+  // A world's cup is whole: a round the data only had part of (byes after it, see CupRound.byes) means drawing its own instead.
+  return cupWinner(rounds, results) !== null && rounds.every((r) => !r.byes?.length);
 }
 
 /** The season's scores beyond the ones it started with (WorldCupSeason.scores), as results. */

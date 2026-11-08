@@ -275,6 +275,119 @@ describe("the Brasileirão's past winners", () => {
   });
 });
 
+describe("Ligue 1's past winners", () => {
+  const rows = leagueWinners("ligue-1")!;
+
+  it("runs from 1932-33 to 2025-26, the war years not held, 1992-93's title withdrawn", () => {
+    assert.equal(rows.length, 94);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows.at(-1)!.season, "1932-33");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 6);
+    const revoked = rows.find((r) => r.season === "1992-93")!;
+    assert.equal(revoked.champion, null);
+    assert.equal(revoked.stripped!.name, "Marseille");
+    assert.deepEqual(
+      mostTitles(rows, 5).map((c) => [c.name, c.titles]),
+      [
+        ["Paris Saint-Germain", 14],
+        ["Saint-Étienne", 10],
+        ["Marseille", 9],
+        ["Monaco", 8],
+        ["Nantes", 8],
+      ],
+    );
+  });
+
+  it("keeps the war years in the era around them, though the file names them differently", () => {
+    const list = eras(rows);
+    assert.deepEqual(list, [{ name: "French championship", from: 1932, to: null }]);
+    assert.equal(filterRows(rows, { era: list[0] }).length, 94);
+  });
+});
+
+describe("the Segunda División's past winners", () => {
+  const rows = leagueWinners("segunda-division")!;
+
+  it("runs from 1929 to 2025-26, the Civil War years not held, North and South from 1949-50 to 1967-68", () => {
+    assert.equal(rows.length, 117);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows[0]!.champion!.name, "Racing Santander");
+    assert.equal(rows.at(-1)!.season, "1929");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 3);
+    const groups = rows.filter((r) => r.tournament !== null);
+    assert.equal(groups.length, 38, "19 seasons of two groups");
+    assert.deepEqual(rows.filter((r) => r.season === "1949-50").map((r) => [r.tournament, r.champion!.name]), [
+      ["North", "Racing Santander"],
+      ["South", "Alcoyano"],
+    ]);
+    assert.deepEqual(eras(rows), [{ name: "Segunda División", from: 1929, to: null }]);
+  });
+
+  it("counts each group's win as a title, as the sources do", () => {
+    assert.deepEqual(
+      mostTitles(rows, 2).map((c) => [c.name, c.titles]),
+      [
+        ["Real Murcia", 8],
+        ["Real Betis", 7],
+      ],
+    );
+  });
+});
+
+describe("the 2. Bundesliga's past winners", () => {
+  const rows = leagueWinners("2-bundesliga")!;
+
+  it("runs from 1974-75 to 2025-26, in a Nord and a Süd until 1980-81 and again in 1991-92", () => {
+    assert.equal(rows.length, 60);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows[0]!.champion!.name, "Schalke 04");
+    assert.deepEqual(rows.filter((r) => r.season === "1974-75").map((r) => [r.tournament, r.competition, r.champion!.name]), [
+      ["North", "2. Bundesliga Nord", "Hannover 96"],
+      ["South", "2. Bundesliga Süd", "Karlsruher SC"],
+    ]);
+    assert.deepEqual(
+      eras(rows).map((e) => [e.name, e.from, e.to]),
+      [
+        ["2. Bundesliga Nord", 1974, 1981],
+        ["2. Bundesliga Süd", 1974, 1981],
+        ["2. Bundesliga", 1981, 1991],
+        ["2. Bundesliga Nord", 1991, 1992],
+        ["2. Bundesliga Süd", 1991, 1992],
+        ["2. Bundesliga", 1992, null],
+      ],
+    );
+    assert.equal(mostTitles(rows, 1)[0]!.titles, 5, "1. FC Köln's five");
+  });
+});
+
+describe("the Brasileirão Série B's past winners", () => {
+  const rows = leagueWinners("brasileirao-serie-b")!;
+
+  it("runs from 1971 to 2025, with the years no Série B was played", () => {
+    assert.equal(rows.length, 55);
+    assert.equal(rows[0]!.season, "2025");
+    assert.equal(rows[0]!.champion!.name, "Coritiba");
+    assert.equal(rows.at(-1)!.season, "1971");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 11);
+    assert.deepEqual(eras(rows), [{ name: "Campeonato Brasileiro Série B", from: 1971, to: null }]);
+    assert.deepEqual(mostTitles(rows, 1).map((c) => [c.name, c.titles]), [["Coritiba", 3]]);
+  });
+});
+
+describe("the Brasileirão Série C's past winners", () => {
+  const rows = leagueWinners("brasileirao-serie-c")!;
+
+  it("runs from 1981 to 2025, with the years no Série C was played", () => {
+    assert.equal(rows.length, 45);
+    assert.equal(rows[0]!.season, "2025");
+    assert.equal(rows[0]!.champion!.name, "Ponte Preta");
+    assert.equal(rows.at(-1)!.season, "1981");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 10);
+    assert.deepEqual(eras(rows), [{ name: "Campeonato Brasileiro Série C", from: 1981, to: null }]);
+    assert.deepEqual(mostTitles(rows, 1).map((c) => [c.name, c.titles]), [["Vila Nova", 3]]);
+  });
+});
+
 describe("parseLeagueHistory", () => {
   const placing = (id: number, name: string) => ({ name, currentName: name, footsimuId: id, footsimuSlug: name.toLowerCase(), footsimuPath: `/x/team/${name.toLowerCase()}`, points: 40 });
   const season = (over: Partial<HistorySeason> = {}): HistorySeason => ({

@@ -228,7 +228,9 @@ export interface Era {
 /** The competition's names over time, oldest first, from the real seasons (My World's seasons belong to the current name). */
 export function eras(rows: readonly WinnerRow[]): Era[] {
   const out: Era[] = [];
-  const real = rows.filter((x) => !x.world).sort((a, b) => a.startYear - b.startYear || a.endYear - b.endYear);
+  // Seasons not played don't name an era (France's war years are listed as "Division 1" between two
+  // stretches of the "French championship"): they belong to the era around them (inEra).
+  const real = rows.filter((x) => !x.world && x.status === "completed").sort((a, b) => a.startYear - b.startYear || a.endYear - b.endYear);
   for (let i = 0; i < real.length; ) {
     let j = i;
     while (j < real.length && real[j]!.season === real[i]!.season) j++;
@@ -249,8 +251,9 @@ export function eras(rows: readonly WinnerRow[]): Era[] {
   return out;
 }
 
-/** Is a row in an era: the same competition name, within its years (an open era takes everything since). */
-export const inEra = (row: WinnerRow, era: Era) => row.competition === era.name && row.startYear >= era.from && (era.to === null || row.endYear <= era.to);
+/** Is a row in an era: the same competition name (any, for a season not played), within its years (an open era takes everything since). */
+export const inEra = (row: WinnerRow, era: Era) =>
+  (row.status !== "completed" || row.competition === era.name) && row.startYear >= era.from && (era.to === null || row.endYear <= era.to);
 
 export const decadeOf = (year: number) => Math.floor(year / 10) * 10;
 

@@ -600,6 +600,7 @@
     "roundComplete": "Completa",
     "simulatedDraw": "Sorteo simulado",
     "simulatedDrawNote": "Estos emparejamientos son un sorteo simulado. El sorteo real los sustituye en cuanto se celebra.",
+    "byes": "Pasa{count, plural, one {} other {n}} sin jugar: {clubs}. La fuente lista la ronda anterior incompleta, así que sus ganadores no completan este sorteo; el sorteo real lo sustituye en cuanto aparezca.",
     "drawAfter": "El sorteo se hace después de la {round}.",
     "drawClubs": "{count} clubes entrarán en el bombo.",
     "drawClubsEntering": "{count} clubes entrarán en el bombo{entering}.",
@@ -1277,7 +1278,11 @@
     "world": "My World",
     "comingSoon": "Historial real próximamente",
     "revoked": "Título revocado",
-    "tied": "Puesto compartido"
+    "tied": "Puesto compartido",
+    "tournaments": {
+      "North": "Norte",
+      "South": "Sur"
+    }
   },
   "World": {
     "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés, español, alemán, italiano o brasileño",

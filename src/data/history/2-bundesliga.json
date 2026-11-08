@@ -1,0 +1,2064 @@
+{
+  "league": "2. Bundesliga",
+  "footsimuSlug": "2-bundesliga",
+  "footsimuCode": "BL2",
+  "country": "Germany",
+  "scope": "German second tier (2. Fußball-Bundesliga) from its creation in 1974-75 to 2025-26. 1974-75 to 1980-81 and 1991-92 were played in two groups (Nord/Süd, labelled North/South): one row per group via the tournament field. Earlier second-level competitions (Oberligen 1945-63, Regionalligen 1963-74) are not included. Title counts in the source list count each group win as a title",
+  "source": [
+    "https://en.wikipedia.org/wiki/2._Bundesliga (revision 1376798648; champions, runners-up, third)",
+    "Wikipedia season articles (YYYY–YY 2. Bundesliga): league tables, points",
+    "https://de.wikipedia.org/wiki/2._Fußball-Bundesliga_YYYY/YY (German Wikipedia final tables: top three and points, every season and group; cross-check)",
+    "https://www.rsssf.org/tablesd/duit2champ.html (RSSSF champions every season and group; runners-up 1981-; third 1992-2008; cross-check)",
+    "https://www.rsssf.org/tablesd/duitYY.html / duitYYYY.html (RSSSF final tables 1996-97 to 2025-26; cross-check)",
+    "https://site.api.espn.com/apis/v2/sports/soccer/ger.2/standings?season=YYYY (2002-03 to 2025-26, cross-check)"
+  ],
+  "retrievedAt": "2026-11-07T02:07:36+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id (the id FootSimu uses)",
+    "footsimuSlug": "club page slug on footsimu.com, only for clubs in a FootSimu league in 2026-27",
+    "footsimuPath": "club page path under the league the club plays in now, without locale",
+    "points": "final points (2 per win until 1994-95, 3 from 1995-96); 1991-92 includes the carried-over first-phase points",
+    "name": "club name used in the source for that season",
+    "currentName": "club as known today (FootSimu name where available); defunct/renamed clubs annotated",
+    "tournament": "\"North\" / \"South\" (2. Bundesliga Nord / Süd) for 1974-75 to 1980-81 and 1991-92, otherwise null",
+    "tiedWith": "not used (ties on points were separated by goal difference; see notes)",
+    "strippedChampion": "not used"
+  },
+  "seasons": [
+    {
+      "season": "1974-75",
+      "startYear": 1974,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "2. Bundesliga Nord",
+      "format": "league",
+      "champion": {
+        "name": "Hannover 96",
+        "currentName": "Hannover 96",
+        "footsimuId": 2428,
+        "footsimuSlug": "hannover-96",
+        "footsimuPath": "/2-bundesliga/team/hannover-96",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Bayer Uerdingen",
+        "currentName": "KFC Uerdingen 05 (Bayer 05 Uerdingen until 1995)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "third": {
+        "name": "FC St. Pauli",
+        "currentName": "St. Pauli",
+        "footsimuId": 270,
+        "footsimuSlug": "st-pauli",
+        "footsimuPath": "/2-bundesliga/team/st-pauli",
+        "points": 50
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the North group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1974-75",
+      "startYear": 1974,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "2. Bundesliga Süd",
+      "format": "league",
+      "champion": {
+        "name": "Karlsruher SC",
+        "currentName": "Karlsruher SC",
+        "footsimuId": 4471,
+        "footsimuSlug": "karlsruher-sc",
+        "footsimuPath": "/2-bundesliga/team/karlsruher-sc",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Pirmasens",
+        "currentName": "FK Pirmasens",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "third": {
+        "name": "FC Schweinfurt 05",
+        "currentName": "Schweinfurt 05",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the South group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place",
+        "Pirmasens and FC Schweinfurt 05 level on 48 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "1975-76",
+      "startYear": 1975,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "2. Bundesliga Nord",
+      "format": "league",
+      "champion": {
+        "name": "Tennis Borussia Berlin",
+        "currentName": "Tennis Borussia Berlin",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Borussia Dortmund",
+        "currentName": "Borussia Dortmund",
+        "footsimuId": 124,
+        "footsimuSlug": "borussia-dortmund",
+        "footsimuPath": "/bundesliga/team/borussia-dortmund",
+        "points": 52
+      },
+      "third": {
+        "name": "Preußen Münster",
+        "currentName": "Preußen Münster",
+        "footsimuId": 9867,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the North group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1975-76",
+      "startYear": 1975,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "2. Bundesliga Süd",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Saarbrücken",
+        "currentName": "1. FC Saarbrücken",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 54
+      },
+      "third": {
+        "name": "FC Homburg",
+        "currentName": "FC 08 Homburg",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the South group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1976-77",
+      "startYear": 1976,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "2. Bundesliga Nord",
+      "format": "league",
+      "champion": {
+        "name": "FC St. Pauli",
+        "currentName": "St. Pauli",
+        "footsimuId": 270,
+        "footsimuSlug": "st-pauli",
+        "footsimuPath": "/2-bundesliga/team/st-pauli",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Arminia Bielefeld",
+        "currentName": "Arminia Bielefeld",
+        "footsimuId": 2506,
+        "footsimuSlug": "arminia-bielefeld",
+        "footsimuPath": "/2-bundesliga/team/arminia-bielefeld",
+        "points": 50
+      },
+      "third": {
+        "name": "Wuppertaler SV",
+        "currentName": "Wuppertaler SV",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the North group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1976-77",
+      "startYear": 1976,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "2. Bundesliga Süd",
+      "format": "league",
+      "champion": {
+        "name": "VfB Stuttgart",
+        "currentName": "VfB Stuttgart",
+        "footsimuId": 134,
+        "footsimuSlug": "vfb-stuttgart",
+        "footsimuPath": "/bundesliga/team/vfb-stuttgart",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "1860 Munich",
+        "currentName": "TSV 1860 Munich",
+        "footsimuId": 135,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 56
+      },
+      "third": {
+        "name": "Kickers Offenbach",
+        "currentName": "Kickers Offenbach",
+        "footsimuId": 3811,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the South group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1977-78",
+      "startYear": 1977,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "2. Bundesliga Nord",
+      "format": "league",
+      "champion": {
+        "name": "Arminia Bielefeld",
+        "currentName": "Arminia Bielefeld",
+        "footsimuId": 2506,
+        "footsimuSlug": "arminia-bielefeld",
+        "footsimuPath": "/2-bundesliga/team/arminia-bielefeld",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Rot-Weiss Essen",
+        "currentName": "Rot-Weiss Essen",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "third": {
+        "name": "Preußen Münster",
+        "currentName": "Preußen Münster",
+        "footsimuId": 9867,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the North group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1977-78",
+      "startYear": 1977,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "2. Bundesliga Süd",
+      "format": "league",
+      "champion": {
+        "name": "Darmstadt 98",
+        "currentName": "SV Darmstadt 98",
+        "footsimuId": 3812,
+        "footsimuSlug": "sv-darmstadt-98",
+        "footsimuPath": "/2-bundesliga/team/sv-darmstadt-98",
+        "points": 58
+      },
+      "runnerUp": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 53
+      },
+      "third": {
+        "name": "FC Homburg",
+        "currentName": "FC 08 Homburg",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the South group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1978-79",
+      "startYear": 1978,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "2. Bundesliga Nord",
+      "format": "league",
+      "champion": {
+        "name": "Bayer Leverkusen",
+        "currentName": "Bayer Leverkusen",
+        "footsimuId": 131,
+        "footsimuSlug": "bayer-leverkusen",
+        "footsimuPath": "/bundesliga/team/bayer-leverkusen",
+        "points": 59
+      },
+      "runnerUp": {
+        "name": "Bayer Uerdingen",
+        "currentName": "KFC Uerdingen 05 (Bayer 05 Uerdingen until 1995)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "third": {
+        "name": "Preußen Münster",
+        "currentName": "Preußen Münster",
+        "footsimuId": 9867,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the North group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1978-79",
+      "startYear": 1978,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "2. Bundesliga Süd",
+      "format": "league",
+      "champion": {
+        "name": "1860 Munich",
+        "currentName": "TSV 1860 Munich",
+        "footsimuId": 135,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Bayreuth",
+        "currentName": "SpVgg Bayreuth",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 52
+      },
+      "third": {
+        "name": "Wormatia Worms",
+        "currentName": "Wormatia Worms",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the South group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1979-80",
+      "startYear": 1979,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "2. Bundesliga Nord",
+      "format": "league",
+      "champion": {
+        "name": "Arminia Bielefeld",
+        "currentName": "Arminia Bielefeld",
+        "footsimuId": 2506,
+        "footsimuSlug": "arminia-bielefeld",
+        "footsimuPath": "/2-bundesliga/team/arminia-bielefeld",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Rot-Weiss Essen",
+        "currentName": "Rot-Weiss Essen",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 54
+      },
+      "third": {
+        "name": "Hannover 96",
+        "currentName": "Hannover 96",
+        "footsimuId": 2428,
+        "footsimuSlug": "hannover-96",
+        "footsimuPath": "/2-bundesliga/team/hannover-96",
+        "points": 52
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the North group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1979-80",
+      "startYear": 1979,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "2. Bundesliga Süd",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Karlsruher SC",
+        "currentName": "Karlsruher SC",
+        "footsimuId": 4471,
+        "footsimuSlug": "karlsruher-sc",
+        "footsimuPath": "/2-bundesliga/team/karlsruher-sc",
+        "points": 59
+      },
+      "third": {
+        "name": "Stuttgarter Kickers",
+        "currentName": "Stuttgarter Kickers",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 52
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the South group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1980-81",
+      "startYear": 1980,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "2. Bundesliga Nord",
+      "format": "league",
+      "champion": {
+        "name": "Werder Bremen",
+        "currentName": "Werder Bremen",
+        "footsimuId": 137,
+        "footsimuSlug": "werder-bremen",
+        "footsimuPath": "/bundesliga/team/werder-bremen",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Eintracht Braunschweig",
+        "currentName": "Eintracht Braunschweig",
+        "footsimuId": 3067,
+        "footsimuSlug": "eintracht-braunschweig",
+        "footsimuPath": "/2-bundesliga/team/eintracht-braunschweig",
+        "points": 65
+      },
+      "third": {
+        "name": "Hertha BSC",
+        "currentName": "Hertha BSC",
+        "footsimuId": 129,
+        "footsimuSlug": "hertha-bsc",
+        "footsimuPath": "/2-bundesliga/team/hertha-bsc",
+        "points": 64
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the North group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1980-81",
+      "startYear": 1980,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "2. Bundesliga Süd",
+      "format": "league",
+      "champion": {
+        "name": "Darmstadt 98",
+        "currentName": "SV Darmstadt 98",
+        "footsimuId": 3812,
+        "footsimuSlug": "sv-darmstadt-98",
+        "footsimuPath": "/2-bundesliga/team/sv-darmstadt-98",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Kickers Offenbach",
+        "currentName": "Kickers Offenbach",
+        "footsimuId": 3811,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "third": {
+        "name": "Stuttgarter Kickers",
+        "currentName": "Stuttgarter Kickers",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "notes": [
+        "Played in two regional groups (Nord/North and Süd/South) from 1974-75 to 1980-81; this row is the South group. Both group winners were promoted and the two runners-up met in a play-off for a third promotion place"
+      ]
+    },
+    {
+      "season": "1981-82",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Schalke 04",
+        "currentName": "Schalke 04",
+        "footsimuId": 133,
+        "footsimuSlug": "schalke-04",
+        "footsimuPath": "/bundesliga/team/schalke-04",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Hertha BSC",
+        "currentName": "Hertha BSC",
+        "footsimuId": 129,
+        "footsimuSlug": "hertha-bsc",
+        "footsimuPath": "/2-bundesliga/team/hertha-bsc",
+        "points": 48
+      },
+      "third": {
+        "name": "Kickers Offenbach",
+        "currentName": "Kickers Offenbach",
+        "footsimuId": 3811,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1982-83",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Waldhof Mannheim",
+        "currentName": "SV Waldhof Mannheim",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Kickers Offenbach",
+        "currentName": "Kickers Offenbach",
+        "footsimuId": 3811,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "third": {
+        "name": "Uerdingen",
+        "currentName": "KFC Uerdingen 05 (Bayer 05 Uerdingen until 1995)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "notes": []
+    },
+    {
+      "season": "1983-84",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Karlsruher SC",
+        "currentName": "Karlsruher SC",
+        "footsimuId": 4471,
+        "footsimuSlug": "karlsruher-sc",
+        "footsimuPath": "/2-bundesliga/team/karlsruher-sc",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Schalke 04",
+        "currentName": "Schalke 04",
+        "footsimuId": 133,
+        "footsimuSlug": "schalke-04",
+        "footsimuPath": "/bundesliga/team/schalke-04",
+        "points": 55
+      },
+      "third": {
+        "name": "MSV Duisburg",
+        "currentName": "MSV Duisburg",
+        "footsimuId": 3308,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "notes": []
+    },
+    {
+      "season": "1984-85",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Hannover 96",
+        "currentName": "Hannover 96",
+        "footsimuId": 2428,
+        "footsimuSlug": "hannover-96",
+        "footsimuPath": "/2-bundesliga/team/hannover-96",
+        "points": 50
+      },
+      "third": {
+        "name": "1. FC Saarbrücken",
+        "currentName": "1. FC Saarbrücken",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": [
+        "1. FC Nürnberg and Hannover 96 level on 50 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "1985-86",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Homburg",
+        "currentName": "FC 08 Homburg",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "BW Berlin",
+        "currentName": "SpVgg Blau-Weiß 1890 Berlin (successor of Blau-Weiß 90 Berlin, defunct 1992)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "third": {
+        "name": "Fortuna Köln",
+        "currentName": "SC Fortuna Köln",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1986-87",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Hannover 96",
+        "currentName": "Hannover 96",
+        "footsimuId": 2428,
+        "footsimuSlug": "hannover-96",
+        "footsimuPath": "/2-bundesliga/team/hannover-96",
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Karlsruher SC",
+        "currentName": "Karlsruher SC",
+        "footsimuId": 4471,
+        "footsimuSlug": "karlsruher-sc",
+        "footsimuPath": "/2-bundesliga/team/karlsruher-sc",
+        "points": 52
+      },
+      "third": {
+        "name": "FC St. Pauli",
+        "currentName": "St. Pauli",
+        "footsimuId": 270,
+        "footsimuSlug": "st-pauli",
+        "footsimuPath": "/2-bundesliga/team/st-pauli",
+        "points": 49
+      },
+      "notes": []
+    },
+    {
+      "season": "1987-88",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Stuttgarter Kickers",
+        "currentName": "Stuttgarter Kickers",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "FC St. Pauli",
+        "currentName": "St. Pauli",
+        "footsimuId": 270,
+        "footsimuSlug": "st-pauli",
+        "footsimuPath": "/2-bundesliga/team/st-pauli",
+        "points": 49
+      },
+      "third": {
+        "name": "Darmstadt 98",
+        "currentName": "SV Darmstadt 98",
+        "footsimuId": 3812,
+        "footsimuSlug": "sv-darmstadt-98",
+        "footsimuPath": "/2-bundesliga/team/sv-darmstadt-98",
+        "points": 47
+      },
+      "notes": []
+    },
+    {
+      "season": "1988-89",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Fortuna Düsseldorf",
+        "currentName": "Fortuna Düsseldorf",
+        "footsimuId": 9707,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Homburg",
+        "currentName": "FC 08 Homburg",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "third": {
+        "name": "1. FC Saarbrücken",
+        "currentName": "1. FC Saarbrücken",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1989-90",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Hertha BSC",
+        "currentName": "Hertha BSC",
+        "footsimuId": 129,
+        "footsimuSlug": "hertha-bsc",
+        "footsimuPath": "/2-bundesliga/team/hertha-bsc",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Wattenscheid",
+        "currentName": "SG Wattenscheid 09",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "third": {
+        "name": "1. FC Saarbrücken",
+        "currentName": "1. FC Saarbrücken",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "notes": []
+    },
+    {
+      "season": "1990-91",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Schalke 04",
+        "currentName": "Schalke 04",
+        "footsimuId": 133,
+        "footsimuSlug": "schalke-04",
+        "footsimuPath": "/bundesliga/team/schalke-04",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "MSV Duisburg",
+        "currentName": "MSV Duisburg",
+        "footsimuId": 3308,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 53
+      },
+      "third": {
+        "name": "Stuttgarter Kickers",
+        "currentName": "Stuttgarter Kickers",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "notes": []
+    },
+    {
+      "season": "1991-92",
+      "startYear": 1991,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "2. Bundesliga Nord",
+      "format": "league",
+      "champion": {
+        "name": "Bayer Uerdingen",
+        "currentName": "KFC Uerdingen 05 (Bayer 05 Uerdingen until 1995)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 39
+      },
+      "runnerUp": {
+        "name": "VfB Oldenburg",
+        "currentName": "VfB Oldenburg",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "Hertha BSC",
+        "currentName": "Hertha BSC",
+        "footsimuId": 129,
+        "footsimuSlug": "hertha-bsc",
+        "footsimuPath": "/2-bundesliga/team/hertha-bsc",
+        "points": 35
+      },
+      "notes": [
+        "1991-92 (after German reunification): two groups of 12 (Nord/North and Süd/South), each followed by a promotion round of the top six with points carried over (32 matches). This row is the North group's final table; both group winners were promoted"
+      ]
+    },
+    {
+      "season": "1991-92",
+      "startYear": 1991,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "2. Bundesliga Süd",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Saarbrücken",
+        "currentName": "1. FC Saarbrücken",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Waldhof Mannheim",
+        "currentName": "SV Waldhof Mannheim",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "SC Freiburg",
+        "currentName": "Freiburg",
+        "footsimuId": 126,
+        "footsimuSlug": "freiburg",
+        "footsimuPath": "/bundesliga/team/freiburg",
+        "points": 37
+      },
+      "notes": [
+        "1991-92 (after German reunification): two groups of 12 (Nord/North and Süd/South), each followed by a promotion round of the top six with points carried over (32 matches). This row is the South group's final table; both group winners were promoted"
+      ]
+    },
+    {
+      "season": "1992-93",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "SC Freiburg",
+        "currentName": "Freiburg",
+        "footsimuId": 126,
+        "footsimuSlug": "freiburg",
+        "footsimuPath": "/bundesliga/team/freiburg",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "MSV Duisburg",
+        "currentName": "MSV Duisburg",
+        "footsimuId": 3308,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 60
+      },
+      "third": {
+        "name": "VfB Leipzig",
+        "currentName": "1. FC Lokomotive Leipzig (VfB Leipzig, defunct 2004, refounded under the old name)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 58
+      },
+      "notes": []
+    },
+    {
+      "season": "1993-94",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "VfL Bochum",
+        "currentName": "VfL Bochum",
+        "footsimuId": 121,
+        "footsimuSlug": "vfl-bochum",
+        "footsimuPath": "/2-bundesliga/team/vfl-bochum",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Uerdingen",
+        "currentName": "KFC Uerdingen 05 (Bayer 05 Uerdingen until 1995)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "third": {
+        "name": "1860 Munich",
+        "currentName": "TSV 1860 Munich",
+        "footsimuId": 135,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "notes": [
+        "Uerdingen and 1860 Munich level on 47 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "1994-95",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Hansa Rostock",
+        "currentName": "Hansa Rostock",
+        "footsimuId": 128,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "FC St. Pauli",
+        "currentName": "St. Pauli",
+        "footsimuId": 270,
+        "footsimuSlug": "st-pauli",
+        "footsimuPath": "/2-bundesliga/team/st-pauli",
+        "points": 44
+      },
+      "third": {
+        "name": "Fortuna Düsseldorf",
+        "currentName": "Fortuna Düsseldorf",
+        "footsimuId": 9707,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 43
+      },
+      "notes": []
+    },
+    {
+      "season": "1995-96",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "VfL Bochum",
+        "currentName": "VfL Bochum",
+        "footsimuId": 121,
+        "footsimuSlug": "vfl-bochum",
+        "footsimuPath": "/2-bundesliga/team/vfl-bochum",
+        "points": 69
+      },
+      "runnerUp": {
+        "name": "Arminia Bielefeld",
+        "currentName": "Arminia Bielefeld",
+        "footsimuId": 2506,
+        "footsimuSlug": "arminia-bielefeld",
+        "footsimuPath": "/2-bundesliga/team/arminia-bielefeld",
+        "points": 57
+      },
+      "third": {
+        "name": "MSV Duisburg",
+        "currentName": "MSV Duisburg",
+        "footsimuId": 3308,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 56
+      },
+      "notes": []
+    },
+    {
+      "season": "1996-97",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Kaiserslautern",
+        "currentName": "Kaiserslautern",
+        "footsimuId": 130,
+        "footsimuSlug": "kaiserslautern",
+        "footsimuPath": "/2-bundesliga/team/kaiserslautern",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "VfL Wolfsburg",
+        "currentName": "VfL Wolfsburg",
+        "footsimuId": 138,
+        "footsimuSlug": "vfl-wolfsburg",
+        "footsimuPath": "/2-bundesliga/team/vfl-wolfsburg",
+        "points": 58
+      },
+      "third": {
+        "name": "Hertha BSC",
+        "currentName": "Hertha BSC",
+        "footsimuId": 129,
+        "footsimuSlug": "hertha-bsc",
+        "footsimuPath": "/2-bundesliga/team/hertha-bsc",
+        "points": 58
+      },
+      "notes": [
+        "VfL Wolfsburg and Hertha BSC level on 58 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "1997-98",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Eintracht Frankfurt",
+        "currentName": "Eintracht Frankfurt",
+        "footsimuId": 125,
+        "footsimuSlug": "eintracht-frankfurt",
+        "footsimuPath": "/bundesliga/team/eintracht-frankfurt",
+        "points": 64
+      },
+      "runnerUp": {
+        "name": "SC Freiburg",
+        "currentName": "Freiburg",
+        "footsimuId": 126,
+        "footsimuSlug": "freiburg",
+        "footsimuPath": "/bundesliga/team/freiburg",
+        "points": 61
+      },
+      "third": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 59
+      },
+      "notes": []
+    },
+    {
+      "season": "1998-99",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Arminia Bielefeld",
+        "currentName": "Arminia Bielefeld",
+        "footsimuId": 2506,
+        "footsimuSlug": "arminia-bielefeld",
+        "footsimuPath": "/2-bundesliga/team/arminia-bielefeld",
+        "points": 67
+      },
+      "runnerUp": {
+        "name": "Unterhaching",
+        "currentName": "SpVgg Unterhaching",
+        "footsimuId": 136,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 63
+      },
+      "third": {
+        "name": "SSV Ulm",
+        "currentName": "SSV Ulm 1846",
+        "footsimuId": 15710,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 58
+      },
+      "notes": []
+    },
+    {
+      "season": "1999-00",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Köln",
+        "currentName": "FC Köln",
+        "footsimuId": 122,
+        "footsimuSlug": "fc-koln",
+        "footsimuPath": "/bundesliga/team/fc-koln",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "VfL Bochum",
+        "currentName": "VfL Bochum",
+        "footsimuId": 121,
+        "footsimuSlug": "vfl-bochum",
+        "footsimuPath": "/2-bundesliga/team/vfl-bochum",
+        "points": 61
+      },
+      "third": {
+        "name": "Energie Cottbus",
+        "currentName": "Energie Cottbus",
+        "footsimuId": 123,
+        "footsimuSlug": "energie-cottbus",
+        "footsimuPath": "/2-bundesliga/team/energie-cottbus",
+        "points": 58
+      },
+      "notes": []
+    },
+    {
+      "season": "2000-01",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "Borussia Mönchengladbach",
+        "currentName": "Borussia Mönchengladbach",
+        "footsimuId": 268,
+        "footsimuSlug": "borussia-monchengladbach",
+        "footsimuPath": "/bundesliga/team/borussia-monchengladbach",
+        "points": 62
+      },
+      "third": {
+        "name": "St. Pauli",
+        "currentName": "St. Pauli",
+        "footsimuId": 270,
+        "footsimuSlug": "st-pauli",
+        "footsimuPath": "/2-bundesliga/team/st-pauli",
+        "points": 60
+      },
+      "notes": []
+    },
+    {
+      "season": "2001-02",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Hannover 96",
+        "currentName": "Hannover 96",
+        "footsimuId": 2428,
+        "footsimuSlug": "hannover-96",
+        "footsimuPath": "/2-bundesliga/team/hannover-96",
+        "points": 75
+      },
+      "runnerUp": {
+        "name": "Arminia Bielefeld",
+        "currentName": "Arminia Bielefeld",
+        "footsimuId": 2506,
+        "footsimuSlug": "arminia-bielefeld",
+        "footsimuPath": "/2-bundesliga/team/arminia-bielefeld",
+        "points": 65
+      },
+      "third": {
+        "name": "VfL Bochum",
+        "currentName": "VfL Bochum",
+        "footsimuId": 121,
+        "footsimuSlug": "vfl-bochum",
+        "footsimuPath": "/2-bundesliga/team/vfl-bochum",
+        "points": 65
+      },
+      "notes": [
+        "Arminia Bielefeld and VfL Bochum level on 65 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "2002-03",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "SC Freiburg",
+        "currentName": "Freiburg",
+        "footsimuId": 126,
+        "footsimuSlug": "freiburg",
+        "footsimuPath": "/bundesliga/team/freiburg",
+        "points": 67
+      },
+      "runnerUp": {
+        "name": "1. FC Köln",
+        "currentName": "FC Köln",
+        "footsimuId": 122,
+        "footsimuSlug": "fc-koln",
+        "footsimuPath": "/bundesliga/team/fc-koln",
+        "points": 65
+      },
+      "third": {
+        "name": "Eintracht Frankfurt",
+        "currentName": "Eintracht Frankfurt",
+        "footsimuId": 125,
+        "footsimuSlug": "eintracht-frankfurt",
+        "footsimuPath": "/bundesliga/team/eintracht-frankfurt",
+        "points": 62
+      },
+      "notes": []
+    },
+    {
+      "season": "2003-04",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Arminia Bielefeld",
+        "currentName": "Arminia Bielefeld",
+        "footsimuId": 2506,
+        "footsimuSlug": "arminia-bielefeld",
+        "footsimuPath": "/2-bundesliga/team/arminia-bielefeld",
+        "points": 56
+      },
+      "third": {
+        "name": "Mainz 05",
+        "currentName": "Mainz 05",
+        "footsimuId": 2950,
+        "footsimuSlug": "mainz-05",
+        "footsimuPath": "/bundesliga/team/mainz-05",
+        "points": 54
+      },
+      "notes": []
+    },
+    {
+      "season": "2004-05",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Köln",
+        "currentName": "FC Köln",
+        "footsimuId": 122,
+        "footsimuSlug": "fc-koln",
+        "footsimuPath": "/bundesliga/team/fc-koln",
+        "points": 67
+      },
+      "runnerUp": {
+        "name": "Duisburg",
+        "currentName": "MSV Duisburg",
+        "footsimuId": 3308,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 62
+      },
+      "third": {
+        "name": "Eintracht Frankfurt",
+        "currentName": "Eintracht Frankfurt",
+        "footsimuId": 125,
+        "footsimuSlug": "eintracht-frankfurt",
+        "footsimuPath": "/bundesliga/team/eintracht-frankfurt",
+        "points": 61
+      },
+      "notes": []
+    },
+    {
+      "season": "2005-06",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "VfL Bochum",
+        "currentName": "VfL Bochum",
+        "footsimuId": 121,
+        "footsimuSlug": "vfl-bochum",
+        "footsimuPath": "/2-bundesliga/team/vfl-bochum",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Alemannia Aachen",
+        "currentName": "Alemannia Aachen",
+        "footsimuId": 2997,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 65
+      },
+      "third": {
+        "name": "Energie Cottbus",
+        "currentName": "Energie Cottbus",
+        "footsimuId": 123,
+        "footsimuSlug": "energie-cottbus",
+        "footsimuPath": "/2-bundesliga/team/energie-cottbus",
+        "points": 58
+      },
+      "notes": [
+        "Bochum 66 points (19-9-6) per de.wikipedia and RSSSF; the English season article shows 67"
+      ]
+    },
+    {
+      "season": "2006-07",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Karlsruher SC",
+        "currentName": "Karlsruher SC",
+        "footsimuId": 4471,
+        "footsimuSlug": "karlsruher-sc",
+        "footsimuPath": "/2-bundesliga/team/karlsruher-sc",
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "Hansa Rostock",
+        "currentName": "Hansa Rostock",
+        "footsimuId": 128,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 62
+      },
+      "third": {
+        "name": "Duisburg",
+        "currentName": "MSV Duisburg",
+        "footsimuId": 3308,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 60
+      },
+      "notes": []
+    },
+    {
+      "season": "2007-08",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Borussia Mönchengladbach",
+        "currentName": "Borussia Mönchengladbach",
+        "footsimuId": 268,
+        "footsimuSlug": "borussia-monchengladbach",
+        "footsimuPath": "/bundesliga/team/borussia-monchengladbach",
+        "points": 66
+      },
+      "runnerUp": {
+        "name": "Hoffenheim",
+        "currentName": "Hoffenheim",
+        "footsimuId": 7911,
+        "footsimuSlug": "hoffenheim",
+        "footsimuPath": "/bundesliga/team/hoffenheim",
+        "points": 60
+      },
+      "third": {
+        "name": "1. FC Köln",
+        "currentName": "FC Köln",
+        "footsimuId": 122,
+        "footsimuSlug": "fc-koln",
+        "footsimuPath": "/bundesliga/team/fc-koln",
+        "points": 60
+      },
+      "notes": [
+        "Hoffenheim and 1. FC Köln level on 60 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "2008-09",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "SC Freiburg",
+        "currentName": "Freiburg",
+        "footsimuId": 126,
+        "footsimuSlug": "freiburg",
+        "footsimuPath": "/bundesliga/team/freiburg",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Mainz 05",
+        "currentName": "Mainz 05",
+        "footsimuId": 2950,
+        "footsimuSlug": "mainz-05",
+        "footsimuPath": "/bundesliga/team/mainz-05",
+        "points": 63
+      },
+      "third": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 60
+      },
+      "notes": [
+        "RSSSF lists Freiburg as runner-up in its promotion table, an evident slip (Freiburg were champions); Mainz 05 second per the season articles (en, de) and ESPN"
+      ]
+    },
+    {
+      "season": "2009-10",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Kaiserslautern",
+        "currentName": "Kaiserslautern",
+        "footsimuId": 130,
+        "footsimuSlug": "kaiserslautern",
+        "footsimuPath": "/2-bundesliga/team/kaiserslautern",
+        "points": 67
+      },
+      "runnerUp": {
+        "name": "St. Pauli",
+        "currentName": "St. Pauli",
+        "footsimuId": 270,
+        "footsimuSlug": "st-pauli",
+        "footsimuPath": "/2-bundesliga/team/st-pauli",
+        "points": 64
+      },
+      "third": {
+        "name": "FC Augsburg",
+        "currentName": "Augsburg",
+        "footsimuId": 3841,
+        "footsimuSlug": "augsburg",
+        "footsimuPath": "/bundesliga/team/augsburg",
+        "points": 62
+      },
+      "notes": []
+    },
+    {
+      "season": "2010-11",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Hertha BSC",
+        "currentName": "Hertha BSC",
+        "footsimuId": 129,
+        "footsimuSlug": "hertha-bsc",
+        "footsimuPath": "/2-bundesliga/team/hertha-bsc",
+        "points": 74
+      },
+      "runnerUp": {
+        "name": "FC Augsburg",
+        "currentName": "Augsburg",
+        "footsimuId": 3841,
+        "footsimuSlug": "augsburg",
+        "footsimuPath": "/bundesliga/team/augsburg",
+        "points": 65
+      },
+      "third": {
+        "name": "VfL Bochum",
+        "currentName": "VfL Bochum",
+        "footsimuId": 121,
+        "footsimuSlug": "vfl-bochum",
+        "footsimuPath": "/2-bundesliga/team/vfl-bochum",
+        "points": 65
+      },
+      "notes": [
+        "FC Augsburg and VfL Bochum level on 65 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "2011-12",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Greuther Fürth",
+        "currentName": "Greuther Fürth",
+        "footsimuId": 3070,
+        "footsimuSlug": "greuther-furth",
+        "footsimuPath": "/2-bundesliga/team/greuther-furth",
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "Eintracht Frankfurt",
+        "currentName": "Eintracht Frankfurt",
+        "footsimuId": 125,
+        "footsimuSlug": "eintracht-frankfurt",
+        "footsimuPath": "/bundesliga/team/eintracht-frankfurt",
+        "points": 68
+      },
+      "third": {
+        "name": "Fortuna Düsseldorf",
+        "currentName": "Fortuna Düsseldorf",
+        "footsimuId": 9707,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 62
+      },
+      "notes": []
+    },
+    {
+      "season": "2012-13",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Hertha BSC",
+        "currentName": "Hertha BSC",
+        "footsimuId": 129,
+        "footsimuSlug": "hertha-bsc",
+        "footsimuPath": "/2-bundesliga/team/hertha-bsc",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Eintracht Braunschweig",
+        "currentName": "Eintracht Braunschweig",
+        "footsimuId": 3067,
+        "footsimuSlug": "eintracht-braunschweig",
+        "footsimuPath": "/2-bundesliga/team/eintracht-braunschweig",
+        "points": 67
+      },
+      "third": {
+        "name": "1. FC Kaiserslautern",
+        "currentName": "Kaiserslautern",
+        "footsimuId": 130,
+        "footsimuSlug": "kaiserslautern",
+        "footsimuPath": "/2-bundesliga/team/kaiserslautern",
+        "points": 58
+      },
+      "notes": []
+    },
+    {
+      "season": "2013-14",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Köln",
+        "currentName": "FC Köln",
+        "footsimuId": 122,
+        "footsimuSlug": "fc-koln",
+        "footsimuPath": "/bundesliga/team/fc-koln",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "SC Paderborn",
+        "currentName": "Paderborn",
+        "footsimuId": 3307,
+        "footsimuSlug": "paderborn",
+        "footsimuPath": "/bundesliga/team/paderborn",
+        "points": 62
+      },
+      "third": {
+        "name": "Greuther Fürth",
+        "currentName": "Greuther Fürth",
+        "footsimuId": 3070,
+        "footsimuSlug": "greuther-furth",
+        "footsimuPath": "/2-bundesliga/team/greuther-furth",
+        "points": 60
+      },
+      "notes": []
+    },
+    {
+      "season": "2014-15",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "FC Ingolstadt",
+        "currentName": "FC Ingolstadt 04",
+        "footsimuId": 6367,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 64
+      },
+      "runnerUp": {
+        "name": "Darmstadt 98",
+        "currentName": "SV Darmstadt 98",
+        "footsimuId": 3812,
+        "footsimuSlug": "sv-darmstadt-98",
+        "footsimuPath": "/2-bundesliga/team/sv-darmstadt-98",
+        "points": 59
+      },
+      "third": {
+        "name": "Karlsruher SC",
+        "currentName": "Karlsruher SC",
+        "footsimuId": 4471,
+        "footsimuSlug": "karlsruher-sc",
+        "footsimuPath": "/2-bundesliga/team/karlsruher-sc",
+        "points": 58
+      },
+      "notes": []
+    },
+    {
+      "season": "2015-16",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "SC Freiburg",
+        "currentName": "Freiburg",
+        "footsimuId": 126,
+        "footsimuSlug": "freiburg",
+        "footsimuPath": "/bundesliga/team/freiburg",
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "RB Leipzig",
+        "currentName": "RB Leipzig",
+        "footsimuId": 11420,
+        "footsimuSlug": "rb-leipzig",
+        "footsimuPath": "/bundesliga/team/rb-leipzig",
+        "points": 67
+      },
+      "third": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 65
+      },
+      "notes": []
+    },
+    {
+      "season": "2016-17",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "VfB Stuttgart",
+        "currentName": "VfB Stuttgart",
+        "footsimuId": 134,
+        "footsimuSlug": "vfb-stuttgart",
+        "footsimuPath": "/bundesliga/team/vfb-stuttgart",
+        "points": 69
+      },
+      "runnerUp": {
+        "name": "Hannover 96",
+        "currentName": "Hannover 96",
+        "footsimuId": 2428,
+        "footsimuSlug": "hannover-96",
+        "footsimuPath": "/2-bundesliga/team/hannover-96",
+        "points": 67
+      },
+      "third": {
+        "name": "Eintracht Braunschweig",
+        "currentName": "Eintracht Braunschweig",
+        "footsimuId": 3067,
+        "footsimuSlug": "eintracht-braunschweig",
+        "footsimuPath": "/2-bundesliga/team/eintracht-braunschweig",
+        "points": 66
+      },
+      "notes": []
+    },
+    {
+      "season": "2017-18",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Fortuna Düsseldorf",
+        "currentName": "Fortuna Düsseldorf",
+        "footsimuId": 9707,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 63
+      },
+      "runnerUp": {
+        "name": "1. FC Nürnberg",
+        "currentName": "1. FC Nürnberg",
+        "footsimuId": 269,
+        "footsimuSlug": "1-fc-nurnberg",
+        "footsimuPath": "/2-bundesliga/team/1-fc-nurnberg",
+        "points": 60
+      },
+      "third": {
+        "name": "Holstein Kiel",
+        "currentName": "Holstein Kiel",
+        "footsimuId": 7884,
+        "footsimuSlug": "holstein-kiel",
+        "footsimuPath": "/2-bundesliga/team/holstein-kiel",
+        "points": 56
+      },
+      "notes": []
+    },
+    {
+      "season": "2018-19",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Köln",
+        "currentName": "FC Köln",
+        "footsimuId": 122,
+        "footsimuSlug": "fc-koln",
+        "footsimuPath": "/bundesliga/team/fc-koln",
+        "points": 63
+      },
+      "runnerUp": {
+        "name": "SC Paderborn",
+        "currentName": "Paderborn",
+        "footsimuId": 3307,
+        "footsimuSlug": "paderborn",
+        "footsimuPath": "/bundesliga/team/paderborn",
+        "points": 57
+      },
+      "third": {
+        "name": "1. FC Union Berlin",
+        "currentName": "Union Berlin",
+        "footsimuId": 598,
+        "footsimuSlug": "union-berlin",
+        "footsimuPath": "/bundesliga/team/union-berlin",
+        "points": 57
+      },
+      "notes": [
+        "SC Paderborn and 1. FC Union Berlin level on 57 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "2019-20",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Arminia Bielefeld",
+        "currentName": "Arminia Bielefeld",
+        "footsimuId": 2506,
+        "footsimuSlug": "arminia-bielefeld",
+        "footsimuPath": "/2-bundesliga/team/arminia-bielefeld",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "VfB Stuttgart",
+        "currentName": "VfB Stuttgart",
+        "footsimuId": 134,
+        "footsimuSlug": "vfb-stuttgart",
+        "footsimuPath": "/bundesliga/team/vfb-stuttgart",
+        "points": 58
+      },
+      "third": {
+        "name": "1. FC Heidenheim",
+        "currentName": "1. FC Heidenheim",
+        "footsimuId": 6418,
+        "footsimuSlug": "1-fc-heidenheim",
+        "footsimuPath": "/2-bundesliga/team/1-fc-heidenheim",
+        "points": 55
+      },
+      "notes": []
+    },
+    {
+      "season": "2020-21",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "VfL Bochum",
+        "currentName": "VfL Bochum",
+        "footsimuId": 121,
+        "footsimuSlug": "vfl-bochum",
+        "footsimuPath": "/2-bundesliga/team/vfl-bochum",
+        "points": 67
+      },
+      "runnerUp": {
+        "name": "Greuther Fürth",
+        "currentName": "Greuther Fürth",
+        "footsimuId": 3070,
+        "footsimuSlug": "greuther-furth",
+        "footsimuPath": "/2-bundesliga/team/greuther-furth",
+        "points": 64
+      },
+      "third": {
+        "name": "Holstein Kiel",
+        "currentName": "Holstein Kiel",
+        "footsimuId": 7884,
+        "footsimuSlug": "holstein-kiel",
+        "footsimuPath": "/2-bundesliga/team/holstein-kiel",
+        "points": 62
+      },
+      "notes": []
+    },
+    {
+      "season": "2021-22",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Schalke 04",
+        "currentName": "Schalke 04",
+        "footsimuId": 133,
+        "footsimuSlug": "schalke-04",
+        "footsimuPath": "/bundesliga/team/schalke-04",
+        "points": 65
+      },
+      "runnerUp": {
+        "name": "Werder Bremen",
+        "currentName": "Werder Bremen",
+        "footsimuId": 137,
+        "footsimuSlug": "werder-bremen",
+        "footsimuPath": "/bundesliga/team/werder-bremen",
+        "points": 63
+      },
+      "third": {
+        "name": "Hamburger SV",
+        "currentName": "Hamburger SV",
+        "footsimuId": 127,
+        "footsimuSlug": "hamburger-sv",
+        "footsimuPath": "/bundesliga/team/hamburger-sv",
+        "points": 60
+      },
+      "notes": []
+    },
+    {
+      "season": "2022-23",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Heidenheim",
+        "currentName": "1. FC Heidenheim",
+        "footsimuId": 6418,
+        "footsimuSlug": "1-fc-heidenheim",
+        "footsimuPath": "/2-bundesliga/team/1-fc-heidenheim",
+        "points": 67
+      },
+      "runnerUp": {
+        "name": "Darmstadt 98",
+        "currentName": "SV Darmstadt 98",
+        "footsimuId": 3812,
+        "footsimuSlug": "sv-darmstadt-98",
+        "footsimuPath": "/2-bundesliga/team/sv-darmstadt-98",
+        "points": 67
+      },
+      "third": {
+        "name": "Hamburger SV",
+        "currentName": "Hamburger SV",
+        "footsimuId": 127,
+        "footsimuSlug": "hamburger-sv",
+        "footsimuPath": "/bundesliga/team/hamburger-sv",
+        "points": 66
+      },
+      "notes": [
+        "1. FC Heidenheim and Darmstadt 98 level on 67 points, separated by goal difference"
+      ]
+    },
+    {
+      "season": "2023-24",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "FC St. Pauli",
+        "currentName": "St. Pauli",
+        "footsimuId": 270,
+        "footsimuSlug": "st-pauli",
+        "footsimuPath": "/2-bundesliga/team/st-pauli",
+        "points": 69
+      },
+      "runnerUp": {
+        "name": "Holstein Kiel",
+        "currentName": "Holstein Kiel",
+        "footsimuId": 7884,
+        "footsimuSlug": "holstein-kiel",
+        "footsimuPath": "/2-bundesliga/team/holstein-kiel",
+        "points": 68
+      },
+      "third": {
+        "name": "Fortuna Düsseldorf",
+        "currentName": "Fortuna Düsseldorf",
+        "footsimuId": 9707,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "2024-25",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "1. FC Köln",
+        "currentName": "FC Köln",
+        "footsimuId": 122,
+        "footsimuSlug": "fc-koln",
+        "footsimuPath": "/bundesliga/team/fc-koln",
+        "points": 61
+      },
+      "runnerUp": {
+        "name": "Hamburger SV",
+        "currentName": "Hamburger SV",
+        "footsimuId": 127,
+        "footsimuSlug": "hamburger-sv",
+        "footsimuPath": "/bundesliga/team/hamburger-sv",
+        "points": 59
+      },
+      "third": {
+        "name": "SV Elversberg",
+        "currentName": "SV Elversberg",
+        "footsimuId": 10388,
+        "footsimuSlug": "sv-elversberg",
+        "footsimuPath": "/bundesliga/team/sv-elversberg",
+        "points": 58
+      },
+      "notes": []
+    },
+    {
+      "season": "2025-26",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "2. Bundesliga",
+      "format": "league",
+      "champion": {
+        "name": "Schalke 04",
+        "currentName": "Schalke 04",
+        "footsimuId": 133,
+        "footsimuSlug": "schalke-04",
+        "footsimuPath": "/bundesliga/team/schalke-04",
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "SV Elversberg",
+        "currentName": "SV Elversberg",
+        "footsimuId": 10388,
+        "footsimuSlug": "sv-elversberg",
+        "footsimuPath": "/bundesliga/team/sv-elversberg",
+        "points": 62
+      },
+      "third": {
+        "name": "SC Paderborn",
+        "currentName": "Paderborn",
+        "footsimuId": 3307,
+        "footsimuSlug": "paderborn",
+        "footsimuPath": "/bundesliga/team/paderborn",
+        "points": 62
+      },
+      "notes": [
+        "SV Elversberg and SC Paderborn level on 62 points, separated by goal difference"
+      ]
+    }
+  ]
+}

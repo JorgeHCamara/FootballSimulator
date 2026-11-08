@@ -61,6 +61,12 @@ export interface CupRound {
   /** Clubs in the round, once known. */
   participants: TeamId[];
   /**
+   * Clubs through to the next round without a game: only after a first round
+   * the feed listed a tie or two short (see roundTies), whose winners can't
+   * fill the next round's draw; the real draw replaces it once it's listed.
+   */
+  byes?: TeamId[];
+  /**
    * The previous round's ties whose winners meet in each of this round's ties
    * (by tie index, in the draw's order), when the draw is the slots' own (no
    * real ties, no clubs entering, no fixed bracket): known before anyone has
@@ -344,12 +350,14 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
       fromPrevious = null;
     } else {
       const winners = previous!.ties.map((t) => tieWinner(t, results));
-      fromPrevious = winners.every((w): w is TeamId => w !== null) ? winners : null;
+      fromPrevious = winners.every((w): w is TeamId => w !== null) ? [...winners, ...(previous!.byes ?? [])] : null;
     }
+    // The previous round came short (its feed listed fewer ties than the round has): this one may be drawn a club or two short.
+    const previousShort = previous !== undefined && previous.drawn !== "pending" && previous.ties.length + (previous.byes?.length ?? 0) < previous.config.ties;
 
     // The slots' draw, whoever wins: which of the previous round's ties feed each of this round's.
     const feeders: [number, number][] | undefined =
-      r > 0 && realTies.length === 0 && entrants.length === 0 && !roundConfig.bracket
+      r > 0 && !previousShort && realTies.length === 0 && entrants.length === 0 && !roundConfig.bracket
         ? drawRound(
             Array.from({ length: config.rounds[r - 1]!.ties }, (_, i) => i),
             hashSeed(config.code, r, options.drawSalt),
@@ -364,9 +372,13 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
     const complete = ties.length >= roundTies(roundConfig, r, realTies.length, entrants.length);
 
     const participants = fromPrevious === null ? [...placed] : [...new Set([...fromPrevious, ...entrants, ...placed])];
+    // After a short previous round, its clubs are drawn as they are: a tie fewer for each club missing, those clubs through without a game.
+    const missing = roundConfig.ties * 2 - participants.length;
+    const short = !complete && previousShort && realTies.length === 0 && entrants.length === 0 && missing > 0 && missing <= 2 * FIRST_ROUND_SLACK;
+    const playing = short ? roundConfig.ties - missing : roundConfig.ties;
     // Not drawable yet: the previous round is open, or clubs entering this round
     // aren't known from any feed (keep the real ties already published).
-    if (!complete && (fromPrevious === null || participants.length < roundConfig.ties * 2)) {
+    if (!complete && (fromPrevious === null || (participants.length < roundConfig.ties * 2 && !short))) {
       rounds.push({ index: r, config: roundConfig, drawn: "pending", ties, participants, ...withFeeders });
       return;
     }
@@ -387,10 +399,12 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
       pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt), slotOf);
     }
     for (const pair of pairs) {
-      if (ties.length >= roundConfig.ties) break;
+      if (ties.length >= playing) break;
       const [home, away] = hostFirst(roundConfig, pair[0], pair[1], options.tiers, config);
       ties.push(makeTie(r, ties.length, home, away, roundConfig, undefined, date));
     }
+    const drawnIn = new Set(ties.flatMap((t) => [t.homeId, t.awayId]));
+    const byes = short ? remaining.filter((id) => !drawnIn.has(id)) : [];
     rounds.push({
       index: r,
       config: roundConfig,
@@ -398,6 +412,7 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
       ties,
       participants,
       ...withFeeders,
+      ...(byes.length > 0 ? { byes } : {}),
     });
   });
   return rounds;

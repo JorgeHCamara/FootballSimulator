@@ -241,6 +241,12 @@ export function CupRounds(props: RoundsProps) {
               <TieCard key={tie.game.id} tie={tie} {...props} />
             ))}
           </div>
+          {round.byes && round.byes.length > 0 && (
+            // A short first round's winners don't fill this draw: these clubs go through without a game until the real draw comes.
+            <p className="rounded-lg border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-300" data-testid="cup-byes">
+              {t("byes", { clubs: round.byes.map((id) => props.teams.get(id)?.name ?? "?").join(", "), count: round.byes.length })}
+            </p>
+          )}
           {round.drawn === "pending" && <PendingRound cup={cup} round={round} rounds={rounds} predictions={predictions} teams={props.teams} />}
         </div>
       )}

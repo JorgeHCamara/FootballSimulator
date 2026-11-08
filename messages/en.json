@@ -600,6 +600,7 @@
     "roundComplete": "Complete",
     "simulatedDraw": "Simulated draw",
     "simulatedDrawNote": "These pairings are a simulated draw. The real draw replaces them as soon as it is made.",
+    "byes": "Through without a game: {clubs}. The feed lists the previous round short, so its winners don't fill this draw; the real draw replaces it as soon as it is listed.",
     "drawAfter": "The draw is made after the {round}.",
     "drawClubs": "{count} clubs will be in the hat.",
     "drawClubsEntering": "{count} clubs will be in the hat{entering}.",
@@ -1277,7 +1278,11 @@
     "world": "My World",
     "comingSoon": "Real history coming soon",
     "revoked": "Title revoked",
-    "tied": "Shared place"
+    "tied": "Shared place",
+    "tournaments": {
+      "North": "North",
+      "South": "South"
+    }
   },
   "World": {
     "metaTitle": "My World: take your club up the football pyramid, in England, Spain, Germany, Italy or Brazil",
