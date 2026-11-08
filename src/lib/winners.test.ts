@@ -58,12 +58,15 @@ describe("the Past Winners files", () => {
     for (const slug of slugs) {
       for (const row of leagueWinners(slug)!) {
         for (const club of rowClubs(row)) {
-          if (club.id === null) assert.equal(club.crest, null, `${slug} ${row.season}: ${club.name} has no id, so a shield`);
+          if (club.id === null) assert.ok(club.crest === null || club.crest.startsWith("/crests/serie-c/"), `${slug} ${row.season}: ${club.name} has no id, so a shield or its Série C crest`);
           else assert.ok(club.crest && (LOCAL.test(club.crest) || ESPN.test(club.crest)), `${slug} ${row.season}: ${club.name}'s badge`);
         }
       }
     }
     assert.equal(crestFor(null, "Leeds City"), null);
+    // No ESPN id, but a club of the site's own Série C: its crest there.
+    assert.equal(crestFor(null, "Paysandu"), "/crests/serie-c/20017.png");
+    assert.equal(crestFor(null, "Santa Cruz"), "/crests/serie-c/20039.png");
     assert.match(crestFor(364, "Liverpool")!, ESPN);
     assert.equal(crestFor(319, "Kidderminster Harriers"), "/crests/319.png");
   });
@@ -224,6 +227,164 @@ describe("Serie A's past winners", () => {
     const [, prima, divisione] = eras(rows);
     assert.ok(filterRows(rows, { era: prima }).some((r) => r.id === "1921-22-figc"));
     assert.ok(filterRows(rows, { era: divisione }).some((r) => r.id === "1921-22-cci"));
+  });
+});
+
+describe("the Brasileirão's past winners", () => {
+  const rows = leagueWinners("brasileirao")!;
+
+  it("runs from 1937 to 2025, calendar years, with the Taça Brasil and the Robertão both in 1967 and 1968", () => {
+    assert.equal(rows.length, 71);
+    assert.equal(rows[0]!.season, "2025");
+    assert.deepEqual([rows[0]!.champion!.name, rows[0]!.runnerUp!.name, rows[0]!.third!.name], ["Flamengo", "Palmeiras", "Cruzeiro"]);
+    assert.equal(rows.at(-1)!.season, "1937");
+    assert.deepEqual(rows.filter((r) => r.startYear === 1967).map((r) => [r.tournament, r.champion!.name]), [
+      ["Torneio Roberto Gomes Pedrosa", "Palmeiras"],
+      ["Taça Brasil", "Palmeiras"],
+    ]);
+  });
+
+  it("counts the titles, both of 1967's and 1968's and both of 1987's among them", () => {
+    assert.deepEqual(
+      mostTitles(rows, 5).map((c) => [c.name, c.titles]),
+      [
+        ["Palmeiras", 12],
+        ["Flamengo", 9],
+        ["Santos", 8],
+        ["Corinthians", 7],
+        ["São Paulo", 6],
+      ],
+    );
+    // 1987: the CBF's champion and the Copa União's, each without a third place.
+    assert.deepEqual(rows.filter((r) => r.season === "1987").map((r) => [r.tournament, r.champion!.name, r.runnerUp!.name, r.third]), [
+      ["CBF", "Sport Recife", "Guarani", null],
+      ["Copa União", "Flamengo", "Internacional", null],
+    ]);
+  });
+
+  it("keeps each parallel championship in its own era, and an era of one season", () => {
+    const list = eras(rows);
+    assert.deepEqual(list.slice(0, 3), [
+      { name: "Torneio dos Campeões", from: 1937, to: 1937 },
+      { name: "Taça Brasil", from: 1959, to: 1968 },
+      { name: "Torneio Roberto Gomes Pedrosa", from: 1967, to: 1970 },
+    ]);
+    assert.deepEqual(list.at(-1), { name: "Campeonato Brasileiro Série A", from: 2001, to: null });
+    assert.equal(filterRows(rows, { era: list[1] }).length, 10, "the Taça Brasil: 1959 to 1968");
+    assert.equal(filterRows(rows, { era: list[2] }).length, 4, "the Robertão: 1967 to 1970");
+  });
+});
+
+describe("Ligue 1's past winners", () => {
+  const rows = leagueWinners("ligue-1")!;
+
+  it("runs from 1932-33 to 2025-26, the war years not held, 1992-93's title withdrawn", () => {
+    assert.equal(rows.length, 94);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows.at(-1)!.season, "1932-33");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 6);
+    const revoked = rows.find((r) => r.season === "1992-93")!;
+    assert.equal(revoked.champion, null);
+    assert.equal(revoked.stripped!.name, "Marseille");
+    assert.deepEqual(
+      mostTitles(rows, 5).map((c) => [c.name, c.titles]),
+      [
+        ["Paris Saint-Germain", 14],
+        ["Saint-Étienne", 10],
+        ["Marseille", 9],
+        ["Monaco", 8],
+        ["Nantes", 8],
+      ],
+    );
+  });
+
+  it("keeps the war years in the era around them, though the file names them differently", () => {
+    const list = eras(rows);
+    assert.deepEqual(list, [{ name: "French championship", from: 1932, to: null }]);
+    assert.equal(filterRows(rows, { era: list[0] }).length, 94);
+  });
+});
+
+describe("the Segunda División's past winners", () => {
+  const rows = leagueWinners("segunda-division")!;
+
+  it("runs from 1929 to 2025-26, the Civil War years not held, North and South from 1949-50 to 1967-68", () => {
+    assert.equal(rows.length, 117);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows[0]!.champion!.name, "Racing Santander");
+    assert.equal(rows.at(-1)!.season, "1929");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 3);
+    const groups = rows.filter((r) => r.tournament !== null);
+    assert.equal(groups.length, 38, "19 seasons of two groups");
+    assert.deepEqual(rows.filter((r) => r.season === "1949-50").map((r) => [r.tournament, r.champion!.name]), [
+      ["North", "Racing Santander"],
+      ["South", "Alcoyano"],
+    ]);
+    assert.deepEqual(eras(rows), [{ name: "Segunda División", from: 1929, to: null }]);
+  });
+
+  it("counts each group's win as a title, as the sources do", () => {
+    assert.deepEqual(
+      mostTitles(rows, 2).map((c) => [c.name, c.titles]),
+      [
+        ["Real Murcia", 8],
+        ["Real Betis", 7],
+      ],
+    );
+  });
+});
+
+describe("the 2. Bundesliga's past winners", () => {
+  const rows = leagueWinners("2-bundesliga")!;
+
+  it("runs from 1974-75 to 2025-26, in a Nord and a Süd until 1980-81 and again in 1991-92", () => {
+    assert.equal(rows.length, 60);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows[0]!.champion!.name, "Schalke 04");
+    assert.deepEqual(rows.filter((r) => r.season === "1974-75").map((r) => [r.tournament, r.competition, r.champion!.name]), [
+      ["North", "2. Bundesliga Nord", "Hannover 96"],
+      ["South", "2. Bundesliga Süd", "Karlsruher SC"],
+    ]);
+    assert.deepEqual(
+      eras(rows).map((e) => [e.name, e.from, e.to]),
+      [
+        ["2. Bundesliga Nord", 1974, 1981],
+        ["2. Bundesliga Süd", 1974, 1981],
+        ["2. Bundesliga", 1981, 1991],
+        ["2. Bundesliga Nord", 1991, 1992],
+        ["2. Bundesliga Süd", 1991, 1992],
+        ["2. Bundesliga", 1992, null],
+      ],
+    );
+    assert.equal(mostTitles(rows, 1)[0]!.titles, 5, "1. FC Köln's five");
+  });
+});
+
+describe("the Brasileirão Série B's past winners", () => {
+  const rows = leagueWinners("brasileirao-serie-b")!;
+
+  it("runs from 1971 to 2025, with the years no Série B was played", () => {
+    assert.equal(rows.length, 55);
+    assert.equal(rows[0]!.season, "2025");
+    assert.equal(rows[0]!.champion!.name, "Coritiba");
+    assert.equal(rows.at(-1)!.season, "1971");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 11);
+    assert.deepEqual(eras(rows), [{ name: "Campeonato Brasileiro Série B", from: 1971, to: null }]);
+    assert.deepEqual(mostTitles(rows, 1).map((c) => [c.name, c.titles]), [["Coritiba", 3]]);
+  });
+});
+
+describe("the Brasileirão Série C's past winners", () => {
+  const rows = leagueWinners("brasileirao-serie-c")!;
+
+  it("runs from 1981 to 2025, with the years no Série C was played", () => {
+    assert.equal(rows.length, 45);
+    assert.equal(rows[0]!.season, "2025");
+    assert.equal(rows[0]!.champion!.name, "Ponte Preta");
+    assert.equal(rows.at(-1)!.season, "1981");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 10);
+    assert.deepEqual(eras(rows), [{ name: "Campeonato Brasileiro Série C", from: 1981, to: null }]);
+    assert.deepEqual(mostTitles(rows, 1).map((c) => [c.name, c.titles]), [["Vila Nova", 3]]);
   });
 });
 

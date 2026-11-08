@@ -147,7 +147,11 @@ export const WORLD_VERSION = 1;
 /** "2026/27" for the season starting in 2026. */
 export const seasonLabel = (year: number) => `${year}/${String((year + 1) % 100).padStart(2, "0")}`;
 /** A world's season label: "2026" for a world of calendar-year countries only (Brazil), else "2026/27". */
-export const worldSeasonLabel = (world: Pick<World, "countries">, year: number) => seasonLabelFor(world.countries, year);
+/**
+ * A season's label: a country's own ("2027" for Brazil's calendar-year seasons, "2027/28" in Europe) when the
+ * label is about one country's leagues or cup; else the world's ("2027" only when every country plays calendar years).
+ */
+export const worldSeasonLabel = (world: Pick<World, "countries">, year: number, country?: WorldCountry) => seasonLabelFor(country ? [country] : world.countries, year);
 
 /** A division's clubs in a season: Série C's grow with its format (src/lib/worldSerieC.ts), the others' are their league's. */
 export const divisionTeams = (code: DivisionCode, year: number) => (isSplitDivision(code) ? serieCFormat(year).clubs : divisionConfig(code).teams);

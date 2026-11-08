@@ -364,7 +364,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
   const playedShare = (games: number, total: number) => (total > 0 ? Math.min(1, Math.max(0, 1 - games / total)) : 1);
   const done = states.every((s) => s.done) && cups.every((c) => c.done);
   const lowerOf = (c: WorldCountry) => ({ lower: t(`leagues.${LOWER_LEAGUE[c]}.the`), back: t(`leagues.${COUNTRY_LEAGUES[c].at(-1)!}.name`) });
-  const shownSeason = worldSeasonLabel(world, year);
+  const shownSeason = worldSeasonLabel(world, year, country);
   /** A competition's name: a league's or a cup's. */
   const name = (code: DivisionCode | WorldCupCode) => t(isWorldCup(code) ? `cups.${code}.name` : `leagues.${code}.name`);
 
@@ -408,7 +408,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
               {me.name}
             </p>
             <p className="text-sm text-zinc-600 dark:text-zinc-400" data-testid="world-season">
-              {t("season", { season })}
+              {t("season", { season: worldSeasonLabel(world, world.year, myCountry) })}
               {myDivision ? ` · ${t(`leagues.${myDivision}.name`)}` : world.nationalLeague.includes(me.id) ? ` · ${t(`leagues.${LOWER_LEAGUE[clubCountry(me)]}.name`)}` : ""}
               {myRow && myRow.played > 0 ? ` · ${t("standing", { position: ordinal(myRow.position, locale), points: myRow.points })}` : ""}
             </p>
@@ -509,8 +509,8 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
           <Icon name="info" size={18} className="mt-0.5 shrink-0 text-pitch-700" />
           {/* A season in the league below, then back up; or (a world from before the National League) gone for good. */}
           {world.nationalLeague.includes(me.id)
-            ? t("outNotice", { club: me.name, season: worldSeasonLabel(world, me.left), ...lowerOf(clubCountry(me)) })
-            : t("goneNotice", { club: me.name, season: worldSeasonLabel(world, me.left) })}
+            ? t("outNotice", { club: me.name, season: worldSeasonLabel(world, me.left, clubCountry(me)), ...lowerOf(clubCountry(me)) })
+            : t("goneNotice", { club: me.name, season: worldSeasonLabel(world, me.left, clubCountry(me)) })}
         </p>
       )}
 
@@ -547,7 +547,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
                   : t("cupNew", {
                       cup: t(`cups.${cupShown.code}.the`),
                       outsiders: (() => {
-                        const count = outsidersNeeded(cupShown.cup, world.divisions.reduce((n, d) => n + d.clubs.length, 0));
+                        const count = outsidersNeeded(cupShown.cup, world.divisions.filter((d) => divisionCountry(d.code) === cupCountry(cupShown.code)).reduce((n, d) => n + d.clubs.length, 0));
                         return count ? t("cupOutsiders", { count }) : "";
                       })(),
                     })
@@ -812,7 +812,7 @@ function Path({ world, locale }: { world: World; locale: SiteLocale }) {
             const place = s.position === null ? "–" : ordinal(s.position, locale);
             return (
               <li key={s.year} className="flex items-center gap-3 px-3 py-2.5 text-sm" data-testid="world-path-step" data-league={s.code} data-move={s.move} data-outcome={s.outcome}>
-                <span className="w-16 shrink-0 font-semibold tabular-nums">{worldSeasonLabel(world, s.year)}</span>
+                <span className="w-16 shrink-0 font-semibold tabular-nums">{worldSeasonLabel(world, s.year, (Object.keys(LOWER_LEAGUE) as WorldCountry[]).find((c) => LOWER_LEAGUE[c] === s.code) ?? divisionCountry(s.code as DivisionCode))}</span>
                 <span className="min-w-0 flex-1">
                   <span className="flex min-w-0 items-center gap-1.5">
                     <span className="truncate">{t(`leagues.${s.code}.name`)}</span>

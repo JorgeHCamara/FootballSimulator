@@ -339,7 +339,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Bundesliga austriaca, Brasileirão Série A, Série B y Série C, la Liga Profesional Argentina, la Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Bundesliga austriaca, Brasileirão Série A, Série B y Série C, la Liga Profesional Argentina, la Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Coupe de France, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",
@@ -570,6 +570,9 @@
       "thirdRound": "Tercera ronda",
       "fourthRound": "Cuarta ronda",
       "fifthRound": "Quinta ronda",
+      "seventhRound": "Séptima ronda",
+      "eighthRound": "Octava ronda",
+      "roundOf64": "Treintaidosavos de final",
       "roundOf32": "Dieciseisavos de final",
       "roundOf16": "Octavos de final",
       "quarterFinals": "Cuartos de final",
@@ -584,6 +587,9 @@
       "thirdRound": "R3",
       "fourthRound": "R4",
       "fifthRound": "R5",
+      "seventhRound": "R7",
+      "eighthRound": "R8",
+      "roundOf64": "1/32",
       "roundOf32": "1/16",
       "roundOf16": "OF",
       "quarterFinals": "CF",
@@ -594,6 +600,7 @@
     "roundComplete": "Completa",
     "simulatedDraw": "Sorteo simulado",
     "simulatedDrawNote": "Estos emparejamientos son un sorteo simulado. El sorteo real los sustituye en cuanto se celebra.",
+    "byes": "Pasa{count, plural, one {} other {n}} sin jugar: {clubs}. La fuente lista la ronda anterior incompleta, así que sus ganadores no completan este sorteo; el sorteo real lo sustituye en cuanto aparezca.",
     "drawAfter": "El sorteo se hace después de la {round}.",
     "drawClubs": "{count} clubes entrarán en el bombo.",
     "drawClubsEntering": "{count} clubes entrarán en el bombo{entering}.",
@@ -612,12 +619,15 @@
       "nonLeague": "NL",
       "BSA": "A",
       "BSB": "B",
+      "BSC": "C",
       "PD": "1ª",
       "SD": "2ª",
       "SA": "A",
       "SB": "B",
       "BL1": "BL",
-      "BL2": "2BL"
+      "BL2": "2BL",
+      "FL1": "L1",
+      "FL2": "L2"
     },
     "basedOn": "Basado en {count} copas simuladas a partir de los resultados actuales, incluidos tus pronósticos en los emparejamientos reales.",
     "chancesNote": "Las rondas aún no sorteadas se sortean de nuevo en cada simulación, así que las probabilidades incluyen la suerte del sorteo.",
@@ -636,7 +646,8 @@
       "CDR": "La fuerza de cada club sale de su propia liga esta temporada (LaLiga o Segunda División), ajustada por la división; los clubes de Primera Federación y categorías inferiores quedan por debajo de Segunda.",
       "CIT": "La fuerza de cada club sale de su propia liga esta temporada (Serie A o Serie B), ajustada por la división; los clubes de la Serie C quedan por debajo de la Serie B. No hay sorteo: la Coppa Italia sigue un cuadro fijo.",
       "DFB": "La fuerza de cada club sale de su propia liga esta temporada (Bundesliga o 2. Bundesliga), ajustada por la división; los clubes de la 3. Liga y los aficionados quedan por debajo de la 2. Bundesliga. Un club aficionado emparejado con uno profesional juega en casa.",
-      "EFC": "La fuerza de cada club sale de su propia liga esta temporada (Premier League, Championship, League One o League Two), ajustada por la división. No hay prórroga antes de la final: un partido empatado a los 90 minutos va directo a los penaltis, y las semifinales a doble partido se deciden por el global y, si sigue igualado, en los penaltis."
+      "EFC": "La fuerza de cada club sale de su propia liga esta temporada (Premier League, Championship, League One o League Two), ajustada por la división. No hay prórroga antes de la final: un partido empatado a los 90 minutos va directo a los penaltis, y las semifinales a doble partido se deciden por el global y, si sigue igualado, en los penaltis.",
+      "CDF": "La fuerza de cada club sale de su propia liga esta temporada (Ligue 1 o Ligue 2), ajustada por la división; los clubes del National y los amateurs quedan por debajo de la Ligue 2. Un club emparejado con otro al menos dos divisiones por encima juega en casa, y antes de la final un partido empatado tras 90 minutos va directo a los penaltis."
     },
     "finalAfter": "Aquí se enfrentan los ganadores de las {round}.",
     "bracketAfter": "Cuadro fijo, sin sorteo: los ganadores se cruzan así.",
@@ -1241,24 +1252,23 @@
   "PastWinners": {
     "title": "Campeones anteriores",
     "breadcrumb": "Campeones anteriores",
-    "heading": "Campeones anteriores de {article, select, none {} other {la }}{league}",
-    "metaTitle": "Campeones anteriores de {article, select, none {} other {la }}{league}: todos los campeones desde {year}",
-    "metaDescription": "Todos los campeones, subcampeones y terceros de {article, select, none {} other {la }}{league} desde {year}, temporada a temporada, y los clubes con más títulos. El historial de la liga, hecho por FootSimu.",
-    "intro": "Todos los campeones, subcampeones y terceros de {article, select, none {} other {la }}{league} desde la temporada {season}, de la más reciente a la más antigua, con los clubes que más la ganaron. Filtra por era o busca un club.",
+    "heading": "Campeones anteriores {article, select, none {de } masc {del } other {de la }}{league}",
+    "metaTitle": "Campeones anteriores {article, select, none {de } masc {del } other {de la }}{league}: todos los campeones desde {year}",
+    "metaDescription": "Todos los campeones, subcampeones y terceros {article, select, none {de } masc {del } other {de la }}{league} desde {year}, temporada a temporada, y los clubes con más títulos. El historial de la liga, hecho por FootSimu.",
+    "intro": "Todos los campeones, subcampeones y terceros {article, select, none {de } masc {del } other {de la }}{league} desde la temporada {season}, de la más reciente a la más antigua, con los clubes que más la ganaron. Filtra por era o busca un club.",
     "season": "Temporada",
     "champion": "Campeón",
     "runnerUp": "Subcampeón",
     "third": "Tercero",
     "notHeld": "No disputado",
     "abandoned": "Abandonado",
-    "final": "Final",
-    "playoff": "Playoffs",
     "mostTitles": "Más títulos",
     "titlesWord": "{count, plural, one {título} other {títulos}}",
     "filter": "Filtrar las temporadas",
     "all": "Todas",
     "era": "{name} ({from}–{to})",
     "eraOpen": "{name} ({from}–)",
+    "eraYear": "{name} ({year})",
     "decade": "Años {decade}",
     "search": "Buscar un club",
     "noMatches": "Ninguna temporada coincide.",
@@ -1268,7 +1278,11 @@
     "world": "My World",
     "comingSoon": "Historial real próximamente",
     "revoked": "Título revocado",
-    "tied": "Puesto compartido"
+    "tied": "Puesto compartido",
+    "tournaments": {
+      "North": "Norte",
+      "South": "Sur"
+    }
   },
   "World": {
     "metaTitle": "Mi mundo: lleva a tu club a lo más alto del fútbol inglés, español, alemán, italiano o brasileño",
@@ -1467,7 +1481,7 @@
     "newSeason": "Una nueva temporada: todos los clubes empiezan con 0 puntos.",
     "cupFirst": "Esta temporada, {cup} empezó desde la real, con su sorteo y sus resultados hasta ahora: a partir de aquí, la copa es tuya. Cambia cualquier resultado, tira los dados o simula la ronda o el resto de la copa.",
     "cupNew": "Nueva temporada: {cup} se sortea ronda a ronda entre los clubes de este mundo{outsiders}, cada partido con la forma de los clubes esta temporada.",
-    "cupOutsiders": " y {count} clubes de fuera de la liga, de la FA Cup real",
+    "cupOutsiders": " y {count} clubes de fuera de las ligas",
     "pastCup": "La {cup} de {season}: todas las rondas y la final.",
     "tables": "Tablas",
     "competitions": "Ligas y copas",

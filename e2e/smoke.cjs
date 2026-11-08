@@ -567,7 +567,7 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="promoted-contender"]').innerText(), /plays Ligue 1's 16th over two legs/);
       // Header: the second divisions sit under their country, top division first.
       const menu = p.locator('[data-testid="league-menu"]');
-      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]], ["Italy", "it", ["Serie A", "Serie B", "Coppa Italia"]], ["France", "fr", ["Ligue 1", "Ligue 2"]]]) {
+      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]], ["Italy", "it", ["Serie A", "Serie B", "Coppa Italia"]], ["France", "fr", ["Ligue 1", "Ligue 2", "Coupe de France"]]]) {
         // Countries sit in the Europe panel.
         await menu.getByRole("button", { name: "Europe" }).click();
         await menu.locator(`#menu-${flag}`).waitFor();
@@ -615,6 +615,30 @@ async function step(name, fn) {
       const text = await p.locator('[data-testid="playoff"]').innerText();
       assert.match(text, /3rd place × 6th place/);
       assert.match(text, /hosts the 2nd leg and goes through if the aggregate is level/);
+      await p.close();
+    });
+
+    await step("Past Winners for the cups: a third tab beside Fixtures and Chances, a page saying the history is coming (out of search results), its Fixtures and Chances tabs back", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      for (const slug of ["fa-cup", "efl-cup", "copa-del-rey", "dfb-pokal", "coppa-italia", "copa-do-brasil"]) {
+        await p.goto(`${BASE_URL}/en/${slug}`);
+        assert.deepEqual((await p.locator('[role="tablist"]').first().locator('[role="tab"]').allInnerTexts()).map((x) => x.trim()), ["Fixtures", "Chances", "Past Winners"], slug);
+      }
+      await p.goto(`${BASE_URL}/en/fa-cup`);
+      await p.getByTestId("past-winners-tab").click();
+      await p.waitForURL(/\/en\/fa-cup\/past-winners$/);
+      assert.equal((await p.locator("h1").innerText()).trim(), "FA Cup past winners");
+      await p.getByTestId("past-winners-coming-soon").waitFor();
+      assert.equal(await p.getByTestId("past-winners-row").count(), 0);
+      assert.match(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex/);
+      assert.equal((await p.getByTestId("view-table").innerText()).trim(), "Fixtures");
+      await p.getByTestId("view-chances").click();
+      await p.waitForURL(/\/en\/fa-cup#chances$/);
+      await p.locator('[role="tab"][aria-selected="true"]', { hasText: "Chances" }).waitFor();
+      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      assert.doesNotMatch(sitemap, /fa-cup\/past-winners/, "not in the sitemap until it has its history");
+      await p.goto(`${BASE_URL}/pt/copa-do-brasil/past-winners`);
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores da Copa do Brasil");
       await p.close();
     });
 
@@ -850,6 +874,39 @@ async function step(name, fn) {
       await menu.getByRole("button", { name: "Europe" }).click();
       assert.deepEqual((await menu.locator("#menu-de a").allInnerTexts()).map((x) => x.trim()), ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]);
       await p.close();
+    });
+
+    await step("Coupe de France: the seventh and eighth rounds, the Ligue 1 clubs in the round of 64, a club two divisions below at home, Stade de France final", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/coupe-de-france`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["Seventh Round", "Eighth Round", "Round of 64", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 92, "92 seventh-round ties");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /\bL2\b/, "Ligue 2 tags");
+      assert.match(await p.locator("main").innerText(), /straight to penalties/i);
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      await bar.nth(2).click();
+      assert.equal(await ties.count(), 32, "round of 64 drawn");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /\bL1\b/, "the Ligue 1 clubs are in");
+      await bar.nth(7).click();
+      assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Stade de France/);
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Coupe de France \d{4}\/\d{2} winner/);
+      const menu = p.locator('[data-testid="league-menu"]');
+      await menu.getByRole("button", { name: "Europe" }).click();
+      assert.deepEqual((await menu.locator("#menu-fr a").allInnerTexts()).map((x) => x.trim()), ["Ligue 1", "Ligue 2", "Coupe de France"]);
+      await p.close();
+      // PT and ES: the round names.
+      const pt = await browser.newPage();
+      await pt.goto(`${BASE_URL}/pt/coupe-de-france`);
+      assert.match(await pt.locator('[data-testid="round-bar"]').innerText(), /Sétima fase[\s\S]*Oitava fase[\s\S]*32 avos de final/);
+      await pt.goto(`${BASE_URL}/es/coupe-de-france`);
+      assert.match(await pt.locator('[data-testid="round-bar"]').innerText(), /Séptima ronda[\s\S]*Octava ronda[\s\S]*Treintaidosavos de final/);
+      await pt.close();
     });
 
     await step("Champions League: 36-club league phase, knockout phase to the final, win chances", async () => {
@@ -1644,10 +1701,10 @@ async function step(name, fn) {
       await p.waitForURL(/\/en\/premier-league#chances$/);
       await p.locator('[data-testid="chances"]').waitFor({ timeout: 20_000 });
       // A league without a history file: no tab, no page.
-      await p.goto(`${BASE_URL}/en/ligue-1`);
+      await p.goto(`${BASE_URL}/en/primeira-liga`);
       await p.locator('[role="tablist"]').first().waitFor();
       assert.equal(await p.getByTestId("past-winners-tab").count(), 0);
-      assert.equal((await p.request.get(`${BASE_URL}/en/ligue-1/past-winners`)).status(), 404);
+      assert.equal((await p.request.get(`${BASE_URL}/en/primeira-liga/past-winners`)).status(), 404);
       // The sitemap lists the page in every language.
       const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/premier-league/past-winners<`));
@@ -1724,6 +1781,110 @@ async function step(name, fn) {
       await phone.close();
     });
 
+    await step("Past Winners: the Brasileirão's history (1937 on), with the Taça Brasil and the Robertão both in 1967 and 1968, in PT and ES", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/pt/brasileirao/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores do Brasileirão Série A");
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 71);
+      const chips = await p.getByTestId("past-winners-chip").allInnerTexts();
+      for (const chip of ["Taça Brasil (1959–1968)", "Torneio Roberto Gomes Pedrosa (1967–1970)", "Torneio dos Campeões (1937)", "Campeonato Brasileiro Série A (2001–)"]) assert.ok(chips.includes(chip), chip);
+      assert.deepEqual(await p.getByTestId("past-winners-title").evaluateAll((els) => els.map((e) => e.dataset.titles)), ["12", "9", "8", "7", "6"]);
+      // 1987: Sport (the CBF's) and Flamengo (the Copa União's), no third place; Guarani with its own badge.
+      const y1987 = rows.filter({ hasText: /^1987/ });
+      assert.equal(await y1987.count(), 2);
+      assert.match(await y1987.nth(0).innerText(), /CBF[\s\S]*Sport Recife[\s\S]*Guarani/);
+      assert.match(await y1987.nth(1).innerText(), /Copa União[\s\S]*Flamengo[\s\S]*Internacional/);
+      assert.equal(await y1987.nth(0).locator('[data-place="runnerUp"] img[src*="/3448.png"]').count(), 1, "Guarani's crest");
+      assert.equal(await y1987.locator('[data-place="third"] [data-testid="shield-badge"]').count(), 0);
+      // 1967: both championships, one after the other, under one heading.
+      const both = rows.filter({ hasText: /^1967/ });
+      assert.equal(await both.count(), 2);
+      assert.match(await both.nth(0).innerText(), /Torneio Roberto Gomes Pedrosa/);
+      assert.match(await both.nth(1).innerText(), /Taça Brasil/);
+      const eras = await p.getByTestId("past-winners-era").allInnerTexts();
+      // 1967 and 1968 under one heading naming both championships' eras.
+      assert.ok(eras.includes("Torneio Roberto Gomes Pedrosa (1967–1970) · Taça Brasil (1959–1968)"), eras.join(" / "));
+      await p.goto(`${BASE_URL}/es/brasileirao/past-winners`);
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores del Brasileirão Série A");
+      await p.close();
+    });
+
+    await step("Past Winners: Ligue 1's history (1932-33 on), the war years in their place and 1992-93's title withdrawn", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/en/ligue-1/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Ligue 1 past winners");
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 94);
+      assert.deepEqual(await p.getByTestId("past-winners-era").allInnerTexts(), ["French championship (1932–)"], "one era, the war years in it");
+      assert.equal(await p.locator('[data-testid="past-winners-row"][data-status="not_held"]').count(), 6);
+      assert.match(await rows.filter({ hasText: "1992-93" }).locator('[data-place="champion"]').innerText(), /Marseille[\s\S]*Title revoked/i);
+      assert.deepEqual(await p.getByTestId("past-winners-title").evaluateAll((els) => els.map((e) => e.dataset.titles)), ["14", "10", "9", "8", "8"]);
+      await p.close();
+    });
+
+    await step("Past Winners: the Segunda División's history (1929 on), with its North and South groups named in each language", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/es/segunda-division/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores de la Segunda División");
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 117);
+      const groups = rows.filter({ hasText: /^1949-50/ });
+      assert.equal(await groups.count(), 2);
+      assert.match(await groups.nth(0).innerText(), /Norte[\s\S]*Racing Santander/);
+      assert.match(await groups.nth(1).innerText(), /Sur[\s\S]*Alcoyano/);
+      await p.goto(`${BASE_URL}/en/segunda-division/past-winners`);
+      assert.match(await p.getByTestId("past-winners-row").filter({ hasText: /^1949-50/ }).first().innerText(), /North/);
+      await p.close();
+    });
+
+    await step("Past Winners: the 2. Bundesliga's history (1974-75 on), with its Nord and Süd seasons under headings naming both", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/en/2-bundesliga/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 60);
+      const eras = await p.getByTestId("past-winners-era").allInnerTexts();
+      assert.deepEqual(eras, [
+        "2. Bundesliga (1992–)",
+        "2. Bundesliga Nord (1991–1992) · 2. Bundesliga Süd (1991–1992)",
+        "2. Bundesliga (1981–1991)",
+        "2. Bundesliga Nord (1974–1981) · 2. Bundesliga Süd (1974–1981)",
+      ]);
+      const split = rows.filter({ hasText: /^1974-75/ });
+      assert.equal(await split.count(), 2);
+      assert.match(await split.nth(0).innerText(), /North/);
+      assert.match(await split.nth(1).innerText(), /South/);
+      await p.goto(`${BASE_URL}/pt/2-bundesliga/past-winners`);
+      assert.match(await p.getByTestId("past-winners-row").filter({ hasText: /^1974-75/ }).first().innerText(), /Norte/);
+      await p.close();
+    });
+
+    await step("Past Winners: the Brasileirão Série B's history (1971 on), in PT", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/pt/brasileirao-serie-b/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores do Brasileirão Série B");
+      assert.equal(await p.getByTestId("past-winners-row").count(), 55);
+      assert.equal(await p.locator('[data-testid="past-winners-row"][data-status="not_held"]').count(), 11);
+      assert.match(await p.getByTestId("past-winners-row").first().innerText(), /2025[\s\S]*Coritiba/);
+      await p.close();
+    });
+
+    await step("Past Winners: the Brasileirão Série C's history (1981 on), in ES", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/es/brasileirao-serie-c/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores del Brasileirão Série C");
+      assert.equal(await p.getByTestId("past-winners-row").count(), 45);
+      assert.equal(await p.locator('[data-testid="past-winners-row"][data-status="not_held"]').count(), 10);
+      assert.match(await p.getByTestId("past-winners-row").first().innerText(), /2025[\s\S]*Ponte Preta/);
+      await p.close();
+    });
+
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       assert.match(await page.title(), /^Simulador do Brasileirão .* \| FootSimu$/);
@@ -1757,7 +1918,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 45, "every competition once");
+      assert.equal(links.length, 46, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();
@@ -2710,6 +2871,19 @@ async function step(name, fn) {
       await p.locator('[data-testid="world-tabs"] [data-league="EL2"]').click();
       await p.getByTestId("past-winners-coming-soon").waitFor();
       assert.equal(await worldRows.count(), 2, "League Two: the world's seasons only");
+      // A cup has its Past Winners beside the season picker too: this world's two finals (winner and runner-up), its real history to come.
+      await p.locator('[data-testid="world-tabs"] [data-league="FAC"]').click();
+      assert.equal(await p.getByTestId("world-table-view").innerText(), "Fixtures");
+      await p.getByTestId("world-past-winners").click();
+      const cupWinners = p.locator('[data-testid="world-winners"][data-cup="FAC"]');
+      await cupWinners.waitFor();
+      assert.equal(await cupWinners.getByTestId("past-winners-coming-soon").count(), 1);
+      assert.equal(await cupWinners.getByTestId("past-winners-row").count(), 2);
+      assert.match(await cupWinners.getByTestId("past-winners-row").first().innerText(), new RegExp(`${worldSeason(year + 1)}[\\s\\S]*Final[\\s\\S]*My World`, "i"));
+      assert.equal(await p.getByTestId("world-actions").count(), 0, "the rounds and their buttons put away");
+      await p.getByTestId("world-table-view").click();
+      await p.getByTestId("world-actions").waitFor();
+      await p.locator('[data-testid="world-tabs"] [data-league="EL2"]').click();
       // The Table button brings the table and fixtures back.
       await tableView.click();
       await p.getByTestId("world-table").waitFor();
@@ -2808,7 +2982,7 @@ async function step(name, fn) {
       }
     });
 
-    await step("My World with England and Spain: a Segunda División club, Spain's tabs (La Liga, Segunda División, Copa del Rey) behind the country picker, the games left by country, both pyramids ended together (the Segunda's four down to the Primera Federación), Spain's past season and its Past Winners (the world's seasons only)", async () => {
+    await step("My World with England and Spain: a Segunda División club, Spain's tabs (La Liga, Segunda División, Copa del Rey) behind the country picker, the games left by country, both pyramids ended together (the Segunda's four down to the Primera Federación), Spain's past season and its Past Winners (the world's season on top of the real history)", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/my-world`);
       await p.getByTestId("world-setup").waitFor();
@@ -2922,8 +3096,12 @@ async function step(name, fn) {
       await p.getByTestId("world-table-view").click();
       await p.locator('[data-testid="world-tabs"] [data-league="SD"]').click();
       await p.getByTestId("world-past-winners").click();
-      await p.getByTestId("past-winners-coming-soon").waitFor();
-      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]').count(), 1, "the Segunda: the world's season only");
+      await p.getByTestId("world-winners").waitFor();
+      assert.equal(await p.getByTestId("past-winners-coming-soon").count(), 0);
+      const segundaRows = p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]');
+      assert.equal(await segundaRows.first().getAttribute("data-world"), "true", "the world's season first");
+      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"][data-world="true"]').count(), 1);
+      assert.equal(await segundaRows.count(), 118, "the Segunda: the world's season and every real one since 1929");
       await p.getByTestId("world-table-view").click();
       // Saved: a reload keeps both countries.
       await p.reload();
@@ -2994,7 +3172,9 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
       await fixtures.getByTestId("matchday-select").selectOption("-1");
       assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
-      assert.equal(await fixtures.getByTestId("match-score").count(), 2);
+      // Both legs, and the shoot-out's score when the tie was level on aggregate.
+      const scores = await fixtures.getByTestId("match-score").count();
+      assert.ok(scores === 2 || scores === 3, `${scores} scores`);
       await p.close();
     });
 
@@ -3062,6 +3242,34 @@ async function step(name, fn) {
         assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
         assert.equal(await fixtures.getByTestId("match-score").count(), 2);
       }
+      await p.close();
+    });
+
+    await step("My World with England and Brazil: each country's seasons as it plays them (2026/27 in England, 2026 in Brazil)", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
+      await p.locator('[data-testid="world-country"][data-country="BRA"]').click();
+      await p.locator('[data-testid="world-league"][data-league="BSA"]').click();
+      await p.getByTestId("world-club").nth(0).click();
+      await p.getByTestId("world-create").click();
+      const world = p.getByTestId("world");
+      await world.waitFor();
+      const year = Number(await world.getAttribute("data-year"));
+      const split = `${year}/${String((year + 1) % 100).padStart(2, "0")}`;
+      // The club's own season, and Brazil's tables: calendar years.
+      assert.match(await p.getByTestId("world-season").innerText(), new RegExp(`\\b${year}\\b(?!/)`));
+      const seasonCountry = p.getByTestId("world-season-country");
+      await seasonCountry.selectOption("BRA");
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${year} (this season)`);
+      assert.match(await p.getByTestId("world-season-heading").innerText(), new RegExp(`The ${year} season`));
+      await p.locator('[data-testid="world-tabs"] [data-league="CDB"]').click();
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${year} (this season)`, "the Copa do Brasil too");
+      // England's: split years.
+      await seasonCountry.selectOption("ENG");
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${split} (this season)`);
+      assert.match(await p.getByTestId("world-season-heading").innerText(), new RegExp(`The ${split} season`));
       await p.close();
     });
 

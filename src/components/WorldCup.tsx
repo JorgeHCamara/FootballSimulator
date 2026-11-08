@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { tieWinner } from "../engine/cup.ts";
 import { worldSeasonLabel, type World } from "../lib/myWorld.ts";
+import { cupCountry } from "../lib/worldCountries.ts";
 import {
   pastCup,
   resetCup,
@@ -17,6 +18,9 @@ import {
 import { ConfirmDialog } from "./ConfirmDialog.tsx";
 import { CupRounds } from "./CupRounds.tsx";
 import { CupChampion } from "./CupSimulator.tsx";
+import { worldCupWinners } from "../lib/worldWinners.ts";
+import { Icon } from "./Icon.tsx";
+import { PastWinners } from "./PastWinners.tsx";
 import { SeasonPicker } from "./WorldSeason.tsx";
 
 const noop = () => {};
@@ -51,7 +55,7 @@ function PastCup({ world, year, code }: { world: World; year: number; code: Worl
           {t("pastNoFixtures")}
         </p>
       )}
-      <CupChampion cup={past.cup} rounds={past.rounds ?? []} winner={past.final[0]} predictions={{}} teams={past.teams} season={worldSeasonLabel(world, year)} />
+      <CupChampion cup={past.cup} rounds={past.rounds ?? []} winner={past.final[0]} predictions={{}} teams={past.teams} season={worldSeasonLabel(world, year, cupCountry(code))} />
     </div>
   );
 }
@@ -94,11 +98,46 @@ export function WorldCup({
   const actionButton =
     "grow rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-zinc-50 disabled:opacity-40 lg:grow-0 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800";
 
+  const pw = useTranslations("PastWinners");
+  // Past Winners instead of the rounds: this world's finished seasons of the cup (no real history yet).
+  const [winners, setWinners] = useState(false);
+  // The view, beside the season picker: the rounds (Fixtures), or Past Winners (the one shown is pressed).
+  const view = (active: boolean) =>
+    `flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-semibold sm:flex-initial ${active ? "border-pitch-600 bg-pitch-600 text-white hover:bg-pitch-700" : "border-zinc-300 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"}`;
   const picker = (
     <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center lg:col-start-1 lg:row-start-1 lg:self-center">
-      <SeasonPicker world={world} year={year} onYear={onYear} />
+      <SeasonPicker
+        world={world}
+        year={year}
+        country={cupCountry(code)}
+        onYear={(y) => {
+          // A season picked: its rounds again.
+          setWinners(false);
+          onYear(y);
+        }}
+      />
+      <div className="flex gap-2">
+        <button type="button" aria-pressed={!winners} onClick={() => setWinners(false)} className={view(!winners)} data-testid="world-table-view">
+          <Icon name="calendar-days" size={16} className="shrink-0" />
+          {tc("fixtures")}
+        </button>
+        <button type="button" aria-pressed={winners} onClick={() => setWinners(true)} className={view(winners)} data-testid="world-past-winners">
+          <Icon name="trophy" size={16} className="shrink-0" />
+          {pw("title")}
+        </button>
+      </div>
     </div>
   );
+  if (winners) {
+    return (
+      <div className={grid}>
+        {picker}
+        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2" data-testid="world-winners" data-cup={code}>
+          <PastWinners key={code} rows={worldCupWinners(world, code)} comingSoon />
+        </div>
+      </div>
+    );
+  }
   if (year !== world.year) {
     return (
       <div className={grid}>
@@ -157,7 +196,7 @@ export function WorldCup({
           kickOff={false}
           ownDraw
         />
-        <CupChampion cup={cup} rounds={rounds} winner={state.winner} predictions={picks} teams={state.teams} season={worldSeasonLabel(world, world.year)} />
+        <CupChampion cup={cup} rounds={rounds} winner={state.winner} predictions={picks} teams={state.teams} season={worldSeasonLabel(world, world.year, cupCountry(code))} />
       </div>
       <ConfirmDialog
         open={confirmReset}
