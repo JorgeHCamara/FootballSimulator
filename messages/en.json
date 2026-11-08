@@ -339,7 +339,7 @@
       },
       {
         "q": "Which leagues can I simulate?",
-        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Belgian Pro League, Greek Super League, Austrian Bundesliga, Brasileirão Série A, Série B and Série C, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the Saudi Pro League, the J1 League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
+        "a": "The Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Belgian Pro League, Greek Super League, Austrian Bundesliga, Brasileirão Série A, Série B and Série C, the Argentine, Chilean, Colombian, Uruguayan, Paraguayan, Ecuadorian and Peruvian top divisions, Liga MX, MLS, the Saudi Pro League, the J1 League, the FA Cup, the Copa do Brasil, the Copa del Rey, the Coppa Italia, the DFB-Pokal, the Coupe de France, the Champions League, the Europa League, the Conference League, the Copa Libertadores and the Copa Sudamericana, with real fixtures and results for the current season."
       },
       {
         "q": "How does the football simulator decide results?",
@@ -570,6 +570,9 @@
       "thirdRound": "Third Round",
       "fourthRound": "Fourth Round",
       "fifthRound": "Fifth Round",
+      "seventhRound": "Seventh Round",
+      "eighthRound": "Eighth Round",
+      "roundOf64": "Round of 64",
       "roundOf32": "Round of 32",
       "roundOf16": "Round of 16",
       "quarterFinals": "Quarter-finals",
@@ -584,6 +587,9 @@
       "thirdRound": "R3",
       "fourthRound": "R4",
       "fifthRound": "R5",
+      "seventhRound": "R7",
+      "eighthRound": "R8",
+      "roundOf64": "R64",
       "roundOf32": "R32",
       "roundOf16": "R16",
       "quarterFinals": "QF",
@@ -612,12 +618,15 @@
       "nonLeague": "NL",
       "BSA": "A",
       "BSB": "B",
+      "BSC": "C",
       "PD": "1ª",
       "SD": "2ª",
       "SA": "A",
       "SB": "B",
       "BL1": "BL",
-      "BL2": "2BL"
+      "BL2": "2BL",
+      "FL1": "L1",
+      "FL2": "L2"
     },
     "basedOn": "Based on {count} simulated cups from the current results, including your predictions on real pairings.",
     "chancesNote": "Rounds not drawn yet are drawn afresh in every run, so the chances include the luck of the draw.",
@@ -636,7 +645,8 @@
       "CDR": "Each club's strength comes from its own league this season (La Liga or Segunda División), scaled by the division; clubs from Primera Federación and below are rated under Segunda.",
       "CIT": "Each club's strength comes from its own league this season (Serie A or Serie B), scaled by the division; Serie C clubs are rated below Serie B. There is no draw: the Coppa Italia follows a fixed bracket.",
       "DFB": "Each club's strength comes from its own league this season (Bundesliga or 2. Bundesliga), scaled by the division; 3. Liga and amateur clubs are rated below the 2. Bundesliga. An amateur club drawn against a professional one plays at home.",
-      "EFC": "Each club's strength comes from its own league this season (Premier League, Championship, League One or League Two), scaled by the division. There is no extra time before the final: a tie level after 90 minutes goes straight to penalties, and the two-legged semi-finals are decided on aggregate, then penalties."
+      "EFC": "Each club's strength comes from its own league this season (Premier League, Championship, League One or League Two), scaled by the division. There is no extra time before the final: a tie level after 90 minutes goes straight to penalties, and the two-legged semi-finals are decided on aggregate, then penalties.",
+      "CDF": "Each club's strength comes from its own league this season (Ligue 1 or Ligue 2), scaled by the division; National and amateur clubs are rated below Ligue 2. A club drawn against one at least two divisions above it plays at home, and before the final a game level after 90 minutes goes straight to penalties."
     },
     "finalAfter": "The winners of the {round} meet here.",
     "bracketAfter": "Fixed bracket, no draw: the winners meet like this.",
@@ -1468,7 +1478,7 @@
     "newSeason": "A new season: every club starts on 0 points.",
     "cupFirst": "This season, {cup} started from the real one, with its draw and results so far: from here, the cup is yours. Change any result, roll the dice, or simulate the round or the rest of the cup.",
     "cupNew": "A new season: {cup} is drawn round by round among this world's clubs{outsiders}, every game on the clubs' form this season.",
-    "cupOutsiders": " and {count} non-league sides from the real FA Cup",
+    "cupOutsiders": " and {count} clubs from outside the leagues",
     "pastCup": "The {season} {cup}: every round and the final.",
     "tables": "Tables",
     "competitions": "Leagues and cups",

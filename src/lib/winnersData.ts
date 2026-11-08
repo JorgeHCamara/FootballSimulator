@@ -11,7 +11,8 @@ import { join } from "node:path";
 import { CREST_FALLBACKS } from "../config/crests.ts";
 import type { LeagueConfig } from "../config/leagues.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
-import { parseLeagueHistory, winnerRows, type LeagueHistory, type WinnerRow } from "./winners.ts";
+import serieC2026 from "../data/serie-c/2026.json" with { type: "json" };
+import { fold, parseLeagueHistory, winnerRows, type LeagueHistory, type WinnerRow } from "./winners.ts";
 
 export const HISTORY_DIR = join(process.cwd(), "src", "data", "history");
 
@@ -40,13 +41,18 @@ export const hasPastWinners = (slug: string): boolean => all().has(slug);
 
 export const espnCrest = (id: number) => `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
 
+/** The crests of the clubs in the site's own leagues (Série C), by name: for history clubs ESPN has no id for. */
+const firstPartyCrests = new Map(serieC2026.clubs.flatMap((c) => [[fold(c.name), c.crest] as const, [fold(c.cbfName), c.crest] as const]));
+
 /**
  * A club's badge as the site shows it elsewhere: a team override's crest, the
  * site's own file for a club ESPN has none for (CREST_FALLBACKS), else ESPN's
- * crest for the club's id. A club without an id has none (a shield is drawn).
+ * crest for the club's id. A club without an id takes the crest of the club of
+ * that name in the site's own Série C (Paysandu, Santa Cruz…); any other has
+ * none (a shield is drawn).
  */
 export function crestFor(id: number | null, name: string): string | null {
-  if (id === null) return null;
+  if (id === null) return firstPartyCrests.get(fold(name)) ?? null;
   const [team] = applyTeamOverrides([{ id, name, shortName: name, tla: "" }]);
   return team?.crest ?? CREST_FALLBACKS[id] ?? espnCrest(id);
 }
