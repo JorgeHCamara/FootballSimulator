@@ -49,10 +49,11 @@ function similarity(a, b) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function json(url) {
-  for (let attempt = 0; attempt < 4; attempt++) {
+  // The free key allows a few dozen requests a minute: back off longer each time it says so.
+  for (let attempt = 0; attempt < 8; attempt++) {
     const res = await fetch(url);
     if (res.status === 429) {
-      await sleep(15_000);
+      await sleep(30_000 * (attempt + 1));
       continue;
     }
     if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
@@ -130,6 +131,7 @@ const overrides = existsSync(OVERRIDES) ? JSON.parse(await readFile(OVERRIDES, "
 console.log(`${clubs.length} clubs without an ESPN crest`);
 
 const review = [];
+let looked = 0;
 for (const club of clubs) {
   let entry = known.get(club.espnId);
   if (!entry || !entry.candidates) {
@@ -138,6 +140,9 @@ for (const club of clubs) {
     const accepted = best && best.score >= 0.8 && (!second || second.score < best.score);
     entry = { ...club, verdict: !best ? "not found" : accepted ? "accepted" : "review", pick: accepted ? best.idTeam : null, candidates: candidates.slice(0, 4) };
     console.log(`${entry.verdict.padEnd(9)} ${club.name} (${club.competitions.join(",")}) → ${best ? `${best.team} [${best.location}] ${best.score}` : "-"}`);
+    // Saved as it goes: a run stopped part way (rate limits) picks up from here next time.
+    known.set(club.espnId, entry);
+    if (++looked % 10 === 0) await writeFile(REVIEW, JSON.stringify({ generated: new Date().toISOString(), clubs: [...known.values()] }, null, 1) + "\n");
   }
   if (Object.hasOwn(overrides, String(club.espnId))) {
     entry.pick = overrides[club.espnId];

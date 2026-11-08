@@ -170,6 +170,12 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
     const entrants: Partial<Record<CupRoundKey, TeamId[]>> = {};
     for (const round of cup.rounds) {
       if (!round.entrantsFrom) continue;
+      // A round the real draw has filled takes no one else (and a past season's
+      // cup mustn't take this season's league clubs).
+      if (real.filter((t) => t.round === round.key).length >= round.ties) {
+        entrants[round.key] = [];
+        continue;
+      }
       const members = round.entrantsFrom.flatMap((code) => feeders.members[code] ?? []);
       // Clubs already in the real draw (earlier rounds) don't enter again.
       const inCup = new Set(real.flatMap((t) => [t.homeId, t.awayId]));

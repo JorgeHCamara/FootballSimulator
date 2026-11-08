@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-02T13:30:53.661Z",
+ "generated": "2026-11-08T15:43:32.849Z",
  "clubs": [
   {
    "espnId": 4489,
@@ -2759,50 +2759,6 @@
    ]
   },
   {
-   "espnId": 22043,
-   "name": "Mijas Las Lagunas",
-   "shortName": "ML Lagunas",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "accepted",
-   "pick": "150387",
-   "candidates": [
-    {
-     "idTeam": "150387",
-     "team": "Mijas-Las Lagunas",
-     "location": "Las Lagunas, Andalusia, Spain",
-     "league": "Spanish Segunda Federación Group 4",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/o4tqma1735058621.png",
-     "score": 1
-    }
-   ]
-  },
-  {
-   "espnId": 5401,
-   "name": "Real Jaen CF",
-   "shortName": "Real Jaen CF",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "accepted",
-   "pick": "137763",
-   "candidates": [
-    {
-     "idTeam": "137763",
-     "team": "Real Jaén",
-     "location": "Jaén, Spain",
-     "league": "Spanish Primera RFEF Group 2",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/may3aj1735056799.png",
-     "score": 1
-    }
-   ]
-  },
-  {
    "espnId": 22439,
    "name": "Real Ávila",
    "shortName": "Real Ávila",
@@ -2935,6 +2891,151 @@
    ]
   },
   {
+   "espnId": 22043,
+   "name": "Mijas Las Lagunas",
+   "shortName": "ML Lagunas",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150387",
+   "candidates": [
+    {
+     "idTeam": "150387",
+     "team": "Mijas-Las Lagunas",
+     "location": "Las Lagunas, Andalusia, Spain",
+     "league": "Spanish Segunda Federación Group 4",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/o4tqma1735058621.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 5401,
+   "name": "Real Jaen CF",
+   "shortName": "Real Jaen CF",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137763",
+   "candidates": [
+    {
+     "idTeam": "137763",
+     "team": "Real Jaén",
+     "location": "Jaén, Spain",
+     "league": "Spanish Primera RFEF Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/may3aj1735056799.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17573,
+   "name": "Trival Valderas",
+   "shortName": "Trival Valde",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150356",
+   "candidates": [
+    {
+     "idTeam": "150356",
+     "team": "Trival Valderas",
+     "location": "Alcorcón, Community of Madrid, Spain",
+     "league": "Spanish Tercera Federación Group 7",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/iajqel1734926818.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21291,
+   "name": "Calvo Sotelo",
+   "shortName": "Calvo Sotelo",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "144250",
+   "candidates": [
+    {
+     "idTeam": "144250",
+     "team": "Calvo Sotelo Puertollano",
+     "location": "Puertollano, Ciudad Real, Castilla–La Mancha, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/krh52y1735230576.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 19288,
+   "name": "CD Artistico Navalcarnero",
+   "shortName": "CDA Navalcarnero",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 133837,
+   "name": "CD Tarancon",
+   "shortName": "CD Tarancon",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "150488",
+   "candidates": [
+    {
+     "idTeam": "150488",
+     "team": "Tarancón",
+     "location": "Tarancón, Cuenca, Castilla–La Mancha, Spain",
+     "league": "Spanish Tercera Federación Group 18",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/f4et441735231180.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 22440,
+   "name": "Salamanca UDS",
+   "shortName": "Salamanca UDS",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138249",
+   "candidates": [
+    {
+     "idTeam": "138249",
+     "team": "Salamanca UDS",
+     "location": "Salamanca, Spain",
+     "league": "Spanish Segunda Federación Group 5",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ea70171579897018.png",
+     "score": 1
+    }
+   ]
+  },
+  {
    "espnId": 5464,
    "name": "Portugalete",
    "shortName": "Portugalete",
@@ -2974,6 +3075,72 @@
      "location": "Irun, Spain",
      "league": "Spanish Primera Federación Group 1",
      "badge": "https://r2.thesportsdb.com/images/media/team/badge/45alur1786122180.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21723,
+   "name": "Utebo",
+   "shortName": "Utebo",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146803",
+   "candidates": [
+    {
+     "idTeam": "146803",
+     "team": "Utebo",
+     "location": "Utebo, Spain",
+     "league": "Spanish Segunda RFEF Group 2",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/k19kig1660660164.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 6827,
+   "name": "Alcoyano",
+   "shortName": "Alcoyano",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140497",
+   "candidates": [
+    {
+     "idTeam": "140497",
+     "team": "Alcoyano",
+     "location": "Alcoy, Spain",
+     "league": "Spanish Segunda Federación Group 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/4f60su1639481382.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 5535,
+   "name": "Badajoz",
+   "shortName": "Badajoz",
+   "country": "Spain",
+   "competitions": [
+    "CDR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137750",
+   "candidates": [
+    {
+     "idTeam": "137750",
+     "team": "Badajoz",
+     "location": "Badajoz, Extremadura, Spain",
+     "league": "Spanish Segunda Federación Group 4",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2heu6p1690613064.png",
      "score": 1
     }
    ]
@@ -3031,173 +3198,6 @@
      "location": "Barakaldo, Spain",
      "league": "Spanish Primera Federación Group 1",
      "badge": "https://r2.thesportsdb.com/images/media/team/badge/v6ugnf1578747360.png",
-     "score": 1
-    }
-   ]
-  },
-  {
-   "espnId": 21723,
-   "name": "Utebo",
-   "shortName": "Utebo",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "accepted",
-   "pick": "146803",
-   "candidates": [
-    {
-     "idTeam": "146803",
-     "team": "Utebo",
-     "location": "Utebo, Spain",
-     "league": "Spanish Segunda RFEF Group 2",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/k19kig1660660164.png",
-     "score": 1
-    }
-   ]
-  },
-  {
-   "espnId": 21291,
-   "name": "Calvo Sotelo",
-   "shortName": "Calvo Sotelo",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "fixed",
-   "pick": "144250",
-   "candidates": [
-    {
-     "idTeam": "144250",
-     "team": "Calvo Sotelo Puertollano",
-     "location": "Puertollano, Ciudad Real, Castilla–La Mancha, Spain",
-     "league": "Spanish Segunda Federación Group 5",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/krh52y1735230576.png",
-     "score": 0.67
-    }
-   ]
-  },
-  {
-   "espnId": 5535,
-   "name": "Badajoz",
-   "shortName": "Badajoz",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "accepted",
-   "pick": "137750",
-   "candidates": [
-    {
-     "idTeam": "137750",
-     "team": "Badajoz",
-     "location": "Badajoz, Extremadura, Spain",
-     "league": "Spanish Segunda Federación Group 4",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2heu6p1690613064.png",
-     "score": 1
-    }
-   ]
-  },
-  {
-   "espnId": 133837,
-   "name": "CD Tarancon",
-   "shortName": "CD Tarancon",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "fixed",
-   "pick": "150488",
-   "candidates": [
-    {
-     "idTeam": "150488",
-     "team": "Tarancón",
-     "location": "Tarancón, Cuenca, Castilla–La Mancha, Spain",
-     "league": "Spanish Tercera Federación Group 18",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/f4et441735231180.png",
-     "score": 0.5
-    }
-   ]
-  },
-  {
-   "espnId": 6827,
-   "name": "Alcoyano",
-   "shortName": "Alcoyano",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "accepted",
-   "pick": "140497",
-   "candidates": [
-    {
-     "idTeam": "140497",
-     "team": "Alcoyano",
-     "location": "Alcoy, Spain",
-     "league": "Spanish Segunda Federación Group 3",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/4f60su1639481382.png",
-     "score": 1
-    }
-   ]
-  },
-  {
-   "espnId": 17573,
-   "name": "Trival Valderas",
-   "shortName": "Trival Valde",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "accepted",
-   "pick": "150356",
-   "candidates": [
-    {
-     "idTeam": "150356",
-     "team": "Trival Valderas",
-     "location": "Alcorcón, Community of Madrid, Spain",
-     "league": "Spanish Tercera Federación Group 7",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/iajqel1734926818.png",
-     "score": 1
-    }
-   ]
-  },
-  {
-   "espnId": 19288,
-   "name": "CD Artistico Navalcarnero",
-   "shortName": "CDA Navalcarnero",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "not found",
-   "pick": null,
-   "candidates": []
-  },
-  {
-   "espnId": 22440,
-   "name": "Salamanca UDS",
-   "shortName": "Salamanca UDS",
-   "country": "Spain",
-   "competitions": [
-    "CDR"
-   ],
-   "hasLogo": false,
-   "verdict": "accepted",
-   "pick": "138249",
-   "candidates": [
-    {
-     "idTeam": "138249",
-     "team": "Salamanca UDS",
-     "location": "Salamanca, Spain",
-     "league": "Spanish Segunda Federación Group 5",
-     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ea70171579897018.png",
      "score": 1
     }
    ]
@@ -3651,6 +3651,3155 @@
      "location": "Eimsbüttel, Hamburg, Germany",
      "league": "German Oberliga Hamburg",
      "badge": "https://r2.thesportsdb.com/images/media/team/badge/53ai8h1780097084.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134140,
+   "name": "Sporting Club Baie-Mahault",
+   "shortName": "SCMahault",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134141,
+   "name": "Siroco Les Abymes",
+   "shortName": "Abymes",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "145634",
+   "candidates": [
+    {
+     "idTeam": "145634",
+     "team": "Siroco Les Abymes",
+     "location": "",
+     "league": "Guadeloupe Division dHonneur",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/u6i3ep1771121874.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134139,
+   "name": "Olympique De Cayenne",
+   "shortName": "Oly Cayenne",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134137,
+   "name": "AS Etoile Matoury",
+   "shortName": "Etoile Matoury",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134117,
+   "name": "Chambéry Savoie",
+   "shortName": "Chambéry",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "147035",
+   "candidates": [
+    {
+     "idTeam": "147035",
+     "team": "Chambéry SF",
+     "location": "Chambéry, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/cto3nu1673032747.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 134079,
+   "name": "Neuvillette-Jamin",
+   "shortName": "Jamin",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157579",
+   "candidates": [
+    {
+     "idTeam": "157579",
+     "team": "La Neuvillette Jamin",
+     "location": "Reims, Grand-Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/4cpiq51793551997.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 22476,
+   "name": "US Saint-Philbert-de-Grand-Lieu",
+   "shortName": "Saint-Philbert",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 16917,
+   "name": "La Roche-sur-Yon",
+   "shortName": "La Roche",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149977",
+   "candidates": [
+    {
+     "idTeam": "149977",
+     "team": "La Roche-sur-Yon",
+     "location": "La Roche-sur-Yon, Pays de la Loire, France",
+     "league": "_No League Soccer",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/kuu8vv1732583553.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134128,
+   "name": "Balagne",
+   "shortName": "Balagne",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149128",
+   "candidates": [
+    {
+     "idTeam": "149128",
+     "team": "Balagne",
+     "location": "LÎle-Rousse, Haute-Corse, Corsica, France",
+     "league": "French National 2 Group E",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1perra1721817562.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18906,
+   "name": "Le Puy",
+   "shortName": "Le Puy",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "138458",
+   "candidates": [
+    {
+     "idTeam": "138458",
+     "team": "Le Puy-en-Velay",
+     "location": "Le Puy-en-Velay, France",
+     "league": "French Championnat National",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/uhsmj31781478894.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 21804,
+   "name": "Diables Noirs",
+   "shortName": "Diables Noirs",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134138,
+   "name": "Saint-Pauloise FC",
+   "shortName": "Pauloise",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 21769,
+   "name": "La Tamponnaise",
+   "shortName": "La Tamponnaise",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134109,
+   "name": "Tourcoing",
+   "shortName": "Tourcoing",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157580",
+   "candidates": [
+    {
+     "idTeam": "157580",
+     "team": "Tourcoing",
+     "location": "Tourcoing, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/tjy4pf1793486238.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134069,
+   "name": "CA Boulay",
+   "shortName": "Boulay",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149734",
+   "candidates": [
+    {
+     "idTeam": "149734",
+     "team": "Boulay",
+     "location": "Boulay-Moselle, Grand Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/6ct4771731550966.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134153,
+   "name": "Rhone Crussol Foot",
+   "shortName": "CRUSSOL",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157598",
+   "candidates": [
+    {
+     "idTeam": "157598",
+     "team": "Rhône Crussol",
+     "location": "Guilherand-Granges, Auvergne-Rhône-Alpes, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/k7kw481793573751.png",
+     "score": 0.75
+    }
+   ]
+  },
+  {
+   "espnId": 9021,
+   "name": "Frejus",
+   "shortName": "Frejus",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "146330",
+   "candidates": [
+    {
+     "idTeam": "146330",
+     "team": "Fréjus Saint-Raphaël",
+     "location": "Saint-Raphaël, France",
+     "league": "French National 1 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/hv86jg1726120873.png",
+     "score": 0.33
+    }
+   ]
+  },
+  {
+   "espnId": 134147,
+   "name": "Chalon-sur-Saone",
+   "shortName": "Chalon-sur-Saone",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 18101,
+   "name": "Hauts Lyonnais",
+   "shortName": "Hauts Lyonnais",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149686",
+   "candidates": [
+    {
+     "idTeam": "149686",
+     "team": "Hauts Lyonnais",
+     "location": "Pomeys, Auvergne-Rhône-Alpes, France",
+     "league": "French National 1 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/hizxau1731298961.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134091,
+   "name": "Choisy Au Bac",
+   "shortName": "Choisy",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157585",
+   "candidates": [
+    {
+     "idTeam": "157585",
+     "team": "Choisy-au-Bac",
+     "location": "Choisy-au-Bac, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/d52rkm1793509857.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 11313,
+   "name": "Fontenay Foot",
+   "shortName": "Fontenay Foot",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142594",
+   "candidates": [
+    {
+     "idTeam": "142594",
+     "team": "Vendée Fontenay Foot",
+     "location": "Fontenay-le-Comte, Vendée, France",
+     "league": "French National 2 Group B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/m0fahy1727102959.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 134108,
+   "name": "Firminy",
+   "shortName": "Firminy",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157616",
+   "candidates": [
+    {
+     "idTeam": "157616",
+     "team": "Firminy",
+     "location": "Firminy, Auvergne-Rhône-Alpes, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/t4yb751793550954.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 16916,
+   "name": "IC Croix",
+   "shortName": "IC Croix",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "153856",
+   "candidates": [
+    {
+     "idTeam": "153856",
+     "team": "Croix",
+     "location": "Croix, Hauts-de-France, France",
+     "league": "French National 3 Group E",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/0ppg2x1763051031.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 21303,
+   "name": "ES Thaon",
+   "shortName": "Thaon",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142591",
+   "candidates": [
+    {
+     "idTeam": "142591",
+     "team": "Thaon",
+     "location": "Capavenir-Vosges, France",
+     "league": "French National 2 Group F",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2rbzof1626289228.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 9024,
+   "name": "Le Poire SV",
+   "shortName": "Le Poire SV",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "149127",
+   "candidates": [
+    {
+     "idTeam": "149127",
+     "team": "Vendée Poiré-sur-Vie",
+     "location": "Le Poiré-sur-Vie, France",
+     "league": "French National 1 Group B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fr9f7i1721817181.png",
+     "score": 0.25
+    }
+   ]
+  },
+  {
+   "espnId": 11303,
+   "name": "Vertou",
+   "shortName": "Vertou",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149978",
+   "candidates": [
+    {
+     "idTeam": "149978",
+     "team": "Vertou",
+     "location": "Vertou, Loire-Atlantique, Pays de la Loire, France",
+     "league": "French National 2 Group B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/f054fa1732584479.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134146,
+   "name": "Pont-de-Cheruy",
+   "shortName": "Pont-de-Cheruy",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134152,
+   "name": "Saint Sebastien",
+   "shortName": "Sebastien",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157608",
+   "candidates": [
+    {
+     "idTeam": "157608",
+     "team": "Saint-Sébastien",
+     "location": "Saint-Sébastien, Pays de la Loire, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/iy3l6k1793634907.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134121,
+   "name": "La Baule-Le Pouliguen",
+   "shortName": "Pouliguen",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157609",
+   "candidates": [
+    {
+     "idTeam": "157609",
+     "team": "La Baule-Le Pouliguen",
+     "location": "La Baule-Escoublac, Pays de la Loire, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/adfhkb1793551737.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134125,
+   "name": "Tinteniac St Domineuc",
+   "shortName": "Tinteniac",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157563",
+   "candidates": [
+    {
+     "idTeam": "157563",
+     "team": "Tinténiac Saint-Domineuc",
+     "location": "Tinténiac, Brittany, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/sd4tqh1793636231.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 134088,
+   "name": "Koetzingue",
+   "shortName": "Koetzingue",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157568",
+   "candidates": [
+    {
+     "idTeam": "157568",
+     "team": "Koetzingue",
+     "location": "Kœtzingue, Grand-Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ya35p01793551502.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18901,
+   "name": "Biesheim",
+   "shortName": "Biesheim",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "147562",
+   "candidates": [
+    {
+     "idTeam": "147562",
+     "team": "Biesheim",
+     "location": "Biesheim, France",
+     "league": "French National 1 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/cl7h1b1754632002.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 7725,
+   "name": "Amneville",
+   "shortName": "Amneville",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142595",
+   "candidates": [
+    {
+     "idTeam": "142595",
+     "team": "CSO Amnéville",
+     "location": "Amnéville, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/6p3ywb1727107271.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134097,
+   "name": "Sundhoffen",
+   "shortName": "Sundhoffen",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157567",
+   "candidates": [
+    {
+     "idTeam": "157567",
+     "team": "Sundhoffen",
+     "location": "Sundhoffen, Grand-Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/45miw21793635891.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134090,
+   "name": "Asptt Dijon",
+   "shortName": "Asptt",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153859",
+   "candidates": [
+    {
+     "idTeam": "153859",
+     "team": "ASPTT Dijon",
+     "location": "Dijon, Bourgogne-Franche-Comté, France",
+     "league": "French National 3 Group H",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/9ssit11763012793.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 9011,
+   "name": "Selongey",
+   "shortName": "Selongey",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "153883",
+   "candidates": [
+    {
+     "idTeam": "153883",
+     "team": "Is-Selongey",
+     "location": "Selongey, Bourgogne, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/g6awtv1763052540.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134080,
+   "name": "Contres",
+   "shortName": "Contres",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157591",
+   "candidates": [
+    {
+     "idTeam": "157591",
+     "team": "Contres",
+     "location": "Contres, Centre-Val de Loire, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/heizvb1793549395.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20275,
+   "name": "ESA Linas-Montlhery",
+   "shortName": "Linas-Montlhery",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134134,
+   "name": "Cournon",
+   "shortName": "Cournon",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157619",
+   "candidates": [
+    {
+     "idTeam": "157619",
+     "team": "Cournon d'Auvergne",
+     "location": "Cournon-dAuvergne, Auvergne-Rhône-Alpes, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/sor0id1793503730.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134063,
+   "name": "Chassieu Declines FC",
+   "shortName": "Chassieu",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157620",
+   "candidates": [
+    {
+     "idTeam": "157620",
+     "team": "Chassieu Décines",
+     "location": "Chassieu, Auvergne-Rhône-Alpes, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/wn2y381793506356.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134127,
+   "name": "Grau-Du-Roi",
+   "shortName": "GrauduRoi",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134135,
+   "name": "Riviera",
+   "shortName": "Riviera",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "154104",
+   "candidates": [
+    {
+     "idTeam": "154104",
+     "team": "Riviera",
+     "location": "Saint-Jean-Cap-Ferrat, Provence-Alpes-Côte d’Azur, France",
+     "league": "French National 2 Group H",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ane7fn1766704548.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 19393,
+   "name": "GSI Pontivy",
+   "shortName": "GSI Pontivy",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153861",
+   "candidates": [
+    {
+     "idTeam": "153861",
+     "team": "GSI Pontivy",
+     "location": "Pontivy, Morbihan, Brittany, France",
+     "league": "French National 1 Group B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/y9cvpm1763052379.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 10677,
+   "name": "Rennes TA",
+   "shortName": "Rennes TA",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "133719",
+     "team": "Rennes",
+     "location": "111 Rue de Lorient, 35000 Rennes",
+     "league": "French Ligue 1",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ypturx1473504818.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134126,
+   "name": "Le Touquet",
+   "shortName": "Touquet",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149802",
+   "candidates": [
+    {
+     "idTeam": "149802",
+     "team": "Le Touquet",
+     "location": "Touquet-Paris-Plage, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/zqeomr1731808679.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 9017,
+   "name": "Avranches",
+   "shortName": "Avranches",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138819",
+   "candidates": [
+    {
+     "idTeam": "138819",
+     "team": "Avranches",
+     "location": "Avranches, France",
+     "league": "French National 1 Group B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/bdozzc1580238482.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134150,
+   "name": "Lyon-la-Duchere",
+   "shortName": "Lyon-la-Duchere",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 22138,
+   "name": "US Feurs",
+   "shortName": "Feurs",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142603",
+   "candidates": [
+    {
+     "idTeam": "142603",
+     "team": "Feurs",
+     "location": "Feurs, Loire, France",
+     "league": "French National 3 Group G",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/exr1tk1626289290.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134101,
+   "name": "Pays de Saint-Omer",
+   "shortName": "Saint-Omer",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 21817,
+   "name": "AF Virois",
+   "shortName": "AF Virois",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142615",
+   "candidates": [
+    {
+     "idTeam": "142615",
+     "team": "Virois",
+     "location": "Vire Normandie, France",
+     "league": "French National 2 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fcu5p41690574653.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 18064,
+   "name": "Racing Besancon",
+   "shortName": "Racing Besan",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146349",
+   "candidates": [
+    {
+     "idTeam": "146349",
+     "team": "Racing Besançon",
+     "location": "Besançon, France",
+     "league": "French National 2 Group F",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/w7anmn1654867985.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18120,
+   "name": "Am. du Personnel Municipal Metz",
+   "shortName": "Am. du Perso",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153869",
+   "candidates": [
+    {
+     "idTeam": "153869",
+     "team": "APM Metz",
+     "location": "Metz, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/p3doky1763007169.png",
+     "score": 0.8
+    }
+   ]
+  },
+  {
+   "espnId": 18068,
+   "name": "Saint-Brieuc",
+   "shortName": "Saint-Brieuc",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 9009,
+   "name": "Rouen",
+   "shortName": "Rouen",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138067",
+   "candidates": [
+    {
+     "idTeam": "138067",
+     "team": "Rouen",
+     "location": "Rouen",
+     "league": "French Ligue 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/6m1fwf1690606286.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 10689,
+   "name": "St-Ouen L'Aumone",
+   "shortName": "St-Ouen L'Au",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 131572,
+   "name": "Stade Béthunois",
+   "shortName": "Béthunois",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149742",
+   "candidates": [
+    {
+     "idTeam": "149742",
+     "team": "Stade Béthunois",
+     "location": "Béthune, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/9itnpr1731646182.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 21773,
+   "name": "Strasbourg Koenigshoffen",
+   "shortName": "S Koenigshoffen",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142669",
+   "candidates": [
+    {
+     "idTeam": "142669",
+     "team": "Strasbourg FCOSK",
+     "location": "Strasbourg, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/dl3x261626314708.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134120,
+   "name": "Oberlauterbach",
+   "shortName": "Oberlauterbach",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157571",
+   "candidates": [
+    {
+     "idTeam": "157571",
+     "team": "Oberlauterbach-Eberbach",
+     "location": "Oberlauterbach, Grand-Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3pegxm1793571054.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134142,
+   "name": "US Cheminots Paray-Foot",
+   "shortName": "Cheminots",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157614",
+   "candidates": [
+    {
+     "idTeam": "157614",
+     "team": "Paray",
+     "location": "Paray-le-Monial, Bourgogne-Franche-Comté, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/eg8qiv1793572082.png",
+     "score": 0.4
+    }
+   ]
+  },
+  {
+   "espnId": 10235,
+   "name": "Villefranche",
+   "shortName": "Villefranche",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "138823",
+   "candidates": [
+    {
+     "idTeam": "138823",
+     "team": "Villefranche Beaujolais",
+     "location": "Villefranche-sur-Saône, Rhône-Alpes, France",
+     "league": "French Ligue 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/93nv281580244314.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 7296,
+   "name": "Vesoul",
+   "shortName": "Vesoul",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149703",
+   "candidates": [
+    {
+     "idTeam": "149703",
+     "team": "Vesoul",
+     "location": "Vesoul, Bourgogne-Franche-Comté, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/mqg76u1731377802.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18400,
+   "name": "FC Fleury 91",
+   "shortName": "FC Fleury 91",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142604",
+   "candidates": [
+    {
+     "idTeam": "142604",
+     "team": "Fleury",
+     "location": "Fleury-Mérogis, France",
+     "league": "French Championnat National",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/b6hmjd1752323430.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 10232,
+   "name": "Vitre",
+   "shortName": "Vitre",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "144768",
+   "candidates": [
+    {
+     "idTeam": "144768",
+     "team": "Vitré",
+     "location": "Vitré, Ille-et-Vilaine, France",
+     "league": "French National 3 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/dstiag1727103557.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134087,
+   "name": "Saint-Pierre Milizac",
+   "shortName": "St-Pierre",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 10680,
+   "name": "Balma",
+   "shortName": "Balma",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157602",
+   "candidates": [
+    {
+     "idTeam": "157602",
+     "team": "Balma",
+     "location": "Balma, Occitania, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/89gn7p1793487542.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134106,
+   "name": "Castanet",
+   "shortName": "Castanet",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "154070",
+   "candidates": [
+    {
+     "idTeam": "154070",
+     "team": "Castanet",
+     "location": "Castanet-Tolosan, Occitania, France",
+     "league": "French National 2 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/54x9101765645492.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 14381,
+   "name": "Avenir Foot Lozere",
+   "shortName": "Avenir Foot ",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157595",
+   "candidates": [
+    {
+     "idTeam": "157595",
+     "team": "Avenir Foot Lozère",
+     "location": "Mende, Occitania, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/v3divc1793484076.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134067,
+   "name": "Entente Crest-Aouste",
+   "shortName": "Entente",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "146329",
+     "team": "Entente SSG",
+     "location": "Sannois, France",
+     "league": "_No League Soccer",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/q1agn71654811143.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134107,
+   "name": "Boulazac",
+   "shortName": "Boulazac",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157601",
+   "candidates": [
+    {
+     "idTeam": "157601",
+     "team": "Boulazac",
+     "location": "Boulazac-Isle-Manoire, Nouvelle-Aquitaine, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/25sjdp1793505664.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17621,
+   "name": "Anglet Genets",
+   "shortName": "Anglet Genet",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142571",
+   "candidates": [
+    {
+     "idTeam": "142571",
+     "team": "Genêts Anglet",
+     "location": "Anglet, Pyrénées-Atlantiques, France",
+     "league": "French National 2 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/wz738x1722791387.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 16925,
+   "name": "Bressuire",
+   "shortName": "Bressuire",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149944",
+   "candidates": [
+    {
+     "idTeam": "149944",
+     "team": "Bressuire",
+     "location": "Bressuire, Nouvelle-Aquitaine, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/lusqu81732294812.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20272,
+   "name": "FC Challans",
+   "shortName": "Challans",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "147878",
+   "candidates": [
+    {
+     "idTeam": "147878",
+     "team": "Challans",
+     "location": "Challans, France",
+     "league": "French National 2 Group B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/sm82r01702804986.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134149,
+   "name": "Brive",
+   "shortName": "Brive",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 7720,
+   "name": "Angouleme",
+   "shortName": "Angouleme",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "146322",
+   "candidates": [
+    {
+     "idTeam": "146322",
+     "team": "Angoulême Charente",
+     "location": "Angoulême, France",
+     "league": "French National 1 Group B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/syfyvv1654811126.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134068,
+   "name": "Cercle Paul Bert Brequigny Football",
+   "shortName": "Cercle",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157610",
+   "candidates": [
+    {
+     "idTeam": "157610",
+     "team": "CPB Bréquigny",
+     "location": "Rennes, Brittany, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/z0c77d1793503359.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 134071,
+   "name": "Montlucon Football",
+   "shortName": "Montlucon",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157611",
+   "candidates": [
+    {
+     "idTeam": "157611",
+     "team": "Montluçon",
+     "location": "Montluçon, Auvergne-Rhône-Alpes, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/s3wih81793503506.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 10225,
+   "name": "Chauny",
+   "shortName": "Chauny",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157578",
+   "candidates": [
+    {
+     "idTeam": "157578",
+     "team": "Chauny",
+     "location": "Chauny, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/b5lawy1793509436.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134113,
+   "name": "Le Pays Du Valois",
+   "shortName": "Valois",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "154093",
+   "candidates": [
+    {
+     "idTeam": "154093",
+     "team": "Le Pays du Valois",
+     "location": "Le Plessis Belleville, Hauts-de-France, France",
+     "league": "French National 1 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1nevbo1766616276.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134130,
+   "name": "Claira / St Laurent",
+   "shortName": "Claira",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157593",
+   "candidates": [
+    {
+     "idTeam": "157593",
+     "team": "Claira/Saint Laurent",
+     "location": "Saint-Laurent-de-la-Salanque, Occitanie, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fwrxuy1793510283.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 134144,
+   "name": "Puissalicon Magalas",
+   "shortName": "Puissalicon",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157594",
+   "candidates": [
+    {
+     "idTeam": "157594",
+     "team": "Puissalicon-Magalas",
+     "location": "Puissalicon & Magalas, Occitania, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/a7q5ex1793573068.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134118,
+   "name": "ES Buxerolles",
+   "shortName": "Buxerolles",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157613",
+   "candidates": [
+    {
+     "idTeam": "157613",
+     "team": "Buxerolles",
+     "location": "Buxerolles, Nouvelle-Aquitaine, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/umnplk1793505929.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 12957,
+   "name": "Sablé FC",
+   "shortName": "Sablé FC",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142634",
+   "candidates": [
+    {
+     "idTeam": "142634",
+     "team": "Sablé",
+     "location": "Sablé-sur-Sarthe, France",
+     "league": "_No League Soccer",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/10itvx1626296593.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134122,
+   "name": "FC Lourdes",
+   "shortName": "FC Lourdes",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 21772,
+   "name": "Lannion",
+   "shortName": "Lannion",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "147036",
+   "candidates": [
+    {
+     "idTeam": "147036",
+     "team": "Lannion",
+     "location": "Lannion, France",
+     "league": "French National 2 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fn3lo11793484315.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134132,
+   "name": "St Andre St Macaire",
+   "shortName": "Macaire",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157606",
+   "candidates": [
+    {
+     "idTeam": "157606",
+     "team": "Saint-André Saint-Macaire",
+     "location": "Sèvremoine, Pays de la Loire, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/wv6bi61793574364.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 134103,
+   "name": "Nueillaubiers",
+   "shortName": "Nueillaubiers",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157607",
+   "candidates": [
+    {
+     "idTeam": "157607",
+     "team": "Nueillaubiers",
+     "location": "Nueil-les-Aubiers, Nouvelle-Aquitaine, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2qeeqt1793570913.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134148,
+   "name": "Stade Bordelais",
+   "shortName": "Stade Bordelais",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146355",
+   "candidates": [
+    {
+     "idTeam": "146355",
+     "team": "Stade Bordelais",
+     "location": "Le Bouscat, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/vjw8wb1654868081.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134105,
+   "name": "Mazeres Uzos Rontignon",
+   "shortName": "Rontignon",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153889",
+   "candidates": [
+    {
+     "idTeam": "153889",
+     "team": "Mazères-Uzos-Rontignon",
+     "location": "Mazères-Lezons, Pyrénées-Atlantiques, Nouvelle-Aquitaine, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ilc3ds1763248294.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134065,
+   "name": "Olympique des Membres de Cambrai Amerique",
+   "shortName": "Cambrai",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157575",
+   "candidates": [
+    {
+     "idTeam": "157575",
+     "team": "OMCA Cambrai",
+     "location": "Cambrai, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2qejjl1793571853.png",
+     "score": 1
+    },
+    {
+     "idTeam": "153872",
+     "team": "Cambrai",
+     "location": "Cambrai, Nord, Hauts-de-France, France",
+     "league": "_No League Soccer",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/hz7vj31763160405.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134076,
+   "name": "AS Tefana",
+   "shortName": "Tefana",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 10683,
+   "name": "Thionville",
+   "shortName": "Thionville",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "147875",
+   "candidates": [
+    {
+     "idTeam": "147875",
+     "team": "Thionville Lusitanos",
+     "location": "Thionville Cedex, France",
+     "league": "French Ligue 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/rwl7nj1702804979.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 7729,
+   "name": "Chateaubriant",
+   "shortName": "Chateaubrian",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "141332",
+   "candidates": [
+    {
+     "idTeam": "141332",
+     "team": "Voltigeurs de Châteaubriant",
+     "location": "Châteaubriant, Loire-Atlantique. France",
+     "league": "French National 1 Group B",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/9m0ffr1619035798.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134074,
+   "name": "Horizon Patho",
+   "shortName": "Patho",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134123,
+   "name": "Chatou",
+   "shortName": "Chatou",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157590",
+   "candidates": [
+    {
+     "idTeam": "157590",
+     "team": "Chatou",
+     "location": "Chatou, Île-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/6tzj0w1793506574.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134085,
+   "name": "Les Ulis",
+   "shortName": "Les Ulis",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149975",
+   "candidates": [
+    {
+     "idTeam": "149975",
+     "team": "Les Ulis",
+     "location": "Les Ulis, Essonne, Île-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/g44iuy1732581679.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134066,
+   "name": "ESAP Metz",
+   "shortName": "Metz",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157565",
+   "candidates": [
+    {
+     "idTeam": "157565",
+     "team": "ESAP Metz",
+     "location": "Metz, Grand-Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3opqqe1793550724.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134129,
+   "name": "Reipertswiller",
+   "shortName": "Reiperts",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157566",
+   "candidates": [
+    {
+     "idTeam": "157566",
+     "team": "Reipertswiller",
+     "location": "Reipertswiller, Grand Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/4kijdi1793485166.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134102,
+   "name": "Massay",
+   "shortName": "Massay",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157589",
+   "candidates": [
+    {
+     "idTeam": "157589",
+     "team": "Massay",
+     "location": "Massay, Centre-Val de Loire, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/iek1ta1793552425.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134098,
+   "name": "Montlouis",
+   "shortName": "Montlouis",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "152580",
+   "candidates": [
+    {
+     "idTeam": "152580",
+     "team": "Montlouis",
+     "location": "Montlouis-sur-Loire, France",
+     "league": "French National 1 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1w8tzf1753055114.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134131,
+   "name": "Montigny-Les-Metz",
+   "shortName": "Montigny",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157573",
+   "candidates": [
+    {
+     "idTeam": "157573",
+     "team": "Montigny-lès-Metz",
+     "location": "Montigny-lès-Metz, Grand-Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/wa8xq51793552579.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 14439,
+   "name": "Pontarlier",
+   "shortName": "Pontarlier",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142610",
+   "candidates": [
+    {
+     "idTeam": "142610",
+     "team": "Pontarlier",
+     "location": "Pontarlier, Franche-Comté, France",
+     "league": "French National 3 Group F",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/edn9bw1699896389.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131576,
+   "name": "Montreuil FC",
+   "shortName": "Montreuil",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "153881",
+   "candidates": [
+    {
+     "idTeam": "153881",
+     "team": "Montreuil",
+     "location": "Montreuil, Paris, Île-de-France, France",
+     "league": "_No League Soccer",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/epbagb1763264335.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20876,
+   "name": "Loon Plage FC",
+   "shortName": "Loon Plage",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142644",
+   "candidates": [
+    {
+     "idTeam": "142644",
+     "team": "Loon-Plage",
+     "location": "Loon-Plage, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/5uaypv1626314597.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 16735,
+   "name": "Neslois",
+   "shortName": "Neslois",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157581",
+   "candidates": [
+    {
+     "idTeam": "157581",
+     "team": "Pays Neslois",
+     "location": "Nesle, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/gvmlx71793572566.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134119,
+   "name": "Furiani-Agliani",
+   "shortName": "Furiani",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142605",
+   "candidates": [
+    {
+     "idTeam": "142605",
+     "team": "Furiani-Agliani",
+     "location": "Furiani, Haute-Corse, France",
+     "league": "French National 1 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/zn7y3m1680936716.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134064,
+   "name": "Olympique Charleville Prix AM",
+   "shortName": "Charleville",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142585",
+   "candidates": [
+    {
+     "idTeam": "142585",
+     "team": "Olympique Charleville Prix AM",
+     "location": "Prix-lès-Mézières, Grand-Est, France",
+     "league": "French National 2 Group E",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/53bf7v1731387606.png",
+     "score": 0.22
+    }
+   ]
+  },
+  {
+   "espnId": 16913,
+   "name": "Olympique Marcquois",
+   "shortName": "Oly Marcquois",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142582",
+   "candidates": [
+    {
+     "idTeam": "142582",
+     "team": "Olympique Marcquois",
+     "location": "Marcq-en-Baroeul, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/25kr611626286150.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 132434,
+   "name": "Paris 13 Atletico",
+   "shortName": "Paris13",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146312",
+   "candidates": [
+    {
+     "idTeam": "146312",
+     "team": "Paris 13 Atletico",
+     "location": "Gobelins, Paris, France",
+     "league": "French Championnat National",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/t2wpmc1654775914.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134078,
+   "name": "Racing Chambery",
+   "shortName": "Chambery",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157600",
+   "candidates": [
+    {
+     "idTeam": "157600",
+     "team": "Racing Club de Chambéry",
+     "location": "",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1igckp1793573537.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 3200,
+   "name": "Chamois Niortais FC",
+   "shortName": "Chamois",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "134711",
+   "candidates": [
+    {
+     "idTeam": "134711",
+     "team": "Chamois Niortais Saint-Flo",
+     "location": "Niort",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/vcwu3b1793571927.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134133,
+   "name": "RIOM",
+   "shortName": "Riom",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157615",
+   "candidates": [
+    {
+     "idTeam": "157615",
+     "team": "Riom",
+     "location": "Riom, Auvergne-Rhône-Alpes, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/bs9upx1793573993.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 19388,
+   "name": "FC Limonest",
+   "shortName": "Limonest",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "140000",
+   "candidates": [
+    {
+     "idTeam": "140000",
+     "team": "Limonest Saint-Didier",
+     "location": "Limonest, France",
+     "league": "French National 1 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/wmsphh1699893970.png",
+     "score": 0.33
+    }
+   ]
+  },
+  {
+   "espnId": 134115,
+   "name": "Rives 82",
+   "shortName": "Rives",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "153890",
+   "candidates": [
+    {
+     "idTeam": "153890",
+     "team": "2 Rives 82",
+     "location": "Golfech, Tarn-et-Garonne, Occitanie, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/rdcww91763000811.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 10685,
+   "name": "Trelissac FC",
+   "shortName": "Trelissac",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "137697",
+   "candidates": [
+    {
+     "idTeam": "137697",
+     "team": "Trélissac",
+     "location": "Trélissac, France",
+     "league": "French National 2 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/u0o40q1690573127.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134070,
+   "name": "Rochefort FC",
+   "shortName": "Rochefort",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134093,
+   "name": "Juventus Papus",
+   "shortName": "Papus",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157604",
+   "candidates": [
+    {
+     "idTeam": "157604",
+     "team": "Juventus de Papus",
+     "location": "Toulouse, Occitanie, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/0ze4361793551154.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134082,
+   "name": "Sag Cestas",
+   "shortName": "Cestas",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "154068",
+   "candidates": [
+    {
+     "idTeam": "154068",
+     "team": "SAG Cestas",
+     "location": "Cestas, Nouvelle-Aquitanie, France",
+     "league": "French National 2 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/5owuox1765644356.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 7733,
+   "name": "Bayonne",
+   "shortName": "Bayonne",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134114,
+   "name": "Saint-Die Kellermann",
+   "shortName": "Kellermann",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157572",
+   "candidates": [
+    {
+     "idTeam": "157572",
+     "team": "Saint-Dié Kellermann",
+     "location": "Saint-Dié-des-Vosges, Grand Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ywwlbc1793485727.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134151,
+   "name": "Saint-Renan",
+   "shortName": "Renan",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142643",
+   "candidates": [
+    {
+     "idTeam": "142643",
+     "team": "Saint-Renan",
+     "location": "",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/b501ga1626314592.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 168,
+   "name": "Sedan",
+   "shortName": "Sedan",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "134213",
+   "candidates": [
+    {
+     "idTeam": "134213",
+     "team": "Sedan",
+     "location": "Sedan, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/dnlmpx1654776508.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 18085,
+   "name": "Bourges Foot",
+   "shortName": "Bourges Foot",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "146325",
+   "candidates": [
+    {
+     "idTeam": "146325",
+     "team": "Bourges Foot 18",
+     "location": "Bourges, France",
+     "league": "French National 1 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/gd4yc31654811133.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 18907,
+   "name": "Senlis",
+   "shortName": "Senlis",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157592",
+   "candidates": [
+    {
+     "idTeam": "157592",
+     "team": "Senlis",
+     "location": "Senlis, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/lkycb81793487003.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 19386,
+   "name": "Saint-Pryvé Saint Hilaire",
+   "shortName": "Saint-PH",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134072,
+   "name": "Seyssinet",
+   "shortName": "Seyssinet",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142614",
+   "candidates": [
+    {
+     "idTeam": "142614",
+     "team": "Seyssinet",
+     "location": "Seyssinet-Pariset, Isère, Auvergne-Rhône-Alpes, France",
+     "league": "French National 3 Group H",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/yphl7u1763177767.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134124,
+   "name": "St Martin Tatinghem",
+   "shortName": "Tatinghem",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157632",
+   "candidates": [
+    {
+     "idTeam": "157632",
+     "team": "Saint-Martin-lèz-Tatinghem",
+     "location": "Saint-Martin-lèz-Tatinghem, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/8vq97x1793722004.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 22139,
+   "name": "Racing Club de France",
+   "shortName": "Racing CF",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "146356",
+   "candidates": [
+    {
+     "idTeam": "146356",
+     "team": "Racing Club de France",
+     "location": "Colombes, France",
+     "league": "French National 1 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ge73bz1664450385.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134111,
+   "name": "Stade Castelbourgeois",
+   "shortName": "Castel",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157605",
+   "candidates": [
+    {
+     "idTeam": "157605",
+     "team": "Stade Castelbourgeois",
+     "location": "Châteaubourg, Brittany, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/17nkrd1793635105.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 19390,
+   "name": "Stade Pontivy",
+   "shortName": "Stade Pontivy",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "147032",
+   "candidates": [
+    {
+     "idTeam": "147032",
+     "team": "Stade Pontivyen",
+     "location": "Pontivy, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/qjlsgb1673032731.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 10693,
+   "name": "Plabennec",
+   "shortName": "Plabennec",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142636",
+   "candidates": [
+    {
+     "idTeam": "142636",
+     "team": "Stade Plabennécois",
+     "location": "Plabennec, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/2woybb1700065265.png",
+     "score": 0
+    }
+   ]
+  },
+  {
+   "espnId": 134116,
+   "name": "Talange",
+   "shortName": "Talange",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157569",
+   "candidates": [
+    {
+     "idTeam": "157569",
+     "team": "Talange",
+     "location": "Talange, Grand Est, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/pcjdqi1793485355.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134110,
+   "name": "Baume-Les-Dames",
+   "shortName": "Baume",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157570",
+   "candidates": [
+    {
+     "idTeam": "157570",
+     "team": "Baume-les-Dames",
+     "location": "Baume-les-Dames, Bourgogne-Franche-Comté, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/pg2oit1793485562.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134086,
+   "name": "Tremblay",
+   "shortName": "Tremblay",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157587",
+   "candidates": [
+    {
+     "idTeam": "157587",
+     "team": "Tremblay",
+     "location": "Tremblay-en-France, Île-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/cpinkj1793636603.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134077,
+   "name": "Maisons-Alfort",
+   "shortName": "Maisons",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157588",
+   "candidates": [
+    {
+     "idTeam": "157588",
+     "team": "Maisons-Alfort",
+     "location": "Maisons-Alfort, Île-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/zkq1u61793552225.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 17623,
+   "name": "US Marseille Endoume",
+   "shortName": "US Marseille",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157599",
+   "candidates": [
+    {
+     "idTeam": "157599",
+     "team": "Endoume",
+     "location": "Marseille, Provence-Alpes-Côte dAzur, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/tgfluu1793487270.png",
+     "score": 0.4
+    }
+   ]
+  },
+  {
+   "espnId": 132785,
+   "name": "SC Toulon",
+   "shortName": "SC Toulon",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138457",
+   "candidates": [
+    {
+     "idTeam": "138457",
+     "team": "Toulon",
+     "location": "Toulon, France",
+     "league": "French National 1 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/72lrp51690570479.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134094,
+   "name": "Val Yerres Crosne",
+   "shortName": "Val Yerres",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157586",
+   "candidates": [
+    {
+     "idTeam": "157586",
+     "team": "Val Yerres Crosne",
+     "location": "Yerres & Crosne, Île-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/znp9af1793636777.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134092,
+   "name": "Union Cosnoise",
+   "shortName": "Cosnoise",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142670",
+   "candidates": [
+    {
+     "idTeam": "142670",
+     "team": "Cosne",
+     "location": "Cosne-Cours-sur-Loire, Bourgogne-Franche-Comté, France",
+     "league": "French National 2 Group G",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/d9pyez1699907973.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 134084,
+   "name": "Vandruvre",
+   "shortName": "Vandruvre",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 9010,
+   "name": "Epinal",
+   "shortName": "Epinal",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "138827",
+   "candidates": [
+    {
+     "idTeam": "138827",
+     "team": "Épinal",
+     "location": "Épinal",
+     "league": "French National 1 Group A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/hlpvz41680936771.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134081,
+   "name": "Veauche",
+   "shortName": "Veauche",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157617",
+   "candidates": [
+    {
+     "idTeam": "157617",
+     "team": "Veauche",
+     "location": "Veauche, Auvergne-Rhône-Alpes, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/mp17sp1793636927.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134089,
+   "name": "St Paul en Jarez",
+   "shortName": "Jarez",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "157618",
+   "candidates": [
+    {
+     "idTeam": "157618",
+     "team": "Saint-Paul-en-Jarez",
+     "location": "Saint-Paul-en-Jarez, Auvergne-Rhône-Alpes, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ski2t41793634638.png",
+     "score": 0.75
+    }
+   ]
+  },
+  {
+   "espnId": 134075,
+   "name": "Verson",
+   "shortName": "Verson",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157582",
+   "candidates": [
+    {
+     "idTeam": "157582",
+     "team": "Verson",
+     "location": "Verson, Normandy, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/h1z2n61793637655.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 4744,
+   "name": "Calais",
+   "shortName": "Calais",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "skipped",
+   "pick": null,
+   "candidates": [
+    {
+     "idTeam": "149740",
+     "team": "Calais Beau Marais",
+     "location": "Calais, Hauts-de-France, France",
+     "league": "_No League Soccer",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/ty612t1731645728.png",
+     "score": 0.33
+    }
+   ]
+  },
+  {
+   "espnId": 134112,
+   "name": "Violaines",
+   "shortName": "Violaines",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157576",
+   "candidates": [
+    {
+     "idTeam": "157576",
+     "team": "Violaines",
+     "location": "Violaines, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/07lrbq1793637837.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134145,
+   "name": "Vermelles",
+   "shortName": "Vermelles",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157577",
+   "candidates": [
+    {
+     "idTeam": "157577",
+     "team": "Vermelles",
+     "location": "Vermelles, Hauts-de-France, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/mno1zq1793637485.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134083,
+   "name": "Perros-Louannec",
+   "shortName": "Louannec",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157564",
+   "candidates": [
+    {
+     "idTeam": "157564",
+     "team": "Perros Louannec",
+     "location": "Perros-Guirec & Louannec, Brittany, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/h2eafl1793572781.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 7574,
+   "name": "Vannes OC",
+   "shortName": "Vannes OC",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "142593",
+   "candidates": [
+    {
+     "idTeam": "142593",
+     "team": "Vannes",
+     "location": "Vannes, France",
+     "league": "French National 2 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/t5f2zj1677555607.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 134099,
+   "name": "Stade Sotteville",
+   "shortName": "Sotteville",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "not found",
+   "pick": null,
+   "candidates": []
+  },
+  {
+   "espnId": 134104,
+   "name": "USF Fecamp",
+   "shortName": "Fecamp",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "157584",
+   "candidates": [
+    {
+     "idTeam": "157584",
+     "team": "Fécamp",
+     "location": "Fécamp, Normandy, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/r1tj5k1793486654.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 134096,
+   "name": "Atlas Paillade",
+   "shortName": "Paillade",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "153884",
+   "candidates": [
+    {
+     "idTeam": "153884",
+     "team": "Montpellier Atlas Paillade",
+     "location": "Montpellier, Hérault, Occitania, France",
+     "league": "Coupe de France",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/379gtz1763246784.png",
+     "score": 0.67
+    }
+   ]
+  },
+  {
+   "espnId": 21306,
+   "name": "AS Cannes",
+   "shortName": "Cannes",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "140033",
+   "candidates": [
+    {
+     "idTeam": "140033",
+     "team": "Cannes",
+     "location": "Cannes, France",
+     "league": "French Ligue 3",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/1120tb1690570715.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 20871,
+   "name": "Rumilly Vallières",
+   "shortName": "Rumilly",
+   "country": "France",
+   "competitions": [
+    "CDF"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "141331",
+   "candidates": [
+    {
+     "idTeam": "141331",
+     "team": "Rumilly-Vallières",
+     "location": "Rumilly, Haute-Savoie, France",
+     "league": "French National 1 Group C",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/dhf6nx1655554185.png",
      "score": 1
     }
    ]

@@ -339,7 +339,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A, B e C, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A, B e C, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Campeonato Argentino, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Coupe de France, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -570,6 +570,9 @@
       "thirdRound": "Terceira fase",
       "fourthRound": "Quarta fase",
       "fifthRound": "Quinta fase",
+      "seventhRound": "Sétima fase",
+      "eighthRound": "Oitava fase",
+      "roundOf64": "32 avos de final",
       "roundOf32": "16 avos de final",
       "roundOf16": "Oitavas de final",
       "quarterFinals": "Quartas de final",
@@ -584,6 +587,9 @@
       "thirdRound": "F3",
       "fourthRound": "F4",
       "fifthRound": "F5",
+      "seventhRound": "F7",
+      "eighthRound": "F8",
+      "roundOf64": "32A",
       "roundOf32": "16A",
       "roundOf16": "OF",
       "quarterFinals": "QF",
@@ -594,6 +600,7 @@
     "roundComplete": "Completa",
     "simulatedDraw": "Sorteio simulado",
     "simulatedDrawNote": "Estes confrontos são um sorteio simulado. O sorteio real substitui o simulado assim que for feito.",
+    "byes": "Passa{count, plural, one {} other {m}} sem jogar: {clubs}. A fonte lista a fase anterior incompleta, então seus vencedores não completam este sorteio; o sorteio real o substitui assim que for listado.",
     "drawAfter": "O sorteio acontece depois da {round}.",
     "drawClubs": "{count} clubes estarão no sorteio.",
     "drawClubsEntering": "{count} clubes estarão no sorteio{entering}.",
@@ -612,12 +619,15 @@
       "nonLeague": "NL",
       "BSA": "A",
       "BSB": "B",
+      "BSC": "C",
       "PD": "1ª",
       "SD": "2ª",
       "SA": "A",
       "SB": "B",
       "BL1": "BL",
-      "BL2": "2BL"
+      "BL2": "2BL",
+      "FL1": "L1",
+      "FL2": "L2"
     },
     "basedOn": "Com base em {count} copas simuladas a partir dos resultados atuais, incluindo seus palpites nos confrontos reais.",
     "chancesNote": "As fases ainda não sorteadas são sorteadas de novo em cada simulação, então as chances incluem a sorte do sorteio.",
@@ -636,7 +646,8 @@
       "CDR": "A força de cada clube vem do seu próprio campeonato nesta temporada (La Liga ou Segunda División), ajustada pela divisão; clubes da Primera Federación para baixo ficam abaixo da Segunda.",
       "CIT": "A força de cada clube vem do seu próprio campeonato nesta temporada (Serie A ou Serie B), ajustada pela divisão; clubes da Serie C ficam abaixo da Serie B. Não há sorteio: a Coppa Italia segue uma chave fixa.",
       "DFB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Bundesliga ou 2. Bundesliga), ajustada pela divisão; clubes da 3. Liga e amadores ficam abaixo da 2. Bundesliga. Um clube amador sorteado contra um profissional joga em casa.",
-      "EFC": "A força de cada clube vem do seu próprio campeonato nesta temporada (Premier League, Championship, League One ou League Two), ajustada pela divisão. Não há prorrogação antes da final: um jogo empatado aos 90 minutos vai direto para os pênaltis, e as semifinais em dois jogos são decididas no placar agregado e, se empatadas, nos pênaltis."
+      "EFC": "A força de cada clube vem do seu próprio campeonato nesta temporada (Premier League, Championship, League One ou League Two), ajustada pela divisão. Não há prorrogação antes da final: um jogo empatado aos 90 minutos vai direto para os pênaltis, e as semifinais em dois jogos são decididas no placar agregado e, se empatadas, nos pênaltis.",
+      "CDF": "A força de cada clube vem da sua própria liga nesta temporada (Ligue 1 ou Ligue 2), ajustada pela divisão; os clubes do National e amadores ficam abaixo da Ligue 2. Um clube sorteado contra outro pelo menos duas divisões acima joga em casa, e antes da final um jogo empatado após 90 minutos vai direto para os pênaltis."
     },
     "finalAfter": "Os vencedores das {round} se enfrentam aqui.",
     "bracketAfter": "Chave fixa, sem sorteio: os vencedores se enfrentam assim.",
@@ -1270,7 +1281,11 @@
     "world": "My World",
     "comingSoon": "Histórico real em breve",
     "revoked": "Título revogado",
-    "tied": "Posição dividida"
+    "tied": "Posição dividida",
+    "tournaments": {
+      "North": "Norte",
+      "South": "Sul"
+    }
   },
   "World": {
     "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol, alemão, italiano ou brasileiro",
@@ -1469,7 +1484,7 @@
     "newSeason": "Uma nova temporada: todos os clubes começam com 0 ponto.",
     "cupFirst": "Nesta temporada, {cup} começou da real, com o sorteio e os resultados até agora: daqui em diante, a copa é sua. Mude qualquer resultado, role os dados ou simule a fase ou o resto da copa.",
     "cupNew": "Nova temporada: {cup} é sorteada fase a fase entre os clubes deste mundo{outsiders}, cada jogo com a forma dos clubes nesta temporada.",
-    "cupOutsiders": " e {count} clubes de fora da liga, da FA Cup real",
+    "cupOutsiders": " e {count} clubes de fora das ligas",
     "pastCup": "A {cup} de {season}: todas as fases e a final.",
     "tables": "Tabelas",
     "competitions": "Ligas e copas",

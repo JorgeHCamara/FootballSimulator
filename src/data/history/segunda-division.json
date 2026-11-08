@@ -1,0 +1,4072 @@
+{
+  "league": "Segunda División",
+  "footsimuSlug": "segunda-division",
+  "footsimuCode": "SD",
+  "country": "Spain",
+  "scope": "Spanish second tier (Segunda División, now LALIGA HYPERMOTION) from 1929 to 2025-26. 1936-37 to 1938-39 not held (Civil War). Seasons played as groups plus a final group (1934-35, 1935-36, 1939-40 to 1942-43) have format \"playoff\", and places/points come from the final group. 1949-50 to 1967-68 were played in two parallel groups: one row per group, tournament \"North\" / \"South\", each with its own winner, runner-up and third. Title counts in the source list count each group win as a title",
+  "source": [
+    "https://en.wikipedia.org/wiki/Segunda_División (revision 1383420573; champions, runners-up, third)",
+    "Wikipedia season articles (YYYY–YY Segunda División): league and group tables, points",
+    "https://es.wikipedia.org/wiki/Segunda_División_de_España_YYYY-YY (Spanish Wikipedia season tables: top three and points, every season 1929-2025-26; cross-check)",
+    "https://www.rsssf.org/tabless/span2champ.html (RSSSF champions and North/South group winners, every season; cross-check)",
+    "https://www.rsssf.org/tabless/spanhist2839.html (RSSSF tables 1928-36)",
+    "de.wikipedia / it.wikipedia season articles (tie-break for 1954-55 North)",
+    "https://site.api.espn.com/apis/v2/sports/soccer/esp.2/standings?season=YYYY (cross-check where ESPN has standings)"
+  ],
+  "retrievedAt": "2026-11-07T02:07:34+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id (the id FootSimu uses)",
+    "footsimuSlug": "club page slug on footsimu.com, only for clubs in a FootSimu league in 2026-27",
+    "footsimuPath": "club page path under the league the club plays in now, without locale",
+    "points": "final points (2 per win until 1994-95, 3 from 1995-96); final-group points for the \"playoff\" seasons",
+    "name": "club name used in the source for that season",
+    "currentName": "club as known today (FootSimu name where available); historic/defunct clubs and reserve teams are annotated",
+    "tournament": "\"North\" / \"South\" for 1949-50 to 1967-68, otherwise null",
+    "tiedWith": "not used (all level-on-points places were resolved by the official tie-breaks; see notes)",
+    "strippedChampion": "not used"
+  },
+  "seasons": [
+    {
+      "season": "1929",
+      "startYear": 1929,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 22
+      },
+      "runnerUp": {
+        "name": "Iberia SC",
+        "currentName": "Iberia SC (defunct; merged into Zaragoza 1932)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 22
+      },
+      "third": {
+        "name": "Deportivo Alavés",
+        "currentName": "Alavés",
+        "footsimuId": 96,
+        "footsimuSlug": "alaves",
+        "footsimuPath": "/la-liga/team/alaves",
+        "points": 21
+      },
+      "notes": [
+        "Third place from Wikipedia season article",
+        "Sevilla and Iberia finished level on 22 points; Sevilla ranked first on head-to-head"
+      ]
+    },
+    {
+      "season": "1929-30",
+      "startYear": 1929,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Alavés",
+        "currentName": "Alavés",
+        "footsimuId": 96,
+        "footsimuSlug": "alaves",
+        "footsimuPath": "/la-liga/team/alaves",
+        "points": 22
+      },
+      "runnerUp": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 21
+      },
+      "third": {
+        "name": "Iberia SC",
+        "currentName": "Iberia SC (defunct; merged into Zaragoza 1932)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 21
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1930-31",
+      "startYear": 1930,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 26
+      },
+      "runnerUp": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 23
+      },
+      "third": {
+        "name": "Athletic Club Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 23
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1931-32",
+      "startYear": 1931,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 21
+      },
+      "runnerUp": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 19
+      },
+      "third": {
+        "name": "Sporting de Gijón CF",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 18
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1932-33",
+      "startYear": 1932,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 27
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 24
+      },
+      "third": {
+        "name": "Murcia FC",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 20
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1933-34",
+      "startYear": 1933,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 27
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 24
+      },
+      "third": {
+        "name": "Murcia FC",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 21
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1934-35",
+      "startYear": 1934,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "playoff",
+      "champion": {
+        "name": "Hércules FC",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 14
+      },
+      "runnerUp": {
+        "name": "CA Osasuna",
+        "currentName": "Osasuna",
+        "footsimuId": 97,
+        "footsimuSlug": "osasuna",
+        "footsimuPath": "/la-liga/team/osasuna",
+        "points": 13
+      },
+      "third": {
+        "name": "Celta de Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 12
+      },
+      "notes": [
+        "Three groups followed by a final group; places are from the final group (Hércules 14, Osasuna 13, Celta 12)"
+      ]
+    },
+    {
+      "season": "1935-36",
+      "startYear": 1935,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "playoff",
+      "champion": {
+        "name": "Celta de Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 13
+      },
+      "runnerUp": {
+        "name": "Zaragoza FC",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 13
+      },
+      "third": {
+        "name": "Arenas de Guecho",
+        "currentName": "Arenas Club de Getxo",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 11
+      },
+      "notes": [
+        "Three groups followed by a final group; places are from the final group",
+        "Celta and Zaragoza level on 13 points in the final group"
+      ]
+    },
+    {
+      "season": "1936-37",
+      "startYear": 1936,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held: Spanish Civil War (1936-39)"
+      ]
+    },
+    {
+      "season": "1937-38",
+      "startYear": 1937,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held: Spanish Civil War (1936-39)"
+      ]
+    },
+    {
+      "season": "1938-39",
+      "startYear": 1938,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held: Spanish Civil War (1936-39)"
+      ]
+    },
+    {
+      "season": "1939-40",
+      "startYear": 1939,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "playoff",
+      "champion": {
+        "name": "Real Murcia CF",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 9
+      },
+      "runnerUp": {
+        "name": "RC Deportivo",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 9
+      },
+      "third": {
+        "name": "Cádiz CF",
+        "currentName": "Cádiz",
+        "footsimuId": 3842,
+        "footsimuSlug": "cadiz",
+        "footsimuPath": "/segunda-division/team/cadiz",
+        "points": 9
+      },
+      "notes": [
+        "Five regional groups; the five group winners played a final group, whose places are used here"
+      ]
+    },
+    {
+      "season": "1940-41",
+      "startYear": 1940,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "playoff",
+      "champion": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 8
+      },
+      "runnerUp": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 6
+      },
+      "third": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 6
+      },
+      "notes": [
+        "Two groups of 12; the top two of each played a final group, whose places are used here"
+      ]
+    },
+    {
+      "season": "1941-42",
+      "startYear": 1941,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "playoff",
+      "champion": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 15
+      },
+      "runnerUp": {
+        "name": "Real Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 13
+      },
+      "third": {
+        "name": "Real Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 12
+      },
+      "notes": [
+        "Three groups followed by a final group; places are from the final group"
+      ]
+    },
+    {
+      "season": "1942-43",
+      "startYear": 1942,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "playoff",
+      "champion": {
+        "name": "Sabadell",
+        "currentName": "CD Sabadell",
+        "footsimuId": 11487,
+        "footsimuSlug": "cd-sabadell",
+        "footsimuPath": "/segunda-division/team/cd-sabadell",
+        "points": 13
+      },
+      "runnerUp": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 12
+      },
+      "third": {
+        "name": "Real Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 11
+      },
+      "notes": [
+        "Three groups followed by a final group; places are from the final group"
+      ]
+    },
+    {
+      "season": "1943-44",
+      "startYear": 1943,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 37
+      },
+      "runnerUp": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 32
+      },
+      "third": {
+        "name": "Constancia",
+        "currentName": "CE Constància",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 31
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1944-45",
+      "startYear": 1944,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Alcoyano",
+        "currentName": "CD Alcoyano",
+        "footsimuId": 6827,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 34
+      },
+      "runnerUp": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 33
+      },
+      "third": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 32
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1945-46",
+      "startYear": 1945,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sabadell",
+        "currentName": "CD Sabadell",
+        "footsimuId": 11487,
+        "footsimuSlug": "cd-sabadell",
+        "footsimuPath": "/segunda-division/team/cd-sabadell",
+        "points": 35
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 33
+      },
+      "third": {
+        "name": "Gimnástico",
+        "currentName": "Gimnàstic de Tarragona",
+        "footsimuId": 4492,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 29
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1946-47",
+      "startYear": 1946,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Alcoyano",
+        "currentName": "CD Alcoyano",
+        "footsimuId": 6827,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "runnerUp": {
+        "name": "Gimnàstic",
+        "currentName": "Gimnàstic de Tarragona",
+        "footsimuId": 4492,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 35
+      },
+      "third": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 32
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1947-48",
+      "startYear": 1947,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 36
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 33
+      },
+      "third": {
+        "name": "Ferrol",
+        "currentName": "Racing Ferrol",
+        "footsimuId": 8448,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 28
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1948-49",
+      "startYear": 1948,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 35
+      },
+      "runnerUp": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 35
+      },
+      "third": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 35
+      },
+      "notes": [
+        "Third place from Wikipedia season article",
+        "Real Sociedad, Málaga and Granada all finished on 35 points; order per the official table"
+      ]
+    },
+    {
+      "season": "1949-50",
+      "startYear": 1949,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Racing Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Lérida",
+        "currentName": "UE Lleida",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "third": {
+        "name": "Real Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 39
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1949-50",
+      "startYear": 1949,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Alcoyano",
+        "currentName": "CD Alcoyano",
+        "footsimuId": 6827,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "runnerUp": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "Plus Ultra",
+        "currentName": "AD Plus Ultra (merged into Real Madrid Castilla 1972)",
+        "footsimuId": 7000,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1950-51",
+      "startYear": 1950,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 48
+      },
+      "runnerUp": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 42
+      },
+      "third": {
+        "name": "Sabadell",
+        "currentName": "CD Sabadell",
+        "footsimuId": 11487,
+        "footsimuSlug": "cd-sabadell",
+        "footsimuPath": "/segunda-division/team/cd-sabadell",
+        "points": 38
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1950-51",
+      "startYear": 1950,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Tetuán",
+        "currentName": "Atlético Tetuán (defunct 1956; predecessor of Moghreb Tétouan)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 35
+      },
+      "runnerUp": {
+        "name": "Salamanca",
+        "currentName": "UD Salamanca (defunct 2013)",
+        "footsimuId": 3796,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 32
+      },
+      "third": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 31
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1951-52",
+      "startYear": 1951,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 39
+      },
+      "runnerUp": {
+        "name": "Logroñés",
+        "currentName": "CD Logroñés (defunct 2009)",
+        "footsimuId": 7206,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 36
+      },
+      "third": {
+        "name": "Ferrol",
+        "currentName": "Racing Ferrol",
+        "footsimuId": 8448,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 33
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1951-52",
+      "startYear": 1951,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Mestalla",
+        "currentName": "Valencia CF Mestalla",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 40
+      },
+      "third": {
+        "name": "Alcoyano",
+        "currentName": "CD Alcoyano",
+        "footsimuId": 6827,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1952-53",
+      "startYear": 1952,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Osasuna",
+        "currentName": "Osasuna",
+        "footsimuId": 97,
+        "footsimuSlug": "osasuna",
+        "footsimuPath": "/la-liga/team/osasuna",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "España Industrial",
+        "currentName": "CD Condal (defunct 1970)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "third": {
+        "name": "Avilés",
+        "currentName": "Real Avilés",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1952-53",
+      "startYear": 1952,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Jaén",
+        "currentName": "Real Jaén",
+        "footsimuId": 5401,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "runnerUp": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "Atlético Tetuán",
+        "currentName": "Atlético Tetuán (defunct 1956; predecessor of Moghreb Tétouan)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1953-54",
+      "startYear": 1953,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Alavés",
+        "currentName": "Alavés",
+        "footsimuId": 96,
+        "footsimuSlug": "alaves",
+        "footsimuPath": "/la-liga/team/alaves",
+        "points": 41
+      },
+      "runnerUp": {
+        "name": "Baracaldo",
+        "currentName": "Barakaldo CF",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "Lérida",
+        "currentName": "UE Lleida",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1953-54",
+      "startYear": 1953,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 39
+      },
+      "runnerUp": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 38
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1954-55",
+      "startYear": 1954,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Cultural Leonesa",
+        "currentName": "Cultural Leonesa",
+        "footsimuId": 10629,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 39
+      },
+      "third": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 39
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs",
+        "Oviedo and Zaragoza both finished on 39 points; Oviedo placed second per es.wikipedia, it.wikipedia and de.wikipedia (the English season article lists Zaragoza second)"
+      ]
+    },
+    {
+      "season": "1954-55",
+      "startYear": 1954,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Atlético Tetuán",
+        "currentName": "Atlético Tetuán (defunct 1956; predecessor of Moghreb Tétouan)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 39
+      },
+      "third": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 38
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1955-56",
+      "startYear": 1955,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Osasuna",
+        "currentName": "Osasuna",
+        "footsimuId": 97,
+        "footsimuSlug": "osasuna",
+        "footsimuPath": "/la-liga/team/osasuna",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 41
+      },
+      "third": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 40
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1955-56",
+      "startYear": 1955,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Jaén",
+        "currentName": "Real Jaén",
+        "footsimuId": 5401,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 36
+      },
+      "third": {
+        "name": "España Industrial",
+        "currentName": "CD Condal (defunct 1970)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1956-57",
+      "startYear": 1956,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 62
+      },
+      "runnerUp": {
+        "name": "Sabadell",
+        "currentName": "CD Sabadell",
+        "footsimuId": 11487,
+        "footsimuSlug": "cd-sabadell",
+        "footsimuPath": "/segunda-division/team/cd-sabadell",
+        "points": 54
+      },
+      "third": {
+        "name": "Indauchu",
+        "currentName": "SD Indautxu",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1956-57",
+      "startYear": 1956,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 45
+      },
+      "third": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 43
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1957-58",
+      "startYear": 1957,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Sabadell",
+        "currentName": "CD Sabadell",
+        "footsimuId": 11487,
+        "footsimuSlug": "cd-sabadell",
+        "footsimuPath": "/segunda-division/team/cd-sabadell",
+        "points": 50
+      },
+      "third": {
+        "name": "Real Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 40
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1957-58",
+      "startYear": 1957,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Tenerife",
+        "currentName": "Tenerife",
+        "footsimuId": 245,
+        "footsimuSlug": "tenerife",
+        "footsimuPath": "/segunda-division/team/tenerife",
+        "points": 38
+      },
+      "third": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1958-59",
+      "startYear": 1958,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Sabadell",
+        "currentName": "CD Sabadell",
+        "footsimuId": 11487,
+        "footsimuSlug": "cd-sabadell",
+        "footsimuPath": "/segunda-division/team/cd-sabadell",
+        "points": 39
+      },
+      "third": {
+        "name": "Indauchu",
+        "currentName": "SD Indautxu",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 35
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs",
+        "Group label corrected per RSSSF and es.wikipedia: the English champions list has the North and South groups swapped for this season"
+      ]
+    },
+    {
+      "season": "1958-59",
+      "startYear": 1958,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Elche",
+        "currentName": "Elche",
+        "footsimuId": 3751,
+        "footsimuSlug": "elche",
+        "footsimuPath": "/la-liga/team/elche",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Levante",
+        "currentName": "Levante",
+        "footsimuId": 1538,
+        "footsimuSlug": "levante",
+        "footsimuPath": "/la-liga/team/levante",
+        "points": 37
+      },
+      "third": {
+        "name": "Atlético Almería",
+        "currentName": "Club Atlético Almería (defunct; not the modern UD Almería)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 32
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs",
+        "Group label corrected per RSSSF and es.wikipedia: the English champions list has the North and South groups swapped for this season"
+      ]
+    },
+    {
+      "season": "1959-60",
+      "startYear": 1959,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Racing Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 40
+      },
+      "third": {
+        "name": "Ourense",
+        "currentName": "CD Ourense (defunct 2014)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1959-60",
+      "startYear": 1959,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Córdoba",
+        "currentName": "Córdoba",
+        "footsimuId": 8447,
+        "footsimuSlug": "cordoba",
+        "footsimuPath": "/segunda-division/team/cordoba",
+        "points": 39
+      },
+      "third": {
+        "name": "Jaén",
+        "currentName": "Real Jaén",
+        "footsimuId": 5401,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1960-61",
+      "startYear": 1960,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Osasuna",
+        "currentName": "Osasuna",
+        "footsimuId": 97,
+        "footsimuSlug": "osasuna",
+        "footsimuPath": "/la-liga/team/osasuna",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 40
+      },
+      "third": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1960-61",
+      "startYear": 1960,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Tenerife",
+        "currentName": "Tenerife",
+        "footsimuId": 245,
+        "footsimuSlug": "tenerife",
+        "footsimuPath": "/segunda-division/team/tenerife",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Atlético Ceuta",
+        "currentName": "AD Ceuta",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1961-62",
+      "startYear": 1961,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 40
+      },
+      "third": {
+        "name": "Orense",
+        "currentName": "CD Ourense (defunct 2014)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1961-62",
+      "startYear": 1961,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Córdoba",
+        "currentName": "Córdoba",
+        "footsimuId": 8447,
+        "footsimuSlug": "cordoba",
+        "footsimuPath": "/segunda-division/team/cordoba",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 38
+      },
+      "third": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1962-63",
+      "startYear": 1962,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Pontevedra",
+        "currentName": "Pontevedra CF",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 41
+      },
+      "runnerUp": {
+        "name": "Español",
+        "currentName": "Espanyol",
+        "footsimuId": 88,
+        "footsimuSlug": "espanyol",
+        "footsimuPath": "/la-liga/team/espanyol",
+        "points": 39
+      },
+      "third": {
+        "name": "Real Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1962-63",
+      "startYear": 1962,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Levante",
+        "currentName": "Levante",
+        "footsimuId": 1538,
+        "footsimuSlug": "levante",
+        "footsimuPath": "/la-liga/team/levante",
+        "points": 41
+      },
+      "third": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 38
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1963-64",
+      "startYear": 1963,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Real Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 39
+      },
+      "third": {
+        "name": "Europa",
+        "currentName": "CE Europa",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1963-64",
+      "startYear": 1963,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 38
+      },
+      "third": {
+        "name": "Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1964-65",
+      "startYear": 1964,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Pontevedra",
+        "currentName": "Pontevedra CF",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Sabadell",
+        "currentName": "CD Sabadell",
+        "footsimuId": 11487,
+        "footsimuSlug": "cd-sabadell",
+        "footsimuPath": "/segunda-division/team/cd-sabadell",
+        "points": 39
+      },
+      "third": {
+        "name": "Real Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 38
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1964-65",
+      "startYear": 1964,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 42
+      },
+      "runnerUp": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 38
+      },
+      "third": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 35
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1965-66",
+      "startYear": 1965,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 39
+      },
+      "third": {
+        "name": "Real Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1965-66",
+      "startYear": 1965,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 39
+      },
+      "runnerUp": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 37
+      },
+      "third": {
+        "name": "Algeciras",
+        "currentName": "Algeciras CF",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 35
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1966-67",
+      "startYear": 1966,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 46
+      },
+      "runnerUp": {
+        "name": "Real Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 45
+      },
+      "third": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1966-67",
+      "startYear": 1966,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 44
+      },
+      "runnerUp": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 40
+      },
+      "third": {
+        "name": "Castellón",
+        "currentName": "Castellón",
+        "footsimuId": 4438,
+        "footsimuSlug": "castellon",
+        "footsimuPath": "/segunda-division/team/castellon",
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1967-68",
+      "startYear": 1967,
+      "tournament": "North",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 43
+      },
+      "runnerUp": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 41
+      },
+      "third": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 36
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Northern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1967-68",
+      "startYear": 1967,
+      "tournament": "South",
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 40
+      },
+      "runnerUp": {
+        "name": "Calvo Sotelo",
+        "currentName": "CD Calvo Sotelo (defunct 1988)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 39
+      },
+      "third": {
+        "name": "Alcoyano",
+        "currentName": "CD Alcoyano",
+        "footsimuId": 6827,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 37
+      },
+      "notes": [
+        "Second tier split into two parallel groups (North and South); this row is the Southern group: winner, runner-up and third of the group table. Promotion was then decided by group placings and/or promotion play-offs"
+      ]
+    },
+    {
+      "season": "1968-69",
+      "startYear": 1968,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 52
+      },
+      "third": {
+        "name": "Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 50
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1969-70",
+      "startYear": 1969,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 49
+      },
+      "third": {
+        "name": "Español",
+        "currentName": "Espanyol",
+        "footsimuId": 88,
+        "footsimuSlug": "espanyol",
+        "footsimuPath": "/la-liga/team/espanyol",
+        "points": 49
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1970-71",
+      "startYear": 1970,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Burgos (I)",
+        "currentName": "Burgos CF (defunct 1983)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 45
+      },
+      "third": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 45
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1971-72",
+      "startYear": 1971,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Castellón",
+        "currentName": "Castellón",
+        "footsimuId": 4438,
+        "footsimuSlug": "castellon",
+        "footsimuPath": "/segunda-division/team/castellon",
+        "points": 50
+      },
+      "third": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1972-73",
+      "startYear": 1972,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Elche",
+        "currentName": "Elche",
+        "footsimuId": 3751,
+        "footsimuSlug": "elche",
+        "footsimuPath": "/la-liga/team/elche",
+        "points": 50
+      },
+      "third": {
+        "name": "Racing de Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 48
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1973-74",
+      "startYear": 1973,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "third": {
+        "name": "UD Salamanca",
+        "currentName": "UD Salamanca (defunct 2013)",
+        "footsimuId": 3796,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1974-75",
+      "startYear": 1974,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Racing Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 52
+      },
+      "third": {
+        "name": "Sevilla FC",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 51
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1975-76",
+      "startYear": 1975,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Burgos (I)",
+        "currentName": "Burgos CF (defunct 1983)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 49
+      },
+      "third": {
+        "name": "CD Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 47
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1976-77",
+      "startYear": 1976,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Cádiz",
+        "currentName": "Cádiz",
+        "footsimuId": 3842,
+        "footsimuSlug": "cadiz",
+        "footsimuPath": "/segunda-division/team/cadiz",
+        "points": 46
+      },
+      "third": {
+        "name": "Rayo Vallecano",
+        "currentName": "Rayo Vallecano",
+        "footsimuId": 101,
+        "footsimuSlug": "rayo-vallecano",
+        "footsimuPath": "/la-liga/team/rayo-vallecano",
+        "points": 45
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1977-78",
+      "startYear": 1977,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Recreativo",
+        "currentName": "Recreativo Huelva",
+        "footsimuId": 2571,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "third": {
+        "name": "Celta de Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 46
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1978-79",
+      "startYear": 1978,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "AD Almería",
+        "currentName": "AD Almería (defunct 1982)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 47
+      },
+      "third": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 46
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1979-80",
+      "startYear": 1979,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "runnerUp": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 45
+      },
+      "third": {
+        "name": "CA Osasuna",
+        "currentName": "Osasuna",
+        "footsimuId": 97,
+        "footsimuSlug": "osasuna",
+        "footsimuPath": "/la-liga/team/osasuna",
+        "points": 44
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1980-81",
+      "startYear": 1980,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Castellón",
+        "currentName": "Castellón",
+        "footsimuId": 4438,
+        "footsimuSlug": "castellon",
+        "footsimuPath": "/segunda-division/team/castellon",
+        "points": 45
+      },
+      "runnerUp": {
+        "name": "Cádiz",
+        "currentName": "Cádiz",
+        "footsimuId": 3842,
+        "footsimuSlug": "cadiz",
+        "footsimuPath": "/segunda-division/team/cadiz",
+        "points": 45
+      },
+      "third": {
+        "name": "Racing de Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 45
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1981-82",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Salamanca",
+        "currentName": "UD Salamanca (defunct 2013)",
+        "footsimuId": 3796,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 51
+      },
+      "third": {
+        "name": "CD Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 50
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1982-83",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Cádiz",
+        "currentName": "Cádiz",
+        "footsimuId": 3842,
+        "footsimuSlug": "cadiz",
+        "footsimuPath": "/segunda-division/team/cadiz",
+        "points": 47
+      },
+      "third": {
+        "name": "RCD Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 46
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1983-84",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Castilla",
+        "currentName": "Real Madrid Castilla",
+        "footsimuId": 7000,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Bilbao Athletic",
+        "currentName": "Athletic Bilbao B",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "third": {
+        "name": "Hércules CF",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 45
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1984-85",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 55
+      },
+      "runnerUp": {
+        "name": "Cádiz",
+        "currentName": "Cádiz",
+        "footsimuId": 3842,
+        "footsimuSlug": "cadiz",
+        "footsimuPath": "/segunda-division/team/cadiz",
+        "points": 49
+      },
+      "third": {
+        "name": "Celta de Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 48
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1985-86",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Sabadell",
+        "currentName": "CD Sabadell",
+        "footsimuId": 11487,
+        "footsimuSlug": "cd-sabadell",
+        "footsimuPath": "/segunda-division/team/cd-sabadell",
+        "points": 46
+      },
+      "third": {
+        "name": "RCD Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 46
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1986-87",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Valencia",
+        "currentName": "Valencia",
+        "footsimuId": 94,
+        "footsimuSlug": "valencia",
+        "footsimuPath": "/la-liga/team/valencia",
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Logroñés",
+        "currentName": "CD Logroñés (defunct 2009)",
+        "footsimuId": 7206,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 54
+      },
+      "third": {
+        "name": "Recreativo de Huelva",
+        "currentName": "Recreativo Huelva",
+        "footsimuId": 2571,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "notes": [
+        "Third place from Wikipedia season article",
+        "Two-phase season: a first phase of 22 clubs, then promotion and relegation groups; places are from the promotion group (Valencia 57, Logroñés 54, Recreativo 50)"
+      ]
+    },
+    {
+      "season": "1987-88",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 54
+      },
+      "runnerUp": {
+        "name": "Elche",
+        "currentName": "Elche",
+        "footsimuId": 3751,
+        "footsimuSlug": "elche",
+        "footsimuPath": "/la-liga/team/elche",
+        "points": 50
+      },
+      "third": {
+        "name": "Castilla CF",
+        "currentName": "Real Madrid Castilla",
+        "footsimuId": 7000,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1988-89",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Castellón",
+        "currentName": "Castellón",
+        "footsimuId": 4438,
+        "footsimuSlug": "castellon",
+        "footsimuPath": "/segunda-division/team/castellon",
+        "points": 51
+      },
+      "runnerUp": {
+        "name": "Rayo Vallecano",
+        "currentName": "Rayo Vallecano",
+        "footsimuId": 101,
+        "footsimuSlug": "rayo-vallecano",
+        "footsimuPath": "/la-liga/team/rayo-vallecano",
+        "points": 49
+      },
+      "third": {
+        "name": "CD Tenerife",
+        "currentName": "Tenerife",
+        "footsimuId": 245,
+        "footsimuSlug": "tenerife",
+        "footsimuPath": "/segunda-division/team/tenerife",
+        "points": 48
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1989-90",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Burgos",
+        "currentName": "Real Burgos CF (defunct 1993)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 50
+      },
+      "runnerUp": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 47
+      },
+      "third": {
+        "name": "Bilbao Athletic",
+        "currentName": "Athletic Bilbao B",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 45
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1990-91",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Albacete",
+        "currentName": "Albacete",
+        "footsimuId": 2737,
+        "footsimuSlug": "albacete",
+        "footsimuPath": "/segunda-division/team/albacete",
+        "points": 49
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 48
+      },
+      "third": {
+        "name": "Real Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 48
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1991-92",
+      "startYear": 1991,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 53
+      },
+      "runnerUp": {
+        "name": "Rayo Vallecano",
+        "currentName": "Rayo Vallecano",
+        "footsimuId": 101,
+        "footsimuSlug": "rayo-vallecano",
+        "footsimuPath": "/la-liga/team/rayo-vallecano",
+        "points": 48
+      },
+      "third": {
+        "name": "UE Figueres",
+        "currentName": "UE Figueres",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 47
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1992-93",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Lleida",
+        "currentName": "UE Lleida",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 57
+      },
+      "runnerUp": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 52
+      },
+      "third": {
+        "name": "Racing de Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 52
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1993-94",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Espanyol",
+        "currentName": "Espanyol",
+        "footsimuId": 88,
+        "footsimuSlug": "espanyol",
+        "footsimuPath": "/la-liga/team/espanyol",
+        "points": 52
+      },
+      "runnerUp": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 51
+      },
+      "third": {
+        "name": "SD Compostela",
+        "currentName": "SD Compostela",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 49
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1994-95",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Mérida",
+        "currentName": "CP Mérida (defunct 2000)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 56
+      },
+      "runnerUp": {
+        "name": "Rayo Vallecano",
+        "currentName": "Rayo Vallecano",
+        "footsimuId": 101,
+        "footsimuSlug": "rayo-vallecano",
+        "footsimuPath": "/la-liga/team/rayo-vallecano",
+        "points": 53
+      },
+      "third": {
+        "name": "UE Lleida",
+        "currentName": "UE Lleida",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 46
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1995-96",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 73
+      },
+      "runnerUp": {
+        "name": "Logroñés",
+        "currentName": "CD Logroñés (defunct 2009)",
+        "footsimuId": 7206,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 69
+      },
+      "third": {
+        "name": "RCD Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 69
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1996-97",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Mérida",
+        "currentName": "CP Mérida (defunct 2000)",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Salamanca",
+        "currentName": "UD Salamanca (defunct 2013)",
+        "footsimuId": 3796,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 71
+      },
+      "third": {
+        "name": "RCD Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 70
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1997-98",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Alavés",
+        "currentName": "Alavés",
+        "footsimuId": 96,
+        "footsimuSlug": "alaves",
+        "footsimuPath": "/la-liga/team/alaves",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Extremadura",
+        "currentName": "CF Extremadura (defunct 2010)",
+        "footsimuId": 16741,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 79
+      },
+      "third": {
+        "name": "UD Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 73
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1998-99",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Atlético Madrid B",
+        "currentName": "Atlético Madrid B",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 74
+      },
+      "third": {
+        "name": "Numancia",
+        "currentName": "CD Numancia",
+        "footsimuId": 100,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 73
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "1999-00",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Osasuna",
+        "currentName": "Osasuna",
+        "footsimuId": 97,
+        "footsimuSlug": "osasuna",
+        "footsimuPath": "/la-liga/team/osasuna",
+        "points": 67
+      },
+      "third": {
+        "name": "Villarreal",
+        "currentName": "Villarreal",
+        "footsimuId": 102,
+        "footsimuSlug": "villarreal",
+        "footsimuPath": "/la-liga/team/villarreal",
+        "points": 66
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2000-01",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Sevilla",
+        "currentName": "Sevilla",
+        "footsimuId": 243,
+        "footsimuSlug": "sevilla",
+        "footsimuPath": "/la-liga/team/sevilla",
+        "points": 80
+      },
+      "runnerUp": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 75
+      },
+      "third": {
+        "name": "Tenerife",
+        "currentName": "Tenerife",
+        "footsimuId": 245,
+        "footsimuSlug": "tenerife",
+        "footsimuPath": "/segunda-division/team/tenerife",
+        "points": 74
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2001-02",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Madrid",
+        "currentName": "Atlético Madrid",
+        "footsimuId": 1068,
+        "footsimuSlug": "atletico-madrid",
+        "footsimuPath": "/la-liga/team/atletico-madrid",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Racing Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 71
+      },
+      "third": {
+        "name": "Recreativo",
+        "currentName": "Recreativo Huelva",
+        "footsimuId": 2571,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 69
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2002-03",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 72
+      },
+      "third": {
+        "name": "Albacete",
+        "currentName": "Albacete",
+        "footsimuId": 2737,
+        "footsimuSlug": "albacete",
+        "footsimuPath": "/segunda-division/team/albacete",
+        "points": 71
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2003-04",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Levante",
+        "currentName": "Levante",
+        "footsimuId": 1538,
+        "footsimuSlug": "levante",
+        "footsimuPath": "/la-liga/team/levante",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Getafe",
+        "currentName": "Getafe",
+        "footsimuId": 2922,
+        "footsimuSlug": "getafe",
+        "footsimuPath": "/la-liga/team/getafe",
+        "points": 76
+      },
+      "third": {
+        "name": "Numancia",
+        "currentName": "CD Numancia",
+        "footsimuId": 100,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 76
+      },
+      "notes": [
+        "Getafe (76 pts) finished second ahead of Numancia (76) on head-to-head per the season article and es.wikipedia; the English champions list shows Numancia as runner-up (both were promoted)"
+      ]
+    },
+    {
+      "season": "2004-05",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Cádiz",
+        "currentName": "Cádiz",
+        "footsimuId": 3842,
+        "footsimuSlug": "cadiz",
+        "footsimuPath": "/segunda-division/team/cadiz",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 76
+      },
+      "third": {
+        "name": "Alavés",
+        "currentName": "Alavés",
+        "footsimuId": 96,
+        "footsimuSlug": "alaves",
+        "footsimuPath": "/la-liga/team/alaves",
+        "points": 76
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2005-06",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Recreativo",
+        "currentName": "Recreativo Huelva",
+        "footsimuId": 2571,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 78
+      },
+      "runnerUp": {
+        "name": "Gimnàstic",
+        "currentName": "Gimnàstic de Tarragona",
+        "footsimuId": 4492,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 76
+      },
+      "third": {
+        "name": "Levante",
+        "currentName": "Levante",
+        "footsimuId": 1538,
+        "footsimuSlug": "levante",
+        "footsimuPath": "/la-liga/team/levante",
+        "points": 74
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2006-07",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 88
+      },
+      "runnerUp": {
+        "name": "Almería",
+        "currentName": "Almería",
+        "footsimuId": 6832,
+        "footsimuSlug": "almeria",
+        "footsimuPath": "/segunda-division/team/almeria",
+        "points": 80
+      },
+      "third": {
+        "name": "Murcia",
+        "currentName": "Real Murcia",
+        "footsimuId": 2738,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 76
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2007-08",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Numancia",
+        "currentName": "CD Numancia",
+        "footsimuId": 100,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 77
+      },
+      "runnerUp": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 72
+      },
+      "third": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 72
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2008-09",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Xerez",
+        "currentName": "Xerez CD",
+        "footsimuId": 3835,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 81
+      },
+      "third": {
+        "name": "Tenerife",
+        "currentName": "Tenerife",
+        "footsimuId": 245,
+        "footsimuSlug": "tenerife",
+        "footsimuPath": "/segunda-division/team/tenerife",
+        "points": 81
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2009-10",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Sociedad",
+        "currentName": "Real Sociedad",
+        "footsimuId": 89,
+        "footsimuSlug": "real-sociedad",
+        "footsimuPath": "/la-liga/team/real-sociedad",
+        "points": 74
+      },
+      "runnerUp": {
+        "name": "Hércules",
+        "currentName": "Hércules CF",
+        "footsimuId": 6833,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 71
+      },
+      "third": {
+        "name": "Levante",
+        "currentName": "Levante",
+        "footsimuId": 1538,
+        "footsimuSlug": "levante",
+        "footsimuPath": "/la-liga/team/levante",
+        "points": 71
+      },
+      "notes": [
+        "Third place from Wikipedia season article",
+        "Real Sociedad 74; Hércules, Levante and Real Betis all on 71. Hércules second and Levante third (both promoted) per the season article and es.wikipedia; ESPN lists Betis third, which is wrong (Betis finished fourth and missed promotion)"
+      ]
+    },
+    {
+      "season": "2010-11",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 83
+      },
+      "runnerUp": {
+        "name": "Rayo Vallecano",
+        "currentName": "Rayo Vallecano",
+        "footsimuId": 101,
+        "footsimuSlug": "rayo-vallecano",
+        "footsimuPath": "/la-liga/team/rayo-vallecano",
+        "points": 79
+      },
+      "third": {
+        "name": "Barcelona B",
+        "currentName": "Barcelona B",
+        "footsimuId": 5462,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 71
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2011-12",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 91
+      },
+      "runnerUp": {
+        "name": "Celta Vigo",
+        "currentName": "Celta Vigo",
+        "footsimuId": 85,
+        "footsimuSlug": "celta-vigo",
+        "footsimuPath": "/la-liga/team/celta-vigo",
+        "points": 85
+      },
+      "third": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 82
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2012-13",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Elche",
+        "currentName": "Elche",
+        "footsimuId": 3751,
+        "footsimuSlug": "elche",
+        "footsimuPath": "/la-liga/team/elche",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Villarreal",
+        "currentName": "Villarreal",
+        "footsimuId": 102,
+        "footsimuSlug": "villarreal",
+        "footsimuPath": "/la-liga/team/villarreal",
+        "points": 77
+      },
+      "third": {
+        "name": "Almería",
+        "currentName": "Almería",
+        "footsimuId": 6832,
+        "footsimuSlug": "almeria",
+        "footsimuPath": "/segunda-division/team/almeria",
+        "points": 74
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2013-14",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Eibar",
+        "currentName": "Eibar",
+        "footsimuId": 3752,
+        "footsimuSlug": "eibar",
+        "footsimuPath": "/segunda-division/team/eibar",
+        "points": 71
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 69
+      },
+      "third": {
+        "name": "Barcelona B",
+        "currentName": "Barcelona B",
+        "footsimuId": 5462,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 66
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2014-15",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Real Betis",
+        "currentName": "Real Betis",
+        "footsimuId": 244,
+        "footsimuSlug": "real-betis",
+        "footsimuPath": "/la-liga/team/real-betis",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Sporting Gijón",
+        "currentName": "Sporting Gijón",
+        "footsimuId": 3788,
+        "footsimuSlug": "sporting-gijon",
+        "footsimuPath": "/segunda-division/team/sporting-gijon",
+        "points": 82
+      },
+      "third": {
+        "name": "Girona",
+        "currentName": "Girona",
+        "footsimuId": 9812,
+        "footsimuSlug": "girona",
+        "footsimuPath": "/segunda-division/team/girona",
+        "points": 82
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2015-16",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Alavés",
+        "currentName": "Alavés",
+        "footsimuId": 96,
+        "footsimuSlug": "alaves",
+        "footsimuPath": "/la-liga/team/alaves",
+        "points": 75
+      },
+      "runnerUp": {
+        "name": "Leganés",
+        "currentName": "Leganés",
+        "footsimuId": 17534,
+        "footsimuSlug": "leganes",
+        "footsimuPath": "/segunda-division/team/leganes",
+        "points": 74
+      },
+      "third": {
+        "name": "Gimnàstic",
+        "currentName": "Gimnàstic de Tarragona",
+        "footsimuId": 4492,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 71
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2016-17",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Levante",
+        "currentName": "Levante",
+        "footsimuId": 1538,
+        "footsimuSlug": "levante",
+        "footsimuPath": "/la-liga/team/levante",
+        "points": 84
+      },
+      "runnerUp": {
+        "name": "Girona",
+        "currentName": "Girona",
+        "footsimuId": 9812,
+        "footsimuSlug": "girona",
+        "footsimuPath": "/segunda-division/team/girona",
+        "points": 70
+      },
+      "third": {
+        "name": "Getafe",
+        "currentName": "Getafe",
+        "footsimuId": 2922,
+        "footsimuSlug": "getafe",
+        "footsimuPath": "/la-liga/team/getafe",
+        "points": 68
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2017-18",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Rayo Vallecano",
+        "currentName": "Rayo Vallecano",
+        "footsimuId": 101,
+        "footsimuSlug": "rayo-vallecano",
+        "footsimuPath": "/la-liga/team/rayo-vallecano",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Huesca",
+        "currentName": "SD Huesca",
+        "footsimuId": 5413,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 75
+      },
+      "third": {
+        "name": "Real Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 71
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2018-19",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Osasuna",
+        "currentName": "Osasuna",
+        "footsimuId": 97,
+        "footsimuSlug": "osasuna",
+        "footsimuPath": "/la-liga/team/osasuna",
+        "points": 87
+      },
+      "runnerUp": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 79
+      },
+      "third": {
+        "name": "Málaga",
+        "currentName": "Málaga",
+        "footsimuId": 99,
+        "footsimuSlug": "malaga",
+        "footsimuPath": "/la-liga/team/malaga",
+        "points": 74
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2019-20",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Huesca",
+        "currentName": "SD Huesca",
+        "footsimuId": 5413,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "Cádiz",
+        "currentName": "Cádiz",
+        "footsimuId": 3842,
+        "footsimuSlug": "cadiz",
+        "footsimuPath": "/segunda-division/team/cadiz",
+        "points": 69
+      },
+      "third": {
+        "name": "Real Zaragoza",
+        "currentName": "Real Zaragoza",
+        "footsimuId": 91,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 65
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2020-21",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Espanyol",
+        "currentName": "Espanyol",
+        "footsimuId": 88,
+        "footsimuSlug": "espanyol",
+        "footsimuPath": "/la-liga/team/espanyol",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Mallorca",
+        "currentName": "Mallorca",
+        "footsimuId": 84,
+        "footsimuSlug": "mallorca",
+        "footsimuPath": "/segunda-division/team/mallorca",
+        "points": 82
+      },
+      "third": {
+        "name": "Leganés",
+        "currentName": "Leganés",
+        "footsimuId": 17534,
+        "footsimuSlug": "leganes",
+        "footsimuPath": "/segunda-division/team/leganes",
+        "points": 73
+      },
+      "notes": [
+        "Third place from ESPN final standings",
+        "Leganés and Almería both on 73; Leganés third on head-to-head (season article and ESPN)"
+      ]
+    },
+    {
+      "season": "2021-22",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Almería",
+        "currentName": "Almería",
+        "footsimuId": 6832,
+        "footsimuSlug": "almeria",
+        "footsimuPath": "/segunda-division/team/almeria",
+        "points": 81
+      },
+      "runnerUp": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 81
+      },
+      "third": {
+        "name": "Eibar",
+        "currentName": "Eibar",
+        "footsimuId": 3752,
+        "footsimuSlug": "eibar",
+        "footsimuPath": "/segunda-division/team/eibar",
+        "points": 80
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2022-23",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Granada",
+        "currentName": "Granada",
+        "footsimuId": 3747,
+        "footsimuSlug": "granada",
+        "footsimuPath": "/segunda-division/team/granada",
+        "points": 75
+      },
+      "runnerUp": {
+        "name": "Las Palmas",
+        "currentName": "Las Palmas",
+        "footsimuId": 98,
+        "footsimuSlug": "las-palmas",
+        "footsimuPath": "/segunda-division/team/las-palmas",
+        "points": 72
+      },
+      "third": {
+        "name": "Levante",
+        "currentName": "Levante",
+        "footsimuId": 1538,
+        "footsimuSlug": "levante",
+        "footsimuPath": "/la-liga/team/levante",
+        "points": 72
+      },
+      "notes": [
+        "Third place from ESPN final standings"
+      ]
+    },
+    {
+      "season": "2023-24",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Leganés",
+        "currentName": "Leganés",
+        "footsimuId": 17534,
+        "footsimuSlug": "leganes",
+        "footsimuPath": "/segunda-division/team/leganes",
+        "points": 74
+      },
+      "runnerUp": {
+        "name": "Valladolid",
+        "currentName": "Real Valladolid",
+        "footsimuId": 95,
+        "footsimuSlug": "real-valladolid",
+        "footsimuPath": "/segunda-division/team/real-valladolid",
+        "points": 72
+      },
+      "third": {
+        "name": "Eibar",
+        "currentName": "Eibar",
+        "footsimuId": 3752,
+        "footsimuSlug": "eibar",
+        "footsimuPath": "/segunda-division/team/eibar",
+        "points": 71
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    },
+    {
+      "season": "2024-25",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Levante",
+        "currentName": "Levante",
+        "footsimuId": 1538,
+        "footsimuSlug": "levante",
+        "footsimuPath": "/la-liga/team/levante",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Elche",
+        "currentName": "Elche",
+        "footsimuId": 3751,
+        "footsimuSlug": "elche",
+        "footsimuPath": "/la-liga/team/elche",
+        "points": 77
+      },
+      "third": {
+        "name": "Oviedo",
+        "currentName": "Real Oviedo",
+        "footsimuId": 92,
+        "footsimuSlug": "real-oviedo",
+        "footsimuPath": "/segunda-division/team/real-oviedo",
+        "points": 75
+      },
+      "notes": [
+        "Third place from Wikipedia season article",
+        "Real Oviedo and Mirandés both on 75; Oviedo third on head-to-head (season article and ESPN)"
+      ]
+    },
+    {
+      "season": "2025-26",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Segunda División",
+      "format": "league",
+      "champion": {
+        "name": "Racing Santander",
+        "currentName": "Racing Santander",
+        "footsimuId": 87,
+        "footsimuSlug": "racing-santander",
+        "footsimuPath": "/la-liga/team/racing-santander",
+        "points": 82
+      },
+      "runnerUp": {
+        "name": "Deportivo La Coruña",
+        "currentName": "Deportivo La Coruña",
+        "footsimuId": 90,
+        "footsimuSlug": "deportivo-la-coruna",
+        "footsimuPath": "/la-liga/team/deportivo-la-coruna",
+        "points": 77
+      },
+      "third": {
+        "name": "Almería",
+        "currentName": "Almería",
+        "footsimuId": 6832,
+        "footsimuSlug": "almeria",
+        "footsimuPath": "/segunda-division/team/almeria",
+        "points": 74
+      },
+      "notes": [
+        "Third place from Wikipedia season article"
+      ]
+    }
+  ]
+}
