@@ -578,11 +578,11 @@ describe("DFB-Pokal (amateur clubs host professional ones)", () => {
     const tiers = clubTiers(dfb, divisions, [1, 20, 40, 41]);
     assert.deepEqual(tiers, { 1: 0, 20: 1, 40: 2.5, 41: 2.5 });
     const round = dfb.rounds[2]!;
-    assert.deepEqual(hostFirst(round, 1, 40, tiers, dfb.hostTier), [40, 1], "amateur hosts Bundesliga club");
-    assert.deepEqual(hostFirst(round, 20, 40, tiers, dfb.hostTier), [40, 20], "amateur hosts 2. Bundesliga club");
-    assert.deepEqual(hostFirst(round, 1, 20, tiers, dfb.hostTier), [1, 20], "2. Bundesliga club drawn away stays away");
-    assert.deepEqual(hostFirst(round, 40, 41, tiers, dfb.hostTier), [40, 41], "two amateurs: draw order");
-    assert.deepEqual(hostFirst(dfb.rounds[5]!, 1, 40, tiers, dfb.hostTier), [1, 40], "final: no home rule");
+    assert.deepEqual(hostFirst(round, 1, 40, tiers, dfb), [40, 1], "amateur hosts Bundesliga club");
+    assert.deepEqual(hostFirst(round, 20, 40, tiers, dfb), [40, 20], "amateur hosts 2. Bundesliga club");
+    assert.deepEqual(hostFirst(round, 1, 20, tiers, dfb), [1, 20], "2. Bundesliga club drawn away stays away");
+    assert.deepEqual(hostFirst(round, 40, 41, tiers, dfb), [40, 41], "two amateurs: draw order");
+    assert.deepEqual(hostFirst(dfb.rounds[5]!, 1, 40, tiers, dfb), [1, 40], "final: no home rule");
   });
 
   it("never draws a professional club at home to an amateur one", () => {
@@ -664,5 +664,58 @@ describe("cup buttons fill in likely rolls; the cup chances keep the full distri
     const finals: Record<string, number> = {"1": 51, "2": 38, "3": 43, "4": 22, "5": 42, "6": 20, "7": 19, "8": 27, "9": 29, "10": 19, "11": 30, "12": 28, "13": 18, "14": 24, "15": 16, "16": 10, "17": 14, "18": 12, "19": 13, "20": 11, "21": 13, "22": 6, "23": 6, "24": 12, "25": 8, "26": 9, "27": 9, "28": 4, "29": 5, "30": 5, "31": 1, "32": 2, "33": 8, "34": 2, "35": 1, "36": 4, "37": 3, "38": 3, "39": 2, "40": 4, "41": 3, "42": 2, "44": 2};
     assert.deepEqual(Object.fromEntries(Object.entries(mc.won).filter(([, n]) => n > 0)), won);
     assert.deepEqual(Object.fromEntries(Object.entries(mc.reached).filter(([, c]) => c[7]! > 0).map(([id, c]) => [id, c[7]])), finals);
+  });
+});
+
+describe("Coupe de France (from the seventh round; a club two divisions below hosts)", () => {
+  const cdf = CUPS.find((c) => c.code === "CDF")!;
+  /** The real seventh round: clubs 2001 to 2184, 2001 v 2002, 2003 v 2004, … (`count` of its 92 ties listed). */
+  const seventh = (count: number): RealCupTie[] =>
+    Array.from({ length: count }, (_, t) => ({ round: "seventhRound", homeId: 2001 + 2 * t, awayId: 2002 + 2 * t, legs: [fixture(600_000 + t, 2001 + 2 * t, 2002 + 2 * t)] }));
+  const ligue1 = Array.from({ length: 18 }, (_, i) => i + 1);
+
+  it("plays the seventh and eighth rounds, then the Ligue 1 clubs join in the round of 64; final at the Stade de France", () => {
+    assert.deepEqual(cdf.rounds.map((r) => r.ties), [92, 46, 32, 16, 8, 4, 2, 1]);
+    assert.deepEqual(cdf.rounds[2]!.entrantsFrom, ["FL1"]);
+    assert.equal(cdf.rounds.at(-1)!.venue, "Stade de France");
+    assert.ok(cdf.rounds.slice(0, -1).every((r) => r.noExtraTime === true), "straight to penalties before the final");
+    assert.equal(cdf.rounds.at(-1)!.noExtraTime, false, "extra time in the final");
+  });
+
+  it("gives the home game to a club at least two divisions below", () => {
+    // 1 Ligue 1, 2 Ligue 2, 3 and 4 amateur (tier 3).
+    const tiers = clubTiers(cdf, { 1: "FL1", 2: "FL2" }, [1, 2, 3, 4]);
+    assert.deepEqual(tiers, { 1: 0, 2: 1, 3: 3, 4: 3 });
+    const round = cdf.rounds[3]!;
+    assert.deepEqual(hostFirst(round, 1, 3, tiers, cdf), [3, 1], "amateur hosts Ligue 1");
+    assert.deepEqual(hostFirst(round, 2, 3, tiers, cdf), [3, 2], "amateur hosts Ligue 2");
+    assert.deepEqual(hostFirst(round, 1, 2, tiers, cdf), [1, 2], "one division apart: draw order");
+    assert.deepEqual(hostFirst(round, 3, 4, tiers, cdf), [3, 4], "same level: draw order");
+    assert.deepEqual(hostFirst(cdf.rounds.at(-1)!, 1, 3, tiers, cdf), [1, 3], "final: neutral");
+  });
+
+  it("with the whole seventh round, draws every round to the final, the Ligue 1 clubs in the round of 64", () => {
+    const real = seventh(92);
+    const opts = { entrants: { roundOf64: ligue1 }, drawSalt: 0, roundDates: {} };
+    const first = buildCup(cdf, real, {}, opts);
+    assert.equal(first[0]!.drawn, "real");
+    const rounds = buildCup(cdf, real, homeWins(first[0]!.ties), opts);
+    assert.equal(rounds[1]!.drawn, "simulated");
+    assert.equal(rounds[1]!.ties.length, 46);
+    assert.equal(rounds[2]!.participants.length, 0, "the round of 64 waits for the eighth round's results");
+  });
+
+  it("plays a seventh round the feed lists a tie short; the eighth then waits for its real draw", () => {
+    const real = seventh(91);
+    const rounds = buildCup(cdf, real, {}, { entrants: { roundOf64: ligue1 }, drawSalt: 0, roundDates: {} });
+    assert.equal(rounds[0]!.drawn, "real", "the listed ties are the round");
+    assert.equal(rounds[0]!.ties.length, 91);
+    const played = buildCup(cdf, real, homeWins(rounds[0]!.ties), { entrants: { roundOf64: ligue1 }, drawSalt: 0, roundDates: {} });
+    assert.equal(played[1]!.drawn, "pending", "91 winners can't fill 46 ties");
+    // Three short is more than a feed slip: the round waits.
+    assert.equal(buildCup(cdf, seventh(89), {}, { entrants: { roundOf64: ligue1 }, drawSalt: 0, roundDates: {} })[0]!.drawn, "pending");
+    // The chances run the short round too.
+    const mc = runCupMonteCarlo({ config: cdf, real, fixed: {}, strengths: {}, options: { entrants: { roundOf64: ligue1 } }, iterations: 5, seed: 1 });
+    assert.equal(mc.reached[2001]![0], 5, "every club listed plays the seventh round");
   });
 });
