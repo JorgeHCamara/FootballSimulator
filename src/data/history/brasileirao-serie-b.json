@@ -1,0 +1,1705 @@
+{
+  "league": "Brasileirão Série B",
+  "footsimuSlug": "brasileirao-serie-b",
+  "footsimuCode": "BSB",
+  "country": "Brazil",
+  "scope": "Brazilian second division (Campeonato Brasileiro Série B), CBF-recognised editions 1971-2025: 1971-72, 1980-85 (1980-84 as the Taça de Prata), 1988-92, 1994-99, 2001-2025. Not held / not recognised: 1973-79, 1986 (Torneio Paralelo), 1987 (Copa União modules), 1993, 2000 (Copa João Havelange Yellow Module), each with a note. Up to 2005 the title was decided by finals or a final group (format \"final\"/\"playoff\"); league format (double round robin) from 2006",
+  "source": [
+    "https://en.wikipedia.org/wiki/Campeonato_Brasileiro_Série_B (revision 1381845091; champions, runners-up, third)",
+    "https://pt.wikipedia.org/wiki/Predefinição:Campeões_do_Campeonato_Brasileiro_de_Futebol_-_Série_B (revision 72743294; champion, final scores, runner-up, 3rd and 4th place every edition)",
+    "pt.wikipedia season articles (Campeonato Brasileiro de Futebol de YYYY - Série B): final classification, results grids; table templates 2020-2025",
+    "Wikipedia season articles (YYYY Campeonato Brasileiro Série B): tables and points",
+    "https://www.rsssf.org/tablesb/braz2champ.html and https://rsssfbrasil.com/tablesae/br2camp.htm (champions; notes on 1986/1987/2000)",
+    "https://rsssfbrasil.com/tablesae/brYYYYl2.htm (RSSSF Brasil season files 1971-2005: final groups / final tables)",
+    "https://site.api.espn.com/apis/v2/sports/soccer/bra.2/standings?season=YYYY (2006-2025, cross-check)"
+  ],
+  "retrievedAt": "2026-11-07T02:13:32+00:00",
+  "fieldNotes": {
+    "footsimuId": "ESPN team id (the id FootSimu uses)",
+    "footsimuSlug": "club page slug on footsimu.com, only for clubs in a FootSimu league in 2026-27",
+    "footsimuPath": "club page path under the league the club plays in now, without locale",
+    "points": "final league points 2006-2025 (3 per win); null up to 2005 (multi-stage formats, totals not comparable)",
+    "name": "club name used in the source for that season",
+    "currentName": "club as known today (FootSimu name where available)",
+    "tournament": "always null (one edition per year)",
+    "tiedWith": "not used (ties on points separated by wins/goal difference; see notes)",
+    "strippedChampion": "not used",
+    "format": "\"final\": title decided by a final (third = next-best club in the official final classification); \"playoff\": final round-robin group; \"league\": straight league"
+  },
+  "seasons": [
+    {
+      "season": "1971",
+      "startYear": 1971,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Villa Nova",
+        "currentName": "Villa Nova Atlético Clube",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Remo",
+        "currentName": "Remo",
+        "footsimuId": 4936,
+        "footsimuSlug": "remo",
+        "footsimuPath": "/brasileirao/team/remo",
+        "points": null
+      },
+      "third": {
+        "name": "Itabaiana",
+        "currentName": "Itabaiana",
+        "footsimuId": null,
+        "footsimuSlug": "itabaiana",
+        "footsimuPath": "/brasileirao-serie-c/team/itabaiana",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (0 – 1; 3 – 0; 2 – 1); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)"
+      ]
+    },
+    {
+      "season": "1972",
+      "startYear": 1972,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Sampaio Corrêa",
+        "currentName": "Sampaio Corrêa",
+        "footsimuId": 4873,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Campinense",
+        "currentName": "Campinense",
+        "footsimuId": 7509,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Atlético de Alagoinhas",
+        "currentName": "Atlético de Alagoinhas",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (1 – 1 (a.e.t.); 5 – 4 (pens)); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)"
+      ]
+    },
+    {
+      "season": "1973",
+      "startYear": 1973,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held 1973-1979: no second division was organised (first-division places were awarded by invitation). The first phase of the 1979 Copa Brasil is not recognised by CBF as a Série B title"
+      ]
+    },
+    {
+      "season": "1974",
+      "startYear": 1974,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held 1973-1979: no second division was organised (first-division places were awarded by invitation). The first phase of the 1979 Copa Brasil is not recognised by CBF as a Série B title"
+      ]
+    },
+    {
+      "season": "1975",
+      "startYear": 1975,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held 1973-1979: no second division was organised (first-division places were awarded by invitation). The first phase of the 1979 Copa Brasil is not recognised by CBF as a Série B title"
+      ]
+    },
+    {
+      "season": "1976",
+      "startYear": 1976,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held 1973-1979: no second division was organised (first-division places were awarded by invitation). The first phase of the 1979 Copa Brasil is not recognised by CBF as a Série B title"
+      ]
+    },
+    {
+      "season": "1977",
+      "startYear": 1977,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held 1973-1979: no second division was organised (first-division places were awarded by invitation). The first phase of the 1979 Copa Brasil is not recognised by CBF as a Série B title"
+      ]
+    },
+    {
+      "season": "1978",
+      "startYear": 1978,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held 1973-1979: no second division was organised (first-division places were awarded by invitation). The first phase of the 1979 Copa Brasil is not recognised by CBF as a Série B title"
+      ]
+    },
+    {
+      "season": "1979",
+      "startYear": 1979,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held 1973-1979: no second division was organised (first-division places were awarded by invitation). The first phase of the 1979 Copa Brasil is not recognised by CBF as a Série B title"
+      ]
+    },
+    {
+      "season": "1980",
+      "startYear": 1980,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Londrina",
+        "currentName": "Londrina",
+        "footsimuId": 17333,
+        "footsimuSlug": "londrina",
+        "footsimuPath": "/brasileirao-serie-b/team/londrina",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "CSA",
+        "currentName": "CSA",
+        "footsimuId": 7531,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Ferroviária",
+        "currentName": "Ferroviaria",
+        "footsimuId": null,
+        "footsimuSlug": "ferroviaria",
+        "footsimuPath": "/brasileirao-serie-c/team/ferroviaria",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (1 – 1; 4 – 0); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)",
+        "Played as the Taça de Prata (second level, with in-season promotion to the Taça de Ouro)"
+      ]
+    },
+    {
+      "season": "1981",
+      "startYear": 1981,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Anapolina",
+        "currentName": "Associação Atlética Anapolina",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Remo",
+        "currentName": "Remo",
+        "footsimuId": 4936,
+        "footsimuSlug": "remo",
+        "footsimuPath": "/brasileirao/team/remo",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (4 – 2; 1 – 1); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)",
+        "Played as the Taça de Prata (second level, with in-season promotion to the Taça de Ouro)"
+      ]
+    },
+    {
+      "season": "1982",
+      "startYear": 1982,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Campo Grande",
+        "currentName": "Campo Grande Atlético Clube",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "CSA",
+        "currentName": "CSA",
+        "footsimuId": 7531,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Uberaba",
+        "currentName": "Uberaba",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (3 – 4; 2 – 1; 3 – 0); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)",
+        "Played as the Taça de Prata (second level, with in-season promotion to the Taça de Ouro)"
+      ]
+    },
+    {
+      "season": "1983",
+      "startYear": 1983,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Juventus",
+        "currentName": "Clube Atlético Juventus",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "CSA",
+        "currentName": "CSA",
+        "footsimuId": 7531,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Joinville",
+        "currentName": "Joinville",
+        "footsimuId": 13143,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (1 – 3; 3 – 0; 1 – 0); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)",
+        "Played as the Taça de Prata (second level, with in-season promotion to the Taça de Ouro)"
+      ]
+    },
+    {
+      "season": "1984",
+      "startYear": 1984,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Uberlândia",
+        "currentName": "Uberlândia Esporte Clube",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Remo",
+        "currentName": "Remo",
+        "footsimuId": 4936,
+        "footsimuSlug": "remo",
+        "footsimuPath": "/brasileirao/team/remo",
+        "points": null
+      },
+      "third": {
+        "name": "Inter de Santa Maria",
+        "currentName": "Inter de Santa Maria",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (1 – 0; 0 – 0); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)",
+        "Played as the Taça de Prata (second level, with in-season promotion to the Taça de Ouro)"
+      ]
+    },
+    {
+      "season": "1985",
+      "startYear": 1985,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "Tuna Luso",
+        "currentName": "Tuna Luso Brasileira",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Goytacaz",
+        "currentName": "Goytacaz Futebol Clube",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Figueirense",
+        "currentName": "Figueirense",
+        "footsimuId": null,
+        "footsimuSlug": "figueirense",
+        "footsimuPath": "/brasileirao-serie-c/team/figueirense",
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group"
+      ]
+    },
+    {
+      "season": "1986",
+      "startYear": 1986,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held: the 1986 Torneio Paralelo (groups E-H of the first-division championship, won by Central, Criciúma, Inter de Limeira and Treze) decided promotion only and had no champion; CBF recognises no 1986 Série B title"
+      ]
+    },
+    {
+      "season": "1987",
+      "startYear": 1987,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held: in 1987 the Copa União split into Green and Yellow Modules (Yellow, winners Sport and Guarani, is sometimes regarded as the second level), with Blue and White Modules as a lower level; none of these is a CBF-recognised Série B edition"
+      ]
+    },
+    {
+      "season": "1988",
+      "startYear": 1988,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Inter de Limeira",
+        "currentName": "Inter De Limeira",
+        "footsimuId": null,
+        "footsimuSlug": "inter-de-limeira",
+        "footsimuPath": "/brasileirao-serie-c/team/inter-de-limeira",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": null
+      },
+      "third": {
+        "name": "Ponte Preta",
+        "currentName": "Ponte Preta",
+        "footsimuId": 3459,
+        "footsimuSlug": "ponte-preta",
+        "footsimuPath": "/brasileirao-serie-b/team/ponte-preta",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (2 – 1); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)",
+        "Third place Ponte Preta per the CBF-based classification on pt.wikipedia and RSSSF Brasil; the English season article's table (Valeriodoce) is from an earlier phase"
+      ]
+    },
+    {
+      "season": "1989",
+      "startYear": 1989,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Bragantino",
+        "currentName": "Red Bull Bragantino",
+        "footsimuId": 6079,
+        "footsimuSlug": "red-bull-bragantino",
+        "footsimuPath": "/brasileirao/team/red-bull-bragantino",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "São José",
+        "currentName": "São José Esporte Clube",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Remo",
+        "currentName": "Remo",
+        "footsimuId": 4936,
+        "footsimuSlug": "remo",
+        "footsimuPath": "/brasileirao/team/remo",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (1 – 0; 2 – 1); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)",
+        "Third place Remo per the CBF-based classification on pt.wikipedia and RSSSF Brasil; the English season article's table (Volta Redonda) is from an earlier phase"
+      ]
+    },
+    {
+      "season": "1990",
+      "startYear": 1990,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Sport",
+        "currentName": "Sport",
+        "footsimuId": 7635,
+        "footsimuSlug": "sport",
+        "footsimuPath": "/brasileirao-serie-b/team/sport",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Atlético Paranaense",
+        "currentName": "Athletico Paranaense",
+        "footsimuId": 3458,
+        "footsimuSlug": "athletico-paranaense",
+        "footsimuPath": "/brasileirao/team/athletico-paranaense",
+        "points": null
+      },
+      "third": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (1 – 1; 0 – 0); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)"
+      ]
+    },
+    {
+      "season": "1991",
+      "startYear": 1991,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Paysandu",
+        "currentName": "Paysandu",
+        "footsimuId": null,
+        "footsimuSlug": "paysandu",
+        "footsimuPath": "/brasileirao-serie-c/team/paysandu",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": null
+      },
+      "third": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (0 – 1; 2 – 0); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)"
+      ]
+    },
+    {
+      "season": "1992",
+      "startYear": 1992,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Paraná",
+        "currentName": "Paraná",
+        "footsimuId": 3453,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Vitória",
+        "currentName": "Vitória",
+        "footsimuId": 3457,
+        "footsimuSlug": "vitoria",
+        "footsimuPath": "/brasileirao/team/vitoria",
+        "points": null
+      },
+      "third": {
+        "name": "Criciúma",
+        "currentName": "Criciúma",
+        "footsimuId": 9971,
+        "footsimuSlug": "criciuma",
+        "footsimuPath": "/brasileirao-serie-b/team/criciuma",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (2 – 1; 1 – 0); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)"
+      ]
+    },
+    {
+      "season": "1993",
+      "startYear": 1993,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held"
+      ]
+    },
+    {
+      "season": "1994",
+      "startYear": 1994,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Juventude",
+        "currentName": "Juventude",
+        "footsimuId": 6270,
+        "footsimuSlug": "juventude",
+        "footsimuPath": "/brasileirao-serie-b/team/juventude",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Goiás",
+        "currentName": "Goiás",
+        "footsimuId": 3395,
+        "footsimuSlug": "goias",
+        "footsimuPath": "/brasileirao-serie-b/team/goias",
+        "points": null
+      },
+      "third": {
+        "name": "Desportiva",
+        "currentName": "Desportiva",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (1 – 2; 2 – 1); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)"
+      ]
+    },
+    {
+      "season": "1995",
+      "startYear": 1995,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "Atlético Paranaense",
+        "currentName": "Athletico Paranaense",
+        "footsimuId": 3458,
+        "footsimuSlug": "athletico-paranaense",
+        "footsimuPath": "/brasileirao/team/athletico-paranaense",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": null
+      },
+      "third": {
+        "name": "Mogi Mirim",
+        "currentName": "Mogi Mirim",
+        "footsimuId": 4777,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group"
+      ]
+    },
+    {
+      "season": "1996",
+      "startYear": 1996,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "União São João",
+        "currentName": "União São João Esporte Clube",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "América de Natal",
+        "currentName": "América-RN",
+        "footsimuId": 7634,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "third": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group"
+      ]
+    },
+    {
+      "season": "1997",
+      "startYear": 1997,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "América Mineiro",
+        "currentName": "América Mineiro",
+        "footsimuId": 6154,
+        "footsimuSlug": "america-mineiro",
+        "footsimuPath": "/brasileirao-serie-b/team/america-mineiro",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Ponte Preta",
+        "currentName": "Ponte Preta",
+        "footsimuId": 3459,
+        "footsimuSlug": "ponte-preta",
+        "footsimuPath": "/brasileirao-serie-b/team/ponte-preta",
+        "points": null
+      },
+      "third": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group"
+      ]
+    },
+    {
+      "season": "1998",
+      "startYear": 1998,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "Gama",
+        "currentName": "Gama",
+        "footsimuId": 9972,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Botafogo-SP",
+        "currentName": "Botafogo-SP",
+        "footsimuId": 10281,
+        "footsimuSlug": "botafogo-sp",
+        "footsimuPath": "/brasileirao-serie-b/team/botafogo-sp",
+        "points": null
+      },
+      "third": {
+        "name": "Desportiva",
+        "currentName": "Associação Desportiva Ferroviária Vale do Rio Doce",
+        "footsimuId": null,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group",
+        "Runner-up is Botafogo (Ribeirão Preto, SP), shown as \"Botafogo\" in the English list; not Botafogo of Rio de Janeiro"
+      ]
+    },
+    {
+      "season": "1999",
+      "startYear": 1999,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "Goiás",
+        "currentName": "Goiás",
+        "footsimuId": 3395,
+        "footsimuSlug": "goias",
+        "footsimuPath": "/brasileirao-serie-b/team/goias",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Santa Cruz",
+        "currentName": "Santa Cruz",
+        "footsimuId": null,
+        "footsimuSlug": "santa-cruz",
+        "footsimuPath": "/brasileirao-serie-c/team/santa-cruz",
+        "points": null
+      },
+      "third": {
+        "name": "Bahia",
+        "currentName": "Bahia",
+        "footsimuId": 9967,
+        "footsimuSlug": "bahia",
+        "footsimuPath": "/brasileirao/team/bahia",
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group"
+      ]
+    },
+    {
+      "season": "2000",
+      "startYear": 2000,
+      "tournament": null,
+      "status": "not_held",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": null,
+      "runnerUp": null,
+      "third": null,
+      "notes": [
+        "Not held: replaced by the Copa João Havelange. Its Yellow Module was the second-level equivalent and was won by Paraná; the module's top three went on to the competition's final phase. Not an official Série B title (CBF)"
+      ]
+    },
+    {
+      "season": "2001",
+      "startYear": 2001,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "Paysandu",
+        "currentName": "Paysandu",
+        "footsimuId": null,
+        "footsimuSlug": "paysandu",
+        "footsimuPath": "/brasileirao-serie-c/team/paysandu",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Figueirense",
+        "currentName": "Figueirense",
+        "footsimuId": null,
+        "footsimuSlug": "figueirense",
+        "footsimuPath": "/brasileirao-serie-c/team/figueirense",
+        "points": null
+      },
+      "third": {
+        "name": "Caxias",
+        "currentName": "Caxias",
+        "footsimuId": null,
+        "footsimuSlug": "caxias",
+        "footsimuPath": "/brasileirao-serie-c/team/caxias",
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group"
+      ]
+    },
+    {
+      "season": "2002",
+      "startYear": 2002,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "final",
+      "champion": {
+        "name": "Criciúma",
+        "currentName": "Criciúma",
+        "footsimuId": 9971,
+        "footsimuSlug": "criciuma",
+        "footsimuPath": "/brasileirao-serie-b/team/criciuma",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Fortaleza",
+        "currentName": "Fortaleza",
+        "footsimuId": 6272,
+        "footsimuSlug": "fortaleza",
+        "footsimuPath": "/brasileirao-serie-b/team/fortaleza",
+        "points": null
+      },
+      "third": {
+        "name": "Santa Cruz",
+        "currentName": "Santa Cruz",
+        "footsimuId": null,
+        "footsimuSlug": "santa-cruz",
+        "footsimuPath": "/brasileirao-serie-c/team/santa-cruz",
+        "points": null
+      },
+      "notes": [
+        "Decided by a final (0 – 2; 4 – 1); runner-up is the losing finalist; third is the next-best club in the official final classification (semi-final stage)"
+      ]
+    },
+    {
+      "season": "2003",
+      "startYear": 2003,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": null
+      },
+      "third": {
+        "name": "Sport",
+        "currentName": "Sport",
+        "footsimuId": 7635,
+        "footsimuSlug": "sport",
+        "footsimuPath": "/brasileirao-serie-b/team/sport",
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group",
+        "Third place Sport per the CBF-based classification on pt.wikipedia and RSSSF Brasil; the English season article's table (Remo) is from an earlier phase"
+      ]
+    },
+    {
+      "season": "2004",
+      "startYear": 2004,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "Brasiliense",
+        "currentName": "Brasiliense",
+        "footsimuId": 9968,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Fortaleza",
+        "currentName": "Fortaleza",
+        "footsimuId": 6272,
+        "footsimuSlug": "fortaleza",
+        "footsimuPath": "/brasileirao-serie-b/team/fortaleza",
+        "points": null
+      },
+      "third": {
+        "name": "Avaí",
+        "currentName": "Avaí",
+        "footsimuId": 9966,
+        "footsimuSlug": "avai",
+        "footsimuPath": "/brasileirao-serie-b/team/avai",
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group",
+        "Avaí third from the final quadrangular (Brasiliense 12, Fortaleza 8, Avaí 8, Bahia 5) per RSSSF Brasil and the pt.wikipedia list; the pt.wikipedia season article ranks Bahia third on aggregate points over all phases"
+      ]
+    },
+    {
+      "season": "2005",
+      "startYear": 2005,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "playoff",
+      "champion": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": null
+      },
+      "runnerUp": {
+        "name": "Santa Cruz",
+        "currentName": "Santa Cruz",
+        "footsimuId": null,
+        "footsimuSlug": "santa-cruz",
+        "footsimuPath": "/brasileirao-serie-c/team/santa-cruz",
+        "points": null
+      },
+      "third": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": null
+      },
+      "notes": [
+        "Multi-stage format ending in a final round-robin group (triangular/quadrangular); places are from the final group"
+      ]
+    },
+    {
+      "season": "2006",
+      "startYear": 2006,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Mineiro",
+        "currentName": "Atlético Mineiro",
+        "footsimuId": 7632,
+        "footsimuSlug": "atletico-mineiro",
+        "footsimuPath": "/brasileirao/team/atletico-mineiro",
+        "points": 71
+      },
+      "runnerUp": {
+        "name": "Sport",
+        "currentName": "Sport",
+        "footsimuId": 7635,
+        "footsimuSlug": "sport",
+        "footsimuPath": "/brasileirao-serie-b/team/sport",
+        "points": 64
+      },
+      "third": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": 64
+      },
+      "notes": [
+        "Sport and Náutico level on 64 points, separated by number of wins (first tie-break)"
+      ]
+    },
+    {
+      "season": "2007",
+      "startYear": 2007,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": 69
+      },
+      "runnerUp": {
+        "name": "Ipatinga",
+        "currentName": "Ipatinga",
+        "footsimuId": 4905,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 67
+      },
+      "third": {
+        "name": "Portuguesa",
+        "currentName": "Portuguesa",
+        "footsimuId": 4773,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "2008",
+      "startYear": 2008,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Corinthians",
+        "currentName": "Corinthians",
+        "footsimuId": 874,
+        "footsimuSlug": "corinthians",
+        "footsimuPath": "/brasileirao/team/corinthians",
+        "points": 85
+      },
+      "runnerUp": {
+        "name": "Santo André",
+        "currentName": "Esporte Clube Santo André",
+        "footsimuId": 4813,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 68
+      },
+      "third": {
+        "name": "Avaí",
+        "currentName": "Avaí",
+        "footsimuId": 9966,
+        "footsimuSlug": "avai",
+        "footsimuPath": "/brasileirao-serie-b/team/avai",
+        "points": 67
+      },
+      "notes": [
+        "Santo André 68 per the English season article and ESPN (the pt.wikipedia results grid gives 67)"
+      ]
+    },
+    {
+      "season": "2009",
+      "startYear": 2009,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Guarani",
+        "currentName": "Guarani",
+        "footsimuId": null,
+        "footsimuSlug": "guarani",
+        "footsimuPath": "/brasileirao-serie-c/team/guarani",
+        "points": 69
+      },
+      "third": {
+        "name": "Ceará",
+        "currentName": "Ceará",
+        "footsimuId": 9969,
+        "footsimuSlug": "ceara",
+        "footsimuPath": "/brasileirao-serie-b/team/ceara",
+        "points": 68
+      },
+      "notes": []
+    },
+    {
+      "season": "2010",
+      "startYear": 2010,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": 71
+      },
+      "runnerUp": {
+        "name": "Figueirense",
+        "currentName": "Figueirense",
+        "footsimuId": null,
+        "footsimuSlug": "figueirense",
+        "footsimuPath": "/brasileirao-serie-c/team/figueirense",
+        "points": 67
+      },
+      "third": {
+        "name": "Bahia",
+        "currentName": "Bahia",
+        "footsimuId": 9967,
+        "footsimuSlug": "bahia",
+        "footsimuPath": "/brasileirao/team/bahia",
+        "points": 65
+      },
+      "notes": []
+    },
+    {
+      "season": "2011",
+      "startYear": 2011,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Portuguesa",
+        "currentName": "Portuguesa",
+        "footsimuId": 4773,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 81
+      },
+      "runnerUp": {
+        "name": "Náutico",
+        "currentName": "Náutico",
+        "footsimuId": 7633,
+        "footsimuSlug": "nautico",
+        "footsimuPath": "/brasileirao-serie-b/team/nautico",
+        "points": 64
+      },
+      "third": {
+        "name": "Ponte Preta",
+        "currentName": "Ponte Preta",
+        "footsimuId": 3459,
+        "footsimuSlug": "ponte-preta",
+        "footsimuPath": "/brasileirao-serie-b/team/ponte-preta",
+        "points": 63
+      },
+      "notes": [
+        "ESPN standings cache for 2011 is an early-season snapshot and was not used"
+      ]
+    },
+    {
+      "season": "2012",
+      "startYear": 2012,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Goiás",
+        "currentName": "Goiás",
+        "footsimuId": 3395,
+        "footsimuSlug": "goias",
+        "footsimuPath": "/brasileirao-serie-b/team/goias",
+        "points": 78
+      },
+      "runnerUp": {
+        "name": "Criciúma",
+        "currentName": "Criciúma",
+        "footsimuId": 9971,
+        "footsimuSlug": "criciuma",
+        "footsimuPath": "/brasileirao-serie-b/team/criciuma",
+        "points": 73
+      },
+      "third": {
+        "name": "Atlético Paranaense",
+        "currentName": "Athletico Paranaense",
+        "footsimuId": 3458,
+        "footsimuSlug": "athletico-paranaense",
+        "footsimuPath": "/brasileirao/team/athletico-paranaense",
+        "points": 71
+      },
+      "notes": []
+    },
+    {
+      "season": "2013",
+      "startYear": 2013,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Palmeiras",
+        "currentName": "Palmeiras",
+        "footsimuId": 2029,
+        "footsimuSlug": "palmeiras",
+        "footsimuPath": "/brasileirao/team/palmeiras",
+        "points": 79
+      },
+      "runnerUp": {
+        "name": "Chapecoense",
+        "currentName": "Chapecoense",
+        "footsimuId": 9318,
+        "footsimuSlug": "chapecoense",
+        "footsimuPath": "/brasileirao/team/chapecoense",
+        "points": 72
+      },
+      "third": {
+        "name": "Sport",
+        "currentName": "Sport",
+        "footsimuId": 7635,
+        "footsimuSlug": "sport",
+        "footsimuPath": "/brasileirao-serie-b/team/sport",
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "2014",
+      "startYear": 2014,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Joinville",
+        "currentName": "Joinville",
+        "footsimuId": 13143,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "Ponte Preta",
+        "currentName": "Ponte Preta",
+        "footsimuId": 3459,
+        "footsimuSlug": "ponte-preta",
+        "footsimuPath": "/brasileirao-serie-b/team/ponte-preta",
+        "points": 69
+      },
+      "third": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": 63
+      },
+      "notes": []
+    },
+    {
+      "season": "2015",
+      "startYear": 2015,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Santa Cruz",
+        "currentName": "Santa Cruz",
+        "footsimuId": null,
+        "footsimuSlug": "santa-cruz",
+        "footsimuPath": "/brasileirao-serie-c/team/santa-cruz",
+        "points": 67
+      },
+      "third": {
+        "name": "Vitória",
+        "currentName": "Vitória",
+        "footsimuId": 3457,
+        "footsimuSlug": "vitoria",
+        "footsimuPath": "/brasileirao/team/vitoria",
+        "points": 66
+      },
+      "notes": []
+    },
+    {
+      "season": "2016",
+      "startYear": 2016,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Atlético Goianiense",
+        "currentName": "Atlético Goianiense",
+        "footsimuId": 10357,
+        "footsimuSlug": "atletico-goianiense",
+        "footsimuPath": "/brasileirao-serie-b/team/atletico-goianiense",
+        "points": 76
+      },
+      "runnerUp": {
+        "name": "Avaí",
+        "currentName": "Avaí",
+        "footsimuId": 9966,
+        "footsimuSlug": "avai",
+        "footsimuPath": "/brasileirao-serie-b/team/avai",
+        "points": 66
+      },
+      "third": {
+        "name": "Vasco da Gama",
+        "currentName": "Vasco",
+        "footsimuId": 3454,
+        "footsimuSlug": "vasco",
+        "footsimuPath": "/brasileirao/team/vasco",
+        "points": 65
+      },
+      "notes": []
+    },
+    {
+      "season": "2017",
+      "startYear": 2017,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "América Mineiro",
+        "currentName": "América Mineiro",
+        "footsimuId": 6154,
+        "footsimuSlug": "america-mineiro",
+        "footsimuPath": "/brasileirao-serie-b/team/america-mineiro",
+        "points": 73
+      },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": 71
+      },
+      "third": {
+        "name": "Ceará",
+        "currentName": "Ceará",
+        "footsimuId": 9969,
+        "footsimuSlug": "ceara",
+        "footsimuPath": "/brasileirao-serie-b/team/ceara",
+        "points": 67
+      },
+      "notes": []
+    },
+    {
+      "season": "2018",
+      "startYear": 2018,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Fortaleza",
+        "currentName": "Fortaleza",
+        "footsimuId": 6272,
+        "footsimuSlug": "fortaleza",
+        "footsimuPath": "/brasileirao-serie-b/team/fortaleza",
+        "points": 71
+      },
+      "runnerUp": {
+        "name": "CSA",
+        "currentName": "CSA",
+        "footsimuId": 7531,
+        "footsimuSlug": null,
+        "footsimuPath": null,
+        "points": 62
+      },
+      "third": {
+        "name": "Avaí",
+        "currentName": "Avaí",
+        "footsimuId": 9966,
+        "footsimuSlug": "avai",
+        "footsimuPath": "/brasileirao-serie-b/team/avai",
+        "points": 61
+      },
+      "notes": []
+    },
+    {
+      "season": "2019",
+      "startYear": 2019,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Bragantino",
+        "currentName": "Red Bull Bragantino",
+        "footsimuId": 6079,
+        "footsimuSlug": "red-bull-bragantino",
+        "footsimuPath": "/brasileirao/team/red-bull-bragantino",
+        "points": 75
+      },
+      "runnerUp": {
+        "name": "Sport",
+        "currentName": "Sport",
+        "footsimuId": 7635,
+        "footsimuSlug": "sport",
+        "footsimuPath": "/brasileirao-serie-b/team/sport",
+        "points": 68
+      },
+      "third": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": 66
+      },
+      "notes": []
+    },
+    {
+      "season": "2020",
+      "startYear": 2020,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Chapecoense",
+        "currentName": "Chapecoense",
+        "footsimuId": 9318,
+        "footsimuSlug": "chapecoense",
+        "footsimuPath": "/brasileirao/team/chapecoense",
+        "points": 73
+      },
+      "runnerUp": {
+        "name": "América Mineiro",
+        "currentName": "América Mineiro",
+        "footsimuId": 6154,
+        "footsimuSlug": "america-mineiro",
+        "footsimuPath": "/brasileirao-serie-b/team/america-mineiro",
+        "points": 73
+      },
+      "third": {
+        "name": "Juventude",
+        "currentName": "Juventude",
+        "footsimuId": 6270,
+        "footsimuSlug": "juventude",
+        "footsimuPath": "/brasileirao-serie-b/team/juventude",
+        "points": 61
+      },
+      "notes": [
+        "Chapecoense and América Mineiro both 73 points; Chapecoense champions on wins"
+      ]
+    },
+    {
+      "season": "2021",
+      "startYear": 2021,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Botafogo",
+        "currentName": "Botafogo",
+        "footsimuId": 6086,
+        "footsimuSlug": "botafogo",
+        "footsimuPath": "/brasileirao/team/botafogo",
+        "points": 70
+      },
+      "runnerUp": {
+        "name": "Goiás",
+        "currentName": "Goiás",
+        "footsimuId": 3395,
+        "footsimuSlug": "goias",
+        "footsimuPath": "/brasileirao-serie-b/team/goias",
+        "points": 65
+      },
+      "third": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": 64
+      },
+      "notes": []
+    },
+    {
+      "season": "2022",
+      "startYear": 2022,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Cruzeiro",
+        "currentName": "Cruzeiro",
+        "footsimuId": 2022,
+        "footsimuSlug": "cruzeiro",
+        "footsimuPath": "/brasileirao/team/cruzeiro",
+        "points": 78
+      },
+      "runnerUp": {
+        "name": "Grêmio",
+        "currentName": "Grêmio",
+        "footsimuId": 6273,
+        "footsimuSlug": "gremio",
+        "footsimuPath": "/brasileirao/team/gremio",
+        "points": 65
+      },
+      "third": {
+        "name": "Bahia",
+        "currentName": "Bahia",
+        "footsimuId": 9967,
+        "footsimuSlug": "bahia",
+        "footsimuPath": "/brasileirao/team/bahia",
+        "points": 62
+      },
+      "notes": [
+        "Bahia and Vasco both 62 points (17W 11D 10L); Bahia third on goal difference (+14 vs +12) per pt.wikipedia, the English season article and the results grid. The English champions list and ESPN show Vasco third (ESPN lists Vasco on 64, which is wrong)"
+      ]
+    },
+    {
+      "season": "2023",
+      "startYear": 2023,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Vitória",
+        "currentName": "Vitória",
+        "footsimuId": 3457,
+        "footsimuSlug": "vitoria",
+        "footsimuPath": "/brasileirao/team/vitoria",
+        "points": 72
+      },
+      "runnerUp": {
+        "name": "Juventude",
+        "currentName": "Juventude",
+        "footsimuId": 6270,
+        "footsimuSlug": "juventude",
+        "footsimuPath": "/brasileirao-serie-b/team/juventude",
+        "points": 65
+      },
+      "third": {
+        "name": "Criciúma",
+        "currentName": "Criciúma",
+        "footsimuId": 9971,
+        "footsimuSlug": "criciuma",
+        "footsimuPath": "/brasileirao-serie-b/team/criciuma",
+        "points": 64
+      },
+      "notes": []
+    },
+    {
+      "season": "2024",
+      "startYear": 2024,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Santos",
+        "currentName": "Santos",
+        "footsimuId": 2674,
+        "footsimuSlug": "santos",
+        "footsimuPath": "/brasileirao/team/santos",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Mirassol",
+        "currentName": "Mirassol",
+        "footsimuId": 9169,
+        "footsimuSlug": "mirassol",
+        "footsimuPath": "/brasileirao/team/mirassol",
+        "points": 67
+      },
+      "third": {
+        "name": "Sport",
+        "currentName": "Sport",
+        "footsimuId": 7635,
+        "footsimuSlug": "sport",
+        "footsimuPath": "/brasileirao-serie-b/team/sport",
+        "points": 66
+      },
+      "notes": []
+    },
+    {
+      "season": "2025",
+      "startYear": 2025,
+      "tournament": null,
+      "status": "completed",
+      "competition": "Campeonato Brasileiro Série B",
+      "format": "league",
+      "champion": {
+        "name": "Coritiba",
+        "currentName": "Coritiba",
+        "footsimuId": 3456,
+        "footsimuSlug": "coritiba",
+        "footsimuPath": "/brasileirao/team/coritiba",
+        "points": 68
+      },
+      "runnerUp": {
+        "name": "Athletico Paranaense",
+        "currentName": "Athletico Paranaense",
+        "footsimuId": 3458,
+        "footsimuSlug": "athletico-paranaense",
+        "footsimuPath": "/brasileirao/team/athletico-paranaense",
+        "points": 65
+      },
+      "third": {
+        "name": "Chapecoense",
+        "currentName": "Chapecoense",
+        "footsimuId": 9318,
+        "footsimuSlug": "chapecoense",
+        "footsimuPath": "/brasileirao/team/chapecoense",
+        "points": 62
+      },
+      "notes": []
+    }
+  ]
+}

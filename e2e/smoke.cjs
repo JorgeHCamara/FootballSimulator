@@ -1839,6 +1839,17 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Past Winners: the Brasileirão Série B's history (1971 on), in PT", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/pt/brasileirao-serie-b/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores do Brasileirão Série B");
+      assert.equal(await p.getByTestId("past-winners-row").count(), 55);
+      assert.equal(await p.locator('[data-testid="past-winners-row"][data-status="not_held"]').count(), 11);
+      assert.match(await p.getByTestId("past-winners-row").first().innerText(), /2025[\s\S]*Coritiba/);
+      await p.close();
+    });
+
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       assert.match(await page.title(), /^Simulador do Brasileirão .* \| FootSimu$/);
