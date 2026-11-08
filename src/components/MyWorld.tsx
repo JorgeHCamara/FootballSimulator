@@ -547,7 +547,7 @@ function WorldScreen({ world, saved, locale, onChange, onCommit, onSet, canUndo,
                   : t("cupNew", {
                       cup: t(`cups.${cupShown.code}.the`),
                       outsiders: (() => {
-                        const count = outsidersNeeded(cupShown.cup, world.divisions.reduce((n, d) => n + d.clubs.length, 0));
+                        const count = outsidersNeeded(cupShown.cup, world.divisions.filter((d) => divisionCountry(d.code) === cupCountry(cupShown.code)).reduce((n, d) => n + d.clubs.length, 0));
                         return count ? t("cupOutsiders", { count }) : "";
                       })(),
                     })

@@ -29,7 +29,9 @@ export interface CupViewProps {
 
 /**
  * Short division label for a cup club: PL, CH, L1, L2 or NL (non-league) in
- * the FA Cup, A or B in the Copa do Brasil (clubs outside them get no tag).
+ * the FA Cup, A, B or C in the Copa do Brasil (clubs outside them get no tag).
+ * Every division code a cup club can have needs its `Cup.division` message,
+ * or next-intl shows the raw key.
  */
 export function useDivisionTag(divisions: Record<TeamId, CompetitionCode>, cup: CupConfig) {
   const t = useTranslations("Cup");
