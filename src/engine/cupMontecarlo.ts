@@ -1,5 +1,5 @@
 import type { CupConfig } from "../config/cups.ts";
-import { bracketBase, bracketLines, bracketPairs, cupGameId, cupSecondLegId, cupShootoutId, drawRoundRandom, hostFirst, iterationRng, type CupBuildOptions, type RealCupTie } from "./cup.ts";
+import { bracketBase, bracketLines, bracketPairs, cupGameId, cupSecondLegId, cupShootoutId, drawRoundRandom, hostFirst, iterationRng, roundTies, type CupBuildOptions, type RealCupTie } from "./cup.ts";
 import { cupModelFor } from "./cupModel.ts";
 import { expectedGoals, expectedGoalsNeutral, simulateScore } from "./match.ts";
 import { simulatePenalties } from "./playoffs.ts";
@@ -95,7 +95,8 @@ export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult
       const reals = realByRound[r]!;
       const placed = new Set(reals.flatMap((t) => [t.homeId, t.awayId]));
       const participants = [...new Set([...previous, ...entrants[r]!, ...placed])];
-      if (reals.length < round.ties && participants.length < round.ties * 2) break;
+      const ties = roundTies(round, r, reals.length, entrants[r]!.length);
+      if (reals.length < ties && participants.length < ties * 2) break;
       for (const id of participants) count(id, r);
 
       const specs: TieSpec[] = reals.map((t, slot) => {
@@ -118,11 +119,11 @@ export function runCupMonteCarlo(input: CupMonteCarloInput): CupMonteCarloResult
         pairs = drawRoundRandom(remaining, rng);
       }
       for (const pair of pairs) {
-        if (specs.length >= round.ties) break;
-        const [home, away] = hostFirst(round, pair[0], pair[1], options.tiers, config.hostTier);
+        if (specs.length >= ties) break;
+        const [home, away] = hostFirst(round, pair[0], pair[1], options.tiers, config);
         specs.push({ first: home, second: away, legs: twoLegs ? [null, null] : [null], hosts: twoLegs ? [home, away] : [home], pens: null });
       }
-      if (specs.length < round.ties) break;
+      if (specs.length < ties) break;
       if (r === base) lines = bracketLines(config, specs.map((spec) => ({ homeId: spec.first, awayId: spec.second })));
       previous = specs.map((spec) => playTie(spec, model, neutral, rng));
       if (r === roundCount - 1) won[previous[0]!] = (won[previous[0]!] ?? 0) + 1;

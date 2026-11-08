@@ -19,7 +19,7 @@
     "points": "final points (3 per win); only for round-robin seasons (1937 and 2003 onward); null for cup/play-off formats",
     "name": "club name used in the source for that season",
     "currentName": "club as known today (FootSimu name where available)",
-    "tournament": "\"Taça Brasil\" or \"Torneio Roberto Gomes Pedrosa\" for the two parallel championships of 1967 and 1968; null otherwise",
+    "tournament": "\"Taça Brasil\" or \"Torneio Roberto Gomes Pedrosa\" for the two parallel championships of 1967 and 1968; \"CBF\" (Sport, the official champion) and \"Copa União\" (Flamengo) for 1987; null otherwise",
     "competition": "name of the national championship that year",
     "tiedWith": "not used",
     "strippedChampion": "not used; the 1987 dispute is documented in notes (official champion Sport Recife)"
@@ -803,7 +803,7 @@
       "champion": {
         "name": "Guarani",
         "currentName": "Guarani",
-        "footsimuId": null,
+        "footsimuId": 3448,
         "footsimuSlug": "guarani",
         "footsimuPath": "/brasileirao-serie-c/team/guarani",
         "points": null
@@ -959,7 +959,7 @@
       "third": {
         "name": "Guarani",
         "currentName": "Guarani",
-        "footsimuId": null,
+        "footsimuId": 3448,
         "footsimuSlug": "guarani",
         "footsimuPath": "/brasileirao-serie-c/team/guarani",
         "points": null
@@ -1091,7 +1091,7 @@
       "runnerUp": {
         "name": "Guarani",
         "currentName": "Guarani",
-        "footsimuId": null,
+        "footsimuId": 3448,
         "footsimuSlug": "guarani",
         "footsimuPath": "/brasileirao-serie-c/team/guarani",
         "points": null
@@ -1111,7 +1111,7 @@
     {
       "season": "1987",
       "startYear": 1987,
-      "tournament": null,
+      "tournament": "CBF",
       "status": "completed",
       "competition": "Copa Brasil",
       "format": "playoff",
@@ -1126,12 +1126,24 @@
       "runnerUp": {
         "name": "Guarani",
         "currentName": "Guarani",
-        "footsimuId": null,
+        "footsimuId": 3448,
         "footsimuSlug": "guarani",
         "footsimuPath": "/brasileirao-serie-c/team/guarani",
         "points": null
       },
-      "third": {
+      "third": null,
+      "notes": [
+        "Recognised by the CBF and by the Supreme Federal Court (STF, 2017) as the 1987 Brazilian champion: the CBF's final quadrangular was to bring together the top two of the Green and Yellow Modules; Flamengo and Internacional refused to play, and Sport beat Guarani in the remaining matches. No third place"
+      ]
+    },
+    {
+      "season": "1987",
+      "startYear": 1987,
+      "tournament": "Copa União",
+      "status": "completed",
+      "competition": "Copa Brasil",
+      "format": "playoff",
+      "champion": {
         "name": "Flamengo",
         "currentName": "Flamengo",
         "footsimuId": 819,
@@ -1139,9 +1151,17 @@
         "footsimuPath": "/brasileirao/team/flamengo",
         "points": null
       },
+      "runnerUp": {
+        "name": "Internacional",
+        "currentName": "Internacional",
+        "footsimuId": 1936,
+        "footsimuSlug": "internacional",
+        "footsimuPath": "/brasileirao/team/internacional",
+        "points": null
+      },
+      "third": null,
       "notes": [
-        "Group stages followed by knockout/final rounds; third place per the official final classification (points not comparable)",
-        "Disputed title: the CBF and the 2017 Supreme Federal Court (STF) ruling recognise Sport Recife as the sole 1987 champion (the CBF scheduled a final quadrangular between the top two of the Green and Yellow Modules; Flamengo and Internacional refused to play, and Sport beat Guarani in the remaining matches). Flamengo won the Copa União (Green Module, organised by Clube dos Treze, runner-up Internacional) and still claims the title; the CBF briefly recognised both in 2011 before the courts restored Sport as sole champion. Runner-up Guarani; third Flamengo per the official classification"
+        "Copa União (the Green Module), organised by the Clube dos Treze: Flamengo beat Internacional in the final. Flamengo claims it as the 1987 Brazilian title; the CBF briefly recognised both champions in 2011 before the courts restored Sport as the sole champion. No third place"
       ]
     },
     {
@@ -1380,7 +1400,7 @@
       "third": {
         "name": "Guarani",
         "currentName": "Guarani",
-        "footsimuId": null,
+        "footsimuId": 3448,
         "footsimuSlug": "guarani",
         "footsimuPath": "/brasileirao-serie-c/team/guarani",
         "points": null
