@@ -567,7 +567,7 @@ async function step(name, fn) {
       assert.match(await p.locator('[data-testid="promoted-contender"]').innerText(), /plays Ligue 1's 16th over two legs/);
       // Header: the second divisions sit under their country, top division first.
       const menu = p.locator('[data-testid="league-menu"]');
-      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]], ["Italy", "it", ["Serie A", "Serie B", "Coppa Italia"]], ["France", "fr", ["Ligue 1", "Ligue 2"]]]) {
+      for (const [country, flag, leagues] of [["Germany", "de", ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]], ["Italy", "it", ["Serie A", "Serie B", "Coppa Italia"]], ["France", "fr", ["Ligue 1", "Ligue 2", "Coupe de France"]]]) {
         // Countries sit in the Europe panel.
         await menu.getByRole("button", { name: "Europe" }).click();
         await menu.locator(`#menu-${flag}`).waitFor();
@@ -850,6 +850,39 @@ async function step(name, fn) {
       await menu.getByRole("button", { name: "Europe" }).click();
       assert.deepEqual((await menu.locator("#menu-de a").allInnerTexts()).map((x) => x.trim()), ["Bundesliga", "2. Bundesliga", "DFB-Pokal"]);
       await p.close();
+    });
+
+    await step("Coupe de France: the seventh and eighth rounds, the Ligue 1 clubs in the round of 64, a club two divisions below at home, Stade de France final", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/coupe-de-france`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["Seventh Round", "Eighth Round", "Round of 64", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 92, "92 seventh-round ties");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /\bL2\b/, "Ligue 2 tags");
+      assert.match(await p.locator("main").innerText(), /straight to penalties/i);
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      await bar.nth(2).click();
+      assert.equal(await ties.count(), 32, "round of 64 drawn");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /\bL1\b/, "the Ligue 1 clubs are in");
+      await bar.nth(7).click();
+      assert.match(await p.locator('[data-testid="cup-bracket"]').innerText(), /Stade de France/);
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Coupe de France \d{4}\/\d{2} winner/);
+      const menu = p.locator('[data-testid="league-menu"]');
+      await menu.getByRole("button", { name: "Europe" }).click();
+      assert.deepEqual((await menu.locator("#menu-fr a").allInnerTexts()).map((x) => x.trim()), ["Ligue 1", "Ligue 2", "Coupe de France"]);
+      await p.close();
+      // PT and ES: the round names.
+      const pt = await browser.newPage();
+      await pt.goto(`${BASE_URL}/pt/coupe-de-france`);
+      assert.match(await pt.locator('[data-testid="round-bar"]').innerText(), /Sétima fase[\s\S]*Oitava fase[\s\S]*32 avos de final/);
+      await pt.goto(`${BASE_URL}/es/coupe-de-france`);
+      assert.match(await pt.locator('[data-testid="round-bar"]').innerText(), /Séptima ronda[\s\S]*Octava ronda[\s\S]*Treintaidosavos de final/);
+      await pt.close();
     });
 
     await step("Champions League: 36-club league phase, knockout phase to the final, win chances", async () => {
@@ -1730,10 +1763,17 @@ async function step(name, fn) {
       await p.getByTestId("past-winners").waitFor();
       assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores do Brasileirão Série A");
       const rows = p.getByTestId("past-winners-row");
-      assert.equal(await rows.count(), 70);
+      assert.equal(await rows.count(), 71);
       const chips = await p.getByTestId("past-winners-chip").allInnerTexts();
       for (const chip of ["Taça Brasil (1959–1968)", "Torneio Roberto Gomes Pedrosa (1967–1970)", "Torneio dos Campeões (1937)", "Campeonato Brasileiro Série A (2001–)"]) assert.ok(chips.includes(chip), chip);
-      assert.deepEqual(await p.getByTestId("past-winners-title").evaluateAll((els) => els.map((e) => e.dataset.titles)), ["12", "8", "8", "7", "6"]);
+      assert.deepEqual(await p.getByTestId("past-winners-title").evaluateAll((els) => els.map((e) => e.dataset.titles)), ["12", "9", "8", "7", "6"]);
+      // 1987: Sport (the CBF's) and Flamengo (the Copa União's), no third place; Guarani with its own badge.
+      const y1987 = rows.filter({ hasText: /^1987/ });
+      assert.equal(await y1987.count(), 2);
+      assert.match(await y1987.nth(0).innerText(), /CBF[\s\S]*Sport Recife[\s\S]*Guarani/);
+      assert.match(await y1987.nth(1).innerText(), /Copa União[\s\S]*Flamengo[\s\S]*Internacional/);
+      assert.equal(await y1987.nth(0).locator('[data-place="runnerUp"] img[src*="/3448.png"]').count(), 1, "Guarani's crest");
+      assert.equal(await y1987.locator('[data-place="third"] [data-testid="shield-badge"]').count(), 0);
       // 1967: both championships, one after the other, under one heading.
       const both = rows.filter({ hasText: /^1967/ });
       assert.equal(await both.count(), 2);
@@ -1832,7 +1872,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 45, "every competition once");
+      assert.equal(links.length, 46, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();
@@ -3073,7 +3113,9 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
       await fixtures.getByTestId("matchday-select").selectOption("-1");
       assert.equal(await fixtures.getByTestId("playoff-tie").count(), 1);
-      assert.equal(await fixtures.getByTestId("match-score").count(), 2);
+      // Both legs, and the shoot-out's score when the tie was level on aggregate.
+      const scores = await fixtures.getByTestId("match-score").count();
+      assert.ok(scores === 2 || scores === 3, `${scores} scores`);
       await p.close();
     });
 
