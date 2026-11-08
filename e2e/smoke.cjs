@@ -909,6 +909,34 @@ async function step(name, fn) {
       await pt.close();
     });
 
+    await step("Copa Argentina: 64 clubs on a fixed bracket, every game at a neutral ground, straight to penalties", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/copa-argentina`);
+      const bar = p.locator('[data-testid="round-bar"] button');
+      assert.deepEqual(
+        (await bar.allInnerTexts()).map((x) => x.split("\n")[0].replace(/\s*✓$/, "").trim()),
+        ["Round of 64", "Round of 32", "Round of 16", "Quarter-finals", "Semi-finals", "Final"],
+      );
+      const ties = p.locator('[data-testid="cup-tie"]');
+      assert.equal(await ties.count(), 32, "32 round-of-64 ties");
+      assert.match(await p.locator('[data-testid="round-grid"]').innerText(), /\b(LP|PN)\b/, "Liga Profesional and Primera Nacional tags");
+      assert.match(await p.locator("main").innerText(), /straight to penalties/i);
+      assert.match(await p.locator("main").innerText(), /fixed bracket/i);
+      await p.getByRole("button", { name: "Simulate to the final" }).click();
+      await p.locator('[data-testid="champion-team"]').waitFor();
+      // The bracket: each round's ties are between the winners of neighbouring ties.
+      await bar.nth(0).click();
+      const r64Winners = await ties.evaluateAll((els) => els.map((e) => e.dataset.winner));
+      await bar.nth(1).click();
+      const r32 = await ties.evaluateAll((els) => els.map((e) => [e.dataset.home, e.dataset.away]));
+      assert.deepEqual(r32.flat(), r64Winners, "the round of 32 follows the bracket");
+      assert.match(await p.locator('[data-testid="champion"]').innerText(), /Copa Argentina \d{4} winner/);
+      const menu = p.locator('[data-testid="league-menu"]');
+      await menu.getByRole("button", { name: "South America" }).click();
+      assert.deepEqual((await menu.locator("#menu-ar a").allInnerTexts()).map((x) => x.trim()), ["Liga Profesional", "Primera Nacional", "Copa Argentina"]);
+      await p.close();
+    });
+
     await step("Champions League: 36-club league phase, knockout phase to the final, win chances", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/champions-league`);
@@ -1955,7 +1983,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 47, "every competition once");
+      assert.equal(links.length, 48, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();

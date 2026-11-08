@@ -3,7 +3,7 @@ import type { CompetitionCode, FlagCode, SiteLocale } from "./leagues.ts";
 // Knockout cups. Unlike a league, a cup has no table: each round's pairings are
 // drawn, and clubs from several divisions (and outside the league system) meet.
 
-export type CupCode = "FAC" | "CDB" | "CDR" | "CIT" | "DFB" | "EFC" | "CDF";
+export type CupCode = "FAC" | "CDB" | "CDR" | "CIT" | "DFB" | "EFC" | "CDF" | "CAR";
 
 export type CupRoundKey =
   | "preliminaryRound"
@@ -319,6 +319,40 @@ export const CUPS: readonly CupConfig[] = [
     hostGap: 2,
     tagOutsiders: false,
     title: "Coupe de France",
+  },
+  {
+    kind: "cup",
+    code: "CAR",
+    slug: "copa-argentina",
+    name: "Copa Argentina",
+    country: "Argentina",
+    flag: "ar",
+    simulatorName: { en: "Copa Argentina Simulator", pt: "Simulador da Copa Argentina", es: "Simulador de la Copa Argentina" },
+    aka: { en: "Argentine Cup", pt: "Copa da Argentina", es: "Copa Argentina" },
+    espn: { slug: "arg.copa", seasons: "calendar" },
+    // 2026 (AFA, Boletín 6811): 64 clubs (the 30 of the 2025 Liga
+    // Profesional, 15 from the Primera Nacional, 5 from the Primera B, 10
+    // from the Torneo Federal A and 4 from the Primera C) on a fixed bracket
+    // drawn in December 2025, from the round of 64 to the final. Every game is
+    // a single match at a neutral ground; level after 90 minutes: straight to
+    // penalties. The winner goes to the 2027 Copa Libertadores.
+    rounds: [
+      { key: "roundOf64", espnSlug: "round-of-64", ties: 32, neutral: true, noExtraTime: true },
+      { key: "roundOf32", espnSlug: "round-of-32", ties: 16, neutral: true, noExtraTime: true, bracket: true },
+      { key: "roundOf16", espnSlug: "round-of-16", ties: 8, neutral: true, noExtraTime: true, bracket: true },
+      { key: "quarterFinals", espnSlug: "quarterfinals", ties: 4, neutral: true, noExtraTime: true, bracket: true },
+      { key: "semiFinals", espnSlug: "semifinals", ties: 2, neutral: true, noExtraTime: true, bracket: true },
+      { key: "final", espnSlug: "final", ties: 1, neutral: true, noExtraTime: true, bracket: true },
+    ],
+    feederLeagues: ["ARG", "PN"],
+    // Primera B, Federal A and Primera C clubs: below the Primera Nacional.
+    outsiderTier: 2.5,
+    tagOutsiders: false,
+    title: "Copa Argentina",
+    // 2026 bracket, round of 64 top to bottom (ESPN's home club of each tie):
+    // San Lorenzo v Deportivo Rincón … Boca Juniors v Gimnasia (Chivilcoy) |
+    // River Plate v Ciudad de Bolívar … Huracán v Olimpo.
+    bracketOrder: [18, 17702, 14, 9, 235, 19685, 6756, 3, 15, 8950, 11989, 4, 21, 11972, 10158, 5, 16, 9739, 9744, 7767, 19, 9785, 20, 11, 7764, 7845, 2975, 12, 8, 17, 10060, 10],
   },
 ];
 
