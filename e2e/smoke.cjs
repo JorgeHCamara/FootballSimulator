@@ -1850,6 +1850,17 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Past Winners: the Brasileirão Série C's history (1981 on), in ES", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/es/brasileirao-serie-c/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores del Brasileirão Série C");
+      assert.equal(await p.getByTestId("past-winners-row").count(), 45);
+      assert.equal(await p.locator('[data-testid="past-winners-row"][data-status="not_held"]').count(), 10);
+      assert.match(await p.getByTestId("past-winners-row").first().innerText(), /2025[\s\S]*Ponte Preta/);
+      await p.close();
+    });
+
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       assert.match(await page.title(), /^Simulador do Brasileirão .* \| FootSimu$/);
