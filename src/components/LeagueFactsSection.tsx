@@ -47,6 +47,8 @@ export async function LeagueFactsSection({ league, locale }: { league: LeagueCon
         return t("tables", { count: fact.names.length, names: fact.names.map((n) => n[locale]).join(", ") });
       case "titlePlayoff":
         return t(fact.perTournament ? "titlePlayoffTournament" : "titlePlayoff");
+      case "finalAndReducido":
+        return t("finalAndReducido");
       case "annual":
         return t("annual");
     }

@@ -468,6 +468,75 @@ describe("Argentina's play-offs (zones interleaved, cross-zone round of 16)", ()
   });
 });
 
+describe("Primera Nacional's final and Reducido (zone pairs, the final's loser joining later)", () => {
+  const pn = getLeagueByCode("PN")!;
+  const config = pn.playoff!;
+  // Zone A's clubs 101–118, zone B's 201–218; B's 5th has more points than A's 5th.
+  const zoneRow = (zone: "A" | "B", place: number) => ({ ...row(place, (zone === "A" ? 100 : 200) + place), points: 80 - place * 3 + (zone === "B" && place === 5 ? 2 : 0) });
+  const zoneA = Array.from({ length: 18 }, (_, i) => zoneRow("A", i + 1));
+  const zoneB = Array.from({ length: 18 }, (_, i) => zoneRow("B", i + 1));
+  const seeds = seedByGroupPlace([zoneA, zoneB], [], config.seedFromGroups!.places);
+  const zoned = { ...options, groups: [zoneA, zoneB] };
+
+  it("plays the zone winners' final at a neutral ground, and crosses the zones in the Reducido's first round", () => {
+    const bracket = buildBracket(seeds, config, {}, zoned);
+    assert.deepEqual(bracket.map((r) => r.length), [1, 7, 4, 2, 1]);
+    const final = bracket[0]![0]!;
+    assert.deepEqual([final.higher.teamId, final.lower.teamId].sort(), [101, 201]);
+    assert.equal(final.legs[0]!.neutral, true);
+    assert.ok(final.shootout, "level after extra time: penalties");
+    // 2nd v 8th, 3rd v 7th, 4th v 6th both ways; the 5ths once, at the one with more points (B's).
+    const pairs = bracket[1]!.map((t) => [t.higher.teamId, t.lower.teamId]);
+    assert.deepEqual(pairs, [[102, 208], [202, 108], [103, 207], [203, 107], [104, 206], [204, 106], [205, 105]]);
+    for (const tie of bracket[1]!) {
+      assert.equal(tie.legs.length, 1);
+      assert.equal(tie.legs[0]!.homeId, tie.higher.teamId, "the better-placed club hosts");
+    }
+    // A draw sends the better-placed club through, with no shoot-out.
+    const draw = { [bracket[1]![0]!.legs[0]!.id]: { home: 1, away: 1 } };
+    assert.equal(bracket[1]![0]!.shootout, null);
+    assert.equal(tieOutcome(bracket[1]![0]!, draw)?.winner, 102);
+  });
+
+  it("re-seeds the first round's winners with the final's loser: 1 v 8, 2 v 7…, two legs", () => {
+    let bracket = buildBracket(seeds, config, {}, zoned);
+    // B's champion wins the final; every first-round tie goes to the visitors except 2nd A v 8th B.
+    const results: ResultMap = { [bracket[0]![0]!.legs[0]!.id]: bracket[0]![0]!.legs[0]!.homeId === 201 ? { home: 2, away: 0 } : { home: 0, away: 2 } };
+    for (const tie of bracket[1]!) results[tie.legs[0]!.id] = tie.higher.teamId === 102 ? { home: 1, away: 0 } : { home: 0, away: 1 };
+    bracket = buildBracket(seeds, config, results, zoned);
+    const quarter = bracket[2]!;
+    // Through: 101 (the final's loser, seed 1), 102 (seed 3), 105 (10: A's 5th has fewer points than B's), 106 (11),
+    // 206 (12), 107 (13), 207 (14), 108 (15): best v worst.
+    assert.deepEqual(quarter.map((t) => [t.higher.teamId, t.lower.teamId]), [[101, 108], [102, 207], [105, 107], [106, 206]]);
+    assert.equal(quarter[0]!.higher.teamId, 101, "the final's loser is the top seed");
+    assert.equal(quarter[0]!.legs.length, 2);
+    assert.equal(quarter[0]!.legs[1]!.homeId, 101, "the better seed hosts the second leg");
+    assert.equal(quarter[0]!.shootout, null, "level on aggregate: the better seed goes through");
+    // The final over two legs, level: penalties.
+    assert.equal(bracket[4]![0]!.config.levelTie, "penalties");
+  });
+
+  it("names the slots before the season ends: each side's place in its zone, the final's loser", () => {
+    const bracket = buildBracket(seeds, config, {}, { ...zoned, seasonComplete: false });
+    const tie = bracket[1]![1]!;
+    assert.deepEqual([tie.higher, tie.lower], [{ teamId: null, position: 2, group: 1 }, { teamId: null, position: 8, group: 0 }]);
+    const loser = bracket[2]!.flatMap((t) => [t.higher, t.lower]).find((s) => s.lost);
+    assert.deepEqual(loser, { teamId: null, position: null, from: { round: 0, tie: 0 }, lost: true });
+  });
+
+  it("gives every round its ids, and plays the title and the promotion separately", () => {
+    // 1 + 7 single games (one shoot-out, the final's), 4 + 2 + 1 two-legged ties (one shoot-out, the last).
+    assert.equal(playoffIds(config).length, 2 + 7 + 8 + 4 + 3);
+    const model = { strengths: new Map(), avgHomeGoals: 1.3, avgAwayGoals: 1.1 } as unknown as LeagueModel;
+    const played = simulatePlayoff(seeds, config, {}, model, createRng(7), zoned);
+    const bracket = buildBracket(seeds, config, played, zoned);
+    const champion = tieOutcome(bracket[0]![0]!, played)!.winner;
+    const promoted = playoffWinners(bracket, played)[0]!;
+    assert.ok([101, 201].includes(champion));
+    assert.notEqual(promoted, champion, "the champion isn't in the Reducido");
+  });
+});
+
 describe("realChampion", () => {
   const game = (id: number, utcDate: string, result: Fixture["result"], penalties?: Fixture["penalties"]): Fixture => ({
     id,

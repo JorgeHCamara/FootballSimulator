@@ -159,7 +159,7 @@ async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh =
   const perTeam = gamesPerTeam(league);
   const current = currentSeasonYear(league);
   for (const year of years ?? [current, current - 1]) {
-    let all = await fetchEspnSeason(slug, year, seasons, init);
+    let all = standingResults(await fetchEspnSeason(slug, year, seasons, init), feed.resultsStand);
     // Optional groups (a split later in the season): one table until they exist.
     const groups = league.groups
       ? await keptEspnGroups(league, year, init, fresh).catch((error) => {
@@ -252,6 +252,13 @@ async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh =
     };
   }
   throw new Error(`No ${league.code} fixtures on ESPN for ${(years ?? [current, current - 1]).join(" or ")}`);
+}
+
+/** Abandoned games whose score stood (EspnFeed.resultsStand) count as played, with that score. */
+export function standingResults(events: EspnEvent[], ids: readonly string[] | undefined): EspnEvent[] {
+  if (!ids?.length) return events;
+  const stand = new Set(ids);
+  return events.map((e) => (stand.has(e.id) ? { ...e, status: { ...e.status, type: { ...e.status.type, completed: true, state: "post" } } } : e));
 }
 
 /** A flaky ESPN call, tried up to three times (0.4s, then 1.2s apart). */

@@ -32,6 +32,8 @@ export type LeagueFact =
   | { kind: "splitHalves"; afterRound: number; top: number; bottom: number }
   | { kind: "tables"; names: Record<SiteLocale, string>[] }
   | { kind: "titlePlayoff"; perTournament: boolean }
+  /** Primera Nacional: the zone winners' final (title, first promotion), the Reducido (second). */
+  | { kind: "finalAndReducido" }
   | { kind: "annual" };
 
 export interface LeagueFacts {
@@ -107,7 +109,8 @@ export function leagueFacts(league: LeagueConfig): LeagueFacts | null {
     facts.push({ kind: "tables", names: league.groups.map((g) => g.name) });
     placesScope = "eachTable";
   }
-  if (league.playoff?.title) facts.push({ kind: "titlePlayoff", perTournament: tournaments.length > 1 });
+  if (league.playoff?.titleRound !== undefined) facts.push({ kind: "finalAndReducido" });
+  else if (league.playoff?.title) facts.push({ kind: "titlePlayoff", perTournament: tournaments.length > 1 });
   if (league.annual) {
     facts.push({ kind: "annual" });
     places = league.annual.zones;

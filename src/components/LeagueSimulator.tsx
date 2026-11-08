@@ -325,7 +325,8 @@ export function LeagueSimulator({
     const seeding = league.playoff?.seedFromGroups;
     if (seeding) {
       const campaign = seeding.campaign && split ? computeStandings(teams, split.firstPhase, results, baseOptions) : undefined;
-      return { overall: seedByGroupPlace(groupTables, externalSeeds, seeding.places, seeding.interleave, campaign), groups: undefined };
+      // The group tables too, for ties paired by place within the zones (Primera Nacional's Reducido).
+      return { overall: seedByGroupPlace(groupTables, externalSeeds, seeding.places, seeding.interleave, campaign), groups: groupTables };
     }
     return { overall, groups: groupTables };
   };
@@ -719,7 +720,8 @@ export function LeagueSimulator({
               />
               {playoff?.title && bracket.length > 0 && (
                 <PlayoffChampion
-                  bracket={bracket}
+                  // The title round's winner (Primera Nacional: the final, before the Reducido).
+                  bracket={playoff.titleRound !== undefined ? bracket.slice(0, playoff.titleRound + 1) : bracket}
                   teams={teamMap}
                   predictions={season.predictions}
                   seasonComplete={seasonComplete}
@@ -739,6 +741,7 @@ export function LeagueSimulator({
                   predictions={season.predictions}
                   seasonComplete={seasonComplete}
                   directPromotion={playoff.directPromotion ?? []}
+                  {...(playoff.titleRound !== undefined ? { titleRound: playoff.titleRound } : {})}
                   promotedTo={playoff.promotedTo}
                   nextSeason={nextSeasonLabel(seasonLabel)}
                 />
@@ -815,6 +818,9 @@ export function LeagueSimulator({
                     ...(playoff.winnerPlays ? { winnerPlays: playoff.winnerPlays } : {}),
                     ...(cancelled && playoff.directIfClear ? { cancelled: playoff.directIfClear } : {}),
                     groupNames: (league.groups ?? []).map((g) => g.shortName[lang]),
+                    ...(playoff.titleRound !== undefined ? { titleRound: playoff.titleRound } : {}),
+                    // Sides named by their place in a zone (ties paired within the zones).
+                    ...(playoff.rounds.some((r) => r.zonePairs) ? { zoneNames: (league.groups ?? []).map((g) => g.name[lang]) } : {}),
                     ...(playoff.seedFromGroups?.interleave
                       ? { zoneSlots: { ids: (league.groups ?? []).map((g) => g.id), names: (league.groups ?? []).map((g) => g.name[lang]) } }
                       : {}),

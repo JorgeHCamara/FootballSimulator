@@ -36,6 +36,10 @@ export interface PlayoffView {
    * names, so a seed reads "1st in Zone A" and a winner "Winner 1A/8B".
    */
   zoneSlots?: { ids: string[]; names: string[] };
+  /** Full zone names, for a side named by its place in a zone (Primera Nacional: "2nd in Zone A"). */
+  zoneNames?: string[];
+  /** The round whose winner is champion, when it isn't the last (Primera Nacional's final): the last round's winner is promoted. */
+  titleRound?: number;
   /** What to call a table place that isn't this league's own (My World's Bundesliga v 2. Bundesliga play-off: "16th in the Bundesliga"), by position. */
   slotLabels?: Record<number, string>;
   /** The bracket isn't played this season, for another reason than `cancelled` (a play-out the table made unnecessary): the note to show instead. */
@@ -169,6 +173,12 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff
   const label = (side: PlayoffSide) => {
     if (side.teamId !== null) return teams.get(side.teamId)?.shortName ?? "";
     if (!side.from && side.position !== null && playoff.slotLabels?.[side.position]) return playoff.slotLabels[side.position]!;
+    // An earlier tie's loser (the final's, into the Reducido).
+    if (side.from && side.lost) return t("playoffLoserOf", { round: bracket[side.from.round]![0]!.config.key });
+    // A place in a zone (Primera Nacional's ties paired within the zones).
+    if (!side.from && side.group !== undefined && playoff.zoneNames?.[side.group]) {
+      return t("playoffZonePlace", { position: side.position ?? 0, group: playoff.zoneNames[side.group]! });
+    }
     const group = groupName(side.group);
     if (zones) {
       if (side.from) {
@@ -198,7 +208,8 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff
     // A relegation play-out: the better-placed club hosts the return leg and stays up if level.
     if (config.key === "playOut") return t("playOutRule", { higher });
     if (config.levelTie === "betterPlaced") {
-      return config.legs === 2 ? t("playoffRule", { higher }) : t("playoffRuleOneLegBetterPlaced", { higher });
+      if (config.legs === 2) return t("playoffRule", { higher });
+      return t(config.noExtraTime ? "playoffRuleOneLegBetterPlacedNoExtraTime" : "playoffRuleOneLegBetterPlaced", { higher });
     }
     if (config.venue) return t("playoffRuleFinal", { venue: config.venue });
     if (config.neutral) return t(config.noExtraTime ? "playoffRuleNeutralPenalties" : "playoffRuleNeutral");
@@ -356,8 +367,12 @@ function PlayoffTies({ playoff, teams, predictions, onScore, onSimulate, kickOff
                         wp: Math.max(pens.home, pens.away),
                         lp: Math.min(pens.home, pens.away),
                       }) + " "}
-                    {r === lastRound && playoff.title
-                      ? t("playoffChampion", { winner: teams.get(outcome.winner)?.shortName ?? "", title: playoff.title })
+                    {r === (playoff.titleRound ?? lastRound) && playoff.title
+                      ? t("playoffChampion", { winner: teams.get(outcome.winner)?.shortName ?? "", title: playoff.title }) +
+                        // Champion and promoted (Primera Nacional's final).
+                        (playoff.titleRound !== undefined && playoff.promotedTo
+                          ? ` ${t("playoffPromoted", { winner: teams.get(outcome.winner)?.shortName ?? "", promotedTo: playoff.promotedTo })}`
+                          : "")
                       : r === lastRound && playoff.winnerPlays
                         ? t("playoffToBarrage", { winner: teams.get(outcome.winner)?.shortName ?? "", ...playoff.winnerPlays })
                         : r === lastRound && playoff.promotedTo
