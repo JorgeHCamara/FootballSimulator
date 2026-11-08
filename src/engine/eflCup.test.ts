@@ -111,14 +111,17 @@ describe("EFL Cup: the competition", () => {
     assert.equal(efc.aka.es, "Copa de la Liga de Inglaterra, Carabao Cup");
   });
 
-  it("no extra time in any round but the final (the Coupe de France too); the cups before say nothing and keep their behaviour", () => {
+  it("no extra time in any round but the final (the Coupe de France too; the Copa Argentina has none at all); the cups before say nothing and keep their behaviour", () => {
     assert.deepEqual(
       efc.rounds.map((r) => levelTieRule(r)),
       ["penalties", "penalties", "penalties", "penalties", "penalties", "penalties", "penalties", "extraTime"],
     );
     const cdf = CUPS.find((c) => c.code === "CDF")!;
     assert.deepEqual(cdf.rounds.map((r) => levelTieRule(r)), [...Array(7).fill("penalties"), "extraTime"]);
-    for (const cup of CUPS.filter((c) => c.code !== "EFC" && c.code !== "CDF")) {
+    // The Copa Argentina: straight to penalties in every round, the final too.
+    const car = CUPS.find((c) => c.code === "CAR")!;
+    assert.deepEqual(car.rounds.map((r) => levelTieRule(r)), Array(6).fill("penalties"));
+    for (const cup of CUPS.filter((c) => !["EFC", "CDF", "CAR"].includes(c.code))) {
       assert.ok(cup.rounds.every((r) => r.noExtraTime === undefined && levelTieRule(r) === undefined), `${cup.code}: no rule shown, as before`);
     }
     // Either way the engine decides a level tie on penalties: the flag only changes the rule shown.

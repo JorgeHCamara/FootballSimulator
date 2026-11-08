@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-08T15:43:32.849Z",
+ "generated": "2026-11-08T22:14:09.982Z",
  "clubs": [
   {
    "espnId": 4489,
@@ -6800,6 +6800,138 @@
      "location": "Rumilly, Haute-Savoie, France",
      "league": "French National 1 Group C",
      "badge": "https://r2.thesportsdb.com/images/media/team/badge/dhf6nx1655554185.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22521,
+   "name": "Sarmiento de La Banda",
+   "shortName": "Sarmiento (LB)",
+   "country": "Argentina",
+   "competitions": [
+    "CAR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150160",
+   "candidates": [
+    {
+     "idTeam": "150160",
+     "team": "Sarmiento de La Banda",
+     "location": "La Banda, Santiago del Estero, Argentina",
+     "league": "Argentina Torneo Federal A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/328paa1734117044.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 22166,
+   "name": "Argentino Monte Maíz",
+   "shortName": "Argentino MM",
+   "country": "Argentina",
+   "competitions": [
+    "CAR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "149546",
+   "candidates": [
+    {
+     "idTeam": "149546",
+     "team": "Argentino de Monte Maíz",
+     "location": "Monte Maíz, Córdoba, Argentina",
+     "league": "Argentina Torneo Federal A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/005bl71766678503.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131651,
+   "name": "Gimnasia Chivilcoy",
+   "shortName": "Chivilcoy",
+   "country": "Argentina",
+   "competitions": [
+    "CAR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "151471",
+   "candidates": [
+    {
+     "idTeam": "151471",
+     "team": "Gimnasia y Esgrima de Chivilcoy",
+     "location": "Chivilcoy, Buenos Aires, Argentina",
+     "league": "Argentina Torneo Federal A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/i0x66a1740929276.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 19144,
+   "name": "Deportivo Rincón",
+   "shortName": "Rincón",
+   "country": "Argentina",
+   "competitions": [
+    "CAR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "150150",
+   "candidates": [
+    {
+     "idTeam": "150150",
+     "team": "Deportivo Rincón",
+     "location": "Rincón de los Sauces, Neuquén, Argentina",
+     "league": "Argentina Torneo Federal A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/djv8tn1775755034.png",
+     "score": 1
+    }
+   ]
+  },
+  {
+   "espnId": 131652,
+   "name": "Sportivo Atenas",
+   "shortName": "Atenas",
+   "country": "Argentina",
+   "competitions": [
+    "CAR"
+   ],
+   "hasLogo": false,
+   "verdict": "fixed",
+   "pick": "150153",
+   "candidates": [
+    {
+     "idTeam": "150153",
+     "team": "Atenas de Río Cuarto",
+     "location": "Río Cuarto, Córdoba, Argentina",
+     "league": "Argentina Torneo Federal A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/3abo6g1766678982.png",
+     "score": 0.5
+    }
+   ]
+  },
+  {
+   "espnId": 18328,
+   "name": "San Martín de Formosa",
+   "shortName": "SM Formosa",
+   "country": "Argentina",
+   "competitions": [
+    "CAR"
+   ],
+   "hasLogo": false,
+   "verdict": "accepted",
+   "pick": "142483",
+   "candidates": [
+    {
+     "idTeam": "142483",
+     "team": "San Martín de Formosa",
+     "location": "Formosa, Argentina",
+     "league": "Argentina Torneo Federal A",
+     "badge": "https://r2.thesportsdb.com/images/media/team/badge/fdpydg1678851279.png",
      "score": 1
     }
    ]

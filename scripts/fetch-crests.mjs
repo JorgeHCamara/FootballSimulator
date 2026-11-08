@@ -28,7 +28,7 @@ const CRESTS = new URL("public/crests/", ROOT);
 const API = "https://www.thesportsdb.com/api/v1/json/123";
 const download = process.argv.includes("--download");
 
-const COUNTRY = { England: "England", Spain: "Spain", Germany: "Germany", Italy: "Italy", France: "France", Portugal: "Portugal", Netherlands: "Netherlands", Brazil: "Brazil", USA: "USA" };
+const COUNTRY = { England: "England", Spain: "Spain", Germany: "Germany", Italy: "Italy", France: "France", Portugal: "Portugal", Netherlands: "Netherlands", Brazil: "Brazil", USA: "USA", Argentina: "Argentina" };
 const STATES = {
   AC: "Acre", AL: "Alagoas", AP: "Amapá", AM: "Amazonas", BA: "Bahia", CE: "Ceará", DF: "Distrito Federal|Brasília", ES: "Espírito Santo",
   GO: "Goiás", MA: "Maranhão", MT: "Mato Grosso", MS: "Mato Grosso do Sul", MG: "Minas Gerais", PA: "Pará", PB: "Paraíba", PR: "Paraná",

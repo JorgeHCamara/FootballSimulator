@@ -348,7 +348,7 @@
       },
       {
         "q": "Quais campeonatos posso simular?",
-        "a": "Brasileirão Séries A, B e C, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Campeonato Argentino, Primera Nacional argentina, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Coupe de France, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
+        "a": "Brasileirão Séries A, B e C, Premier League, Championship, League One, League Two, La Liga, Segunda División, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League grega, Bundesliga austríaca, Campeonato Argentino, Primera Nacional argentina, Campeonato Chileno, Campeonato Colombiano, Campeonato Uruguaio, Campeonato Paraguaio, Campeonato Equatoriano, Campeonato Peruano, Liga MX, MLS, Saudi Pro League, J1 League, FA Cup, Copa do Brasil, Copa del Rey, Coppa Italia, DFB-Pokal, Coupe de France, Copa Argentina, Champions League, Europa League, Conference League, Libertadores e Sul-Americana, com jogos e resultados reais da temporada atual."
       },
       {
         "q": "Como o simulador de futebol decide os resultados?",
@@ -388,7 +388,7 @@
       },
       {
         "q": "Há sorteio?",
-        "a": "Não. A {league} é disputada numa chave fixa definida antes da temporada, então todos os confrontos das oitavas à final já são conhecidos: os vencedores de cada fase enfrentam os vencedores do confronto vizinho."
+        "a": "Não. A {league} é disputada numa chave fixa definida antes da temporada, então todos os confrontos até a final já são conhecidos: os vencedores de cada fase enfrentam os vencedores do confronto vizinho."
       },
       {
         "q": "Como as chances são calculadas?",
@@ -658,7 +658,9 @@
       "BL1": "BL",
       "BL2": "2BL",
       "FL1": "L1",
-      "FL2": "L2"
+      "FL2": "L2",
+      "ARG": "LP",
+      "PN": "PN"
     },
     "basedOn": "Com base em {count} copas simuladas a partir dos resultados atuais, incluindo seus palpites nos confrontos reais.",
     "chancesNote": "As fases ainda não sorteadas são sorteadas de novo em cada simulação, então as chances incluem a sorte do sorteio.",
@@ -678,7 +680,8 @@
       "CIT": "A força de cada clube vem do seu próprio campeonato nesta temporada (Serie A ou Serie B), ajustada pela divisão; clubes da Serie C ficam abaixo da Serie B. Não há sorteio: a Coppa Italia segue uma chave fixa.",
       "DFB": "A força de cada clube vem do seu próprio campeonato nesta temporada (Bundesliga ou 2. Bundesliga), ajustada pela divisão; clubes da 3. Liga e amadores ficam abaixo da 2. Bundesliga. Um clube amador sorteado contra um profissional joga em casa.",
       "EFC": "A força de cada clube vem do seu próprio campeonato nesta temporada (Premier League, Championship, League One ou League Two), ajustada pela divisão. Não há prorrogação antes da final: um jogo empatado aos 90 minutos vai direto para os pênaltis, e as semifinais em dois jogos são decididas no placar agregado e, se empatadas, nos pênaltis.",
-      "CDF": "A força de cada clube vem da sua própria liga nesta temporada (Ligue 1 ou Ligue 2), ajustada pela divisão; os clubes do National e amadores ficam abaixo da Ligue 2. Um clube sorteado contra outro pelo menos duas divisões acima joga em casa, e antes da final um jogo empatado após 90 minutos vai direto para os pênaltis."
+      "CDF": "A força de cada clube vem da sua própria liga nesta temporada (Ligue 1 ou Ligue 2), ajustada pela divisão; os clubes do National e amadores ficam abaixo da Ligue 2. Um clube sorteado contra outro pelo menos duas divisões acima joga em casa, e antes da final um jogo empatado após 90 minutos vai direto para os pênaltis.",
+      "CAR": "A força de cada clube vem do seu próprio campeonato nesta temporada (Liga Profesional ou Primera Nacional), ajustada pela divisão; clubes da Primera B, do Federal A e da Primera C ficam abaixo da Primera Nacional. Todos os jogos são em partida única em campo neutro, e um empate nos 90 minutos vai direto para os pênaltis. Não há sorteio: a Copa Argentina segue uma chave fixa."
     },
     "finalAfter": "Os vencedores das {round} se enfrentam aqui.",
     "bracketAfter": "Chave fixa, sem sorteio: os vencedores se enfrentam assim.",
