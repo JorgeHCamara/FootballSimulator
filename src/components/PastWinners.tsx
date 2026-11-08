@@ -94,7 +94,7 @@ function Row({ row }: { row: WinnerRow }) {
   const season = (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold tabular-nums">
       <span>{row.season}</span>
-      {row.tournament && <span className="font-medium text-zinc-500">{row.tournament}</span>}
+      {row.tournament && <span className="font-medium text-zinc-500">{t.has(`tournaments.${row.tournament}`) ? t(`tournaments.${row.tournament}`) : row.tournament}</span>}
       {row.status === "completed" && row.format !== "league" && (
         <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{t(row.format === "final" ? "final" : "playoff")}</span>
       )}

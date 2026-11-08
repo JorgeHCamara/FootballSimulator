@@ -305,6 +305,35 @@ describe("Ligue 1's past winners", () => {
   });
 });
 
+describe("the Segunda División's past winners", () => {
+  const rows = leagueWinners("segunda-division")!;
+
+  it("runs from 1929 to 2025-26, the Civil War years not held, North and South from 1949-50 to 1967-68", () => {
+    assert.equal(rows.length, 117);
+    assert.equal(rows[0]!.season, "2025-26");
+    assert.equal(rows[0]!.champion!.name, "Racing Santander");
+    assert.equal(rows.at(-1)!.season, "1929");
+    assert.equal(rows.filter((r) => r.status === "not_held").length, 3);
+    const groups = rows.filter((r) => r.tournament !== null);
+    assert.equal(groups.length, 38, "19 seasons of two groups");
+    assert.deepEqual(rows.filter((r) => r.season === "1949-50").map((r) => [r.tournament, r.champion!.name]), [
+      ["North", "Racing Santander"],
+      ["South", "Alcoyano"],
+    ]);
+    assert.deepEqual(eras(rows), [{ name: "Segunda División", from: 1929, to: null }]);
+  });
+
+  it("counts each group's win as a title, as the sources do", () => {
+    assert.deepEqual(
+      mostTitles(rows, 2).map((c) => [c.name, c.titles]),
+      [
+        ["Real Murcia", 8],
+        ["Real Betis", 7],
+      ],
+    );
+  });
+});
+
 describe("parseLeagueHistory", () => {
   const placing = (id: number, name: string) => ({ name, currentName: name, footsimuId: id, footsimuSlug: name.toLowerCase(), footsimuPath: `/x/team/${name.toLowerCase()}`, points: 40 });
   const season = (over: Partial<HistorySeason> = {}): HistorySeason => ({

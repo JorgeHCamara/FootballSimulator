@@ -1800,6 +1800,22 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("Past Winners: the Segunda División's history (1929 on), with its North and South groups named in each language", async () => {
+      const p = await browser.newPage();
+      await p.goto(`${BASE_URL}/es/segunda-division/past-winners`);
+      await p.getByTestId("past-winners").waitFor();
+      assert.equal((await p.locator("h1").innerText()).trim(), "Campeones anteriores de la Segunda División");
+      const rows = p.getByTestId("past-winners-row");
+      assert.equal(await rows.count(), 117);
+      const groups = rows.filter({ hasText: /^1949-50/ });
+      assert.equal(await groups.count(), 2);
+      assert.match(await groups.nth(0).innerText(), /Norte[\s\S]*Racing Santander/);
+      assert.match(await groups.nth(1).innerText(), /Sur[\s\S]*Alcoyano/);
+      await p.goto(`${BASE_URL}/en/segunda-division/past-winners`);
+      assert.match(await p.getByTestId("past-winners-row").filter({ hasText: /^1949-50/ }).first().innerText(), /North/);
+      await p.close();
+    });
+
     await step("SEO: titles, structured data, sitemap, robots and images", async () => {
       await page.goto(`${BASE_URL}/pt/brasileirao`);
       assert.match(await page.title(), /^Simulador do Brasileirão .* \| FootSimu$/);
@@ -2884,7 +2900,7 @@ async function step(name, fn) {
       }
     });
 
-    await step("My World with England and Spain: a Segunda División club, Spain's tabs (La Liga, Segunda División, Copa del Rey) behind the country picker, the games left by country, both pyramids ended together (the Segunda's four down to the Primera Federación), Spain's past season and its Past Winners (the world's seasons only)", async () => {
+    await step("My World with England and Spain: a Segunda División club, Spain's tabs (La Liga, Segunda División, Copa del Rey) behind the country picker, the games left by country, both pyramids ended together (the Segunda's four down to the Primera Federación), Spain's past season and its Past Winners (the world's season on top of the real history)", async () => {
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/my-world`);
       await p.getByTestId("world-setup").waitFor();
@@ -2998,8 +3014,12 @@ async function step(name, fn) {
       await p.getByTestId("world-table-view").click();
       await p.locator('[data-testid="world-tabs"] [data-league="SD"]').click();
       await p.getByTestId("world-past-winners").click();
-      await p.getByTestId("past-winners-coming-soon").waitFor();
-      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]').count(), 1, "the Segunda: the world's season only");
+      await p.getByTestId("world-winners").waitFor();
+      assert.equal(await p.getByTestId("past-winners-coming-soon").count(), 0);
+      const segundaRows = p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]');
+      assert.equal(await segundaRows.first().getAttribute("data-world"), "true", "the world's season first");
+      assert.equal(await p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"][data-world="true"]').count(), 1);
+      assert.equal(await segundaRows.count(), 118, "the Segunda: the world's season and every real one since 1929");
       await p.getByTestId("world-table-view").click();
       // Saved: a reload keeps both countries.
       await p.reload();
