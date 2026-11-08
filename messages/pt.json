@@ -1262,8 +1262,6 @@
     "third": "Terceiro",
     "notHeld": "Não disputado",
     "abandoned": "Abandonado",
-    "final": "Final",
-    "playoff": "Playoffs",
     "mostTitles": "Mais títulos",
     "titlesWord": "{count, plural, one {título} other {títulos}}",
     "filter": "Filtrar as temporadas",
