@@ -1262,8 +1262,6 @@
     "third": "Third place",
     "notHeld": "Not held",
     "abandoned": "Abandoned",
-    "final": "Final",
-    "playoff": "Play-offs",
     "mostTitles": "Most titles",
     "titlesWord": "{count, plural, one {title} other {titles}}",
     "filter": "Filter the seasons",
