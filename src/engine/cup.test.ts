@@ -705,17 +705,32 @@ describe("Coupe de France (from the seventh round; a club two divisions below ho
     assert.equal(rounds[2]!.participants.length, 0, "the round of 64 waits for the eighth round's results");
   });
 
-  it("plays a seventh round the feed lists a tie short; the eighth then waits for its real draw", () => {
+  it("plays a seventh round the feed lists a tie short; the eighth is drawn from its 91 winners, one through without a game", () => {
     const real = seventh(91);
-    const rounds = buildCup(cdf, real, {}, { entrants: { roundOf64: ligue1 }, drawSalt: 0, roundDates: {} });
+    const opts = { entrants: { roundOf64: ligue1 }, drawSalt: 0, roundDates: {} };
+    const rounds = buildCup(cdf, real, {}, opts);
     assert.equal(rounds[0]!.drawn, "real", "the listed ties are the round");
     assert.equal(rounds[0]!.ties.length, 91);
-    const played = buildCup(cdf, real, homeWins(rounds[0]!.ties), { entrants: { roundOf64: ligue1 }, drawSalt: 0, roundDates: {} });
-    assert.equal(played[1]!.drawn, "pending", "91 winners can't fill 46 ties");
+    assert.equal(rounds[1]!.drawn, "pending", "the eighth waits for the seventh's results");
+    const played = buildCup(cdf, real, homeWins(rounds[0]!.ties), opts);
+    const eighth = played[1]!;
+    assert.equal(eighth.drawn, "simulated");
+    assert.equal(eighth.ties.length, 45, "91 winners: 45 ties");
+    assert.equal(eighth.byes!.length, 1, "and one club through without a game");
+    const inEighth = new Set([...eighth.ties.flatMap((t) => [t.homeId, t.awayId]), ...eighth.byes!]);
+    assert.equal(inEighth.size, 91, "every winner, once");
+    // The round of 64: the eighth's 45 winners and the bye, with the 18 Ligue 1 clubs.
+    const through = buildCup(cdf, real, { ...homeWins(rounds[0]!.ties), ...homeWins(eighth.ties) }, opts);
+    assert.equal(through[2]!.ties.length, 32);
+    assert.ok(through[2]!.participants.includes(eighth.byes![0]!), "the bye plays the round of 64");
     // Three short is more than a feed slip: the round waits.
-    assert.equal(buildCup(cdf, seventh(89), {}, { entrants: { roundOf64: ligue1 }, drawSalt: 0, roundDates: {} })[0]!.drawn, "pending");
-    // The chances run the short round too.
-    const mc = runCupMonteCarlo({ config: cdf, real, fixed: {}, strengths: {}, options: { entrants: { roundOf64: ligue1 } }, iterations: 5, seed: 1 });
-    assert.equal(mc.reached[2001]![0], 5, "every club listed plays the seventh round");
+    assert.equal(buildCup(cdf, seventh(89), {}, opts)[0]!.drawn, "pending");
+    // A full seventh round: no byes.
+    const full = buildCup(cdf, seventh(92), {}, opts);
+    assert.equal(buildCup(cdf, seventh(92), homeWins(full[0]!.ties), opts)[1]!.byes, undefined);
+    // The chances run the short round, and on to the final.
+    const mc = runCupMonteCarlo({ config: cdf, real, fixed: {}, strengths: {}, options: { entrants: { roundOf64: ligue1 } }, iterations: 20, seed: 1 });
+    assert.equal(mc.reached[2001]![0], 20, "every club listed plays the seventh round");
+    assert.equal(Object.values(mc.won).reduce((n, w) => n + w, 0), 20, "a winner every run");
   });
 });
