@@ -96,6 +96,7 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   18190: "/crests/18190.png", // Galvez
   18192: "/crests/18192.png", // Tocantinopolis
   18195: "/crests/18195.png", // Ivinhema
+  18328: "/crests/18328.png", // San Martín de Formosa
   18334: "/crests/18334.png", // AE Prat
   18342: "/crests/18342.png", // San Sebastián de los Reyes
   18400: "/crests/18400.png", // FC Fleury 91
@@ -104,6 +105,7 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   18901: "/crests/18901.png", // Biesheim
   18906: "/crests/18906.png", // Le Puy
   18907: "/crests/18907.png", // Senlis
+  19144: "/crests/19144.png", // Deportivo Rincón
   19233: "/crests/19233.png", // SSV Jeddeloh II
   19294: "/crests/19294.png", // Unionistas de Salamanca
   19388: "/crests/19388.png", // FC Limonest
@@ -146,6 +148,7 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   22084: "/crests/22084.png", // Covadonga
   22138: "/crests/22138.png", // US Feurs
   22139: "/crests/22139.png", // Racing Club de France
+  22166: "/crests/22166.png", // Argentino Monte Maíz
   22190: "/crests/22190.png", // Capital
   22193: "/crests/22193.png", // Independente AP
   22194: "/crests/22194.png", // Manauara
@@ -158,6 +161,7 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   22468: "/crests/22468.png", // Harborough Town
   22487: "/crests/22487.png", // AE Velo Clube
   22489: "/crests/22489.png", // Betim FC
+  22521: "/crests/22521.png", // Sarmiento de La Banda
   22557: "/crests/22557.png", // Capital CF
   22559: "/crests/22559.png", // Independência
   22561: "/crests/22561.png", // Maracanã
@@ -172,6 +176,8 @@ export const CREST_FALLBACKS: Readonly<Record<number, string>> = {
   131474: "/crests/131474.png", // UD Ourense
   131572: "/crests/131572.png", // Stade Béthunois
   131576: "/crests/131576.png", // Montreuil FC
+  131651: "/crests/131651.png", // Gimnasia Chivilcoy
+  131652: "/crests/131652.png", // Sportivo Atenas
   131671: "/crests/131671.png", // Bare
   131672: "/crests/131672.png", // Clube Laguna
   131674: "/crests/131674.png", // Guapore
