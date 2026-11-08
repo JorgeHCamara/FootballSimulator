@@ -29,7 +29,9 @@ export interface CupViewProps {
 
 /**
  * Short division label for a cup club: PL, CH, L1, L2 or NL (non-league) in
- * the FA Cup, A or B in the Copa do Brasil (clubs outside them get no tag).
+ * the FA Cup, A, B or C in the Copa do Brasil (clubs outside them get no tag).
+ * Every division code a cup club can have needs its `Cup.division` message,
+ * or next-intl shows the raw key.
  */
 export function useDivisionTag(divisions: Record<TeamId, CompetitionCode>, cup: CupConfig) {
   const t = useTranslations("Cup");
@@ -173,12 +175,14 @@ export function CupRounds(props: RoundsProps) {
   // The closing rounds (quarter-finals on), not an early round that happens to be small (Coppa Italia's preliminary round).
   const bracketFrom = rounds.findIndex((_, i) => rounds.slice(i).every((r) => r.config.ties <= 4));
   const decided = (r: CupRound) => r.ties.filter((tie) => tieWinner(tie, predictions) !== null).length;
+  // A drawn round's ties (a first round can be a tie or two short of its size: see roundTies).
+  const size = (r: CupRound) => (r.drawn === "pending" ? r.config.ties : r.ties.length);
 
   const status = (r: CupRound) => {
     if (r.drawn === "pending") return t(r.config.bracket ? "bracketStatus" : "drawPending");
     const done = decided(r);
-    if (done === r.config.ties) return t("roundComplete");
-    return r.drawn === "simulated" && !ownDraw ? t("simulatedDraw") : `${done}/${r.config.ties}`;
+    if (done === size(r)) return t("roundComplete");
+    return r.drawn === "simulated" && !ownDraw ? t("simulatedDraw") : `${done}/${size(r)}`;
   };
   const when = (r: CupRound) => {
     if (!kickOff) return "";
@@ -192,7 +196,7 @@ export function CupRounds(props: RoundsProps) {
         <div className="flex min-w-max gap-1 rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="tablist">
           {rounds.map((r, i) => {
             const active = i === roundIndex;
-            const complete = r.drawn !== "pending" && decided(r) === r.config.ties;
+            const complete = r.drawn !== "pending" && decided(r) === size(r);
             return (
               <button
                 key={r.config.key}

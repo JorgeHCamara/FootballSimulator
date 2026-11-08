@@ -339,7 +339,7 @@
       },
       {
         "q": "¿Qué ligas puedo simular?",
-        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Bundesliga austriaca, Brasileirão Série A, Série B y Série C, la Liga Profesional Argentina, la Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
+        "a": "LaLiga, Segunda División, Premier League, Championship, League One, League Two, Bundesliga, 2. Bundesliga, Serie A, Serie B italiana, Ligue 1, Ligue 2, Primeira Liga, Eredivisie, Eerste Divisie, Scottish Premiership, Süper Lig, Pro League belga, Super League griega, Bundesliga austriaca, Brasileirão Série A, Série B y Série C, la Liga Profesional Argentina, la Liga de Primera de Chile, la Liga BetPlay, el Campeonato Uruguayo, la Primera División de Paraguay, la LigaPro Ecuador, la Liga 1 de Perú, la Liga MX, MLS, la Saudi Pro League, la J1 League, la FA Cup, la Copa de Brasil, la Copa del Rey, la Coppa Italia, la DFB-Pokal, la Coupe de France, la Champions League, la Europa League, la Conference League, la Copa Libertadores y la Copa Sudamericana, con partidos y resultados reales de la temporada actual."
       },
       {
         "q": "¿Cómo decide los resultados el simulador de fútbol?",
@@ -570,6 +570,9 @@
       "thirdRound": "Tercera ronda",
       "fourthRound": "Cuarta ronda",
       "fifthRound": "Quinta ronda",
+      "seventhRound": "Séptima ronda",
+      "eighthRound": "Octava ronda",
+      "roundOf64": "Treintaidosavos de final",
       "roundOf32": "Dieciseisavos de final",
       "roundOf16": "Octavos de final",
       "quarterFinals": "Cuartos de final",
@@ -584,6 +587,9 @@
       "thirdRound": "R3",
       "fourthRound": "R4",
       "fifthRound": "R5",
+      "seventhRound": "R7",
+      "eighthRound": "R8",
+      "roundOf64": "1/32",
       "roundOf32": "1/16",
       "roundOf16": "OF",
       "quarterFinals": "CF",
@@ -612,12 +618,15 @@
       "nonLeague": "NL",
       "BSA": "A",
       "BSB": "B",
+      "BSC": "C",
       "PD": "1ª",
       "SD": "2ª",
       "SA": "A",
       "SB": "B",
       "BL1": "BL",
-      "BL2": "2BL"
+      "BL2": "2BL",
+      "FL1": "L1",
+      "FL2": "L2"
     },
     "basedOn": "Basado en {count} copas simuladas a partir de los resultados actuales, incluidos tus pronósticos en los emparejamientos reales.",
     "chancesNote": "Las rondas aún no sorteadas se sortean de nuevo en cada simulación, así que las probabilidades incluyen la suerte del sorteo.",
@@ -636,7 +645,8 @@
       "CDR": "La fuerza de cada club sale de su propia liga esta temporada (LaLiga o Segunda División), ajustada por la división; los clubes de Primera Federación y categorías inferiores quedan por debajo de Segunda.",
       "CIT": "La fuerza de cada club sale de su propia liga esta temporada (Serie A o Serie B), ajustada por la división; los clubes de la Serie C quedan por debajo de la Serie B. No hay sorteo: la Coppa Italia sigue un cuadro fijo.",
       "DFB": "La fuerza de cada club sale de su propia liga esta temporada (Bundesliga o 2. Bundesliga), ajustada por la división; los clubes de la 3. Liga y los aficionados quedan por debajo de la 2. Bundesliga. Un club aficionado emparejado con uno profesional juega en casa.",
-      "EFC": "La fuerza de cada club sale de su propia liga esta temporada (Premier League, Championship, League One o League Two), ajustada por la división. No hay prórroga antes de la final: un partido empatado a los 90 minutos va directo a los penaltis, y las semifinales a doble partido se deciden por el global y, si sigue igualado, en los penaltis."
+      "EFC": "La fuerza de cada club sale de su propia liga esta temporada (Premier League, Championship, League One o League Two), ajustada por la división. No hay prórroga antes de la final: un partido empatado a los 90 minutos va directo a los penaltis, y las semifinales a doble partido se deciden por el global y, si sigue igualado, en los penaltis.",
+      "CDF": "La fuerza de cada club sale de su propia liga esta temporada (Ligue 1 o Ligue 2), ajustada por la división; los clubes del National y los amateurs quedan por debajo de la Ligue 2. Un club emparejado con otro al menos dos divisiones por encima juega en casa, y antes de la final un partido empatado tras 90 minutos va directo a los penaltis."
     },
     "finalAfter": "Aquí se enfrentan los ganadores de las {round}.",
     "bracketAfter": "Cuadro fijo, sin sorteo: los ganadores se cruzan así.",
@@ -1468,7 +1478,7 @@
     "newSeason": "Una nueva temporada: todos los clubes empiezan con 0 puntos.",
     "cupFirst": "Esta temporada, {cup} empezó desde la real, con su sorteo y sus resultados hasta ahora: a partir de aquí, la copa es tuya. Cambia cualquier resultado, tira los dados o simula la ronda o el resto de la copa.",
     "cupNew": "Nueva temporada: {cup} se sortea ronda a ronda entre los clubes de este mundo{outsiders}, cada partido con la forma de los clubes esta temporada.",
-    "cupOutsiders": " y {count} clubes de fuera de la liga, de la FA Cup real",
+    "cupOutsiders": " y {count} clubes de fuera de las ligas",
     "pastCup": "La {cup} de {season}: todas las rondas y la final.",
     "tables": "Tablas",
     "competitions": "Ligas y copas",
