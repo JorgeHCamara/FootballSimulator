@@ -105,7 +105,9 @@ export const roundEntrants = (cup: CupConfig, r: number) => cup.rounds[r]!.ties 
 /** How many clubs from outside the league pyramid the cup needs: its entrants beyond the pyramid's clubs (32 non-league sides in the FA Cup, none in the EFL Cup). */
 export function outsidersNeeded(cup: CupConfig, leagueClubs: number): number {
   const total = cup.rounds.reduce((n, _, r) => n + Math.max(0, roundEntrants(cup, r)), 0);
-  return Math.max(0, total - leagueClubs);
+  // Only some of each league's clubs enter (the Copa Argentina): the rest of the places are for clubs from below.
+  const entering = cup.worldEntrants ? Math.min(leagueClubs, cup.worldEntrants.reduce((n, k) => n + k, 0)) : leagueClubs;
+  return Math.max(0, total - entering);
 }
 
 /**
@@ -118,7 +120,9 @@ export function outsidersNeeded(cup: CupConfig, leagueClubs: number): number {
 export function generateCup(code: WorldCupCode, ranking: readonly (readonly TeamId[])[], outsiders: readonly TeamId[]): WorldCupSeason {
   const cup = cupConfig(code);
   const leagueClubs = ranking.reduce((n, ids) => n + ids.length, 0);
-  const queue = [...outsiders.slice(0, outsidersNeeded(cup, leagueClubs)), ...[...ranking].reverse().flat()];
+  // Only each league's strongest clubs (the Copa Argentina's 30 and 15): the end of its ranking, weakest up.
+  const leagues = cup.worldEntrants ? ranking.map((ids, i) => ids.slice(Math.max(0, ids.length - (cup.worldEntrants![i] ?? ids.length)))) : ranking;
+  const queue = [...outsiders.slice(0, outsidersNeeded(cup, leagueClubs)), ...[...leagues].reverse().flat()];
   const entrants: Partial<Record<CupRoundKey, TeamId[]>> = {};
   cup.rounds.forEach((round, r) => {
     const needed = roundEntrants(cup, r);

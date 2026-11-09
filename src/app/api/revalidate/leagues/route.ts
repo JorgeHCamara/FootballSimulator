@@ -16,10 +16,10 @@ const AT_ONCE = 6;
 /**
  * Refreshes a league's pages together when its results change (see
  * src/lib/leagueRefresh.ts): for every domestic league (`?league=PL` for one),
- * compares ESPN's data now with the cached copy and, when it changed (or a
- * game kicked off in the last four hours), revalidates the league's data and
- * outlook tags, so its league page, club pages and their images are all
- * rebuilt from the new data on their next visit. Called every 30 minutes by
+ * compares ESPN's data now with the cached copy and, only when it changed,
+ * revalidates the league's data and outlook tags, so its league page, club
+ * pages and their images are all rebuilt from the new data on their next
+ * visit (see src/lib/leagueRefresh.ts). Called every 30 minutes by
  * .github/workflows/revalidate-leagues.yml; only with the REVALIDATE_TOKEN
  * the site is configured with (404 when it has none).
  */
@@ -33,13 +33,13 @@ export async function GET(request: NextRequest) {
   const check = async (league: LeagueConfig) => {
     const [cached, fresh] = await Promise.all([getLeagueData(league).catch(() => undefined), freshLeagueData(league)]);
     const reason = refreshReason(cached, fresh);
-    if (reason === "changed" || reason === "recent") {
+    if (reason === "changed") {
       revalidateTag(dataTag(league.code), "max");
       revalidateTag(outlookTag(league.code), "max");
     }
     results.push({ league: league.code, reason });
   };
   for (let i = 0; i < leagues.length; i += AT_ONCE) await Promise.all(leagues.slice(i, i + AT_ONCE).map(check));
-  const refreshed = results.filter((r) => r.reason === "changed" || r.reason === "recent").map((r) => r.league);
+  const refreshed = results.filter((r) => r.reason === "changed").map((r) => r.league);
   return Response.json({ checked: results.length, refreshed, results }, { headers: { "Cache-Control": "no-store" } });
 }

@@ -94,6 +94,15 @@ export function inferGroups(fixtures: readonly Fixture[], ids: readonly string[]
 /** Server responses are cached for an hour, well inside the free tier's rate limit. */
 const REVALIDATE_SECONDS = 3600;
 
+/** How long a league's cached ESPN data is kept without the route (an hour, as before it; and football-data.org's leagues, which the route doesn't check). */
+export const KEEP_WITHOUT_ROUTE_SECONDS = 3600;
+
+/** How long with the route on: only a safety net for when its job doesn't run (new results come in through the route). */
+export const KEEP_WITH_ROUTE_SECONDS = 21600;
+
+/** How long a league's cached ESPN data is kept: long while the route brings new results in (REVALIDATE_TOKEN set), an hour without. */
+export const leagueDataKeepSeconds = (env: Record<string, string | undefined> = process.env) => (env.REVALIDATE_TOKEN ? KEEP_WITH_ROUTE_SECONDS : KEEP_WITHOUT_ROUTE_SECONDS);
+
 const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 
 const inflight = new Map<string, Promise<LeagueData>>();
@@ -154,8 +163,9 @@ async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh =
   const feed = league.espn;
   if (!feed) throw new Error(`${league.code} has no ESPN feed`);
   const { slug, seasons, weeklyRounds } = feed;
-  // `fresh`: straight from ESPN, past the data cache (see freshLeagueData).
-  const init: RequestInit = fresh ? { cache: "no-store" } : { next: { revalidate: REVALIDATE_SECONDS, tags: [`league:${league.code}`] } };
+  // `fresh`: straight from ESPN, past the data cache (see freshLeagueData). Otherwise kept for hours while
+  // /api/revalidate/leagues brings new results in, an hour without it (leagueDataKeepSeconds).
+  const init: RequestInit = fresh ? { cache: "no-store" } : { next: { revalidate: leagueDataKeepSeconds(), tags: [`league:${league.code}`] } };
   const perTeam = gamesPerTeam(league);
   const current = currentSeasonYear(league);
   for (const year of years ?? [current, current - 1]) {
@@ -278,7 +288,7 @@ const noDataCache = (error: unknown) => error instanceof Error && error.message.
 
 /**
  * The league's groups (MLS conferences: its pages need them), retried, and kept
- * in the data cache an hour at a time: when ESPN's standings fail (busy, a
+ * in the data cache as the rest of its data (leagueDataKeepSeconds): when ESPN's standings fail (busy, a
  * rate limit), the last groups it gave stand instead of failing every page of
  * the league. A fresh load (freshLeagueData) asks ESPN itself.
  */
@@ -286,7 +296,7 @@ async function keptEspnGroups(league: LeagueConfig, year: number, init: RequestI
   const load = () => withRetry(() => loadEspnGroups(league, year, init));
   if (fresh) return load();
   try {
-    return await unstable_cache(load, ["espn-groups", league.code, String(year)], { tags: [`league:${league.code}`], revalidate: REVALIDATE_SECONDS })();
+    return await unstable_cache(load, ["espn-groups", league.code, String(year)], { tags: [`league:${league.code}`], revalidate: leagueDataKeepSeconds() })();
   } catch (error) {
     if (noDataCache(error)) return load();
     throw error;

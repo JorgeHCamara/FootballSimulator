@@ -7,8 +7,8 @@ import { loadReport } from "../../../../../lib/oddsPage.ts";
 import { roundFromParam } from "../../../../../lib/oddsReports.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../../../lib/site.ts";
 
-/** A round's report doesn't change once its snapshot is in; the results in its sentences come from the hourly league data. */
-export const revalidate = 3600;
+/** A round's report doesn't change once its snapshot is in; the results in its sentences come from the league's data (as the league page). */
+export const revalidate = 21600;
 
 type Params = Promise<{ locale: string; league: string; round: string }>;
 

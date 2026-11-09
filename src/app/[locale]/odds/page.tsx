@@ -12,7 +12,8 @@ import { latestReportPath } from "../../../lib/oddsReports.ts";
 import { dateLocale, reportText } from "../../../lib/oddsText.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
 
-export const revalidate = 3600;
+/** Every league's latest report: it changes when a new round's snapshot is deployed, and with the leagues' data (as their pages). */
+export const revalidate = 21600;
 
 type Params = Promise<{ locale: string }>;
 

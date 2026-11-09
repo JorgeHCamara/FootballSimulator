@@ -1320,8 +1320,8 @@
     }
   },
   "World": {
-    "metaTitle": "My World: take your club up the football pyramid, in England, Spain, Germany, Italy or Brazil",
-    "metaDescription": "Pick a club from England, Spain, Germany, Italy or Brazil and play season after season of their leagues and cups, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
+    "metaTitle": "My World: take your club up the football pyramid, in England, Spain, Germany, Italy, Brazil or Argentina",
+    "metaDescription": "Pick a club from England, Spain, Germany, Italy, Brazil or Argentina and play season after season of their leagues and cups, with the play-offs, promotion and relegation. Saved in your browser, with every season's tables.",
     "hero": {
       "badge": "Game mode",
       "start": "Start your world",
@@ -1441,6 +1441,21 @@
         "name": "Série D",
         "the": "Série D",
         "in": "in Série D"
+      },
+      "ARG": {
+        "name": "Liga Profesional",
+        "the": "the Liga Profesional",
+        "in": "in the Liga Profesional"
+      },
+      "PN": {
+        "name": "Primera Nacional",
+        "the": "the Primera Nacional",
+        "in": "in the Primera Nacional"
+      },
+      "AR3": {
+        "name": "Third tier",
+        "the": "the third tier (Primera B and Federal A)",
+        "in": "in the third tier"
       }
     },
     "cups": {
@@ -1473,6 +1488,11 @@
         "name": "Copa do Brasil",
         "the": "the Copa do Brasil",
         "in": "in the Copa do Brasil"
+      },
+      "CAR": {
+        "name": "Copa Argentina",
+        "the": "the Copa Argentina",
+        "in": "in the Copa Argentina"
       }
     },
     "countries": {
@@ -1480,7 +1500,8 @@
       "ESP": "Spain",
       "GER": "Germany",
       "ITA": "Italy",
-      "BRA": "Brazil"
+      "BRA": "Brazil",
+      "ARG": "Argentina"
     },
     "setup": {
       "title": "Create your world",
@@ -1609,6 +1630,18 @@
       "classification": "Final classification",
       "secondPending": "The second stage's two groups of four (1st, 4th, 5th and 8th; 2nd, 3rd, 6th and 7th) are drawn from the first stage's table once it's complete.",
       "secondPendingGroups": "Each group's top four play a promotion group of four once the first stage is complete."
+    },
+    "zones": {
+      "zone": "Zone {zone}",
+      "apertura": "Apertura",
+      "clausura": "Clausura",
+      "annual": "Annual table",
+      "round": "Matchday {round}",
+      "annualNote": "Both tournaments' games: the bottom two go down (the real second relegation comes from the three-season averages, not kept here).",
+      "championsTitle": "{league} {year} champions",
+      "championOf": "{tournament} champion",
+      "championPending": "To be decided",
+      "switch": "Zone"
     }
   }
 }
