@@ -1,6 +1,7 @@
+import { unstable_cache } from "next/cache.js";
 import { outlookSetup } from "./clubOutlook.ts";
 import { getCupData } from "./cupData.ts";
-import { getLeagueData } from "./leagueData.ts";
+import { getLeagueData, leagueDataKeepSeconds } from "./leagueData.ts";
 import { divisionConfig, divisionTeams, isDivision, WORLD_LEAGUES, type DivisionCode, type StartCup, type StartLeague, type StartPack, type WorldGame, type WorldPlayoffGame } from "./myWorld.ts";
 import { cupConfig, WORLD_CUPS, type WorldCupCode, type WorldCupTie } from "./worldCups.ts";
 import { isZoneDivision, TOURNAMENT_ROUNDS } from "./worldZones.ts";
@@ -21,26 +22,7 @@ export async function worldStartPack(): Promise<StartPack> {
   const missing: (DivisionCode | WorldCupCode)[] = [];
   const loadCup = async (code: WorldCupCode) => {
     try {
-      const data = await getCupData(cupConfig(code));
-      const year = Number.parseInt(data.season, 10);
-      if (!Number.isFinite(year)) throw new Error(`${code}: no season`);
-      cups.push({
-        code,
-        year,
-        teams: data.teams.map((t) => ({ id: t.id, name: t.name, shortName: t.shortName, tla: t.tla, ...(t.crest ? { crest: t.crest } : {}) })),
-        divisions: Object.fromEntries(Object.entries(data.divisions).flatMap(([id, league]) => (isDivision(league) ? [[Number(id), league]] : []))),
-        real: data.real.map((t): WorldCupTie => {
-          const last = t.legs.at(-1);
-          return {
-            round: t.round,
-            homeId: t.homeId,
-            awayId: t.awayId,
-            legs: t.legs.map((leg) => (leg.result ? [leg.result.home, leg.result.away] : null)),
-            ...(last?.penalties ? { penalties: [last.penalties.home, last.penalties.away] } : {}),
-          };
-        }),
-        entrants: data.entrants,
-      });
+      cups.push(await keptStartCup(code));
     } catch (error) {
       console.warn(`my world: no ${code} data:`, error instanceof Error ? error.message : error);
       missing.push(code);
@@ -106,4 +88,51 @@ export async function worldStartPack(): Promise<StartPack> {
   cups.sort((a, b) => WORLD_CUPS.indexOf(a.code) - WORLD_CUPS.indexOf(b.code));
   missing.sort((a, b) => order.indexOf(a) - order.indexOf(b));
   return { leagues, cups, missing };
+}
+
+/** Outside a Next.js server or build (scripts, tests) there is no data cache: the cup is loaded on the spot. */
+const noDataCache = (error: unknown) => error instanceof Error && error.message.includes("incrementalCache missing");
+
+/**
+ * A cup's start (its clubs, the draw so far, the clubs entering later), kept
+ * in the data cache as long as the leagues' data (leagueDataKeepSeconds: six
+ * hours while /api/revalidate/leagues brings new results in, an hour
+ * without), so My World's page is rebuilt as rarely as the league pages. The
+ * cup's own pages still read its data hourly. Inside the cached function the
+ * cup's requests skip the cache (Next treats them as no-store there), so each
+ * stored start is fresh. A cup that fails isn't stored: it's tried again on
+ * the next build of the page.
+ */
+async function keptStartCup(code: WorldCupCode): Promise<StartCup> {
+  const load = () => startCup(code);
+  try {
+    return await unstable_cache(load, ["world-start-cup", code], { tags: [`cup:${cupConfig(code).code}`], revalidate: leagueDataKeepSeconds() })();
+  } catch (error) {
+    if (noDataCache(error)) return load();
+    throw error;
+  }
+}
+
+/** A cup's start from its live data; throws when it can't be loaded. */
+async function startCup(code: WorldCupCode): Promise<StartCup> {
+  const data = await getCupData(cupConfig(code));
+  const year = Number.parseInt(data.season, 10);
+  if (!Number.isFinite(year)) throw new Error(`${code}: no season`);
+  return {
+    code,
+    year,
+    teams: data.teams.map((t) => ({ id: t.id, name: t.name, shortName: t.shortName, tla: t.tla, ...(t.crest ? { crest: t.crest } : {}) })),
+    divisions: Object.fromEntries(Object.entries(data.divisions).flatMap(([id, league]) => (isDivision(league) ? [[Number(id), league]] : []))),
+    real: data.real.map((t): WorldCupTie => {
+      const last = t.legs.at(-1);
+      return {
+        round: t.round,
+        homeId: t.homeId,
+        awayId: t.awayId,
+        legs: t.legs.map((leg) => (leg.result ? [leg.result.home, leg.result.away] : null)),
+        ...(last?.penalties ? { penalties: [last.penalties.home, last.penalties.away] } : {}),
+      };
+    }),
+    entrants: data.entrants,
+  };
 }
