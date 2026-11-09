@@ -97,7 +97,7 @@ MLS club pages need ESPN's conference standings: they're retried, and the last o
 
 ### Odds snapshots
 
-After each completed round of each domestic league, every club's season chances (title, each place, relegation, expected position and points) are stored in `src/data/snapshots/<CODE>.json`, one line per round, by season. `.github/workflows/odds-snapshots.yml` runs `npm run snapshots` (`scripts/snapshot-odds.ts`) every six hours and commits any new snapshots to `main`; run it by hand from the Actions tab (Run workflow) or locally with `npm run snapshots` (`-- PL BSA` for some leagues, `-- --dry-run` to only print).
+After each completed round of each domestic league, every club's season chances (title, each place, relegation, expected position and points) are stored in `src/data/snapshots/<CODE>.json`, one line per round, by season. `.github/workflows/odds-snapshots.yml` runs `npm run snapshots` (`scripts/snapshot-odds.ts`) once a day (06:41 UTC, after the Americas' last games of the night) and commits any new snapshots to `main`: each commit deploys production, and each deployment starts Vercel's page cache afresh, so the job deploys at most once a day; run it by hand from the Actions tab (Run workflow) or locally with `npm run snapshots` (`-- PL BSA` for some leagues, `-- --dry-run` to only print).
 
 A round counts once it and every round before it are played (a game postponed far from its round's dates isn't waited for), and its snapshot is taken as of just after its last kick-off: later results are left out, so a late run records the same numbers. Rounds are taken in the order they were played and numbered by how many are complete (rounds are rebuilt from dates, and a few hold games scattered over months). A season's first run stores only the latest round; after that, every newly completed round. `npm run snapshots -- --backfill` also adds every earlier completed round not stored (split leagues whose groups are already known start at the split, so a snapshot never knows who went where); the current season was backfilled that way. `npm run snapshots -- ELC --rebuild` takes a league's stored rounds of the season again with today's engine, each as of its own moment (the Championship was rebuilt so with the rating-noise model). Each snapshot carries the model it was taken with (`modelVersion`, the `SIM_VERSION` then; none before the field: model "1"): the first report after a model change, the race chart and the projected table's round-by-round history label that step as a model update instead of showing it as movement.
 
@@ -219,7 +219,7 @@ with the 2026 seasons (2026/27 in Europe; Argentina from its Clausura), so last
 season, and the priors built from it, has none. `npm run xg` stores it per game
 in `src/data/xg/<CODE>.json` by ESPN game id, `null` where ESPN has none (never
 a 0), fetching only games not stored yet (two requests at a time, retries with
-backoff); the odds snapshots job runs it every six hours before the snapshots.
+backoff); the odds snapshots job runs it once a day before the snapshots.
 
 A league's ratings can rate attack and defence on `w × xG + (1 − w) × goals`
 for each game with xG (goals alone for the others), with

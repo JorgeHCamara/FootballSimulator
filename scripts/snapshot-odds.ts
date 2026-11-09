@@ -1,7 +1,7 @@
 // Odds snapshots: after each completed round of each domestic league, every
 // club's season chances (title, each place, relegation, expected position),
 // appended to src/data/snapshots/<CODE>.json. Run by .github/workflows/odds-snapshots.yml
-// every few hours, which commits the files; safe to run again (rounds already
+// once a day, which commits the files; safe to run again (rounds already
 // stored are skipped).
 //
 //   npm run snapshots                 every domestic league
