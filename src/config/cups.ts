@@ -93,6 +93,15 @@ export interface CupConfig {
   /** What the winner is champion of, for the champion box. */
   title: string;
   /**
+   * My World (src/lib/worldCups.ts): how many clubs of each feeder league enter,
+   * the strongest of each by last season's table (the Copa Argentina: every
+   * Liga Profesional club, the Primera Nacional's best 15), the other places
+   * going to clubs from below. Without it, every league club enters.
+   */
+  worldEntrants?: readonly number[];
+  /** No Past Winners page on the site (the Copa Argentina: its Past Winners are My World's only, for now). */
+  noPastWinnersPage?: true;
+  /**
    * Fixed bracket order of the round before the first `bracket` round: the
    * home club (feed team id) of each of its ties, top to bottom. Without it,
    * or when the clubs don't match (another season), the slot order is used.
@@ -349,6 +358,9 @@ export const CUPS: readonly CupConfig[] = [
     outsiderTier: 2.5,
     tagOutsiders: false,
     title: "Copa Argentina",
+    // My World: the Liga Profesional's 30, the Primera Nacional's best 15, 19 clubs from below.
+    worldEntrants: [30, 15],
+    noPastWinnersPage: true,
     // 2026 bracket, round of 64 top to bottom (ESPN's home club of each tie):
     // San Lorenzo v Deportivo Rincón … Boca Juniors v Gimnasia (Chivilcoy) |
     // River Plate v Ciudad de Bolívar … Huracán v Olimpo.

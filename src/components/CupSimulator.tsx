@@ -241,10 +241,12 @@ export function CupSimulator({ cup, data }: Props) {
           <button type="button" role="tab" aria-selected={tab === "chances"} className={tabButton(tab === "chances")} onClick={() => setTab("chances")}>
             {ts("chances")}
           </button>
-          {/* Its own page (every season's winner and runner-up); the simulator and its predictions stay as they are. */}
-          <Link href={`/${cup.slug}/past-winners`} role="tab" aria-selected={false} className={tabButton(false)} data-testid="past-winners-tab">
-            {pw("title")}
-          </Link>
+          {/* Its own page (every season's winner and runner-up); the simulator and its predictions stay as they are. Not for a cup whose Past Winners are My World's only (the Copa Argentina). */}
+          {!cup.noPastWinnersPage && (
+            <Link href={`/${cup.slug}/past-winners`} role="tab" aria-selected={false} className={tabButton(false)} data-testid="past-winners-tab">
+              {pw("title")}
+            </Link>
+          )}
         </div>
         <div className="flex flex-wrap gap-2" data-testid="actions">
           <button type="button" className={`${primaryButton} grow lg:grow-0`} onClick={simulateRound} disabled={round.drawn === "pending" || roundDecided}>

@@ -2740,10 +2740,10 @@ async function step(name, fn) {
       assert.equal(await p.locator('link[rel="alternate"][hreflang="pt-BR"]').getAttribute("href"), "https://footsimu.com/pt/my-world");
       // Set up: the countries (one card each, every one picked is played: England, Spain), League Two, a club, create.
       const countryCards = p.getByTestId("world-country");
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.picked, e.disabled])), [["ENG", "false", false], ["ESP", "false", false], ["GER", "false", false], ["ITA", "false", false], ["BRA", "false", false]]);
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England", "Spain", "Germany", "Italy", "Brazil"]);
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => [e.dataset.country, e.dataset.picked, e.disabled])), [["ENG", "false", false], ["ESP", "false", false], ["GER", "false", false], ["ITA", "false", false], ["BRA", "false", false], ["ARG", "false", false]]);
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.split("\n")[0])), ["England", "Spain", "Germany", "Italy", "Brazil", "Argentina"]);
       // Cards of the flag and the name alone, every one the same size.
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.trim())), ["England", "Spain", "Germany", "Italy", "Brazil"], "no description, only the name");
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.innerText.trim())), ["England", "Spain", "Germany", "Italy", "Brazil", "Argentina"], "no description, only the name");
       assert.equal((await countryCards.evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().height)))])).length, 1, "country cards the same height");
       assert.equal(await p.getByTestId("world-league").count(), 0, "no leagues until a country is picked");
       await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
@@ -2751,7 +2751,7 @@ async function step(name, fn) {
       await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
       assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["PL", "ELC", "EL1", "EL2", "PD", "SD"], "both: every league, England's first");
       await p.locator('[data-testid="world-country"][data-country="ESP"]').click();
-      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.dataset.picked)), ["true", "false", "false", "false", "false"], "Spain unpicked again");
+      assert.deepEqual(await countryCards.evaluateAll((els) => els.map((e) => e.dataset.picked)), ["true", "false", "false", "false", "false", "false"], "Spain unpicked again");
       assert.equal(await p.getByTestId("world-league").count(), 4);
       await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
       const clubs = p.getByTestId("world-club");
@@ -3393,6 +3393,82 @@ async function step(name, fn) {
       assert.equal(await p.locator('[data-testid="world-past-table"] [data-testid="world-row"]').count(), 20);
       assert.match(await p.getByTestId("world-past-final").innerText(), /^Play-off final: .+ \d+–\d+/);
       await p.close();
+    });
+
+    await step("My World with Argentina: the Liga Profesional's Apertura and Clausura in two zones with their play-offs and the annual table, the Primera Nacional's zones, final and Reducido, the Copa Argentina, two champions a season in Past Winners", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      await p.locator('[data-testid="world-country"][data-country="ARG"]').click();
+      assert.deepEqual(await p.getByTestId("world-league").evaluateAll((els) => els.map((e) => e.dataset.league)), ["ARG", "PN"]);
+      await p.locator('[data-testid="world-league"][data-league="ARG"]').click();
+      assert.equal(await p.getByTestId("world-club").count(), 30);
+      await p.getByTestId("world-club").nth(2).click();
+      assert.match(await p.getByTestId("world-summary").innerText(), /in the Liga Profesional, starting with the \d{4} season\. Your world plays Argentina\.$/);
+      await p.getByTestId("world-create").click();
+      await p.getByTestId("world").waitFor();
+      const year = Number(await p.getByTestId("world").getAttribute("data-year"));
+      assert.deepEqual(await p.locator('[data-testid="world-tabs"] [role="tab"]').allInnerTexts(), ["Liga Profesional", "Primera Nacional", "Copa Argentina"]);
+      assert.equal(await p.getByTestId("world-season-select").locator("option").first().innerText(), `${year} (this season)`, "a calendar-year season");
+      const left = async () => Object.fromEntries(await p.getByTestId("world-left").evaluateAll((els) => els.map((e) => [e.dataset.league, Number(e.dataset.left)])));
+      assert.deepEqual(Object.keys(await left()), ["ARG", "PN", "CAR"]);
+      // The Liga Profesional: the Apertura (played in the sample), the Clausura, the annual table; each zone's table.
+      await p.locator('[data-testid="world-tabs"] [data-league="ARG"]').click();
+      assert.deepEqual(await p.getByTestId("world-tournaments").locator("button").allInnerTexts(), ["Apertura", "Clausura", "Annual table"]);
+      assert.deepEqual(await p.getByTestId("world-table-title").allInnerTexts(), ["Zone A", "Zone B"]);
+      assert.deepEqual(await p.getByTestId("world-zone-table").evaluateAll((els) => els.map((e) => e.querySelectorAll('[data-testid="world-row"]').length)), [15, 15]);
+      const options = await p.getByTestId("world-fixtures").getByTestId("matchday-select").locator("option").allInnerTexts();
+      assert.equal(options.length, 17, "16 rounds and the play-off");
+      // The Apertura's play-off: its round of 16 across the zones, played to its champion.
+      await p.getByTestId("world-tournaments").locator('[data-stage="apertura"]').click();
+      assert.equal(await p.getByTestId("world-fixtures").getByTestId("matchday-select").inputValue(), "-1");
+      assert.match(await p.getByTestId("playoff").innerText(), /Round of 16/i);
+      await p.getByTestId("world-simulate-matchday").click();
+      await p.locator('[data-testid="world-zone-champion"][data-stage="apertura"]').waitFor();
+      assert.match(await p.getByTestId("playoff").innerText(), /wins the Apertura!/);
+      await p.getByTestId("world-tournaments").locator('[data-stage="annual"]').click();
+      assert.equal(await p.locator('[data-testid="world-annual-table"] [data-testid="world-row"]').count(), 30);
+      // The Primera Nacional: two zones of 18, the zone winners' final then the Reducido.
+      await p.locator('[data-testid="world-tabs"] [data-league="PN"]').click();
+      assert.deepEqual(await p.getByTestId("world-zone-table").evaluateAll((els) => els.map((e) => e.querySelectorAll('[data-testid="world-row"]').length)), [18, 18]);
+      for (const code of ["ARG", "PN", "CAR"]) {
+        await p.locator(`[data-testid="world-left"][data-league="${code}"]`).click();
+        await p.getByTestId("world-simulate-rest").click();
+        await p.locator(`[data-testid="world-left"][data-league="${code}"][data-left="0"]`).waitFor();
+      }
+      await p.locator('[data-testid="world-tabs"] [data-league="PN"]').click();
+      assert.match(await p.getByTestId("world-zone-champion").innerText(), /Primera Nacional: .+ champions and promoted; .+ won the Reducido and go up too\./);
+      await p.getByTestId("world-end-season").click();
+      await p.getByTestId("world-review").waitFor();
+      // Two champions in the Liga Profesional (its Apertura and Clausura), the Primera Nacional's, the cup's.
+      assert.deepEqual(
+        (await p.getByTestId("world-review-champion").allInnerTexts()).map((x) => x.split(":")[0]),
+        ["Liga Profesional · Apertura", "Liga Profesional · Clausura", "Primera Nacional"],
+      );
+      assert.equal(await p.locator('[data-testid="world-review-cup"][data-cup="CAR"]').count(), 1);
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="ARG"] li').count(), 4, "two each way");
+      assert.equal(await p.locator('[data-testid="world-moves"][data-upper="PN"] li').count(), 8, "four each way");
+      await p.getByTestId("world-start-season").click();
+      await p.getByTestId("world-tables").waitFor();
+      assert.deepEqual(await left(), { ARG: 480 + 30, PN: 648 + 22, CAR: 63 }, "a new season: both tournaments, the zones, the play-offs, the cup");
+      // Past Winners, in My World only: the Apertura's and the Clausura's champions, no real history yet.
+      await p.locator('[data-testid="world-tabs"] [data-league="ARG"]').click();
+      await p.getByTestId("world-past-winners").click();
+      const rows = p.locator('[data-testid="world-winners"] [data-testid="past-winners-row"]');
+      assert.equal(await rows.count(), 2);
+      assert.match(await rows.nth(0).innerText(), /Clausura/);
+      assert.match(await rows.nth(1).innerText(), /Apertura/);
+      await p.getByTestId("world-table-view").click();
+      // Last season: its tournaments rebuilt, each with its champion.
+      await p.getByTestId("world-season-select").selectOption(String(year));
+      assert.equal(await p.getByTestId("world-zone-champion").count(), 2);
+      await p.close();
+      // On the site, the Copa Argentina has no Past Winners page yet (My World's only).
+      const site = await browser.newPage();
+      await site.goto(`${BASE_URL}/en/copa-argentina`);
+      assert.equal(await site.getByTestId("past-winners-tab").count(), 0);
+      assert.equal((await site.goto(`${BASE_URL}/en/copa-argentina/past-winners`)).status(), 404);
+      await site.close();
     });
 
     await step("My World, every result your way, as on the league pages (no match previews): typed in, rolled, Simulate matchday, Undo, saved on reload, Reset, Simulate rest of season with the play-off, the games left counting down", async () => {
