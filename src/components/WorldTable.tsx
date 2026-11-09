@@ -6,7 +6,7 @@ import type { TeamId } from "../engine/types.ts";
 import { divisionConfig, divisionCountry, LOWER_LEAGUE, neighbours, type DivisionCode, type RowNote, type TableRow, type WorldClub } from "../lib/myWorld.ts";
 import { Icon, type IconName } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
-import { zoneHex } from "./zones.ts";
+import { ZONE_STYLES } from "./zones.ts";
 
 /** A saved row's note as an icon (its meaning in a label and the legend under the table). */
 const NOTE_ICONS: Record<Exclude<RowNote, "">, { icon: IconName; className: string }> = {
@@ -17,10 +17,13 @@ const NOTE_ICONS: Record<Exclude<RowNote, "">, { icon: IconName; className: stri
   R: { icon: "arrow-down", className: "text-red-600" },
 };
 
+const RELEGATION = new Set(["relegation", "relegationPlayoff"]);
+
 /**
  * A My World table: the season in progress (`final` false) or a saved final
  * table, with each club's outcome. Places are coloured as on the league's
- * own page; the visitor's club is highlighted; new clubs are labelled.
+ * own page (the whole row, with the legend under the table); the visitor's
+ * club is in bold with a bar on its left; new clubs are labelled.
  */
 export function WorldTable({
   rows,
@@ -31,6 +34,8 @@ export function WorldTable({
   testId,
   zones: ownZones,
   title,
+  qualified,
+  qualifiedNote,
 }: {
   rows: TableRow[];
   code: DivisionCode;
@@ -42,12 +47,26 @@ export function WorldTable({
   zones?: readonly Zone[];
   /** A heading above the table (Série C's "First stage", its groups). */
   title?: string;
+  /** Clubs already in the first place's competition by another route (Argentina's tournament champions): shown there, their places passed down. */
+  qualified?: ReadonlySet<TeamId>;
+  /** The note under the table explaining `qualified`. */
+  qualifiedNote?: string;
 }) {
   const t = useTranslations("World");
+  const tz = useTranslations("Zones");
   const zones = ownZones ?? divisionConfig(code).zones;
   // The country's bottom division: relegation is out of the pyramid, into the league below.
   const bottom = !neighbours(code).below;
   const zoneAt = (position: number) => zones.find((z) => position >= z.from && position <= z.to)?.kind;
+  // Clubs qualified by another route take the first place's colour; the others' places pass down past them (relegation keeps the real place).
+  const passed = qualified?.size ? new Map(rows.filter((r) => !qualified.has(r.clubId)).map((r, i) => [r.clubId, i + 1])) : undefined;
+  const zoneOf = (row: TableRow) => {
+    const real = zoneAt(row.position);
+    if (!passed || (real && RELEGATION.has(real))) return real;
+    if (qualified!.has(row.clubId)) return zones[0]?.kind;
+    return [zoneAt(passed.get(row.clubId)!)].find((z) => z && !RELEGATION.has(z));
+  };
+  const legend = [...new Set(zones.map((z) => z.kind))];
   const noteLabel = (note: RowNote) => (note === "R" && bottom ? t("notes.out", { league: t(`leagues.${LOWER_LEAGUE[divisionCountry(code)]}.the`) }) : note ? t(`notes.${note}`) : "");
   const used = final ? [...new Set(rows.map((r) => r.note).filter(Boolean))] : [];
   const cell = "px-1.5 py-2 text-right tabular-nums";
@@ -92,26 +111,34 @@ export function WorldTable({
           <tbody>
             {rows.map((row) => {
               const club = clubs[row.clubId]!;
-              const zone = zoneAt(row.position);
+              const zone = zoneOf(row);
+              const isQualified = qualified?.has(row.clubId) ?? false;
               const own = row.clubId === highlight;
               const note = final ? row.note : "";
               const icon = note ? NOTE_ICONS[note] : undefined;
               return (
                 <tr
                   key={row.clubId}
-                  className={`border-t border-zinc-100 dark:border-zinc-800 ${own ? "bg-pitch-50 font-semibold dark:bg-pitch-900/30" : ""}`}
+                  className={`border-t border-zinc-200/70 dark:border-zinc-800 ${zone ? ZONE_STYLES[zone].row : own ? "bg-pitch-50 dark:bg-pitch-900/30" : ""} ${own ? "font-semibold" : ""}`}
                   data-testid="world-row"
                   data-club={row.clubId}
+                  data-zone={zone ?? ""}
+                  {...(zone ? { title: tz(zone) } : {})}
                   {...(own ? { "aria-current": "true" as const } : {})}
                   {...(note ? { "data-note": note } : {})}
                 >
-                  <td className="py-2 pl-3 text-xs tabular-nums text-zinc-500" style={zone ? { boxShadow: `inset 3px 0 0 ${zoneHex(zone)}` } : undefined}>
+                  <td className="py-2 pl-3 text-xs font-semibold tabular-nums text-zinc-600 dark:text-zinc-300" style={own ? { boxShadow: "inset 3px 0 0 var(--color-pitch-600)" } : undefined}>
                     {row.position}
                   </td>
                   <td className="py-2 pl-1">
                     <span className="flex min-w-0 items-center gap-2">
                       <TeamBadge team={club} size={20} textless />
                       <span className="truncate">{club.name}</span>
+                      {isQualified && (
+                        <span className="shrink-0 text-yellow-500" title={qualifiedNote} aria-label={qualifiedNote} data-testid="world-qualified-tag">
+                          <Icon name="trophy" size={14} />
+                        </span>
+                      )}
                       {club.origin === "new" && (
                         <span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300" title={t("newClubHint")}>
                           {t("newClub")}
@@ -141,6 +168,21 @@ export function WorldTable({
           </tbody>
         </table>
       </div>
+      {legend.length > 0 && (
+        <ul data-testid="world-zone-legend" className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+          {legend.map((kind) => (
+            <li key={kind} className="flex items-center gap-1.5">
+              <span className={`h-3 w-3 rounded-sm ring-1 ring-zinc-300 dark:ring-zinc-600 ${ZONE_STYLES[kind].row}`} />
+              {tz(kind)}
+            </li>
+          ))}
+        </ul>
+      )}
+      {qualifiedNote && (
+        <p className="text-xs text-zinc-500" data-testid="world-qualified-note">
+          {qualifiedNote}
+        </p>
+      )}
       {final && used.length > 0 && (
         <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500" aria-hidden>
           {(["C", "P", "W", "O", "R"] as const)

@@ -88,6 +88,7 @@ export function ZoneColumns({
   onPlayoffStage: (stage: number) => void;
 }) {
   const t = useTranslations("World");
+  const ts = useTranslations("Simulator");
   const [annual, setAnnual] = useState(false);
   // One zone at a time, as on the league pages (the user's club's zone to begin with).
   const zoneSwitch = season.zones.length > 1;
@@ -114,6 +115,12 @@ export function ZoneColumns({
   };
   // The annual table's places in My World: the Libertadores and Sudamericana places, the bottom two down.
   const annualZones: Zone[] = [...(league.annual?.zones ?? []).filter((z) => z.kind !== "relegation"), { kind: "relegation", from: 29, to: 30 }];
+  // The Apertura's and the Clausura's champions are in the Libertadores whatever their place: theirs pass down, as on the league page.
+  const champions = season.stages.flatMap((s) => (s.champion !== null ? [{ id: s.champion, tournament: tournament(s) }] : []));
+  const qualified = new Set(champions.map((c) => c.id));
+  const qualifiedNote = champions.length
+    ? ts("annualQualifiedNote", { champions: champions.map((c) => ts("annualChampion", { club: world.clubs[c.id]?.name ?? "", tournament: c.tournament })).join(", ") })
+    : undefined;
   const button = (active: boolean) =>
     `min-h-8 rounded-md px-3 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-900" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300"}`;
   return (
@@ -152,7 +159,7 @@ export function ZoneColumns({
         )}
         </div>
         {annual && season.annual ? (
-          <WorldTable rows={tableRows(season.annual)} code={code} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-annual-table" zones={annualZones} title={t("zones.annual")} />
+          <WorldTable rows={tableRows(season.annual)} code={code} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-annual-table" zones={annualZones} title={t("zones.annual")} {...(qualified.size && league.annual?.championsQualify ? { qualified, ...(qualifiedNote ? { qualifiedNote } : {}) } : {})} />
         ) : (
           stage.tables.map((rows, z) =>
             zoneSwitch && z !== zone ? null : (
