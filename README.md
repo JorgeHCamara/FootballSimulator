@@ -368,6 +368,7 @@ results for 11–15 February 2023):
 | `src/app/[locale]/[league]/share/[code]/` | Share page (the predicted table, read-only) and its 1200×630 card (`opengraph-image`, `twitter-image`), drawn by `src/lib/shareCard.tsx` from `src/lib/scenario.ts` |
 | `src/config/leagues.ts` | Tiebreakers and qualification/relegation zones per league |
 | `src/i18n/`, `messages/` | Routing and translations (EN, PT, ES) |
+| `src/proxy.ts` | Language routing (next-intl): sends an address without a language (`/`, `/premier-league`) to its language's. Only those: on Vercel the proxy runs ahead of the cache, so addresses that already start with `/en`, `/pt` or `/es` skip it (every page sets its own language) |
 | `src/engine/` | Framework-free simulation engine (see below) |
 
 ### Simulation engine
