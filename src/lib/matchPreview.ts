@@ -45,8 +45,20 @@ const HOUR = 3_600_000;
 const MATCH_DAY_BEFORE = 6 * HOUR;
 /** …to this long after it, the game itself is checked every few minutes (see MATCH_DAY_REVALIDATE). */
 const MATCH_DAY_AFTER = 12 * HOUR;
-/** On match day, the game's state is refreshed this often (seconds), and so is its page. */
+/** Close to kick-off and after it, the game's state is refreshed this often (seconds), and so is its page. */
 export const MATCH_DAY_REVALIDATE = 600;
+/** Until this long before kick-off… */
+const CLOSE_TO_KICKOFF = HOUR;
+/** …only a postponement can change it: checked hourly (seconds). */
+export const EARLY_MATCH_DAY_REVALIDATE = 3600;
+
+/**
+ * How often a game's state is checked on match day (seconds), and so its page
+ * rebuilt: hourly until an hour before kick-off, then every 10 minutes. Match
+ * day still starts six hours before (isMatchDay): with the page's own six-hour
+ * revalidate, a page built before then is rebuilt by kick-off.
+ */
+export const matchDayRevalidate = (kickoff: string, now = Date.now()) => (Date.parse(kickoff) - now > CLOSE_TO_KICKOFF ? EARLY_MATCH_DAY_REVALIDATE : MATCH_DAY_REVALIDATE);
 
 /** Is it match day for a game (by its kick-off)? */
 export const isMatchDay = (kickoff: string, now = Date.now()) => {
@@ -112,7 +124,7 @@ export const locateMatch = cache(async (leagueSlug: string, slug: string): Promi
   let result = fixture.result;
   let state: MatchState = result ? "played" : "upcoming";
   if (!result && data.provider === "espn" && league.espn && isMatchDay(fixture.utcDate)) {
-    const live = await fetchEspnGameState(league.espn.slug, fixture.id, fixture.utcDate, MATCH_DAY_REVALIDATE).catch((error: unknown) => {
+    const live = await fetchEspnGameState(league.espn.slug, fixture.id, fixture.utcDate, matchDayRevalidate(fixture.utcDate)).catch((error: unknown) => {
       console.warn(`${league.code} ${fixture.id}: no match-day state:`, error);
       return null;
     });
