@@ -105,6 +105,36 @@ export const leagueDataKeepSeconds = (env: Record<string, string | undefined> = 
 
 const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 
+/** How long last season's data is kept: it doesn't change any more (a day, so a correction still comes in). */
+const PAST_SEASON_KEEP_SECONDS = 86400;
+
+/**
+ * The deployment: part of every kept league's key, so a deployment that
+ * changes how the feed is read never serves data read the old way (the data
+ * cache outlives deployments).
+ */
+export const DEPLOYMENT = process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMMIT_SHA ?? "local";
+
+/**
+ * A league's ESPN data, kept in the data cache as read (about 50–100 KB),
+ * not as ESPN sends it: a season's scoreboard is 4–6 MB, and Next's data
+ * cache keeps no fetch over 2 MB, so it was downloaded and read again on every
+ * render, and the copy /api/revalidate/leagues compares with was never a kept
+ * one. Inside the cached function ESPN's requests skip the data cache (Next
+ * treats them as no-store there). Tagged with the league's data tag, so the
+ * route expires it with the league's pages when new results are in. A load
+ * that fails isn't kept.
+ */
+async function keptEspn(league: LeagueConfig, years: readonly number[] | undefined, keepSeconds: number): Promise<LeagueData> {
+  const load = () => loadEspn(league, years);
+  try {
+    return await unstable_cache(load, ["league-data", league.code, years ? years.join(",") : "current", DEPLOYMENT], { tags: [`league:${league.code}`], revalidate: keepSeconds })();
+  } catch (error) {
+    if (noDataCache(error)) return load();
+    throw error;
+  }
+}
+
 const inflight = new Map<string, Promise<LeagueData>>();
 
 export function seasonLabel(season: Pick<ApiSeason, "startDate" | "endDate">): string {
@@ -163,8 +193,8 @@ async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh =
   const feed = league.espn;
   if (!feed) throw new Error(`${league.code} has no ESPN feed`);
   const { slug, seasons, weeklyRounds } = feed;
-  // `fresh`: straight from ESPN, past the data cache (see freshLeagueData). Otherwise kept for hours while
-  // /api/revalidate/leagues brings new results in, an hour without it (leagueDataKeepSeconds).
+  // `fresh`: straight from ESPN, past the data cache (see freshLeagueData). Otherwise called inside keptEspn,
+  // which keeps the data as read: Next makes these requests no-store there.
   const init: RequestInit = fresh ? { cache: "no-store" } : { next: { revalidate: leagueDataKeepSeconds(), tags: [`league:${league.code}`] } };
   const perTeam = gamesPerTeam(league);
   const current = currentSeasonYear(league);
@@ -284,7 +314,7 @@ export async function withRetry<T>(load: () => Promise<T>, delays: readonly numb
 }
 
 /** Outside a Next.js server or build (scripts, tests) there is no data cache. */
-const noDataCache = (error: unknown) => error instanceof Error && error.message.includes("incrementalCache missing");
+export const noDataCache = (error: unknown) => error instanceof Error && error.message.includes("incrementalCache missing");
 
 /**
  * The league's groups (MLS conferences: its pages need them), retried, and kept
@@ -418,7 +448,8 @@ const pastInflight = new Map<string, Promise<LeagueData | undefined>>();
 /**
  * An earlier season of a league from ESPN (match pages of last season's
  * games, after the new season has taken over), or undefined when it can't be
- * loaded (or with sample data). Cached like the current season's.
+ * loaded (or with sample data). Kept like the current season's (keptEspn), a
+ * day at a time.
  */
 export function getPastSeasonData(league: LeagueConfig, year: number): Promise<LeagueData | undefined> {
   // A first-party league has only its committed season (no feed to ask for another).
@@ -426,7 +457,7 @@ export function getPastSeasonData(league: LeagueConfig, year: number): Promise<L
   const key = `${league.code}:${year}`;
   const pending = pastInflight.get(key);
   if (pending) return pending;
-  const promise = loadEspn(league, [year]).then(
+  const promise = keptEspn(league, [year], PAST_SEASON_KEEP_SECONDS).then(
     (data) => ({ ...data, teams: withClubPages(league, data.teams) }),
     (error: unknown) => {
       console.warn(`${league.code}: no ${year} season on ESPN:`, error);
@@ -445,7 +476,7 @@ async function loadLeagueData(league: LeagueConfig): Promise<LeagueData> {
   if (league.firstParty) return firstPartyData(league);
   if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return loadSample(league);
 
-  const sources: { name: string; load: () => Promise<LeagueData> }[] = [{ name: "ESPN", load: () => loadEspn(league) }];
+  const sources: { name: string; load: () => Promise<LeagueData> }[] = [{ name: "ESPN", load: () => keptEspn(league, undefined, leagueDataKeepSeconds()) }];
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
   if (apiKey && !league.espnOnly) sources.push({ name: "football-data.org", load: () => loadLive(league, apiKey) });
 
