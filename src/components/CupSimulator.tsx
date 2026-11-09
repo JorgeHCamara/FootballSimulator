@@ -70,8 +70,9 @@ export function CupSimulator({ cup, data }: Props) {
     [cup, data.divisions, data.teams],
   );
   const buildOptions = useMemo<CupBuildOptions>(
-    () => ({ entrants: data.entrants, drawSalt: season.drawSalt ?? 0, roundDates: data.roundDates, tiers }),
-    [data.entrants, data.roundDates, season.drawSalt],
+    // Fair draws (every pairing as likely), unless a link shared before them is open: its old draw, so its scores stay on their ties.
+    () => ({ entrants: data.entrants, drawSalt: season.drawSalt ?? 0, roundDates: data.roundDates, tiers, ...(season.oldDraw ? {} : { fairDraw: true }) }),
+    [data.entrants, data.roundDates, season.drawSalt, season.oldDraw],
   );
   const rounds = useMemo(() => buildCup(cup, data.real, season.predictions, buildOptions), [cup, data.real, season.predictions, buildOptions]);
   const allClubs = useMemo(
@@ -124,12 +125,15 @@ export function CupSimulator({ cup, data }: Props) {
       if (shared !== null) {
         const decoded = decodeResults(slotFixtures, shared);
         const drawSalt = Number(url.searchParams.get("d") ?? 0) || 0;
+        // Links shared since the fair draw say so (f=1); an older one is opened with the draw it was made with.
+        const oldDraw = url.searchParams.get("f") !== "1";
         if (decoded) {
-          replace(seasonKey, realFixtures, decoded, { drawSalt });
+          replace(seasonKey, realFixtures, decoded, { drawSalt, oldDraw });
           setNotice(ts("sharedLoaded"));
         }
         url.searchParams.delete("r");
         url.searchParams.delete("d");
+        url.searchParams.delete("f");
         window.history.replaceState(null, "", url);
       } else {
         const removed = reconcile(seasonKey, realFixtures);
@@ -178,6 +182,8 @@ export function CupSimulator({ cup, data }: Props) {
     url.searchParams.set("r", encodeResults(slotFixtures, season.predictions));
     if (season.drawSalt) url.searchParams.set("d", String(season.drawSalt));
     else url.searchParams.delete("d");
+    if (season.oldDraw) url.searchParams.delete("f");
+    else url.searchParams.set("f", "1");
     try {
       await navigator.clipboard.writeText(url.toString());
     } catch {

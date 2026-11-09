@@ -727,11 +727,26 @@ async function step(name, fn) {
         return copied;
       });
       assert.match(shareUrl, /[?&]r=/);
+      assert.match(shareUrl, /[?&]f=1/, "drawn fairly, and the link says so");
       const fresh = await (await browser.newContext()).newPage();
       await fresh.goto(shareUrl);
       await fresh.locator('[data-testid="champion-team"]').waitFor();
       assert.equal(await fresh.locator('[data-testid="champion-team"]').innerText(), await p.locator('[data-testid="champion-team"]').innerText());
       await fresh.context().close();
+      // A link from before the fair draw (no f=1) opens with the draw it was made with, and passes it on when shared again.
+      const old = await (await browser.newContext()).newPage();
+      await old.goto(shareUrl.replace(/[?&]f=1/, ""));
+      await old.locator('[data-testid="round-bar"]').waitFor();
+      const reshared = await old.evaluate(async () => {
+        let copied = "";
+        navigator.clipboard.writeText = async (text) => { copied = text; };
+        document.querySelector('[data-testid="actions"] button:last-child').click();
+        await new Promise((r) => setTimeout(r, 50));
+        return copied;
+      });
+      assert.match(reshared, /[?&]r=/);
+      assert.doesNotMatch(reshared, /[?&]f=1/);
+      await old.context().close();
 
       // Chances: every club still in (per the real results), win chances add up to about 100%.
       await p.getByRole("button", { name: "Reset" }).click();
