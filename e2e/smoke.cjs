@@ -3445,6 +3445,19 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("playoff").innerText(), /wins the Apertura!/);
       await p.getByTestId("world-tournaments").locator('[data-stage="annual"]').click();
       assert.equal(await p.locator('[data-testid="world-annual-table"] [data-testid="world-row"]').count(), 30);
+      // The Apertura's champion is in the Libertadores whatever its place: its row in that colour with a trophy, the places passing down (four in all), as on the league page.
+      const annualRows = p.locator('[data-testid="world-annual-table"] [data-testid="world-row"]');
+      const zonesOf = () => annualRows.evaluateAll((els) => els.map((e) => e.dataset.zone));
+      assert.equal(await p.getByTestId("world-qualified-tag").count(), 1);
+      assert.equal(await annualRows.filter({ has: p.getByTestId("world-qualified-tag") }).getAttribute("data-zone"), "libertadores");
+      const annualZones = await zonesOf();
+      assert.equal(annualZones.filter((z) => z === "libertadores").length, 4);
+      assert.equal(annualZones.filter((z) => z === "sudamericana").length, 6);
+      assert.deepEqual(annualZones.slice(28), ["relegation", "relegation"]);
+      assert.match(await p.getByTestId("world-qualified-note").innerText(), /Already in the Copa Libertadores as tournament champion: .+ \(Apertura champion\)/);
+      // Whole rows in their place's colour, with the legend, as on the league pages.
+      assert.match(await annualRows.first().getAttribute("class"), /bg-blue-100/);
+      assert.deepEqual(await p.getByTestId("world-zone-legend").locator("li").allInnerTexts(), ["Libertadores", "Sudamericana", "Relegation"]);
       // The Primera Nacional: two zones of 18, the zone winners' final then the Reducido.
       await p.locator('[data-testid="world-tabs"] [data-league="PN"]').click();
       // Its zone switch too: one zone of 18 at a time.

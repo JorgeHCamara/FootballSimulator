@@ -53,7 +53,7 @@ export default async function Page({ params }: { params: Params }) {
       <WorldHero />
       {/* The game's own words, the league simulator's (its fixtures and dice) and the cups': the rest of the site's client messages aren't needed inside it. */}
       <div id={PLAY_ANCHOR} className="scroll-mt-4">
-        <NextIntlClientProvider locale={locale} messages={{ World: messages.World, Simulator: messages.Simulator, PastWinners: messages.PastWinners, Cup: messages.Cup }}>
+        <NextIntlClientProvider locale={locale} messages={{ World: messages.World, Simulator: messages.Simulator, PastWinners: messages.PastWinners, Cup: messages.Cup, Zones: messages.Zones }}>
           <PastWinnersProvider value={realWinners}>
             <MyWorld pack={pack} locale={langOf(locale)} />
           </PastWinnersProvider>
