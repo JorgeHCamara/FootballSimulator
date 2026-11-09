@@ -185,6 +185,7 @@ function PastSeason({ world, year, code }: { world: World; year: number; code: D
     return (
       <ZoneColumns
         world={world}
+        year={year}
         code={code}
         season={past.zones}
         fixtures={past.fixtures}
@@ -396,6 +397,7 @@ export function WorldSeason({
   const zoneColumns = state.zones ? (
     <ZoneColumns
       world={world}
+      year={world.year}
       code={code}
       season={state.zones}
       fixtures={state.fixtures}

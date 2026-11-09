@@ -3415,8 +3415,20 @@ async function step(name, fn) {
       // The Liga Profesional: the Apertura (played in the sample), the Clausura, the annual table; each zone's table.
       await p.locator('[data-testid="world-tabs"] [data-league="ARG"]').click();
       assert.deepEqual(await p.getByTestId("world-tournaments").locator("button").allInnerTexts(), ["Apertura", "Clausura", "Annual table"]);
-      assert.deepEqual(await p.getByTestId("world-table-title").allInnerTexts(), ["Zone A", "Zone B"]);
-      assert.deepEqual(await p.getByTestId("world-zone-table").evaluateAll((els) => els.map((e) => e.querySelectorAll('[data-testid="world-row"]').length)), [15, 15]);
+      // One zone at a time, as on the league page: the user's club's zone first, the switch for the other.
+      const zoneSwitch = p.getByTestId("world-zone-switch").locator("button");
+      assert.deepEqual(await zoneSwitch.allInnerTexts(), ["Zone A", "Zone B"]);
+      assert.equal(await p.getByTestId("world-table-title").count(), 0, "the switch names the zone");
+      const zoneRows = () => p.getByTestId("world-zone-table").evaluateAll((els) => els.map((e) => [...e.querySelectorAll('[data-testid="world-row"]')].map((r) => r.innerText)));
+      const mine = await zoneSwitch.evaluateAll((els) => els.findIndex((e) => e.getAttribute("aria-pressed") === "true"));
+      const shownFirst = await zoneRows();
+      assert.equal(shownFirst.length, 1);
+      assert.equal(shownFirst[0].length, 15);
+      await zoneSwitch.nth(1 - mine).click();
+      assert.equal(await zoneSwitch.nth(1 - mine).getAttribute("aria-pressed"), "true");
+      const other = await zoneRows();
+      assert.equal(other[0].length, 15);
+      assert.notDeepEqual(other[0], shownFirst[0], "the other zone's clubs");
       const options = await p.getByTestId("world-fixtures").getByTestId("matchday-select").locator("option").allInnerTexts();
       assert.equal(options.length, 17, "16 rounds and the play-off");
       // The Apertura's play-off: its round of 16 across the zones, played to its champion.
@@ -3431,13 +3443,17 @@ async function step(name, fn) {
       // The Primera Nacional: two zones of 18, the zone winners' final then the Reducido.
       await p.locator('[data-testid="world-tabs"] [data-league="PN"]').click();
       assert.deepEqual(await p.getByTestId("world-zone-table").evaluateAll((els) => els.map((e) => e.querySelectorAll('[data-testid="world-row"]').length)), [18, 18]);
+      // Its promoted clubs as the other leagues' card: pending until the final and the Reducido are played.
+      assert.match(await p.getByTestId("promoted").innerText(), /Promoted to Liga Profesional/i);
+      assert.equal(await p.getByTestId("promoted-team").count(), 0);
       for (const code of ["ARG", "PN", "CAR"]) {
         await p.locator(`[data-testid="world-left"][data-league="${code}"]`).click();
         await p.getByTestId("world-simulate-rest").click();
         await p.locator(`[data-testid="world-left"][data-league="${code}"][data-left="0"]`).waitFor();
       }
       await p.locator('[data-testid="world-tabs"] [data-league="PN"]').click();
-      assert.match(await p.getByTestId("world-zone-champion").innerText(), /Primera Nacional: .+ champions and promoted; .+ won the Reducido and go up too\./);
+      assert.equal(await p.getByTestId("world-zone-champion").count(), 0, "the card, not a line");
+      assert.deepEqual(await p.getByTestId("promoted-team").evaluateAll((els) => els.map((e) => e.innerText.split("\n").at(-1).trim())), ["Champion", "Play-off winner"]);
       await p.getByTestId("world-end-season").click();
       await p.getByTestId("world-review").waitFor();
       // Two champions in the Liga Profesional (its Apertura and Clausura), the Primera Nacional's, the cup's.
