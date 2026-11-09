@@ -8,8 +8,13 @@ import type { QuizQuestion } from "../../../lib/quiz.ts";
 import { todaysQuiz } from "../../../lib/quizPage.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
 
-/** A new set every day (UTC): rebuilt within a quarter of an hour of midnight, and as the live chances move. */
-export const revalidate = 900;
+/**
+ * A new set every day (UTC): rebuilt hourly, so within an hour of midnight,
+ * and as the live chances move (from the leagues' data, kept as the club
+ * pages'). Hourly, not every few minutes: each rebuild reads the day's leagues
+ * and outlooks, and the page says only that a new set comes every day.
+ */
+export const revalidate = 3600;
 /** Room for the day's two live outlooks on a cold server (they're shared with the club pages). */
 export const maxDuration = 60;
 
