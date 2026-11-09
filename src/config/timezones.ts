@@ -33,6 +33,7 @@ export const LEAGUE_TIME_ZONES: Partial<Record<CompetitionCode, string>> = {
   ARG: "America/Argentina/Buenos_Aires",
   CHI: "America/Santiago",
   COL: "America/Bogota",
+  COLB: "America/Bogota",
   URU: "America/Montevideo",
   PAR: "America/Asuncion",
   MX: "America/Mexico_City",

@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "test": "node --test \"src/**/*.test.ts\" \"scripts/**/*.test.ts\"",
-    "test:e2e": "node e2e/smoke.cjs && node e2e/serie-c.cjs",
+    "test:e2e": "node e2e/smoke.cjs && node e2e/serie-c.cjs && node e2e/primera-b.cjs",
     "typecheck": "tsc --noEmit",
     "priors": "NODE_USE_ENV_PROXY=1 node scripts/build-priors.ts",
     "backtest": "NODE_USE_ENV_PROXY=1 node scripts/backtest.ts",
@@ -22,7 +22,8 @@
     "world:seasons": "NODE_USE_ENV_PROXY=1 node scripts/my-world-seasons.ts",
     "history": "NODE_USE_ENV_PROXY=1 node scripts/build-history.ts",
     "xg": "NODE_USE_ENV_PROXY=1 node scripts/fetch-xg.ts",
-    "crests:backgrounds": "NODE_USE_ENV_PROXY=1 node scripts/crest-backgrounds.ts"
+    "crests:backgrounds": "NODE_USE_ENV_PROXY=1 node scripts/crest-backgrounds.ts",
+    "data:primera-b": "NODE_USE_ENV_PROXY=1 node scripts/import-primera-b.ts"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

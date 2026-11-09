@@ -5,9 +5,10 @@ import { useMemo, useState } from "react";
 import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
 import type { MatchParams, TeamStrength } from "../engine/ratings.ts";
 import type { Team, TeamId } from "../engine/types.ts";
-import type { Tournament } from "../lib/leagueData.ts";
+import type { LeagueData, Tournament } from "../lib/leagueData.ts";
 import { LeagueSimulator } from "./LeagueSimulator.tsx";
-import { annualFixtures, tournamentChampion, tournamentConfig } from "../lib/tournaments.ts";
+import { PromotionPathCard } from "./PromotionPathCard.tsx";
+import { annualFixtures, tournamentChampion, tournamentConfig, tournamentStages } from "../lib/tournaments.ts";
 
 export { tournamentChampion, tournamentConfig };
 
@@ -27,6 +28,9 @@ interface Props {
   deductions?: Record<number, number>;
   /** The league's Past Winners page, a third tab in each simulator (see LeagueSimulator). */
   pastWinners?: { href: string; label: string };
+  /** Promotion by the champions and the annual table (Primera B): the season's year, and its real grand final and play-off games. */
+  seasonYear?: number;
+  promotionGames?: LeagueData["promotionGames"];
 }
 
 /**
@@ -36,14 +40,11 @@ interface Props {
  * (and in some leagues relegation). The annual table shares the current
  * tournament's predictions.
  */
-export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths, deductions, matchParams, pastWinners }: Props) {
+export function TournamentSwitch({ league, teams, tournaments, current, groups, priorStrengths, deductions, matchParams, pastWinners, seasonYear, promotionGames }: Props) {
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const [view, setView] = useState<string>(current);
-  const stages = useMemo(
-    () => (league.espn?.stages && !("table" in league.espn.stages) ? league.espn.stages : []),
-    [league.espn?.stages],
-  );
+  const stages = useMemo(() => tournamentStages(league), [league]);
   const configOf = (tournament: Tournament) => tournamentConfig(league, stages.find((s) => s.table === tournament.id));
   // Oldest first in the switch, then the annual table.
   const ordered = useMemo(() => [...tournaments].reverse(), [tournaments]);
@@ -60,6 +61,7 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
       zones: league.annual.zones,
       gamesPerTeam: Math.round(fixtures.length * 2 / Math.max(1, new Set(fixtures.flatMap((f) => [f.homeId, f.awayId])).size)),
       groups: undefined,
+      split: undefined,
       playoff: undefined,
     };
     const champions = league.annual.championsQualify
@@ -132,6 +134,17 @@ export function TournamentSwitch({ league, teams, tournaments, current, groups, 
           {...(pastWinners ? { pastWinners } : {})}
           {...(notes.length ? { qualifiedNote: notes.join(" ") } : {})}
           {...(deductions ? { deductions } : {})}
+        />
+      )}
+      {league.promotionPath && seasonYear !== undefined && (
+        <PromotionPathCard
+          league={{ ...league, promotionPath: league.promotionPath }}
+          teams={teams}
+          tournaments={tournaments}
+          year={seasonYear}
+          {...(promotionGames ? { promotionGames } : {})}
+          {...(priorStrengths ? { priorStrengths } : {})}
+          {...(matchParams ? { matchParams } : {})}
         />
       )}
     </div>

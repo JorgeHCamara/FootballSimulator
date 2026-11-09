@@ -17,6 +17,7 @@
     "leagueDescriptionAmericas": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela ao vivo e as chances de título, Libertadores e rebaixamento.",
     "zonesDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja as duas zonas ao vivo e jogue os playoffs até a final, com as chances de cada clube de chegar aos playoffs e de ser campeão.",
     "stagesDescription": "{simulator} grátis da temporada {season} ({aka}). Jogue de novo a primeira fase, os grupos do acesso e a final, mude qualquer resultado e veja quem sobe, quem é campeão e quem cai.",
+    "promotionPathDescription": "{simulator} grátis para a temporada {season} ({aka}). Jogue de novo os dois torneios (turno único, quadrangulares e final), a reclassificação e o caminho do acesso: veja quem sobe para a Primera A, direto ou pela grande final e a repescagem.",
     "tournamentsDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule cada torneio do ano, jogue os playoffs quando houver e veja a tabela anual com as vagas na Libertadores e na Sul-Americana.",
     "liguillaDescription": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela ao vivo e jogue a Liguilla até a final, com as chances de cada clube de chegar à Liguilla e de ser campeão.",
     "leagueDescriptionAsia": "{simulator} {season} grátis ({aka}). Dê seus palpites ou simule os jogos restantes, veja a tabela ao vivo e as chances de título, Liga dos Campeões da AFC e rebaixamento.",
@@ -92,7 +93,7 @@
     "share": "Compartilhar",
     "linkCopied": "Link copiado",
     "liveSource": "Jogos e resultados reais, atualizados a cada hora",
-    "firstPartySource": "Resultados oficiais da CBF, guardados no Foot Simu",
+    "firstPartySource": {"BSC": "Resultados oficiais da CBF, guardados no Foot Simu", "COLB": "Resultados e jogos do Torneo BetPlay da Dimayor, compilados do artigo da temporada na Wikipédia em espanhol e guardados no Foot Simu (atualizados à mão)"},
     "editResult": "Alterar este resultado",
     "position": "#",
     "team": "Time",
@@ -178,6 +179,7 @@
     "annualNotes": {
       "ARG": "O campeão da Copa Argentina também se classifica, e o último da tabela de médias de três temporadas também é rebaixado (não mostrado).",
       "COL": "O campeão da Copa BetPlay também vai à Sul-Americana. O rebaixamento é definido pela tabela de médias (não mostrada).",
+      "COLB": "Ninguém é rebaixado: não há terceira divisão. Os dois primeiros da reclassificação sobem com os campeões dos torneios, ou disputam a segunda vaga (veja o caminho do acesso).",
       "URU": "Aproximado: o campeão e o vice uruguaios, definidos no playoff entre os campeões de torneio, também vão à Libertadores, e o regulamento oficial pode ser diferente. O rebaixamento é definido pela tabela de médias (não mostrada).",
       "PAR": "As vagas seguem a distribuição habitual; o regulamento oficial desta temporada pode ser diferente. O rebaixamento é definido pela tabela de médias (não mostrada).",
       "PER": "Aproximado: as vagas na Libertadores são definidas num playoff entre os campeões de torneio e os mais bem colocados, e o regulamento oficial pode ser diferente. Os pontos descontados são os da classificação atual da ESPN."
@@ -241,7 +243,10 @@
     "aclEliteQualifying": "Fase preliminar da ACL Elite",
     "aclTwo": "Liga dos Campeões da AFC Two",
     "gulfClub": "Liga dos Campeões do Golfo",
-    "promotionFinal": "Final: título e acesso"
+    "promotionFinal": "Final: título e acesso",
+    "semifinalGroups": "Quadrangulares",
+    "tournamentFinal": "Final",
+    "promotionContention": "Dois primeiros: acesso ou repescagem"
   },
   "Footer": {
     "attribution": "Dados: football-data.org",
@@ -285,8 +290,10 @@
     "step3Americas": "Abra a aba Chances para ver as chances de cada time de título, Libertadores e rebaixamento.",
     "introZones": "Use o {simulator} para prever o resto do {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: as tabelas das duas zonas são atualizadas na hora com os critérios oficiais. Os 8 primeiros de cada zona vão aos playoffs, cruzando as zonas (1º da Zona A x 8º da Zona B…) em jogos únicos até a final. Alterne entre o Apertura, o Clausura e a tabela anual, que define as vagas continentais e o rebaixamento.",
     "introStages": "Use o {simulator} para jogar de novo o {league} {season} ({aka}). Todo resultado real pode ser mudado: a tabela da primeira fase, os dois grupos do acesso (os 2 primeiros de cada grupo sobem) e a final em ida e volta se atualizam na hora, com os critérios de desempate oficiais. Mude quem termina onde e os grupos e a final mudam junto.",
+    "introPromotionPath": "Use o {simulator} para jogar de novo a temporada {season} da {league} ({aka}). Cada um dos dois torneios tem um turno único, dois quadrangulares e uma final em ida e volta, e a reclassificação soma todos os jogos: mude qualquer resultado e veja quem vence cada torneio, quem fica entre os dois primeiros da reclassificação e quem sobe para a Primera A, direto ou pela grande final e a repescagem.",
     "step3Zones": "Abra a aba Chances para ver as chances de cada clube de terminar em primeiro na zona, de chegar aos playoffs e de ser campeão.",
     "step3Stages": "Abra a aba Chances para ver as chances de cada clube no seu grupo do acesso e de ganhar a final.",
+    "step3PromotionPath": "Abaixo das tabelas, o caminho do acesso mostra o campeão de cada torneio, quem sobe e a chance de acesso de cada clube, com os seus palpites.",
     "introTournaments": "Use o {simulator} para prever o resto do {league} {season} ({aka}). O ano tem vários torneios, cada um com sua tabela e seu campeão: alterne entre eles e a tabela anual, que soma todos e define as vagas na Libertadores e na Sul-Americana. Digite seus placares ou simule os jogos restantes, e as tabelas são atualizadas na hora.",
     "step3Tournaments": "Abra a aba Chances para ver as chances de cada clube de ganhar o torneio e, na tabela anual, de ir à Libertadores e à Sul-Americana.",
     "introLiguilla": "Use o {simulator} para prever o resto da {league} {season} ({aka}). Digite seus placares ou simule os jogos restantes: a tabela é atualizada na hora com os critérios oficiais. Os 8 primeiros vão à Liguilla, disputada em ida e volta até a final.",
@@ -515,6 +522,32 @@
         "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
       }
     ],
+    "promotionPath": [
+      {
+        "q": "Como funciona o {simulator}?",
+        "a": "Ele parte dos resultados e jogos reais da {league} {season}, nos dois torneios. Digite um placar para qualquer jogo que falta ou aperte Simular: cada resultado é sorteado a partir do ataque e da defesa que cada time mostrou na temporada, com o fator casa, e as tabelas, os grupos e a final se atualizam na hora."
+      },
+      {
+        "q": "Como funciona um torneio da {league}?",
+        "a": "Cada clube enfrenta todos os outros uma vez (15 jogos). Os 8 primeiros vão para dois quadrangulares: o 1º e o 2º são cabeças de chave e os outros seis são sorteados. Cada grupo é jogado em ida e volta, começando do zero, e no empate em pontos o cabeça de chave se classifica. Os vencedores dos grupos decidem o torneio numa final em ida e volta."
+      },
+      {
+        "q": "Quem sobe para a Primera A?",
+        "a": "Dois clubes. Se um clube vence os dois torneios, ele sobe, e os dois seguintes da reclassificação disputam a segunda vaga na repescagem. Dois campeões diferentes sobem ambos se estiverem entre os dois primeiros da reclassificação; se só um estiver, ele sobe e o outro disputa a repescagem contra o melhor colocado entre os demais; se nenhum estiver, eles fazem uma grande final: o vencedor sobe e o perdedor disputa a repescagem contra o líder da reclassificação."
+      },
+      {
+        "q": "Há rebaixamento?",
+        "a": "Não: a {league} é a última divisão profissional da Colômbia."
+      },
+      {
+        "q": "Como as chances são calculadas?",
+        "a": "A aba Chances joga o resto do torneio 10.000 vezes a partir dos resultados atuais, com os seus palpites. O quadro do acesso joga o resto da temporada, com a grande final e a repescagem, e conta quantas vezes cada clube sobe."
+      },
+      {
+        "q": "O FootSimu é grátis?",
+        "a": "Sim. O FootSimu é totalmente grátis e não precisa de conta."
+      }
+    ],
     "liguilla": [
       {
         "q": "Como funciona o {simulator}?",
@@ -711,6 +744,8 @@
     "carryHalved": " (nos {group}, com metade deles, arredondada para cima)",
     "splitPlaced": "Depois de {round} rodadas os {count} primeiros vão para dois grupos ({groups}), cada um uma nova tabela com os seus próprios jogos, em ida e volta, começando do zero. Para os outros clubes a temporada acaba.",
     "placesList": "{list}: {group}",
+    "splitDrawn": "{perTournament, select, yes {Em cada torneio, depois de} other {Depois de}} {round} rodadas os {count} primeiros vão para {groupCount, plural, =2 {dois} other {#}} grupos ({groups}): os {heads} primeiros são cabeças de chave, um em cada, e os outros são sorteados. Cada grupo é uma nova tabela com os seus próprios jogos, em ida e volta, começando do zero, em que o cabeça de chave leva vantagem no empate em pontos. Os vencedores dos grupos decidem o título numa final em ida e volta.",
+    "promotionPath": "Dois clubes sobem para a {league}. Um clube que vence os dois torneios sobe, e os dois seguintes da reclassificação disputam a segunda vaga numa repescagem. Dois campeões diferentes sobem ambos se estiverem entre os dois primeiros da reclassificação; se só um estiver, ele sobe e o outro disputa a repescagem contra o melhor colocado entre os demais; se nenhum estiver, eles fazem uma grande final: o vencedor sobe e o perdedor disputa a repescagem contra o líder da reclassificação. A grande final e a repescagem são em ida e volta, com o mais bem colocado mandante no segundo jogo; empate no agregado, pênaltis.",
     "splitHalves": "Depois de {round} rodadas a tabela se divide entre os {top} primeiros e os {bottom} últimos, que se enfrentam mais uma vez; os clubes não mudam de metade, sejam quais forem os pontos.",
     "tables": "Os clubes estão divididos em {count, plural, =2 {duas} other {#}} tabelas: {names}.",
     "titlePlayoff": "Um mata-mata depois da fase de classificação decide o campeão.",
@@ -1611,5 +1646,23 @@
       "secondPending": "Os dois quadrangulares da 2ª fase (1º, 4º, 5º e 8º; 2º, 3º, 6º e 7º) saem da tabela da 1ª fase quando ela terminar.",
       "secondPendingGroups": "Os quatro primeiros de cada grupo jogam um quadrangular de acesso quando a 1ª fase terminar."
     }
+  },
+  "Promotion": {
+    "title": "Acesso à {league} {year}",
+    "champion": "Campeão do {tournament}",
+    "undecided": "A definir",
+    "pathPending": "Quando os dois campeões e a reclassificação estiverem definidos (resultados reais e os seus palpites), o caminho segue deles: quem sobe direto, e quem joga a grande final ou a repescagem.",
+    "doubleChampion": "{champion} vence os dois torneios e sobe. A segunda vaga é decidida numa repescagem entre os dois seguintes da reclassificação: {a} x {b}.",
+    "bothTop": "Os dois campeões estão entre os dois primeiros da reclassificação: {a} e {b} sobem.",
+    "oneTop": "{up} sobe como campeão entre os dois primeiros da reclassificação. A segunda vaga é decidida numa repescagem: {a} x {b}.",
+    "neitherTop": "Nenhum campeão está entre os dois primeiros da reclassificação: eles fazem a grande final, {a} x {b}. O vencedor sobe; o perdedor disputa a segunda vaga na repescagem contra {c}.",
+    "chancesTitle": "Chances de acesso",
+    "club": "Clube",
+    "promotion": "Acesso",
+    "tournamentTitle": "Vence o {tournament}",
+    "grandFinal": "Grande final",
+    "playoff": "Repescagem",
+    "simulating": "Simulando o resto da temporada…",
+    "note": "O resto da temporada jogado 1.500 vezes, com os seus palpites: cada torneio, a reclassificação, e a grande final e a repescagem quando acontecem."
   }
 }

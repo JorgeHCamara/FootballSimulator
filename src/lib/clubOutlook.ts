@@ -12,6 +12,10 @@ import { domesticModelOptions } from "./priors.ts";
 import { SCENARIO_ITERATIONS, SCENARIO_SEED, scenarioSimulation } from "./scenario.ts";
 import { seasonRatingNoise } from "./seasonNoise.ts";
 import { annualFixtures, tournamentChampion, tournamentConfig, tournamentStages } from "./tournaments.ts";
+import { simulatePromotion } from "./promotionSeason.ts";
+
+/** Seasons simulated for promotion by the champions and the annual table (Primera B): as many as the table's, a few seconds of a server's time. */
+const PROMOTION_ITERATIONS = SCENARIO_ITERATIONS;
 
 /** A place a club can finish in, with its chance (ranges of the same kind merged: Greece's two Conference League places). */
 export interface ZoneChance {
@@ -166,8 +170,12 @@ export function featuredChances(club: Pick<ClubOutlook, "headline" | "zones">, m
   const empty = club.headline.filter((h) => h.chance <= 0);
   const picked = [...club.headline.filter((h) => h.chance > 0), ...others, ...empty.filter((h) => h.kind !== "title"), ...empty.filter((h) => h.kind === "title")].slice(0, max);
   const order = [...club.headline, ...others];
-  const firstPlace = (c: FeaturedChance) =>
-    Math.min(Infinity, ...club.zones.filter((z) => z.kind === c.zone || (c.kind === "continental" && family(z.kind) === c.zone)).flatMap((z) => z.ranges.map(([from]) => from)));
+  const firstPlace = (c: FeaturedChance) => {
+    const own = club.zones.filter((z) => z.kind === c.zone || (c.kind === "continental" && family(z.kind) === c.zone));
+    // A chance that isn't a place in the table (Primera B's promotion) comes first.
+    if (own.length > 0 && own.every((z) => z.ranges.length === 0)) return 0;
+    return Math.min(Infinity, ...own.flatMap((z) => z.ranges.map(([from]) => from)));
+  };
   return picked.sort((a, b) => firstPlace(a) - firstPlace(b) || order.indexOf(a) - order.indexOf(b));
 }
 
@@ -234,6 +242,12 @@ export interface OutlookSetup {
   zoneCounts: boolean;
   groupOf?: Map<TeamId, Record<SiteLocale, string>>;
   complete: boolean;
+  /**
+   * Promotion by the tournaments' champions and the annual table (Primera
+   * B): each club's chance of going up, with a game's result set (`override`)
+   * or as the season stands.
+   */
+  promotion?: (override?: ResultMap) => Map<TeamId, number>;
 }
 
 /**
@@ -298,6 +312,19 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
       : [];
     const clubs = new Set(fixtures.flatMap((f) => [f.homeId, f.awayId]));
     const teams = data.teams.filter((t) => clubs.has(t.id));
+    // Promotion by the champions and this table (Primera B): its own simulation, each tournament played to its champion.
+    let standing: Map<TeamId, number> | undefined;
+    const promotion = league.promotionPath
+      ? (override?: ResultMap) => {
+          const run = () => {
+            const tournaments = data.tournaments!;
+            const predictions = override ? Object.fromEntries(tournaments.map((t) => [t.seasonKey, override])) : {};
+            return simulatePromotion({ league, teams: data.teams, tournaments, predictions, model, ...(data.promotionGames ? { promotionGames: data.promotionGames } : {}) }, PROMOTION_ITERATIONS, SCENARIO_SEED).promoted;
+          };
+          if (override) return run();
+          return (standing ??= run());
+        }
+      : undefined;
     return {
       model,
       rows: computeStandings(teams, fixtures, fixed, base),
@@ -309,6 +336,7 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
       fixtures,
       zoneCounts: champions.length > 0,
       complete: false,
+      ...(promotion ? { promotion } : {}),
     };
   }
 
@@ -352,7 +380,8 @@ export function outlookSetup(league: LeagueConfig, data: LeagueData): OutlookSet
 }
 
 /** Every club's outlook from one Monte Carlo run of the league's setup. */
-export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: OutlookSetup, result: MonteCarloResult): LeagueOutlook {
+export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: OutlookSetup, result: MonteCarloResult, override?: ResultMap): LeagueOutlook {
+  const promoted = s.promotion?.(override);
   // Rows' places are already over the whole table (a split's groups one after the other).
   const positions = new Map(s.rows.map((r) => [r.teamId, r.position]));
   const passedDown = new Set(s.input.passDown ?? []);
@@ -373,6 +402,8 @@ export function outlookFromRun(league: LeagueConfig, data: LeagueData, s: Outloo
       return n;
     };
     let zones = zoneChances(s.places, s.title, share);
+    // Promotion by the champions and the annual table (Primera B): its own chance, ahead of the table's places (no place of its own).
+    if (promoted) zones = [{ kind: "promotion", ranges: [], chance: promoted.get(row.teamId) ?? 0 }, ...zones];
     // Already in the first zone's competition (a tournament champion): there whatever the table, its places passed down.
     if (passedDown.has(row.teamId)) {
       const first = zones[0]?.kind;
@@ -470,7 +501,7 @@ function setLikeliestFinishes(clubs: Map<TeamId, ClubOutlook>, groupOf?: Readonl
 export function leagueOutlook(league: LeagueConfig, data: LeagueData, iterations = SCENARIO_ITERATIONS, override?: ResultMap, s = outlookSetup(league, data)): LeagueOutlook | null {
   if (!s) return null;
   const result = runMonteCarlo({ ...s.input, iterations, seed: SCENARIO_SEED, ...(override ? { override } : {}) });
-  return outlookFromRun(league, data, s, result);
+  return outlookFromRun(league, data, s, result, override);
 }
 
 /**
@@ -564,14 +595,18 @@ export function resultScenarios(league: LeagueConfig, data: LeagueData, fixture:
   if (hit) return hit;
   // One simulation loop: each season's other games drawn once, then finished with each result (full iterations each).
   const [home, draw, away] = runMonteCarloVariants({ ...setup.input, iterations: SCENARIO_ITERATIONS, seed: SCENARIO_SEED }, resultVariants(fixture, scores));
-  return keepScenarios(key, { scores, after: { home: chancesAfter(league, data, setup, fixture, home!), draw: chancesAfter(league, data, setup, fixture, draw!), away: chancesAfter(league, data, setup, fixture, away!) } });
+  const [vh, vd, va] = resultVariants(fixture, scores);
+  return keepScenarios(key, {
+    scores,
+    after: { home: chancesAfter(league, data, setup, fixture, home!, vh), draw: chancesAfter(league, data, setup, fixture, draw!, vd), away: chancesAfter(league, data, setup, fixture, away!, va) },
+  });
 }
 
 const resultVariants = (fixture: Fixture, scores: ResultScenarios["scores"]): ResultMap[] => [{ [fixture.id]: scores.home }, { [fixture.id]: scores.draw }, { [fixture.id]: scores.away }];
 
 /** The game's two clubs' chances in a run. */
-function chancesAfter(league: LeagueConfig, data: LeagueData, setup: OutlookSetup, fixture: Fixture, result: MonteCarloResult): Map<TeamId, ClubChances> {
-  const outlook = outlookFromRun(league, data, setup, result);
+function chancesAfter(league: LeagueConfig, data: LeagueData, setup: OutlookSetup, fixture: Fixture, result: MonteCarloResult, variant?: ResultMap): Map<TeamId, ClubChances> {
+  const outlook = outlookFromRun(league, data, setup, result, variant);
   const clubs = new Map<TeamId, ClubChances>();
   for (const id of [fixture.homeId, fixture.awayId]) {
     const club = outlook.clubs.get(id);
@@ -615,9 +650,10 @@ export function outlookWithResults(
   const [now, home, draw, away] = runMonteCarloVariants({ ...setup.input, iterations: SCENARIO_ITERATIONS, seed: SCENARIO_SEED }, [{}, ...resultVariants(fixture, scores)]);
   const outlook = outlookFromRun(league, data, setup, now!);
   cache.set(league.code, { version, setup, outlook });
+  const [vh, vd, va] = resultVariants(fixture, scores);
   const scenarios = keepScenarios(`${league.code}:${version}:${fixture.id}:${JSON.stringify(scores)}`, {
     scores,
-    after: { home: chancesAfter(league, data, setup, fixture, home!), draw: chancesAfter(league, data, setup, fixture, draw!), away: chancesAfter(league, data, setup, fixture, away!) },
+    after: { home: chancesAfter(league, data, setup, fixture, home!, vh), draw: chancesAfter(league, data, setup, fixture, draw!, vd), away: chancesAfter(league, data, setup, fixture, away!, va) },
   });
   return { outlook, scenarios };
 }

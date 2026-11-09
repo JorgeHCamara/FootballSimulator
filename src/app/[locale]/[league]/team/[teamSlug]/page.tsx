@@ -319,7 +319,7 @@ export default async function ClubPage({ params }: { params: Params }) {
                 <span className="text-xs font-semibold leading-tight">{tz(zone.kind)}</span>
               </div>
               <p className="mt-2 text-2xl font-extrabold tabular-nums">{pct(zone.chance)}</p>
-              <p className="text-xs text-zinc-500">{zone.ranges.map(([from, to]) => placeRange(from, to, lang)).join(", ")}</p>
+              {zone.ranges.length > 0 && <p className="text-xs text-zinc-500">{zone.ranges.map(([from, to]) => placeRange(from, to, lang)).join(", ")}</p>}
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
                 <div className="h-full rounded-full" style={{ width: `${zone.chance * 100}%`, background: zoneHex(zone.kind) }} />
               </div>

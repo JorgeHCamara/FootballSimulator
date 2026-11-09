@@ -8,7 +8,10 @@ interface Totals {
   goalsFor: number;
   goalsAgainst: number;
   awayGoalsFor: number;
+  awayGoalsAgainst: number;
   points: number;
+  /** 1 for a club in StandingsOptions.seeded. */
+  seeded: number;
 }
 
 interface PlayedMatch {
@@ -39,6 +42,8 @@ export interface StandingsOptions {
   startPoints?: Readonly<Record<TeamId, number>>;
   /** Order for clubs level on every criterion (else by name). */
   fallbackOrder?: readonly TeamId[];
+  /** Clubs the "seeded" criterion puts first (Primera B: each group's head, from the first phase's top two). */
+  seeded?: readonly TeamId[];
 }
 
 const emptyTotals = (): Totals => ({
@@ -49,7 +54,9 @@ const emptyTotals = (): Totals => ({
   goalsFor: 0,
   goalsAgainst: 0,
   awayGoalsFor: 0,
+  awayGoalsAgainst: 0,
   points: 0,
+  seeded: 0,
 });
 
 function accumulate(matches: readonly PlayedMatch[], teamIds: Iterable<TeamId>): Map<TeamId, Totals> {
@@ -85,6 +92,7 @@ function addMatches(totals: Map<TeamId, Totals>, matches: readonly PlayedMatch[]
       a.goalsFor += m.away;
       a.goalsAgainst += m.home;
       a.awayGoalsFor += m.away;
+      a.awayGoalsAgainst += m.home;
       if (m.away > m.home) {
         a.won++;
         a.points += 3;
@@ -117,6 +125,10 @@ function criterionValue(criterion: Tiebreaker, overall: Totals, h2h: Totals | un
       return h2h?.goalsFor ?? 0;
     case "headToHeadAwayGoalsFor":
       return h2h?.awayGoalsFor ?? 0;
+    case "fewerAwayGoalsAgainst":
+      return -overall.awayGoalsAgainst;
+    case "seeded":
+      return overall.seeded;
   }
 }
 
@@ -256,6 +268,10 @@ export function computeStandings(
     const t = overall.get(Number(teamId));
     if (t) t.points -= deduction;
   }
+  for (const teamId of options.seeded ?? []) {
+    const t = overall.get(teamId);
+    if (t) t.seeded = 1;
+  }
 
   const criteria: Tiebreaker[] = options.tiebreakers[0] === "points"
     ? [...options.tiebreakers]
@@ -326,11 +342,12 @@ export function standingsBuilder(
   const baseTotals = new Int32Array(n * FIELDS);
   for (const [i, id] of ids.entries()) {
     const t = base.get(id)!;
-    baseTotals.set([t.played, t.won, t.drawn, t.lost, t.goalsFor, t.goalsAgainst, t.awayGoalsFor, t.points], i * FIELDS);
+    baseTotals.set([t.played, t.won, t.drawn, t.lost, t.goalsFor, t.goalsAgainst, t.awayGoalsFor, t.points, t.awayGoalsAgainst], i * FIELDS);
   }
   const homeOf = Int32Array.from(open, (f) => index.get(f.homeId) ?? -1);
   const awayOf = Int32Array.from(open, (f) => index.get(f.awayId) ?? -1);
   const totals = new Int32Array(n * FIELDS);
+  const seeded = new Set(options.seeded ?? []);
   return (results) => {
     totals.set(baseTotals);
     for (let k = 0; k < open.length; k++) {
@@ -353,6 +370,8 @@ export function standingsBuilder(
         goalsAgainst: totals[o + 5]!,
         awayGoalsFor: totals[o + 6]!,
         points: totals[o + 7]!,
+        awayGoalsAgainst: totals[o + 8]!,
+        seeded: seeded.has(id) ? 1 : 0,
       });
     }
     // Every game, only if a tie gets as far as a head-to-head criterion.
@@ -384,15 +403,18 @@ export function standingsBuilder(
   };
 }
 
-/** Numbers per club in standingsBuilder's totals: played, won, drawn, lost, for, against, away goals, points. */
-const FIELDS = 8;
+/** Numbers per club in standingsBuilder's totals: played, won, drawn, lost, for, against, away goals, points, away goals against. */
+const FIELDS = 9;
 
 /** One game into a club's totals (at offset `o`), from its side: its goals, the other side's, and whether it played away. */
 function tally(t: Int32Array, o: number, own: number, other: number, away: boolean): void {
   t[o]!++;
   t[o + 4]! += own;
   t[o + 5]! += other;
-  if (away) t[o + 6]! += own;
+  if (away) {
+    t[o + 6]! += own;
+    t[o + 8]! += other;
+  }
   if (own > other) {
     t[o + 1]!++;
     t[o + 7]! += 3;

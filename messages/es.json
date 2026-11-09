@@ -17,6 +17,7 @@
     "leagueDescriptionAmericas": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Copa Libertadores y descenso.",
     "zonesDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira las dos zonas en directo y juega los playoffs hasta la final, con las probabilidades de cada club de llegar a los playoffs y de ser campeón.",
     "stagesDescription": "{simulator} gratis de la temporada {season} ({aka}). Vuelve a jugar la primera fase, los grupos del ascenso y la final, cambia cualquier resultado y mira quién sube, quién es campeón y quién desciende.",
+    "promotionPathDescription": "{simulator} gratis para la temporada {season} ({aka}). Juega de nuevo los dos torneos (todos contra todos, cuadrangulares y final), la reclasificación y el camino al ascenso: mira quién sube a la Primera A, directo o por la Gran Final y el repechaje.",
     "tournamentsDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula cada torneo del año, juega sus playoffs cuando los tenga y mira la tabla anual con los cupos a la Copa Libertadores y la Sudamericana.",
     "liguillaDescription": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la tabla en directo y juega la Liguilla hasta la final, con las probabilidades de cada club de llegar a la Liguilla y de ser campeón.",
     "leagueDescriptionAsia": "{simulator} {season} gratis ({aka}). Escribe tus marcadores o simula los partidos restantes, mira la clasificación en directo y las probabilidades de título, Liga de Campeones de la AFC y descenso.",
@@ -92,7 +93,7 @@
     "share": "Compartir",
     "linkCopied": "Enlace copiado",
     "liveSource": "Partidos y resultados reales, actualizados cada hora",
-    "firstPartySource": "Resultados oficiales de la CBF (Confederación Brasileña de Fútbol), guardados en Foot Simu",
+    "firstPartySource": {"BSC": "Resultados oficiales de la CBF (Confederación Brasileña de Fútbol), guardados en Foot Simu", "COLB": "Resultados y partidos del Torneo BetPlay de la Dimayor, recopilados del artículo de la temporada en Wikipedia en español y guardados en Foot Simu (actualizados a mano)"},
     "editResult": "Cambiar este resultado",
     "position": "#",
     "team": "Equipo",
@@ -178,6 +179,7 @@
     "annualNotes": {
       "ARG": "El campeón de la Copa Argentina también se clasifica, y el último de la tabla de promedios de tres temporadas también desciende (no se muestra).",
       "COL": "El campeón de la Copa BetPlay también va a la Copa Sudamericana. El descenso lo define la tabla de promedios (no se muestra).",
+      "COLB": "No hay descenso: no existe tercera división. Los dos primeros de la reclasificación ascienden con los campeones de los torneos, o disputan el segundo cupo (ver el camino al ascenso).",
       "URU": "Aproximado: el campeón y el vicecampeón uruguayos, definidos en el playoff entre los ganadores de torneo, también van a la Copa Libertadores, y el reglamento oficial puede ser distinto. El descenso lo define la tabla de promedios (no se muestra).",
       "PAR": "Los cupos siguen el reparto habitual; el reglamento oficial de esta temporada puede ser distinto. El descenso lo define la tabla de promedios (no se muestra).",
       "PER": "Aproximado: los cupos a la Copa Libertadores se definen en un playoff entre los campeones de torneo y los mejor ubicados, y el reglamento oficial puede ser distinto. Los puntos descontados son los de la clasificación actual de ESPN."
@@ -241,7 +243,10 @@
     "aclEliteQualifying": "Fase preliminar de la ACL Élite",
     "aclTwo": "Liga de Campeones de la AFC Two",
     "gulfClub": "Liga de Campeones del Golfo",
-    "promotionFinal": "Final: título y ascenso"
+    "promotionFinal": "Final: título y ascenso",
+    "semifinalGroups": "Cuadrangulares",
+    "tournamentFinal": "Final",
+    "promotionContention": "Dos primeros: ascenso o repechaje"
   },
   "Footer": {
     "attribution": "Datos: football-data.org",
@@ -285,8 +290,10 @@
     "step3Americas": "Abre la pestaña Probabilidades para ver las opciones de cada equipo de título, Copa Libertadores y descenso.",
     "introZones": "Usa el {simulator} para predecir el resto de la {league} {season} ({aka}). Escribe tus marcadores o simula los partidos restantes: las clasificaciones de las dos zonas se actualizan al instante con los criterios oficiales. Los 8 primeros de cada zona van a los playoffs, cruzando las zonas (1.º de la Zona A vs. 8.º de la Zona B…) a partido único hasta la final. Cambia entre el Apertura, el Clausura y la tabla anual, que define los cupos continentales y el descenso.",
     "introStages": "Usa el {simulator} para volver a jugar el {league} {season} ({aka}). Cada resultado real se puede cambiar: la tabla de la primera fase, los dos grupos del ascenso (los 2 primeros de cada grupo suben) y la final de ida y vuelta se actualizan al instante con los criterios de desempate oficiales. Cambia quién termina dónde y los grupos y la final cambian con ello.",
+    "introPromotionPath": "Usa el {simulator} para jugar de nuevo la temporada {season} de la {league} ({aka}). Cada uno de los dos torneos tiene un todos contra todos, dos cuadrangulares y una final de ida y vuelta, y la reclasificación suma todos los partidos: cambia cualquier resultado y mira quién gana cada torneo, quién queda entre los dos primeros de la reclasificación y quién asciende a la Primera A, directo o por la Gran Final y el repechaje.",
     "step3Zones": "Abre la pestaña Probabilidades para ver las opciones de cada club de terminar primero en su zona, de llegar a los playoffs y de ser campeón.",
     "step3Stages": "Abre la pestaña Probabilidades para ver las opciones de cada club en su grupo del ascenso y de ganar la final.",
+    "step3PromotionPath": "Debajo de las tablas, el camino al ascenso muestra el campeón de cada torneo, quién asciende y la probabilidad de ascenso de cada club, con tus pronósticos.",
     "introTournaments": "Usa el {simulator} para predecir el resto de la {league} {season} ({aka}). El año tiene varios torneos, cada uno con su tabla y su campeón: cambia entre ellos y la tabla anual, que los suma todos y define los cupos a la Copa Libertadores y la Sudamericana. Escribe tus marcadores o simula los partidos restantes, y las tablas se actualizan al instante.",
     "step3Tournaments": "Abre la pestaña Probabilidades para ver las opciones de cada club de ganar el torneo y, en la tabla anual, de ir a la Copa Libertadores y a la Sudamericana.",
     "introLiguilla": "Usa el {simulator} para predecir el resto de la {league} {season} ({aka}). Escribe tus marcadores o simula los partidos restantes: la tabla se actualiza al instante con los criterios oficiales. Los 8 primeros van a la Liguilla, a ida y vuelta hasta la final.",
@@ -515,6 +522,32 @@
         "a": "Sí. FootSimu es completamente gratis y no necesitas cuenta."
       }
     ],
+    "promotionPath": [
+      {
+        "q": "¿Cómo funciona el {simulator}?",
+        "a": "Parte de los resultados y partidos reales de la {league} {season}, en los dos torneos. Escribe un marcador para cualquier partido pendiente o pulsa Simular: cada resultado se sortea según el ataque y la defensa que cada equipo ha mostrado en la temporada, con la ventaja de local, y las tablas, los grupos y la final se actualizan al instante."
+      },
+      {
+        "q": "¿Cómo se juega un torneo de la {league}?",
+        "a": "Cada club se enfrenta a todos los demás una vez (15 partidos). Los 8 primeros pasan a dos cuadrangulares: el 1.º y el 2.º son cabezas de grupo y los otros seis se sortean. Cada grupo se juega de ida y vuelta desde cero puntos, y en caso de empate en puntos clasifica la cabeza de grupo. Los ganadores de los grupos juegan una final de ida y vuelta por el torneo."
+      },
+      {
+        "q": "¿Quién asciende a la Primera A?",
+        "a": "Dos clubes. Si un club gana los dos torneos, asciende, y los dos siguientes de la reclasificación juegan el repechaje por el segundo cupo. Dos campeones distintos ascienden ambos si están entre los dos primeros de la reclasificación; si solo uno lo está, asciende y el otro juega el repechaje contra el mejor ubicado de los demás; si ninguno lo está, juegan la Gran Final: el ganador asciende y el perdedor juega el repechaje contra el líder de la reclasificación."
+      },
+      {
+        "q": "¿Hay descenso?",
+        "a": "No: la {league} es la última división profesional de Colombia."
+      },
+      {
+        "q": "¿Cómo se calculan las probabilidades?",
+        "a": "La pestaña Probabilidades juega el resto del torneo 10.000 veces desde los resultados actuales, con tus pronósticos. El cuadro del ascenso juega el resto de la temporada, con la Gran Final y el repechaje, y cuenta cuántas veces asciende cada club."
+      },
+      {
+        "q": "¿FootSimu es gratis?",
+        "a": "Sí. FootSimu es totalmente gratis y no necesitas una cuenta."
+      }
+    ],
     "liguilla": [
       {
         "q": "¿Cómo funciona el {simulator}?",
@@ -711,6 +744,8 @@
     "carryHalved": " (en los {group}, con la mitad, redondeada hacia arriba)",
     "splitPlaced": "Tras {round} jornadas los {count} primeros pasan a dos grupos ({groups}), cada uno una tabla nueva con sus propios partidos, de ida y vuelta, desde cero puntos. Para los demás clubes la temporada termina.",
     "placesList": "{list}: {group}",
+    "splitDrawn": "{perTournament, select, yes {En cada torneo, tras} other {Tras}} {round} jornadas los {count} primeros pasan a {groupCount, plural, =2 {dos} other {#}} grupos ({groups}): los {heads} primeros son cabezas de grupo, uno en cada uno, y los demás se sortean. Cada grupo es una tabla nueva con sus propios partidos, de ida y vuelta, desde cero puntos, donde la cabeza de grupo prevalece en caso de empate en puntos. Los ganadores de los grupos juegan una final de ida y vuelta por el título.",
+    "promotionPath": "Dos clubes ascienden a la {league}. Un club que gana los dos torneos asciende, y los dos siguientes de la reclasificación juegan el repechaje por el segundo cupo. Dos campeones distintos ascienden ambos si están entre los dos primeros de la reclasificación; si solo uno lo está, asciende y el otro juega el repechaje contra el mejor ubicado de los demás; si ninguno lo está, juegan la Gran Final: el ganador asciende y el perdedor juega el repechaje contra el líder de la reclasificación. La Gran Final y el repechaje son de ida y vuelta, con el mejor ubicado de local en la vuelta; empate en el global, penales.",
     "splitHalves": "Tras {round} jornadas la tabla se divide entre los {top} primeros y los {bottom} últimos, que se enfrentan una vez más; los clubes no cambian de mitad, sean cuales sean sus puntos.",
     "tables": "Los clubes se reparten en {count, plural, =2 {dos} other {#}} tablas: {names}.",
     "titlePlayoff": "Una eliminatoria tras la fase regular decide el campeón.",
@@ -1610,5 +1645,23 @@
       "secondPending": "Los dos grupos de cuatro de la segunda fase (1.º, 4.º, 5.º y 8.º; 2.º, 3.º, 6.º y 7.º) salen de la tabla de la primera fase cuando termine.",
       "secondPendingGroups": "Los cuatro primeros de cada grupo juegan un cuadrangular de ascenso cuando termine la primera fase."
     }
+  },
+  "Promotion": {
+    "title": "Ascenso a la {league} {year}",
+    "champion": "Campeón del {tournament}",
+    "undecided": "Por definir",
+    "pathPending": "Cuando estén definidos los dos campeones y la reclasificación (resultados reales y tus pronósticos), el camino sale de ellos: quién asciende directo, y quién juega la Gran Final o el repechaje.",
+    "doubleChampion": "{champion} gana los dos torneos y asciende. El segundo cupo se juega en el repechaje entre los dos siguientes de la reclasificación: {a} vs. {b}.",
+    "bothTop": "Los dos campeones están entre los dos primeros de la reclasificación: {a} y {b} ascienden.",
+    "oneTop": "{up} asciende como campeón entre los dos primeros de la reclasificación. El segundo cupo se juega en el repechaje: {a} vs. {b}.",
+    "neitherTop": "Ningún campeón está entre los dos primeros de la reclasificación: juegan la Gran Final, {a} vs. {b}. El ganador asciende; el perdedor juega el repechaje por el segundo cupo contra {c}.",
+    "chancesTitle": "Probabilidades de ascenso",
+    "club": "Club",
+    "promotion": "Ascenso",
+    "tournamentTitle": "Gana el {tournament}",
+    "grandFinal": "Gran Final",
+    "playoff": "Repechaje",
+    "simulating": "Simulando el resto de la temporada…",
+    "note": "El resto de la temporada jugado 1.500 veces, con tus pronósticos: cada torneo, la reclasificación, y la Gran Final y el repechaje cuando se juegan."
   }
 }
