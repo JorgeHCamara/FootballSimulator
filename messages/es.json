@@ -1360,7 +1360,6 @@
     "hero": {
       "badge": "Modo de juego",
       "start": "Empezar tu mundo",
-      "continue": "Continuar tu mundo",
       "countries": "{count} países",
       "leagues": "{count} ligas",
       "cups": "{count} copas",

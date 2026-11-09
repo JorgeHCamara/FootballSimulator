@@ -39,6 +39,7 @@ import {
   worldDivisions,
 } from "../lib/myWorld.ts";
 import { browserStore, clearWorld, loadWorld, saveWorld } from "../lib/myWorldStorage.ts";
+import { markWorldPlaying } from "./WorldPlayingFlag.tsx";
 import { PLAY_ANCHOR } from "../lib/worldHero.ts";
 import { cupGamesInSeason, cupGamesLeft, cupStates, isWorldCup, outsidersNeeded, type WorldCupCode } from "../lib/worldCups.ts";
 import { Flag } from "./Flag.tsx";
@@ -73,6 +74,11 @@ export function MyWorld({ pack, locale }: { pack: StartPack; locale: SiteLocale 
     const found = loadWorld(browserStore(), pack);
     setView(found.world ? { kind: "world", world: found.world, saved: true } : { kind: "setup", ...(found.reason === "incompatible" || found.reason === "unreadable" ? { reset: found.reason } : {}) });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A world being played: the page's hero goes (it's for visitors yet to start one); back on a reset.
+  useEffect(() => {
+    if (view.kind !== "loading") markWorldPlaying(view.kind === "world");
+  }, [view.kind]);
 
   const keep = (world: World) => setView({ kind: "world", world, saved: saveWorld(browserStore(), world) });
   /** A change in the season in progress: Undo can take it back. */

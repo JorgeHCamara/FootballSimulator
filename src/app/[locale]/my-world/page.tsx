@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { MyWorld } from "../../../components/MyWorld.tsx";
 import { PastWinnersProvider, type RealWinners } from "../../../components/PastWinnersProvider.tsx";
 import { WorldHero } from "../../../components/WorldHero.tsx";
+import { WorldPlayingFlag } from "../../../components/WorldPlayingFlag.tsx";
 import type { SiteLocale } from "../../../config/leagues.ts";
 import { divisionConfig, WORLD_LEAGUES } from "../../../lib/myWorld.ts";
 import { worldStartPack } from "../../../lib/myWorldStart.ts";
@@ -49,6 +50,8 @@ export default async function Page({ params }: { params: Params }) {
   );
   return (
     <div className="space-y-6" data-testid="my-world">
+      {/* A world already being played: the hero goes, its H1 kept for screen readers (before the hero, so it never shows). */}
+      <WorldPlayingFlag />
       {/* The hero: the page's one H1, the mode in a few words, a button to the game below. */}
       <WorldHero />
       {/* The game's own words, the league simulator's (its fixtures and dice) and the cups': the rest of the site's client messages aren't needed inside it. */}
