@@ -11,7 +11,8 @@ import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
 import type { Fixture, Team, TeamId } from "../engine/types.ts";
 import { EspnError, espnFixtures, espnTeams, fetchEspnYear, type EspnCalendarEntry, type EspnEvent } from "./espn.ts";
-import { DEPLOYMENT, getLeagueData, noDataCache } from "./leagueData.ts";
+import { getLeagueData, noDataCache } from "./leagueData.ts";
+import { espnDataKey } from "./dataCacheKey.ts";
 import { sampleCup } from "./sampleLeague.ts";
 
 export interface CupData {
@@ -37,7 +38,7 @@ const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 const inflight = new Map<string, Promise<CupData>>();
 
 /** The season being played, by its starting year (split seasons run August–May). */
-const currentSeasonYear = (cup: CupConfig, now = new Date()) =>
+export const currentSeasonYear = (cup: CupConfig, now = new Date()) =>
   cup.espn.seasons === "split" && now.getUTCMonth() < 5 ? now.getUTCFullYear() - 1 : now.getUTCFullYear();
 
 /** Groups a round's games into ties: one game, or the two legs between the same clubs (in date order). */
@@ -88,7 +89,7 @@ export function getCupData(cup: CupConfig): Promise<CupData> {
 async function loadCupData(cup: CupConfig): Promise<CupData> {
   if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return sampleCup(cup);
   try {
-    return await keptEspnCup(cup);
+    return await loadEspnCup(cup);
   } catch (error) {
     const reason = error instanceof EspnError ? `HTTP ${error.status}` : String(error);
     if (process.env.NODE_ENV === "production" && (!isBuildPhase() || process.env.VERCEL)) {
@@ -128,24 +129,76 @@ async function loadFeeders(cup: CupConfig) {
   return { strengths: Object.fromEntries(buildCupStrengths(feeders)), teams, divisions, members };
 }
 
+/** A cup's own data as ESPN gives it (its draw so far, round dates and clubs), before the feeder leagues are added. */
+interface CupDraw {
+  year: number;
+  real: RealCupTie[];
+  roundDates: Partial<Record<CupRoundKey, string>>;
+  /** The clubs in ESPN's draw, as read (overrides and saved crests applied). */
+  teams: Team[];
+}
+
 /**
- * A cup's data, kept in the data cache as read (an hour at a time, as
+ * A cup's draw, kept in the data cache as read (an hour at a time, as
  * before), not as ESPN sends it: a cup's season scoreboard is up to 1.5 MB
  * and growing, and Next's data cache keeps no fetch over 2 MB (see keptEspn
  * in leagueData.ts). Inside the cached function ESPN's requests skip the data
- * cache. A load that fails isn't kept.
+ * cache. A load that fails isn't kept. Keyed by how it's read, not by
+ * deployment (see src/lib/dataCacheKey.ts), so a deployment reuses it.
+ *
+ * Only the cup's own draw: the feeder leagues (the clubs' ratings, divisions
+ * and later entrants) are added outside it, from their own kept data. Read
+ * inside this function, each would have been downloaded again (a cached
+ * function skips the data cache within it), every hour, for every cup.
  */
-async function keptEspnCup(cup: CupConfig): Promise<CupData> {
-  const load = () => loadEspnCup(cup);
+async function keptEspnCupDraw(cup: CupConfig): Promise<CupDraw> {
+  const load = () => loadEspnCupDraw(cup);
   try {
-    return await unstable_cache(load, ["cup-data", cup.code, DEPLOYMENT], { tags: [`cup:${cup.code}`], revalidate: REVALIDATE_SECONDS })();
+    return await unstable_cache(load, espnDataKey("cup-draw", cup.code, `current-${currentSeasonYear(cup)}`, cup), {
+      tags: [`cup:${cup.code}`],
+      revalidate: REVALIDATE_SECONDS,
+    })();
   } catch (error) {
     if (noDataCache(error)) return load();
     throw error;
   }
 }
 
+/** A cup's data: its kept draw, with its feeder leagues' clubs, divisions, ratings and later entrants. */
 async function loadEspnCup(cup: CupConfig): Promise<CupData> {
+  const { year, real, roundDates, teams: drawn } = await keptEspnCupDraw(cup);
+  const feeders = await loadFeeders(cup);
+  const entrants: Partial<Record<CupRoundKey, TeamId[]>> = {};
+  for (const round of cup.rounds) {
+    if (!round.entrantsFrom) continue;
+    // A round the real draw has filled takes no one else (and a past season's
+    // cup mustn't take this season's league clubs).
+    if (real.filter((t) => t.round === round.key).length >= round.ties) {
+      entrants[round.key] = [];
+      continue;
+    }
+    const members = round.entrantsFrom.flatMap((code) => feeders.members[code] ?? []);
+    // Clubs already in the real draw (earlier rounds) don't enter again.
+    const inCup = new Set(real.flatMap((t) => [t.homeId, t.awayId]));
+    entrants[round.key] = round.entrantsNotYetIn ? members.filter((id) => !inCup.has(id)) : members;
+  }
+  const teams = new Map(feeders.teams);
+  for (const team of drawn) if (!teams.has(team.id)) teams.set(team.id, team);
+
+  return {
+    teams: [...teams.values()],
+    real,
+    entrants,
+    roundDates,
+    divisions: feeders.divisions,
+    strengths: feeders.strengths,
+    season: cup.espn.seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year),
+    seasonKey: `${cup.code}:${year}`,
+    source: "live",
+  };
+}
+
+async function loadEspnCupDraw(cup: CupConfig): Promise<CupDraw> {
   const init = { next: { revalidate: REVALIDATE_SECONDS, tags: [`cup:${cup.code}`] } };
   const current = currentSeasonYear(cup);
   for (const year of [current, current - 1]) {
@@ -184,36 +237,7 @@ async function loadEspnCup(cup: CupConfig): Promise<CupData> {
         roundDates[round.key] = date.toISOString();
       }
     });
-
-    const feeders = await loadFeeders(cup);
-    const entrants: Partial<Record<CupRoundKey, TeamId[]>> = {};
-    for (const round of cup.rounds) {
-      if (!round.entrantsFrom) continue;
-      // A round the real draw has filled takes no one else (and a past season's
-      // cup mustn't take this season's league clubs).
-      if (real.filter((t) => t.round === round.key).length >= round.ties) {
-        entrants[round.key] = [];
-        continue;
-      }
-      const members = round.entrantsFrom.flatMap((code) => feeders.members[code] ?? []);
-      // Clubs already in the real draw (earlier rounds) don't enter again.
-      const inCup = new Set(real.flatMap((t) => [t.homeId, t.awayId]));
-      entrants[round.key] = round.entrantsNotYetIn ? members.filter((id) => !inCup.has(id)) : members;
-    }
-    const teams = new Map(feeders.teams);
-    for (const team of withFallbackCrests(applyTeamOverrides(espnTeams(all)))) if (!teams.has(team.id)) teams.set(team.id, team);
-
-    return {
-      teams: [...teams.values()],
-      real,
-      entrants,
-      roundDates,
-      divisions: feeders.divisions,
-      strengths: feeders.strengths,
-      season: cup.espn.seasons === "split" ? `${year}/${String(year + 1).slice(2)}` : String(year),
-      seasonKey: `${cup.code}:${year}`,
-      source: "live",
-    };
+    return { year, real, roundDates, teams: withFallbackCrests(applyTeamOverrides(espnTeams(all))) };
   }
   throw new Error(`No ${cup.code} first round on ESPN for ${current} or ${current - 1}`);
 }

@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache.js";
 import { outlookSetup } from "./clubOutlook.ts";
-import { getCupData } from "./cupData.ts";
+import { currentSeasonYear as cupSeasonYear, getCupData } from "./cupData.ts";
+import { espnDataKey } from "./dataCacheKey.ts";
 import { getLeagueData, leagueDataKeepSeconds } from "./leagueData.ts";
 import { divisionConfig, divisionTeams, isDivision, WORLD_LEAGUES, type DivisionCode, type StartCup, type StartLeague, type StartPack, type WorldGame, type WorldPlayoffGame } from "./myWorld.ts";
 import { cupConfig, WORLD_CUPS, type WorldCupCode, type WorldCupTie } from "./worldCups.ts";
@@ -106,7 +107,9 @@ const noDataCache = (error: unknown) => error instanceof Error && error.message.
 async function keptStartCup(code: WorldCupCode): Promise<StartCup> {
   const load = () => startCup(code);
   try {
-    return await unstable_cache(load, ["world-start-cup", code], { tags: [`cup:${cupConfig(code).code}`], revalidate: leagueDataKeepSeconds() })();
+    // Keyed like the cups' own data (src/lib/dataCacheKey.ts): a parser change or another environment never reads it.
+    const cup = cupConfig(code);
+    return await unstable_cache(load, espnDataKey("world-start-cup", code, `current-${cupSeasonYear(cup)}`, cup), { tags: [`cup:${cup.code}`], revalidate: leagueDataKeepSeconds() })();
   } catch (error) {
     if (noDataCache(error)) return load();
     throw error;
