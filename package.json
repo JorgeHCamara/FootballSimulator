@@ -19,6 +19,7 @@
     "backtest:season:tune": "node scripts/backtest-season-tune.ts",
     "snapshots": "NODE_USE_ENV_PROXY=1 node scripts/snapshot-odds.ts",
     "snapshots:check": "NODE_USE_ENV_PROXY=1 node scripts/check-snapshots.ts",
+    "traces:check": "node scripts/check-traces.ts",
     "world:seasons": "NODE_USE_ENV_PROXY=1 node scripts/my-world-seasons.ts",
     "history": "NODE_USE_ENV_PROXY=1 node scripts/build-history.ts",
     "xg": "NODE_USE_ENV_PROXY=1 node scripts/fetch-xg.ts",

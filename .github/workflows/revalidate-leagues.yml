@@ -1,7 +1,9 @@
 name: Refresh league pages
 
 # Every 30 minutes, asks the site to compare each domestic league's ESPN data
-# with the cached copy its pages are built from (src/app/api/revalidate/leagues):
+# with the cached copy its pages are built from (src/app/api/revalidate/leagues;
+# a league only while one of its games is near, under way or just over, and
+# every three hours otherwise, see refreshPlan in src/lib/leagueRefresh.ts):
 # only when new results are in are the league page and every club and match
 # page of that league revalidated together, so they all show the same, new
 # chances. With the token set, this is how new results reach the pages: the
@@ -14,6 +16,19 @@ on:
   schedule:
     - cron: "7,37 * * * *"
   workflow_dispatch:
+    inputs:
+      league:
+        description: "Check one league whatever the plan (its code, e.g. PL); empty for the usual run"
+        required: false
+        default: ""
+      full:
+        description: "Check every league against ESPN, not only those with games near (true/false)"
+        required: false
+        default: "false"
+      archive:
+        description: "Instead, expire these leagues' past-round odds reports for a correction (codes, comma-separated, or all)"
+        required: false
+        default: ""
 
 permissions: {}
 
@@ -28,6 +43,10 @@ jobs:
     env:
       TOKEN: ${{ secrets.REVALIDATE_TOKEN }}
       SITE: ${{ vars.SITE_URL || 'https://footsimu.com' }}
+      # Manual runs only (empty on the schedule).
+      LEAGUE: ${{ inputs.league }}
+      FULL: ${{ inputs.full }}
+      ARCHIVE: ${{ inputs.archive }}
     steps:
       - name: Revalidate leagues with new results
         run: |
@@ -35,6 +54,10 @@ jobs:
             echo "REVALIDATE_TOKEN is not set: nothing to do."
             exit 0
           fi
+          QUERY=""
+          if [ -n "$ARCHIVE" ]; then QUERY="?archive=$ARCHIVE"
+          elif [ -n "$LEAGUE" ]; then QUERY="?league=$LEAGUE"
+          elif [ "$FULL" = "true" ]; then QUERY="?full=1"; fi
           curl --fail-with-body --silent --show-error --max-time 90 \
             -H "Authorization: Bearer $TOKEN" \
-            "$SITE/api/revalidate/leagues"
+            "$SITE/api/revalidate/leagues$QUERY"

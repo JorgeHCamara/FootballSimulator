@@ -3892,6 +3892,47 @@ async function step(name, fn) {
       await p.close();
     });
 
+    await step("prefetching: the footer's competitions and a fixture's clubs wait for intent (pointer, focus, a finger); the matchday's next game's preview is fetched at once; past rounds' odds reports read no live data", async () => {
+      const prefetches = (page) => {
+        const seen = [];
+        page.on("request", (r) => {
+          const h = r.headers();
+          if (h["next-router-prefetch"] || (r.url().includes("_rsc=") && h.rsc)) seen.push(new URL(r.url()).pathname);
+        });
+        return seen;
+      };
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const seen = prefetches(p);
+      await p.goto(`${BASE_URL}/en/premier-league`, { waitUntil: "networkidle" });
+      await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await p.waitForTimeout(1500);
+      const footer = await p.locator("footer nav a").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+      assert.ok(footer.length > 40, "the footer still links every competition");
+      // The page's own address is linked from the header too (prefetched there, as before).
+      assert.deepEqual(footer.filter((href) => href !== "/en/premier-league" && seen.includes(href)), [], "no footer link prefetched on sight");
+      const previews = await p.locator('[data-testid="match-preview-link"]').evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+      assert.deepEqual(previews.filter((href) => seen.includes(href)), [previews[0]], "only the next game's preview at once");
+      await p.locator('footer a[href="/en/la-liga"]').hover();
+      await p.waitForTimeout(1200);
+      assert.ok(seen.includes("/en/la-liga"), "hovering prefetches");
+      await p.locator('footer a[href="/en/serie-a"]').focus();
+      await p.waitForTimeout(1200);
+      assert.ok(seen.includes("/en/serie-a"), "keyboard focus prefetches");
+      // Real links still: Enter on a focused one navigates.
+      await p.keyboard.press("Enter");
+      await p.waitForURL("**/en/serie-a");
+      await p.close();
+      // A past round's report and the latest: both render, the past one from its archive entry.
+      const r = await browser.newPage();
+      await r.goto(`${BASE_URL}/pt/premier-league/odds`);
+      const rounds = await r.locator('[data-testid="odds-archive"] a').evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+      assert.ok(rounds.length > 1);
+      await r.goto(`${BASE_URL}${rounds.at(-1)}`);
+      await r.locator('[data-testid="odds-report"]').waitFor();
+      assert.match(await r.locator('[data-testid="odds-table"]').innerText(), /\d+%/);
+      await r.close();
+    });
+
     console.log("\nAll e2e checks passed.");
   } finally {
     await browser.close();

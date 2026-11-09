@@ -7,8 +7,16 @@ import { loadReport } from "../../../../../lib/oddsPage.ts";
 import { roundFromParam } from "../../../../../lib/oddsReports.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../../../lib/site.ts";
 
-/** A round's report doesn't change once its snapshot is in; the results in its sentences come from the league's data (as the league page). */
-export const revalidate = 21600;
+/**
+ * A past round's report doesn't change: it reads only its snapshots and its
+ * archive entry (src/lib/oddsArchive.ts, kept as long as this), so it's kept
+ * for 30 days (ARCHIVE_KEEP_SECONDS) unless its archive tag is expired, and
+ * isn't rebuilt by new results. The season's latest round reads the league's
+ * live data instead, whose own revalidate (six hours, an hour without the
+ * revalidation route) and tags rebuild it as before: a page is kept no longer
+ * than the shortest of what it reads. Each deployment still starts afresh.
+ */
+export const revalidate = 2592000;
 
 type Params = Promise<{ locale: string; league: string; round: string }>;
 
