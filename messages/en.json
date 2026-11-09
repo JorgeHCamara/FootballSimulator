@@ -1638,7 +1638,9 @@
       "annual": "Annual table",
       "round": "Matchday {round}",
       "annualNote": "Both tournaments' games: the bottom two go down (the real second relegation comes from the three-season averages, not kept here).",
-      "champion": "{tournament}: {club} champions, beating {runnerUp} in the final.",
+      "championsTitle": "{league} {year} champions",
+      "championOf": "{tournament} champion",
+      "championPending": "To be decided",
       "switch": "Zone"
     }
   }

@@ -9,6 +9,7 @@ import { stageOfMatchday, TOURNAMENT_ROUNDS, type ZoneSeason, type ZoneStage } f
 import { FixtureList, PLAYOFF_MATCHDAY, type PlayoffView } from "./FixtureList.tsx";
 import { Icon } from "./Icon.tsx";
 import { PromotedClubs } from "./PromotedClubs.tsx";
+import { TeamBadge } from "./TeamBadge.tsx";
 import { WorldTable } from "./WorldTable.tsx";
 
 /*
@@ -88,8 +89,8 @@ export function ZoneColumns({
 }) {
   const t = useTranslations("World");
   const [annual, setAnnual] = useState(false);
-  // The Liga Profesional: one zone at a time, as on its league page (the user's club's zone to begin with).
-  const zoneSwitch = code === "ARG" && season.zones.length > 1;
+  // One zone at a time, as on the league pages (the user's club's zone to begin with).
+  const zoneSwitch = season.zones.length > 1;
   const [zone, setZone] = useState(() => Math.max(0, season.zones.findIndex((ids) => ids.includes(world.userClub))));
   const league = divisionConfig(code);
   const zoneNames = (league.groups ?? []).map((g) => t("zones.zone", { zone: g.id }));
@@ -115,7 +116,6 @@ export function ZoneColumns({
   const annualZones: Zone[] = [...(league.annual?.zones ?? []).filter((z) => z.kind !== "relegation"), { kind: "relegation", from: 29, to: 30 }];
   const button = (active: boolean) =>
     `min-h-8 rounded-md px-3 text-sm font-semibold ${active ? "bg-white shadow-sm dark:bg-zinc-900" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300"}`;
-  const club = (id: TeamId | null) => (id !== null ? world.clubs[id]?.name ?? "" : "");
   return (
     <>
       <div className="min-w-0 space-y-3 lg:col-span-2 lg:col-start-1 lg:row-start-2" data-testid="world-zones" data-league={code}>
@@ -175,15 +175,30 @@ export function ZoneColumns({
             {...(stage.config.titleRound !== undefined ? { titleRound: stage.config.titleRound } : {})}
           />
         )}
-        {/* The Liga Profesional's champion of each tournament once decided. */}
-        {season.stages
-          .filter((s) => s.champion !== null && !s.config.promotedTo)
-          .map((s) => (
-            <p key={s.index} className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300" data-testid="world-zone-champion" data-stage={s.key}>
-              <Icon name="trophy" size={16} className="shrink-0 text-amber-500" />
-              {t("zones.champion", { tournament: tournament(s), club: club(s.champion), runnerUp: club(s.runnerUp) })}
-            </p>
-          ))}
+        {/* The Liga Profesional's champions, as the promoted clubs' card: the Apertura's and the Clausura's, each once its final is played. */}
+        {!stage.config.promotedTo && (
+          <section className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-950/40" data-testid="world-champions">
+            <h2 className="font-bold">{t("zones.championsTitle", { league: t(`leagues.${code}.name`), year: worldSeasonLabel(world, year, "ARG") })}</h2>
+            <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+              {season.stages.map((s) => {
+                const team = s.champion !== null ? teams.get(s.champion) : undefined;
+                return team ? (
+                  <li key={s.index} className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 dark:bg-zinc-900" data-testid="world-zone-champion" data-stage={s.key}>
+                    <TeamBadge team={team} size={24} />
+                    <span className="font-semibold">{team.name}</span>
+                    <span className="ml-auto text-xs text-zinc-500">{t("zones.championOf", { tournament: tournament(s) })}</span>
+                  </li>
+                ) : (
+                  <li key={s.index} className="flex items-center gap-2 rounded-lg bg-white/60 px-3 py-2 text-zinc-500 dark:bg-zinc-900/60" data-testid="world-zone-pending" data-stage={s.key}>
+                    <Icon name="trophy" size={20} className="shrink-0 text-zinc-400" />
+                    <span>{t("zones.championPending")}</span>
+                    <span className="ml-auto text-xs">{t("zones.championOf", { tournament: tournament(s) })}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
       </div>
       <div className="min-w-0 lg:col-start-3 lg:row-start-2" data-testid="world-fixtures">
         <FixtureList
