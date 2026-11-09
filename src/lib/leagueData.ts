@@ -51,6 +51,11 @@ export interface LeagueData {
    * left out (their goals count alone).
    */
   xg?: Record<number, readonly [number, number]>;
+  /**
+   * The season's promotion games once played (Primera B's grand final and
+   * play-off, see LeagueConfig.promotionPath), each tagged with which it is.
+   */
+  promotionGames?: (Fixture & { phase: "grandFinal" | "playoff" })[];
 }
 
 export interface Tournament {

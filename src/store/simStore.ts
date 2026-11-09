@@ -17,6 +17,12 @@ interface SeasonState {
   /** Cups: bumps every "New draw", changing the simulated pairings. */
   drawSalt?: number;
   /**
+   * Cups: drawn the way shared links made before the fair draw were
+   * (CupBuildOptions.fairDraw off), so such a link shows the ties its scores
+   * were typed for. Gone with the next "New draw" or a reset.
+   */
+  oldDraw?: true;
+  /**
    * Cups: the pairing ("home-away") each predicted slot had. A slot whose
    * pairing changes (new draw, real draw published, earlier upset) drops its
    * prediction, which belonged to another tie.
@@ -30,7 +36,7 @@ interface SimStore {
   history: Record<string, SeasonState[]>;
   setScore: (key: string, fixture: Fixture, score: Score | null) => void;
   applyResults: (key: string, results: ResultMap) => void;
-  replace: (key: string, fixtures: readonly Fixture[], predictions: ResultMap, extra?: { drawSalt?: number }) => void;
+  replace: (key: string, fixtures: readonly Fixture[], predictions: ResultMap, extra?: { drawSalt?: number; oldDraw?: boolean }) => void;
   /** Cups: a new simulated draw (undoable). */
   redraw: (key: string) => void;
   /** Cups: remembers the current pairings and drops predictions whose slot changed pairing; returns how many. */
@@ -108,12 +114,14 @@ export const useSimStore = create<SimStore>()(
 
         replace: (key, fixtures, predictions, extra) => {
           const overrides = fixtures.filter((f) => f.result && predictions[f.id]).map((f) => f.id);
-          commit(key, { predictions, overrides, ...(extra?.drawSalt ? { drawSalt: extra.drawSalt } : {}) });
+          commit(key, { predictions, overrides, ...(extra?.drawSalt ? { drawSalt: extra.drawSalt } : {}), ...(extra?.oldDraw ? { oldDraw: true as const } : {}) });
         },
 
         redraw: (key) => {
           const current = get().seasons[key] ?? empty;
-          commit(key, { ...current, drawSalt: (current.drawSalt ?? 0) + 1 });
+          // A new draw is a fair one, whatever the season was drawn with.
+          const { oldDraw: _old, ...rest } = current;
+          commit(key, { ...rest, drawSalt: (current.drawSalt ?? 0) + 1 });
         },
 
         syncPairings: (key, pairings) => {

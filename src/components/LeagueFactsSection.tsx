@@ -41,6 +41,17 @@ export async function LeagueFactsSection({ league, locale }: { league: LeagueCon
           groups: fact.groups.map((g) => t("placesList", { group: g.name[locale], list: list(g.places) })).join("; "),
         });
       }
+      case "splitDrawn":
+        return t("splitDrawn", {
+          perTournament: fact.perTournament ? "yes" : "no",
+          round: fact.afterRound,
+          count: fact.count,
+          groupCount: fact.groups.length,
+          groups: fact.groups.map((g) => g[locale]).join(", "),
+          heads: fact.heads,
+        });
+      case "promotionPath":
+        return t("promotionPath", { league: fact.promotedTo });
       case "splitHalves":
         return t("splitHalves", { round: fact.afterRound, top: fact.top, bottom: fact.bottom });
       case "tables":

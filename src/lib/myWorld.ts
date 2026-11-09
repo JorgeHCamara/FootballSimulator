@@ -626,7 +626,7 @@ function inheritedCup(start: StartCup, year: number, idOf: (division: DivisionCo
     if (mapped.some((id) => id === undefined)) return undefined;
     entrants[key as CupRoundKey] = mapped as TeamId[];
   }
-  const season: WorldCupSeason = { code: start.code, entrants, real };
+  const season: WorldCupSeason = { code: start.code, entrants, real, draw: 2 };
   return cupPlayable(season, year) ? season : undefined;
 }
 

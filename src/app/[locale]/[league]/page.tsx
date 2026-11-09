@@ -50,7 +50,7 @@ const pageSeason = (data: { season: string; tournaments?: unknown[] }) => (data.
 const playoffWording = (league: LeagueConfig) => league.zones.some((z) => z.kind === "playoffs");
 
 /** Which set of texts a page uses: league, play-off league, continental competition, or cup. */
-type Wording = "league" | "stages" | "reducido" | "leagueAmericas" | "leagueAsia" | "zones" | "tournaments" | "liguilla" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
+type Wording = "league" | "stages" | "promotionPath" | "reducido" | "leagueAmericas" | "leagueAsia" | "zones" | "tournaments" | "liguilla" | "playoffs" | "continental" | "continentalGroups" | "cup" | "cupBracket";
 
 type Loaded = { kind: "league"; config: LeagueConfig; data: LeagueData; wording: Wording } | { kind: "cup"; config: CupConfig; data: CupData; wording: "cup" | "cupBracket" };
 
@@ -67,7 +67,9 @@ async function load(slug: string): Promise<Loaded | undefined> {
     ? league.groups
       ? "continentalGroups"
       : "continental"
-    : league.split && league.playoff?.seedFromGroups
+    : league.promotionPath
+      ? "promotionPath" // Primera B: two tournaments (round robin, groups, final), the aggregate table and the promotion path
+      : league.split && league.playoff?.seedFromGroups
       ? "stages" // Série C: a first stage, promotion groups and a final
       : league.playoff?.titleRound !== undefined
       ? "reducido" // Primera Nacional: zone tables, the zone winners' final and the Reducido
@@ -98,6 +100,7 @@ const META_KEYS: Record<
       | "leagueDescriptionAsia"
       | "zonesDescription"
       | "stagesDescription"
+      | "promotionPathDescription"
       | "reducidoDescription"
       | "tournamentsDescription"
       | "liguillaDescription"
@@ -112,6 +115,7 @@ const META_KEYS: Record<
   leagueAsia: { title: "leagueTitle", description: "leagueDescriptionAsia" },
   zones: { title: "leagueTitle", description: "zonesDescription" },
   stages: { title: "leagueTitle", description: "stagesDescription" },
+  promotionPath: { title: "leagueTitle", description: "promotionPathDescription" },
   reducido: { title: "leagueTitle", description: "reducidoDescription" },
   tournaments: { title: "leagueTitle", description: "tournamentsDescription" },
   liguilla: { title: "leagueTitle", description: "liguillaDescription" },
@@ -175,7 +179,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
     wording === "zones" ||
     wording === "reducido" ||
     wording === "tournaments" ||
-    wording === "liguilla"
+    wording === "liguilla" ||
+    wording === "promotionPath"
       ? wording
       : wording === "playoffs"
         ? "leaguePlayoffs"
@@ -202,6 +207,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
               ? "introZones"
               : wording === "stages"
                 ? "introStages"
+              : wording === "promotionPath"
+                ? "introPromotionPath"
               : wording === "reducido"
                 ? "introReducido"
               : wording === "tournaments"
@@ -242,6 +249,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
                 ? "step3Zones"
                 : step === "step3" && wording === "stages"
                   ? "step3Stages"
+                : step === "step3" && wording === "promotionPath"
+                  ? "step3PromotionPath"
                 : step === "step3" && wording === "reducido"
                   ? "step3Reducido"
                 : step === "step3" && wording === "tournaments"
@@ -301,7 +310,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
           </span>
         </h1>
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{seo(intro, values)}</p>
-        {data.source === "live" && <p className="text-xs text-zinc-500">{t("provider" in data && data.provider === "first-party" ? "firstPartySource" : "liveSource")}</p>}
+        {data.source === "live" && <p className="text-xs text-zinc-500">{"provider" in data && data.provider === "first-party" ? t(`firstPartySource.${config.code}` as "liveSource") : t("liveSource")}</p>}
         {latestOdds && (
           <Link
             href={latestReportPath(config)}
@@ -344,6 +353,8 @@ export default async function LeaguePage({ params }: { params: Params }) {
           {...(matchParams ? { matchParams } : {})}
           {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
           {...(pastWinners ? { pastWinners } : {})}
+          {...(loaded.config.promotionPath && loaded.data.seasonYear !== undefined ? { seasonYear: loaded.data.seasonYear } : {})}
+          {...(loaded.data.promotionGames ? { promotionGames: loaded.data.promotionGames } : {})}
         />
       ) : (
         <LeagueSimulator

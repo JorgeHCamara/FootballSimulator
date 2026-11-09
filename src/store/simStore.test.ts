@@ -47,6 +47,18 @@ describe("typing a cup score keeps the cup's draw and pairings", () => {
     assert.equal(useSimStore.getState().seasons["CUP:a"]!.drawSalt, 1);
   });
 
+  it("a link shared before the fair draw keeps its old draw while scores are typed; a New draw or a reset is fair again", () => {
+    const store = useSimStore.getState();
+    store.replace("CUP:c", [], { [leg.id]: { home: 1, away: 0 } }, { drawSalt: 2, oldDraw: true });
+    store.setScore("CUP:c", leg, { home: 3, away: 0 });
+    assert.equal(useSimStore.getState().seasons["CUP:c"]!.oldDraw, true);
+    store.redraw("CUP:c");
+    assert.equal(useSimStore.getState().seasons["CUP:c"]!.oldDraw, undefined);
+    assert.equal(useSimStore.getState().seasons["CUP:c"]!.drawSalt, 3);
+    store.replace("CUP:d", [], {}, { oldDraw: false });
+    assert.equal(useSimStore.getState().seasons["CUP:d"]!.oldDraw, undefined, "a link made since: the fair draw");
+  });
+
   it("keeps each slot's pairing, so a semi-final with another club loses its old scores", () => {
     const store = useSimStore.getState();
     store.reset("CUP:b");
