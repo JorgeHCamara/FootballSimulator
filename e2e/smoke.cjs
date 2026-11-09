@@ -1983,7 +1983,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/premier-league`);
       assert.doesNotMatch(await p.locator("main").innerText(), /Other league simulators/);
       const links = (await p.locator("footer nav a").allInnerTexts()).map((x) => x.trim());
-      assert.equal(links.length, 48, "every competition once");
+      assert.equal(links.length, 49, "every competition once");
       assert.ok(links.every((x) => !/Simulator/.test(x)), links.join(", "));
       assert.ok(links.includes("Premier League") && links.includes("Süper Lig") && links.includes("Champions League"));
       await p.close();
@@ -3792,11 +3792,11 @@ async function step(name, fn) {
       await phone.context().close();
     });
 
-    await step("My World hero: one H1 per language, the badge, the button to the game (Start, then Continue once a world is saved), the facts counted from the config, the how-it-works card; 390px phone and desktop, no league named", async () => {
+    await step("My World hero: one H1 per language, the badge, the button to the game, the facts counted from the config, the how-it-works card; 390px phone and desktop, no league named; gone once a world is being played", async () => {
       const expected = {
-        en: { h1: "My World", badge: "Game mode", start: "Start your world", resume: "Continue your world", how: "How it works", facts: /^\d+ countries · \d+ leagues · \d+ cups (· )?Saved in your browser · No sign-up$/ },
-        pt: { h1: "Meu mundo", badge: "Modo de jogo", start: "Começar seu mundo", resume: "Continuar seu mundo", how: "Como funciona", facts: /^\d+ países · \d+ ligas · \d+ copas (· )?Salvo no seu navegador · Sem cadastro$/ },
-        es: { h1: "Mi mundo", badge: "Modo de juego", start: "Empezar tu mundo", resume: "Continuar tu mundo", how: "Cómo funciona", facts: /^\d+ países · \d+ ligas · \d+ copas (· )?Guardado en tu navegador · Sin registro$/ },
+        en: { h1: "My World", badge: "Game mode", start: "Start your world", how: "How it works", facts: /^\d+ countries · \d+ leagues · \d+ cups (· )?Saved in your browser · No sign-up$/ },
+        pt: { h1: "Meu mundo", badge: "Modo de jogo", start: "Começar seu mundo", how: "Como funciona", facts: /^\d+ países · \d+ ligas · \d+ copas (· )?Salvo no seu navegador · Sem cadastro$/ },
+        es: { h1: "Mi mundo", badge: "Modo de juego", start: "Empezar tu mundo", how: "Cómo funciona", facts: /^\d+ países · \d+ ligas · \d+ copas (· )?Guardado en tu navegador · Sin registro$/ },
       };
       const named = /Premier League|League Two|Bundesliga|La ?Liga|FA Cup|Copa del Rey|DFB/;
       for (const [locale, x] of Object.entries(expected)) {
@@ -3839,22 +3839,40 @@ async function step(name, fn) {
           await ctx.close();
         }
       }
-      // A saved world: the button says Continue (the server still renders Start, the browser's save decides after loading).
+      // A world being played: the hero goes (it's for visitors yet to start one), as soon as the world is created and on every visit after; its H1 stays for screen readers.
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await p.goto(`${BASE_URL}/en/my-world`);
       await p.getByTestId("world-setup").waitFor();
+      assert.ok(await p.getByTestId("world-hero-badge").isVisible(), "the hero before a world");
       await p.locator('[data-testid="world-country"][data-country="ENG"]').click();
       await p.locator('[data-testid="world-league"][data-league="EL2"]').click();
       await p.getByTestId("world-club").first().click();
       await p.getByTestId("world-create").click();
       await p.getByTestId("world").waitFor();
+      await p.getByTestId("world-hero-badge").waitFor({ state: "hidden" });
+      // On a new visit, hidden from the first paint: never drawn, not even before the game loads.
+      await p.addInitScript(() => {
+        window.__heroShown = false;
+        new MutationObserver(() => {
+          const badge = document.querySelector('[data-testid="world-hero-badge"]');
+          if (badge && badge.getBoundingClientRect().height > 0) window.__heroShown = true;
+        }).observe(document, { childList: true, subtree: true, attributes: true });
+      });
       await p.reload();
       await p.getByTestId("world").waitFor();
-      await p.waitForFunction(() => document.querySelector('[data-testid="world-hero-cta"]')?.dataset.state === "continue");
-      assert.equal((await p.getByTestId("world-hero-cta").innerText()).trim(), expected.en.resume);
-      await p.getByTestId("world-hero-cta").click();
-      await p.waitForFunction(() => scrollY > 200 && document.querySelector("#play").getBoundingClientRect().top < innerHeight / 2);
+      assert.equal(await p.evaluate(() => window.__heroShown), false, "the hero never shows to a player");
+      for (const id of ["world-hero-badge", "world-hero-intro", "world-hero-cta", "world-hero-facts", "world-hero-how"]) assert.equal(await p.getByTestId(id).isVisible(), false, id);
+      assert.equal(await p.locator("h1").count(), 1);
+      assert.equal(await p.locator("h1").innerText(), expected.en.h1, "the H1 kept for screen readers");
+      // The game starts at the top of the page.
+      assert.ok((await p.getByTestId("world").boundingBox()).y < 250);
+      // Another page doesn't keep the mark; without the world, the hero is back.
+      await p.goto(`${BASE_URL}/en`);
+      assert.equal(await p.evaluate(() => document.documentElement.hasAttribute("data-world-playing")), false);
       await p.evaluate(() => localStorage.removeItem("footsimu:my-world"));
+      await p.goto(`${BASE_URL}/en/my-world`);
+      await p.getByTestId("world-setup").waitFor();
+      assert.ok(await p.getByTestId("world-hero-badge").isVisible(), "the hero back without a world");
       await p.close();
     });
 

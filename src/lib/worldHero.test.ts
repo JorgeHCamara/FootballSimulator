@@ -27,7 +27,7 @@ describe("My World hero", () => {
       const w = world(locale);
       const texts = [w.intro, w.homeBody, ...Object.values(w.hero), ...Object.values(w.how)];
       for (const text of texts) assert.doesNotMatch(text, NAMED, `${locale}: ${text}`);
-      for (const key of ["badge", "start", "continue", "countries", "leagues", "cups", "saved", "noSignup"]) assert.ok(w.hero[key], `${locale}: hero.${key}`);
+      for (const key of ["badge", "start", "countries", "leagues", "cups", "saved", "noSignup"]) assert.ok(w.hero[key], `${locale}: hero.${key}`);
       for (const key of ["countries", "leagues", "cups"]) assert.match(w.hero[key]!, /^\{count\} /, `${locale}: hero.${key} takes the count`);
       for (const step of HOW_STEPS) assert.ok((w.how[step.key] ?? "").length > 30, `${locale}: how.${step.key}`);
       assert.ok(w.how.title);

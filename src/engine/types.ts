@@ -65,4 +65,8 @@ export type Tiebreaker =
   | "headToHeadPoints"
   | "headToHeadGoalDifference"
   | "headToHeadGoalsFor"
-  | "headToHeadAwayGoalsFor";
+  | "headToHeadAwayGoalsFor"
+  /** Fewer goals conceded away (Primera B). */
+  | "fewerAwayGoalsAgainst"
+  /** The clubs in StandingsOptions.seeded first (Primera B's groups: the heads prevail over clubs level on points). */
+  | "seeded";

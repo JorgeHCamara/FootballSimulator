@@ -202,15 +202,28 @@ export function buildSplitPhase(input: SplitPhaseInput): SplitPhase {
   return { firstPhase, complete, firstTable, members, groupFixtures, generated, startPoints };
 }
 
-/** A group's table: its own games only, from its starting points; level clubs by their place in the first phase. */
+/**
+ * A group's table: its own games only, from its starting points; level clubs
+ * by their place in the first phase. With the "seeded" criterion, the group's
+ * head (its best-placed club in the first phase: Primera B's 1st and 2nd head
+ * the two groups) prevails over the clubs level with it.
+ */
 export function splitGroupTable(phase: SplitPhase, group: number, teams: readonly Team[], results: ResultMap, options: StandingsOptions): StandingRow[] {
   const ids = phase.members?.[group];
   if (!ids) return [];
   const members = new Set(ids);
+  const head = options.tiebreakers.includes("seeded") ? phase.firstTable.find((r) => members.has(r.teamId))?.teamId : undefined;
   return computeStandings(
     teams.filter((t) => members.has(t.id)),
     phase.groupFixtures[group] ?? [],
     results,
-    { ...options, split: undefined, deductions: undefined, startPoints: phase.startPoints[group] ?? {}, fallbackOrder: phase.firstTable.map((r) => r.teamId) },
+    {
+      ...options,
+      split: undefined,
+      deductions: undefined,
+      startPoints: phase.startPoints[group] ?? {},
+      fallbackOrder: phase.firstTable.map((r) => r.teamId),
+      ...(head !== undefined ? { seeded: [head] } : {}),
+    },
   );
 }

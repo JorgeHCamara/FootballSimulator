@@ -32,6 +32,12 @@ export type ZoneKind =
   | "conferenceLeaguePlayoff"
   | "titlePlayoffs"
   | "promotionFinal"
+  /** Primera B: the round robin's top 8, into the semi-final groups (cuadrangulares). */
+  | "semifinalGroups"
+  /** Primera B: a group's winner, into the tournament's final. */
+  | "tournamentFinal"
+  /** Primera B: the aggregate table's top two, promoted with the champions or into the play-off (see promotionPath). */
+  | "promotionContention"
   | "knockoutRoundOf16"
   | "knockoutPlayoff"
   | "eliminated";
@@ -43,8 +49,8 @@ export interface Zone {
   to: number;
 }
 
-/** Competition codes (football-data.org codes, plus BSB and BSC for Brasileirão Séries B and C, and MLS). */
-export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "BSC" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "PN" | "CHI" | "COL" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL" | "ABL";
+/** Competition codes (football-data.org codes, plus BSB and BSC for Brasileirão Séries B and C, COLB for Colombia's Primera B, and MLS). */
+export type CompetitionCode = "PL" | "ELC" | "EL1" | "EL2" | "PD" | "SD" | "BL1" | "BL2" | "SA" | "SB" | "FL1" | "FL2" | "DJL" | "PPL" | "DED" | "BSA" | "BSB" | "BSC" | "MLS" | "UCL" | "UEL" | "UECL" | "LIB" | "SUD" | "ARG" | "PN" | "CHI" | "COL" | "COLB" | "URU" | "PAR" | "MX" | "ECU" | "PER" | "SPL" | "J1" | "SPFL" | "TSL" | "BPL" | "GSL" | "ABL";
 
 /** A league on ESPN's public feed. */
 export interface EspnFeed {
@@ -165,6 +171,12 @@ export interface LeagueConfig {
     firstPhaseShortName?: Record<SiteLocale, string>;
     /** The groups' own tiebreakers, when they differ from the first phase's (Série C: head-to-head in the groups only). */
     groupTiebreakers?: readonly Tiebreaker[];
+    /**
+     * The groups come from a draw (Primera B): the first phase's top `heads`
+     * head them, one each, and the others are drawn; the groups' `places`
+     * are only a projection until the real draw is in the data.
+     */
+    drawn?: { heads: number };
   };
   /**
    * Real data comes from ESPN and falls back to football-data.org (with `code`
@@ -211,12 +223,21 @@ export interface LeagueConfig {
     /** The real play-off games count in the annual table too (Colombia's reclasificación). */
     includePostseason?: boolean;
   };
+  /**
+   * Promotion decided by the tournaments' champions and the annual table
+   * (Colombia's Primera B): the champions go up when they are among the
+   * annual table's top two, else a grand final and a play-off decide the
+   * places (see src/engine/promotionPath.ts).
+   */
+  promotionPath?: { promotedTo: string };
 }
 
 /** A first-party league's committed season (see LeagueConfig.firstParty). */
 export interface FirstPartySource {
   /** The season's year, which names its data file. */
   season: number;
+  /** A season of several tournaments (Primera B), latest first, as EspnFeed.stages lists ESPN's. */
+  tournaments?: readonly EspnStages[];
 }
 
 /** "split" (August–May) or "calendar" seasons: the feed's, or a calendar year for a first-party league. */
@@ -1272,6 +1293,92 @@ export const LEAGUES: readonly LeagueConfig[] = [
         { kind: "sudamericana", from: 3, to: 5 },
       ],
     },
+  },
+  {
+    code: "COLB",
+    slug: "colombia-primera-b",
+    name: "Primera B",
+    country: "Colombia",
+    flag: "co",
+    simulatorName: { en: "Colombian Primera B Simulator", pt: "Simulador da Primera B Colombiana", es: "Simulador de la Primera B" },
+    aka: { en: "Categoría Primera B", pt: "Torneo BetPlay Dimayor", es: "Torneo BetPlay Dimayor" },
+    teams: 16,
+    // Primera B 2026 (Dimayor's Reglamento Torneo BetPlay 2026, Arts. 4–25):
+    // two tournaments, I and II, each a single round robin (15 games; the
+    // second's fixtures are the first's with the grounds swapped), then its
+    // top 8 in two groups of 4, home and away, from zero points (1st and 2nd
+    // head groups A and B, 3rd–8th drawn into them), and a two-legged final
+    // between the group winners. Two places in the 2027 Primera A: see
+    // `promotionPath`. No relegation (there is no third division). ESPN has
+    // no 2026 Primera B: the season is the site's own data
+    // (scripts/import-primera-b.ts).
+    gamesPerTeam: 15,
+    firstParty: {
+      season: 2026,
+      tournaments: [
+        { table: "torneo-ii", knockout: [], name: "Torneo II" },
+        { table: "torneo-i", knockout: [], name: "Torneo I" },
+      ],
+    },
+    // Round robin: goal difference, goals scored, away goals scored, fewer
+    // goals conceded (always level by then), fewer away goals conceded, then a
+    // draw (a tie for 8th: a decider match, not modelled).
+    tiebreakers: ["points", "goalDifference", "goalsFor", "awayGoalsFor", "fewerAwayGoalsAgainst"],
+    split: {
+      afterRound: 15,
+      // The real draws are in the data; before one, a projection: the heads,
+      // then the others alternately.
+      groups: [
+        { size: 4, legs: 2, carryOver: 0, places: [1, 3, 6, 8] },
+        { size: 4, legs: 2, carryOver: 0, places: [2, 4, 5, 7] },
+      ],
+      // In the groups the head (1st or 2nd of the round robin) prevails on
+      // level points; then the group's goal difference, goals, away goals,
+      // fewer away goals conceded, and the better round-robin place.
+      groupTiebreakers: ["points", "seeded", "goalDifference", "goalsFor", "awayGoalsFor", "fewerAwayGoalsAgainst"],
+      finalZones: [
+        { kind: "title", from: 1, to: 1 },
+        { kind: "tournamentFinal", from: 1, to: 2 },
+      ],
+      firstPhaseName: { en: "Round robin", pt: "Todos contra todos", es: "Todos contra todos" },
+      firstPhaseShortName: { en: "Round robin", pt: "Turno único", es: "Todos c. todos" },
+      drawn: { heads: 2 },
+    },
+    zones: [{ kind: "semifinalGroups", from: 1, to: 8 }],
+    groups: [
+      {
+        id: "A",
+        espnName: "",
+        name: { en: "Group A", pt: "Grupo A", es: "Grupo A" },
+        shortName: { en: "Group A", pt: "Grupo A", es: "Grupo A" },
+        zones: [{ kind: "tournamentFinal", from: 1, to: 1 }],
+      },
+      {
+        id: "B",
+        espnName: "",
+        name: { en: "Group B", pt: "Grupo B", es: "Grupo B" },
+        shortName: { en: "Group B", pt: "Grupo B", es: "Grupo B" },
+        zones: [{ kind: "tournamentFinal", from: 1, to: 1 }],
+      },
+    ],
+    // The final: more points over the two legs, then goal difference (the
+    // aggregate), then penalties, no extra time; the club with more points
+    // over the round robin and the groups hosts the second leg.
+    playoff: {
+      seedFromGroups: { places: 1, campaign: true },
+      rounds: [{ key: "final", legs: 2, levelTie: "penalties", noExtraTime: true, pairs: [[1, 2]] }],
+      // "Primera B Torneo II 2026 champion".
+      title: "Primera B",
+    },
+    // The reclasificación: every game of both tournaments (round robins,
+    // groups and finals; not the grand final or the play-off): its top two
+    // decide who goes up with the champions (see `promotionPath`).
+    annual: {
+      name: { en: "Aggregate table", pt: "Reclassificação", es: "Reclasificación" },
+      includePostseason: true,
+      zones: [{ kind: "promotionContention", from: 1, to: 2 }],
+    },
+    promotionPath: { promotedTo: "Primera A" },
   },
   {
     code: "URU",
