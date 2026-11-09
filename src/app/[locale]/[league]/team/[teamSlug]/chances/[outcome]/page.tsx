@@ -17,8 +17,8 @@ import { loadClub, type LoadedClub } from "../../../../../../../lib/clubPage.ts"
 import { ordinal, placeRange } from "../../../../../../../lib/clubText.ts";
 import { OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd } from "../../../../../../../lib/site.ts";
 
-/** As the club page: refreshed at most every hour (ISR). */
-export const revalidate = 3600;
+/** As the club page: rebuilt when the league's results change, else every six hours at most (ISR). */
+export const revalidate = 21600;
 /** Room for the shared outlook on a cold server (see the club page). */
 export const maxDuration = 60;
 

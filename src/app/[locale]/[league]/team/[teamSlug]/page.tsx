@@ -20,8 +20,8 @@ import { listOf, ordinal, percent, placeRange } from "../../../../../lib/clubTex
 import { inIndexWindow, matchPath, matchSlug } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
 
-/** Regenerated in the background at most every hour, like the league pages (the league data is refreshed hourly). */
-export const revalidate = 3600;
+/** As the league page: rebuilt when the league's results change, else every six hours at most (see its revalidate). */
+export const revalidate = 21600;
 /**
  * Room for a cold render (the league's data from ESPN, its conferences retried,
  * the shared outlook worked out) when many club pages are visited at once,

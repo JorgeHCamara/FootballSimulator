@@ -19,11 +19,12 @@ import { inIndexWindow } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
 
 /**
- * Regenerated in the background every few hours at most; in practice hourly
- * (the league data's refresh), and every 10 minutes on match day, when the
- * game's own state is fetched (see MATCH_DAY_REVALIDATE).
+ * Rebuilt when the league's results change (as the league page), else every
+ * six hours at most; and every 10 minutes on match day, when the game's own
+ * state is fetched (see MATCH_DAY_REVALIDATE: match day starts six hours
+ * before kick-off, so a page built before it is rebuilt in time).
  */
-export const revalidate = 10800;
+export const revalidate = 21600;
 /** Three season simulations for "What this result means" on a first visit. */
 export const maxDuration = 60;
 
