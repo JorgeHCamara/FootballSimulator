@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { COMPETITIONS } from "../config/competitions.ts";
-import { Link } from "../i18n/navigation.ts";
+import { IntentLink } from "./IntentLink.tsx";
 import { Flag } from "./Flag.tsx";
 
 export function SiteFooter() {
@@ -13,10 +13,11 @@ export function SiteFooter() {
           <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
             {COMPETITIONS.map((l) => (
               <li key={l.code}>
-                <Link href={`/${l.slug}`} className="flex items-center gap-1.5 text-zinc-600 hover:text-pitch-700 dark:text-zinc-400 dark:hover:text-pitch-100">
+                {/* Fifty competitions on every page: prefetched on intent only (src/components/IntentLink.tsx). */}
+                <IntentLink href={`/${l.slug}`} className="flex items-center gap-1.5 text-zinc-600 hover:text-pitch-700 dark:text-zinc-400 dark:hover:text-pitch-100">
                   <Flag code={l.flag} width={16} />
                   {l.name}
-                </Link>
+                </IntentLink>
               </li>
             ))}
           </ul>
@@ -24,9 +25,9 @@ export function SiteFooter() {
         <ul className="mt-6 flex justify-center gap-x-5 text-sm" data-testid="site-links">
           {(["about", "privacy", "contact"] as const).map((page) => (
             <li key={page}>
-              <Link href={`/${page}`} className="text-zinc-600 hover:text-pitch-700 hover:underline dark:text-zinc-400 dark:hover:text-pitch-100">
+              <IntentLink href={`/${page}`} className="text-zinc-600 hover:text-pitch-700 hover:underline dark:text-zinc-400 dark:hover:text-pitch-100">
                 {t(page)}
-              </Link>
+              </IntentLink>
             </li>
           ))}
         </ul>

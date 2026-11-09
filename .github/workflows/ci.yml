@@ -17,3 +17,5 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # Each function carries the files it reads from disk, and no others (src/config/fileTracing.ts).
+      - run: npm run traces:check

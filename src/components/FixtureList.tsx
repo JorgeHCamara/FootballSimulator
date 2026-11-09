@@ -6,6 +6,7 @@ import { needsShootout, seriesGames, tieOutcome, type PlayoffSide, type PlayoffT
 import { isSlotTeamId } from "../engine/split.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
 import { Link } from "../i18n/navigation.ts";
+import { IntentLink } from "./IntentLink.tsx";
 import { LinkPendingIcon } from "./LinkPendingIcon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { Icon } from "./Icon.tsx";
@@ -71,6 +72,8 @@ interface Props {
 }
 
 export function FixtureList(props: Props) {
+  // The first game of the matchday shown still to be played, with a preview page (see MatchRow's eagerPreview).
+  const nextToPlay = props.matchPage ? props.fixtures.find((f) => !f.result && props.matchPage!(f))?.id : undefined;
   const { matchday, matchdays, onMatchdayChange, fixtures, teams, predictions, onScore, onSimulate, playoff, playout, note, roundLabels, matchPage, kickOff = true, readOnly = false } = props;
   const t = useTranslations("Simulator");
   const index = matchdays.indexOf(matchday);
@@ -125,6 +128,8 @@ export function FixtureList(props: Props) {
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {fixtures.map((f) => (
             <MatchRow
+              // The matchday's next game to be played: its preview, the likeliest next page, is fetched while on screen.
+              eagerPreview={f.id === nextToPlay}
               key={f.id}
               fixture={f}
               home={teams.get(f.homeId)!}
@@ -409,6 +414,8 @@ interface RowProps {
   inlineDice?: boolean;
   /** The game's preview page: a chart button next to the dice. */
   preview?: string;
+  /** Prefetch the preview as soon as it's on screen (the matchday's next game), not on intent. */
+  eagerPreview?: boolean;
   /** The kick-off time above the game (else only its label, if it has one). */
   kickOff?: boolean;
   fixture: Fixture;
@@ -431,18 +438,18 @@ function parseGoals(text: string): number | null {
 const actionButton =
   "flex h-11 w-11 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 sm:h-8 sm:w-8 dark:hover:bg-zinc-800 dark:hover:text-zinc-100";
 
-/** A club's short name, linking to its own page when it has one. */
+/** A club's short name, linking to its own page when it has one (prefetched on intent: a matchday puts twenty on screen). */
 function TeamName({ team }: { team: Team }) {
   return team.page ? (
-    <Link href={team.page} className="truncate hover:underline" data-testid="club-link">
+    <IntentLink href={team.page} className="truncate hover:underline" data-testid="club-link">
       {team.shortName}
-    </Link>
+    </IntentLink>
   ) : (
     <span className="truncate">{team.shortName}</span>
   );
 }
 
-export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false, preview, kickOff = true }: RowProps) {
+export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate, disabled = false, label, attached = false, joinsNext = false, tags, winner, inlineDice = false, preview, eagerPreview = false, kickOff = true }: RowProps) {
   const side = (id: TeamId) => (winner == null ? "" : winner === id ? "font-bold" : "opacity-60");
   const t = useTranslations("Simulator");
   const shown = prediction ?? fixture.result ?? null;
@@ -558,20 +565,26 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
       {/* The game's actions: its preview page, then the dice. A full fingertip each on phones, smaller from tablets up. */}
       {(preview || (showInputs && !disabled && !inlineDice)) && (
         <div className="mt-1 flex justify-end gap-2" data-testid="match-actions">
-          {preview && (
-            <Link
-              href={preview}
-              // Fetched while the button is on screen, so the page is ready when it's tapped (a first
-              // visit works out the season; its "What this result means" loads after, on the page).
-              prefetch
-              aria-label={t("matchPreview")}
-              className={actionButton}
-              data-testid="match-preview-link"
-            >
-              {/* A spinner from the tap until the preview shows (when it isn't prefetched yet). */}
-              <LinkPendingIcon name="chart-column" />
-            </Link>
-          )}
+          {preview &&
+            (eagerPreview ? (
+              <Link
+                href={preview}
+                // The matchday's next game: fetched in full while the button is on screen, so the page is ready when
+                // it's tapped (a first visit works out the season; its "What this result means" loads after, on the page).
+                prefetch
+                aria-label={t("matchPreview")}
+                className={actionButton}
+                data-testid="match-preview-link"
+              >
+                {/* A spinner from the tap until the preview shows (when it isn't prefetched yet). */}
+                <LinkPendingIcon name="chart-column" />
+              </Link>
+            ) : (
+              // The other games: fetched in full once the pointer, focus or a finger is on the button.
+              <IntentLink href={preview} intentPrefetch aria-label={t("matchPreview")} className={actionButton} data-testid="match-preview-link">
+                <LinkPendingIcon name="chart-column" />
+              </IntentLink>
+            ))}
           {showInputs && !disabled && !inlineDice && (
             <button type="button" onClick={onSimulate} aria-label={t("simulateMatch")} className={actionButton} data-testid="match-dice-button">
               <Icon name="dices" size={18} />

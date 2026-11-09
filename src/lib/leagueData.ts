@@ -11,6 +11,7 @@ import { firstPartyData } from "./firstParty.ts";
 import { withClubPages } from "./clubs.ts";
 import { ratingXgWeight } from "../engine/ratings.ts";
 import { readXg } from "./xgStore.ts";
+import { espnDataKey } from "./dataCacheKey.ts";
 
 export interface LeagueData {
   teams: Team[];
@@ -114,13 +115,6 @@ const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 const PAST_SEASON_KEEP_SECONDS = 86400;
 
 /**
- * The deployment: part of every kept league's key, so a deployment that
- * changes how the feed is read never serves data read the old way (the data
- * cache outlives deployments).
- */
-export const DEPLOYMENT = process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMMIT_SHA ?? "local";
-
-/**
  * A league's ESPN data, kept in the data cache as read (about 50–100 KB),
  * not as ESPN sends it: a season's scoreboard is 4–6 MB, and Next's data
  * cache keeps no fetch over 2 MB, so it was downloaded and read again on every
@@ -128,16 +122,24 @@ export const DEPLOYMENT = process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL
  * one. Inside the cached function ESPN's requests skip the data cache (Next
  * treats them as no-store there). Tagged with the league's data tag, so the
  * route expires it with the league's pages when new results are in. A load
- * that fails isn't kept.
+ * that fails isn't kept. Keyed by how it's read, not by deployment, so a new
+ * deployment reuses it (see src/lib/dataCacheKey.ts: when to bump
+ * ESPN_PARSER_VERSION); the current season's key carries its year, so the
+ * season rollover starts a new entry.
  */
 async function keptEspn(league: LeagueConfig, years: readonly number[] | undefined, keepSeconds: number): Promise<LeagueData> {
   const load = () => loadEspn(league, years);
   try {
-    return await unstable_cache(load, ["league-data", league.code, years ? years.join(",") : "current", DEPLOYMENT], { tags: [`league:${league.code}`], revalidate: keepSeconds })();
+    return await unstable_cache(load, keptLeagueKey(league, years), { tags: [`league:${league.code}`], revalidate: keepSeconds })();
   } catch (error) {
     if (noDataCache(error)) return load();
     throw error;
   }
+}
+
+/** keptEspn's key: the current season's (by its year as of `now`) or the years asked for (see src/lib/dataCacheKey.ts). */
+export function keptLeagueKey(league: LeagueConfig, years?: readonly number[], now = new Date(), env: Record<string, string | undefined> = process.env): string[] {
+  return espnDataKey("league-data", league.code, years ? years.join(",") : `current-${currentSeasonYear(league, now)}`, league, env);
 }
 
 const inflight = new Map<string, Promise<LeagueData>>();
@@ -331,7 +333,7 @@ async function keptEspnGroups(league: LeagueConfig, year: number, init: RequestI
   const load = () => withRetry(() => loadEspnGroups(league, year, init));
   if (fresh) return load();
   try {
-    return await unstable_cache(load, ["espn-groups", league.code, String(year)], { tags: [`league:${league.code}`], revalidate: leagueDataKeepSeconds() })();
+    return await unstable_cache(load, espnDataKey("espn-groups", league.code, String(year), league), { tags: [`league:${league.code}`], revalidate: leagueDataKeepSeconds() })();
   } catch (error) {
     if (noDataCache(error)) return load();
     throw error;
@@ -444,6 +446,34 @@ export async function freshLeagueData(league: LeagueConfig): Promise<LeagueData 
     return await withXg(league, { ...data, teams: withClubPages(league, data.teams) });
   } catch (error) {
     console.warn(`${league.code}: no fresh ESPN data:`, error);
+    return undefined;
+  }
+}
+
+/**
+ * A league's data read straight from its source (a season by its year, or the
+ * current one), past the data cache and past this server's shared requests
+ * (getLeagueData's): for a cached function's own use, such as a past round's
+ * odds report (src/lib/oddsArchive.ts). Inside a cached function the data
+ * cache is skipped anyway (Next bypasses a cache within a cache), and a
+ * request started there must not be shared with a page being rendered: the
+ * page wouldn't be tagged with the league's data tag, so new results wouldn't
+ * refresh it. With sample data, the sample league; a first-party league's
+ * committed season. Undefined when the source fails.
+ */
+export async function uncachedLeagueData(league: LeagueConfig, year?: number): Promise<LeagueData | undefined> {
+  try {
+    let data: LeagueData;
+    if (league.firstParty || process.env.FOOTSIMU_SAMPLE_DATA === "1") {
+      // Only the one season of their own.
+      if (year !== undefined) return undefined;
+      data = league.firstParty ? firstPartyData(league) : loadSample(league);
+    } else {
+      data = await loadEspn(league, year === undefined ? undefined : [year], true);
+    }
+    return { ...data, teams: withClubPages(league, data.teams) };
+  } catch (error) {
+    console.warn(`${league.code}: no ${year ?? "current"} season straight from ESPN:`, error);
     return undefined;
   }
 }

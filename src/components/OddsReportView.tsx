@@ -5,7 +5,7 @@ import { Link } from "../i18n/navigation.ts";
 import { percent } from "../lib/clubText.ts";
 import { matchPath, matchSlug } from "../lib/matchSlug.ts";
 import type { LoadedReport } from "../lib/oddsPage.ts";
-import { clubGames, latestReportPath, moversCardSections, reportGames, reportPath, resultOfRound, type Category, type Change } from "../lib/oddsReports.ts";
+import { clubGames, latestReportPath, moversCardSections, reportPath, resultOfRound, type Category, type Change } from "../lib/oddsReports.ts";
 import { dateLocale, reportText, type Translate } from "../lib/oddsText.ts";
 import { HREFLANG, SITE_NAME, SITE_URL } from "../lib/site.ts";
 import { Flag } from "./Flag.tsx";
@@ -22,12 +22,11 @@ const card = "rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-80
 /** One league's "what changed" report for a round: movers, every club's chances, the round's key game, the race so far. */
 export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport; locale: string }) {
   const lang = (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
-  const { report, data, teams, league, latest } = loaded;
+  const { report, games, teams, league, latest } = loaded;
   const { t, round, season, h1, topic, race, leader, name, count, description } = await reportText(loaded, lang);
   const seo = (await getTranslations({ locale: lang, namespace: "Seo" })) as unknown as Translate;
   const pct = (share: number) => percent(share, lang);
   const previousRound = report.previous ? t("round", { n: report.previous.round }) : undefined;
-  const games = data ? reportGames(report, data) : [];
   const perClub = clubGames(games);
   const path = latest ? latestReportPath(league) : reportPath(league, report.snapshot.round);
   const pageUrl = `${SITE_URL}/${locale}${path}`;
