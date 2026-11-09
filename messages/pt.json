@@ -1639,7 +1639,9 @@
       "annual": "Tabela anual",
       "round": "Rodada {round}",
       "annualNote": "Os jogos dos dois torneios: os dois últimos caem (o segundo rebaixamento real sai da média das três temporadas, que não é calculada aqui).",
-      "champion": "{tournament}: {club} campeão, vencendo {runnerUp} na final.",
+      "championsTitle": "Campeões da {league} {year}",
+      "championOf": "Campeão do {tournament}",
+      "championPending": "A definir",
       "switch": "Zona"
     }
   }

@@ -396,6 +396,7 @@ export function WorldSeason({
   // Argentina's zone leagues: the zones' tables and a tournament's fixtures and play-off (src/components/WorldZones.tsx).
   const zoneColumns = state.zones ? (
     <ZoneColumns
+      key={code}
       world={world}
       year={world.year}
       code={code}

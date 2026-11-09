@@ -1638,7 +1638,9 @@
       "annual": "Tabla anual",
       "round": "Fecha {round}",
       "annualNote": "Los partidos de los dos torneos: los dos últimos descienden (el segundo descenso real sale de los promedios de tres temporadas, que aquí no se calculan).",
-      "champion": "{tournament}: {club} campeón, al ganarle la final a {runnerUp}.",
+      "championsTitle": "Campeones de la {league} {year}",
+      "championOf": "Campeón del {tournament}",
+      "championPending": "A definir",
       "switch": "Zona"
     }
   }
