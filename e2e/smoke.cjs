@@ -736,7 +736,8 @@ async function step(name, fn) {
       // A link from before the fair draw (no f=1) opens with the draw it was made with, and passes it on when shared again.
       const old = await (await browser.newContext()).newPage();
       await old.goto(shareUrl.replace(/[?&]f=1/, ""));
-      await old.locator('[data-testid="round-bar"]').waitFor();
+      // The link is applied once the page has taken it out of the address.
+      await old.waitForFunction(() => !location.search.includes("r="));
       const reshared = await old.evaluate(async () => {
         let copied = "";
         navigator.clipboard.writeText = async (text) => { copied = text; };
