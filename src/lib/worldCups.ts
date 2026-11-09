@@ -80,6 +80,12 @@ export interface WorldCupSeason {
   real?: WorldCupTie[];
   /** The season's scores beyond those: typed in, rolled or simulated, by game id (legs and shoot-outs, as the cup engine numbers them). */
   scores?: Record<number, [number, number]>;
+  /**
+   * 2: drawn fairly (CupBuildOptions.fairDraw), as every season since this
+   * field came in. A season without it keeps the draw it started with until
+   * it ends, so its rounds already played keep their pairings.
+   */
+  draw?: 2;
 }
 
 /** A finished season's cup, as saved. */
@@ -131,7 +137,7 @@ export function generateCup(code: WorldCupCode, ranking: readonly (readonly Team
     if (ids.length < needed) throw new Error(`${code}: ${ids.length} clubs for the ${round.key}, ${needed} needed`);
     entrants[round.key] = ids;
   });
-  return { code, entrants };
+  return { code, entrants, draw: 2 };
 }
 
 /** A country's cups' seasons drawn among its clubs (generateCup). */
@@ -166,6 +172,7 @@ const buildOptions = (cup: CupConfig, season: WorldCupSeason, year: number, seed
   entrants: season.entrants,
   // The draws are the world's own: the same world and season always draw the same.
   drawSalt: (seed ^ Math.imul(year + 1, 0x9e3779b1)) >>> 0,
+  ...(season.draw === 2 ? { fairDraw: true } : {}),
   roundDates: Object.fromEntries(cup.rounds.map((round, r) => [round.key, cupDate(year, r)])),
   ...(tiers ? { tiers } : {}),
 });

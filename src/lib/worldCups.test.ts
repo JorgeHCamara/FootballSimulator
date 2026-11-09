@@ -299,6 +299,15 @@ describe("My World: a cup played your way", () => {
     const other = createWorld(pack, { league: "EL2", club: pack.leagues[3]!.teams[4]!.id }, 43, new Date("2026-11-06T12:00:00Z"));
     assert.notDeepEqual(cupState(other, "FAC").rounds[0]!.ties.map((t) => [t.homeId, t.awayId]), cupState(world, "FAC").rounds[0]!.ties.map((t) => [t.homeId, t.awayId]), "another seed, another draw");
   });
+
+  it("draws fairly: a new world's cups are marked so, while a season saved before keeps the draw it started with", () => {
+    assert.deepEqual(world.cups.map((c) => c.draw), [2, 2]);
+    const pairs = (w: World) => cupState(w, "EFC").rounds.flatMap((r) => r.ties.map((t) => `${t.homeId}-${t.awayId}`));
+    const { draw: _draw, ...older } = world.cups[1]!;
+    const saved = { ...world, cups: [world.cups[0]!, older] };
+    assert.notDeepEqual(pairs(saved), pairs(world), "the older draw, kept for a season under way");
+    assert.deepEqual(pairs(saved), pairs({ ...saved }), "and the same every time");
+  });
 });
 
 describe("My World: the cups at the season's end", () => {
@@ -359,6 +368,10 @@ describe("My World: the cups at the season's end", () => {
     w = playSeason(w);
     const past = pastCup(w, world.year, "FAC")!;
     for (const tie of past.rounds![0]!.ties) assert.deepEqual(tie.game.result, picks[tie.game.id], "the first round as it was played");
+  });
+
+  it("next season's cups are drawn fairly too", () => {
+    assert.deepEqual(next.cups.map((c) => c.draw), [2, 2]);
   });
 
   it("the season's cups are the same whatever the world's clubs did in the leagues: drawn from the world's seed", () => {
