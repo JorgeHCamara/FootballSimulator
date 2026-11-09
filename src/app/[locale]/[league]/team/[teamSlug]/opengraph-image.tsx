@@ -23,7 +23,8 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
     getTranslations({ locale: lang, namespace: "ShareCard" }),
     getTranslations({ locale: lang, namespace: "Simulator" }),
   ]);
-  const generic = () => renderGenericShareCard({ title: getLeagueBySlug(slug)?.name ?? "FootSimu", subtitle: ts("genericSubtitle"), cta: ts("cta") });
+  // A stand-in (the club didn't load, or its card can't be drawn): kept briefly.
+  const generic = () => renderGenericShareCard({ title: getLeagueBySlug(slug)?.name ?? "FootSimu", subtitle: ts("genericSubtitle"), cta: ts("cta") }, "brief");
   const loaded = await loadClub(slug, teamSlug).catch(() => undefined);
   if (!loaded) return firstCardThatRenders([generic]);
   const { league, outlook, club, team, season } = loaded;

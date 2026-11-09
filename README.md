@@ -64,6 +64,7 @@ To show a different name than the one football-data.org sends (for example "CA P
 Each league × language page is pre-rendered with:
 - Keyword-targeted titles and descriptions ("Football Simulator", "Simulador de Futebol", "Simulador do Brasileirão", "Premier League Simulator"…), set per language in `messages/*.json` (`Metadata`, `Seo`, `Faq`).
 - Canonical and `hreflang` links (`en`, `pt-BR`, `es`, `x-default`), Open Graph and Twitter cards with generated images (`opengraph-image.tsx`).
+- The generated images are kept, so crawlers and link previews don't each run a function (`src/lib/cardCache.ts`). The site's and each league's own image are drawn at build time (`generateStaticParams`). A card that can't change is kept by the CDN until the next deployment (a played game, a past round's report and its movers, a shared scenario); one whose numbers move with new results for an hour (a club, an upcoming game, the latest report); and a stand-in (a crest that didn't load, the branded card when the data didn't) for five minutes, so the proper card follows.
 - JSON-LD structured data: `WebSite`, `Organization`, `WebApplication`, `BreadcrumbList` and `FAQPage`.
 - Crawlable intro, "how it works" and FAQ content, plus internal links between all league simulators.
 - `sitemap.xml`, `robots.txt`, web manifest and icons.
