@@ -53,7 +53,8 @@ const isCupSeason = (value: unknown, clubs: Record<string, unknown>) =>
   isRecord(value.entrants) &&
   Object.values(value.entrants).every((ids) => Array.isArray(ids) && ids.every((id) => isRecord(clubs[String(id)]))) &&
   (value.real === undefined || (Array.isArray(value.real) && value.real.every((t) => isCupTie(t, clubs)))) &&
-  isScores(value.scores);
+  isScores(value.scores) &&
+  (value.draw === undefined || value.draw === 2);
 /** A finished season's cup (SavedCup): its final, and its ties when kept. */
 const isSavedCup = (value: unknown, clubs: Record<string, unknown>) =>
   isRecord(value) &&

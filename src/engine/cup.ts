@@ -88,6 +88,14 @@ export interface CupBuildOptions {
   entrants: Partial<Record<CupRoundKey, readonly TeamId[]>>;
   /** Changes every simulated draw ("New draw"); 0 by default. */
   drawSalt: number;
+  /**
+   * Draws with each slot's key mixed (mix32): a fair draw, every pairing as
+   * likely as any other and each season's independent of the last. Without
+   * it, the keys of slots named alike ("e101", "e102") keep their order from
+   * one salt to the next, so the same clubs keep meeting (My World's cups
+   * before seasons were marked fair, the cup pages' draws).
+   */
+  fairDraw?: boolean;
   /** Placeholder kick-off per round (ISO date), for simulated draws. */
   roundDates: Partial<Record<CupRoundKey, string>>;
   /** Each club's tier (0 = top division), for rounds where the lower-division club hosts. */
@@ -138,6 +146,16 @@ export function hashSeed(...parts: (string | number)[]): number {
   return h >>> 0;
 }
 
+/** A 32-bit avalanche (MurmurHash3's finaliser): each input bit flips about half of the output's. */
+export function mix32(h: number): number {
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return h >>> 0;
+}
+
 /**
  * Draws a round: every club gets a key from the seed and its slot, clubs are
  * sorted by key and paired in order, the first of each pair at home. A club's
@@ -146,8 +164,8 @@ export function hashSeed(...parts: (string | number)[]): number {
  * tie takes its place in the same tie of the next round, the round's ties in
  * the same order.
  */
-export function drawRound(clubs: readonly TeamId[], seed: number, slotOf: (id: TeamId) => string | number = (id) => id): [TeamId, TeamId][] {
-  const keyed = clubs.map((id) => ({ id, slot: String(slotOf(id)), key: hashSeed(seed, slotOf(id)) }));
+export function drawRound(clubs: readonly TeamId[], seed: number, slotOf: (id: TeamId) => string | number = (id) => id, fair = false): [TeamId, TeamId][] {
+  const keyed = clubs.map((id) => ({ id, slot: String(slotOf(id)), key: fair ? mix32(hashSeed(seed, slotOf(id))) : hashSeed(seed, slotOf(id)) }));
   keyed.sort((a, b) => a.key - b.key || a.slot.localeCompare(b.slot) || a.id - b.id);
   const pairs: [TeamId, TeamId][] = [];
   for (let i = 0; i + 1 < keyed.length; i += 2) pairs.push([keyed[i]!.id, keyed[i + 1]!.id]);
@@ -362,6 +380,7 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
             Array.from({ length: config.rounds[r - 1]!.ties }, (_, i) => i),
             hashSeed(config.code, r, options.drawSalt),
             (i) => `w${i}`,
+            options.fairDraw,
           ).slice(0, roundConfig.ties)
         : undefined;
     const withFeeders = feeders ? { feeders } : {};
@@ -394,9 +413,9 @@ export function buildCup(config: CupConfig, real: readonly RealCupTie[], results
       // Fixed bracket: neighbouring slots meet, no draw.
       const base = bracketBase(config);
       const fixed = bracketPairs(remaining, bracketLines(config, rounds[base]!.ties), r - base);
-      pairs = [...fixed.pairs, ...drawRound(fixed.rest, hashSeed(config.code, r, options.drawSalt), slotOf)];
+      pairs = [...fixed.pairs, ...drawRound(fixed.rest, hashSeed(config.code, r, options.drawSalt), slotOf, options.fairDraw)];
     } else {
-      pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt), slotOf);
+      pairs = drawRound(remaining, hashSeed(config.code, r, options.drawSalt), slotOf, options.fairDraw);
     }
     for (const pair of pairs) {
       if (ties.length >= playing) break;

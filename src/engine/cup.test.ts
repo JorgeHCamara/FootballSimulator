@@ -17,6 +17,7 @@ import {
   cupShootoutId,
   cupWinner,
   drawRound,
+  hashSeed,
   isCupShootoutId,
   needsShootout,
   simulateCup,
@@ -67,6 +68,26 @@ describe("cup ids", () => {
 });
 
 describe("drawRound", () => {
+  it("fair: every pairing as likely as any other, each season's draw independent of the last (slots named alike don't keep meeting)", () => {
+    const clubs = Array.from({ length: 64 }, (_, i) => 1000 + i * 7);
+    const runs = 3000;
+    const counts = new Map<string, number>();
+    let repeated = 0;
+    let previous = new Set<string>();
+    for (let year = 0; year < runs; year++) {
+      const salt = (12345 ^ Math.imul(year + 1, 0x9e3779b1)) >>> 0;
+      const pairs = new Set(drawRound(clubs, hashSeed("CDB", 3, salt), (id) => `e${id}`, true).map(([a, b]) => `${Math.min(a, b)}-${Math.max(a, b)}`));
+      for (const key of pairs) counts.set(key, (counts.get(key) ?? 0) + 1);
+      repeated += [...pairs].filter((key) => previous.has(key)).length;
+      previous = pairs;
+    }
+    const expected = runs / 63;
+    assert.equal(counts.size, (64 * 63) / 2, "every pairing happens");
+    assert.ok(Math.max(...counts.values()) < expected * 2, `a pairing ${Math.max(...counts.values())} times, ${expected.toFixed(0)} expected`);
+    const perSeason = repeated / (runs - 1);
+    assert.ok(Math.abs(perSeason - 32 / 63) < 0.1, `${perSeason.toFixed(2)} of last season's pairings again, ${(32 / 63).toFixed(2)} expected`);
+  });
+
   it("is deterministic per seed, uses every club once, and changes with the seed", () => {
     const clubs = firstRound.slice(0, 20);
     const a = drawRound(clubs, 7);
