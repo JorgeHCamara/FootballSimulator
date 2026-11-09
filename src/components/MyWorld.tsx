@@ -671,13 +671,20 @@ function Review({ record, world, locale, onStart }: { record: SeasonRecord; worl
       <div>
         <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-zinc-500">{t("review.champions")}</h3>
         <ul className="grid gap-1 sm:grid-cols-2">
-          {divisions.map((d) => (
-            <li key={d.code} className="flex items-center gap-2 text-sm">
-              <Icon name="trophy" size={14} className="shrink-0 text-amber-500" />
-              <span className="text-zinc-500">{t(`leagues.${d.code}.name`)}:</span>
-              <span className={`truncate font-semibold ${d.rows[0]![0] === world.userClub ? "text-pitch-700 dark:text-pitch-100" : ""}`}>{name(d.rows[0]![0])}</span>
-            </li>
-          ))}
+          {divisions.flatMap((d) => {
+            // A league decided by finals (Argentina's): each tournament's champion (the Apertura's and the Clausura's); else the table's 1st.
+            const titles = (world.winners ?? []).filter((w) => w.year === record.year && w.code === d.code && w.final && w.top[0]);
+            const champions = titles.length
+              ? titles.map((w) => ({ key: `${d.code}-${w.tournament ?? ""}`, label: w.tournament ? `${t(`leagues.${d.code}.name`)} · ${t(`zones.${w.tournament}`)}` : t(`leagues.${d.code}.name`), id: w.top[0]![0] }))
+              : [{ key: d.code, label: t(`leagues.${d.code}.name`), id: d.rows[0]![0] }];
+            return champions.map((c) => (
+              <li key={c.key} className="flex items-center gap-2 text-sm" data-testid="world-review-champion" data-league={d.code}>
+                <Icon name="trophy" size={14} className="shrink-0 text-amber-500" />
+                <span className="shrink-0 text-zinc-500">{c.label}:</span>
+                <span className={`truncate font-semibold ${c.id === world.userClub ? "text-pitch-700 dark:text-pitch-100" : ""}`}>{name(c.id)}</span>
+              </li>
+            ));
+          })}
           {/* The cups: their winners and finals. */}
           {cups.map((c) => (
             <li key={c.code} className="flex min-w-0 items-center gap-2 text-sm" data-testid="world-review-cup" data-cup={c.code} data-winner={c.final[0]}>

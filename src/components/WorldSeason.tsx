@@ -39,6 +39,7 @@ import { PastWinners } from "./PastWinners.tsx";
 import { useRealWinners } from "./PastWinnersProvider.tsx";
 import { PromotedClubs } from "./PromotedClubs.tsx";
 import { WorldTable } from "./WorldTable.tsx";
+import { ZoneColumns, zoneStageShown } from "./WorldZones.tsx";
 
 /** A country's competitions as tabs: one button per league, then its cups. */
 export function DivisionTabs({ country, value, onChange, label, testId }: { country: WorldCountry; value: DivisionCode | WorldCupCode; onChange: (code: DivisionCode | WorldCupCode) => void; label: string; testId: string }) {
@@ -176,8 +177,29 @@ function PastSeason({ world, year, code }: { world: World; year: number; code: D
   const t = useTranslations("World");
   const past = useMemo(() => pastDivision(world, year, code), [world, year, code]);
   const [matchday, setMatchday] = useState(1);
+  const [playoffStage, setPlayoffStage] = useState<number | null>(null);
   const teams = useMemo(() => new Map<TeamId, Team>((past?.teams ?? []).map((team) => [team.id, team])), [past]);
   if (!past) return null;
+  // Argentina's zone leagues: each tournament's zone tables and play-off, rebuilt from the saved season.
+  if (past.zones && past.fixtures) {
+    return (
+      <ZoneColumns
+        world={world}
+        code={code}
+        season={past.zones}
+        fixtures={past.fixtures}
+        teams={teams}
+        picks={{}}
+        matchday={matchday}
+        onMatchday={setMatchday}
+        readOnly
+        onScore={() => {}}
+        onSimulate={() => {}}
+        playoffStage={playoffStage}
+        onPlayoffStage={setPlayoffStage}
+      />
+    );
+  }
   const playoff = playoffConfigOf(code);
   const matchdays = [...new Set((past.fixtures ?? []).map((f) => f.matchday))]
     .sort((a, b) => a - b)
@@ -271,6 +293,8 @@ export function WorldSeason({
   const sim = useTranslations("Simulator");
   const pw = useTranslations("PastWinners");
   const [confirmReset, setConfirmReset] = useState(false);
+  // A zone league (Argentina's): the tournament whose play-off shows, when the fixtures are on the play-off.
+  const [playoffStage, setPlayoffStage] = useState<number | null>(null);
   // Past Winners instead of the table and fixtures: the league's real history with this world's finished seasons on top.
   const [winners, setWinners] = useState(false);
   const real = useRealWinners();
@@ -310,6 +334,8 @@ export function WorldSeason({
   );
   const onPlayoff = matchday === PLAYOFF_MATCHDAY;
   const onPlayout = matchday === PLAYOUT_MATCHDAY;
+  // A zone league's tournament on show (its play-off is the one "Simulate matchday" plays there).
+  const zoneStage = state.zones ? state.zones.stages[zoneStageShown(state.zones, code, matchday, playoffStage)]! : undefined;
   const games = useMemo(() => state.fixtures.filter((f) => f.matchday === matchday), [state.fixtures, matchday]);
   const picked = Object.keys(picks).length > 0;
 
@@ -366,9 +392,29 @@ export function WorldSeason({
       </div>
     );
   }
+  // Argentina's zone leagues: the zones' tables and a tournament's fixtures and play-off (src/components/WorldZones.tsx).
+  const zoneColumns = state.zones ? (
+    <ZoneColumns
+      world={world}
+      code={code}
+      season={state.zones}
+      fixtures={state.fixtures}
+      teams={teams}
+      picks={picks}
+      matchday={matchday}
+      onMatchday={onMatchday}
+      readOnly={false}
+      onScore={onScore}
+      onSimulate={(fixture) => onChange(rollScore(world, code, fixture))}
+      playoffStage={playoffStage}
+      onPlayoffStage={setPlayoffStage}
+    />
+  ) : null;
   return (
     <div className={grid}>
       {picker}
+      {zoneColumns}
+      {!zoneColumns && (
       <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-2">
         {state.split ? (
           <SerieCTables split={state.split} code={code} world={world} />
@@ -390,12 +436,13 @@ export function WorldSeason({
           />
         )}
       </div>
+      )}
       <div className="flex flex-wrap gap-2 lg:col-span-2 lg:col-start-2 lg:row-start-1 lg:justify-end" data-testid="world-actions">
         <button
           type="button"
           className="grow rounded-lg bg-pitch-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-pitch-700 disabled:opacity-40 lg:grow-0"
-          onClick={() => onChange(onPlayoff || onPlayout ? simulatePlayoffs(world, code) : simulateMatchday(world, code, matchday))}
-          disabled={(onPlayoff && !state.playoffKnown) || (onPlayout && !state.leagueComplete) || state.done}
+          onClick={() => onChange(onPlayoff || onPlayout ? simulatePlayoffs(world, code, undefined, zoneStage?.index) : simulateMatchday(world, code, matchday))}
+          disabled={(onPlayoff && (zoneStage ? !zoneStage.complete || zoneStage.decided : !state.playoffKnown)) || (onPlayout && !state.leagueComplete) || state.done}
           data-testid="world-simulate-matchday"
         >
           {sim("simulateMatchday")}
@@ -410,6 +457,7 @@ export function WorldSeason({
           {sim("reset")}
         </button>
       </div>
+      {!zoneColumns && (
       <div className="min-w-0 lg:col-start-3 lg:row-start-2" data-testid="world-fixtures">
         <FixtureList
           matchday={matchday}
@@ -438,6 +486,7 @@ export function WorldSeason({
             : {})}
         />
       </div>
+      )}
       <ConfirmDialog
         open={confirmReset}
         danger
