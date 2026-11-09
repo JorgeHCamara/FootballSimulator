@@ -15,7 +15,8 @@ export const historySeason = (year: number, calendar = false) => (calendar ? Str
 
 /** The world's finished seasons of one league as Past Winners rows, newest first, under the competition's current name. */
 export function worldRows(world: World, code: DivisionCode, competition: string): WinnerRow[] {
-  const club = ([id, name, points]: WorldPodium): WinnerClub => {
+  // A final's clubs (Argentina's leagues) show no points: the title wasn't won on them.
+  const club = ([id, name, points]: WorldPodium, final = false): WinnerClub => {
     const c = world.clubs[id];
     return {
       // A real club's world titles add to its real ones; a fictional club's are its own.
@@ -25,26 +26,30 @@ export function worldRows(world: World, code: DivisionCode, competition: string)
       currentName: c?.name ?? name,
       crest: c?.crest ?? null,
       tla: c?.tla ?? null,
-      points,
+      points: final ? null : points,
     };
   };
   const calendar = CALENDAR_YEAR.includes(divisionCountry(code));
+  // A season of two tournaments (the Liga Profesional): the Clausura's row first, as the newest.
+  const order = (w: { tournament?: string }) => (w.tournament === "clausura" ? 0 : 1);
   return (world.winners ?? [])
     .filter((w) => w.code === code)
-    .sort((a, b) => b.year - a.year)
+    .sort((a, b) => b.year - a.year || order(a) - order(b))
     .map((w) => ({
-      id: `world-${w.year}`,
+      id: `world-${w.year}${w.tournament ? `-${w.tournament}` : ""}`,
       season: historySeason(w.year, calendar),
       startYear: w.year,
       endYear: calendar ? w.year : w.year + 1,
-      tournament: null,
+      // The tournament's name (PastWinners.tournaments: "Apertura", "Clausura").
+      tournament: w.tournament ? w.tournament.charAt(0).toUpperCase() + w.tournament.slice(1) : null,
       status: "completed",
       competition,
-      format: "league",
+      // Decided by a final (Argentina's leagues): its winner and runner-up.
+      format: w.final ? "final" : "league",
       notes: [],
-      champion: w.top[0] ? club(w.top[0]) : null,
-      runnerUp: w.top[1] ? club(w.top[1]) : null,
-      third: w.top[2] ? club(w.top[2]) : null,
+      champion: w.top[0] ? club(w.top[0], w.final) : null,
+      runnerUp: w.top[1] ? club(w.top[1], w.final) : null,
+      third: w.final ? null : w.top[2] ? club(w.top[2]) : null,
       world: true,
     }));
 }

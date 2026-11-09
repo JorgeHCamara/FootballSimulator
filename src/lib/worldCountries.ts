@@ -11,7 +11,7 @@ import { SERIE_D_CLUBS } from "../config/serieD.ts";
  * of them, and plays every competition of each.
  */
 
-export const WORLD_COUNTRIES = ["ENG", "ESP", "GER", "ITA", "BRA"] as const;
+export const WORLD_COUNTRIES = ["ENG", "ESP", "GER", "ITA", "BRA", "ARG"] as const;
 export type WorldCountry = (typeof WORLD_COUNTRIES)[number];
 export const isWorldCountry = (code: string): code is WorldCountry => (WORLD_COUNTRIES as readonly string[]).includes(code);
 
@@ -25,11 +25,13 @@ export const GERMANY = ["BL1", "BL2"] as const;
 export const ITALY = ["SA", "SB"] as const;
 /** The Brazilian pyramid's: Série A, Série B and Série C (src/lib/worldSerieC.ts). */
 export const BRAZIL = ["BSA", "BSB", "BSC"] as const;
+/** The Argentine pyramid's: the Liga Profesional and the Primera Nacional, both played in zones (src/lib/worldZones.ts). */
+export const ARGENTINA = ["ARG", "PN"] as const;
 /** Every league a world can play, country by country. */
-export const WORLD_LEAGUES = [...ENGLAND, ...SPAIN, ...GERMANY, ...ITALY, ...BRAZIL] as const;
+export const WORLD_LEAGUES = [...ENGLAND, ...SPAIN, ...GERMANY, ...ITALY, ...BRAZIL, ...ARGENTINA] as const;
 export type DivisionCode = (typeof WORLD_LEAGUES)[number];
 
-export const COUNTRY_LEAGUES: Record<WorldCountry, readonly DivisionCode[]> = { ENG: ENGLAND, ESP: SPAIN, GER: GERMANY, ITA: ITALY, BRA: BRAZIL };
+export const COUNTRY_LEAGUES: Record<WorldCountry, readonly DivisionCode[]> = { ENG: ENGLAND, ESP: SPAIN, GER: GERMANY, ITA: ITALY, BRA: BRAZIL, ARG: ARGENTINA };
 export const isDivision = (code: string): code is DivisionCode => (WORLD_LEAGUES as readonly string[]).includes(code);
 export const divisionConfig = (code: DivisionCode): LeagueConfig => getLeagueByCode(code)!;
 export const divisionCountry = (code: DivisionCode): WorldCountry => WORLD_COUNTRIES.find((c) => (COUNTRY_LEAGUES[c] as readonly string[]).includes(code))!;
@@ -46,10 +48,11 @@ export function neighbours(code: DivisionCode): { above?: DivisionCode; below?: 
  * The league below each country's bottom division, where its relegated clubs
  * spend a season before coming back up (src/lib/myWorld.ts): England's
  * National League, Spain's Primera Federación, Germany's 3. Liga, Italy's
- * Serie C. Codes for the messages (World.leagues.NL, World.leagues.PF…) and
- * a club's seasons list.
+ * Serie C, Brazil's Série D, Argentina's third tier (the Primera B
+ * Metropolitana and the Torneo Federal A). Codes for the messages
+ * (World.leagues.NL, World.leagues.PF…) and a club's seasons list.
  */
-export const LOWER_LEAGUE = { ENG: "NL", ESP: "PF", GER: "L3", ITA: "SC", BRA: "BSD" } as const;
+export const LOWER_LEAGUE = { ENG: "NL", ESP: "PF", GER: "L3", ITA: "SC", BRA: "BSD", ARG: "AR3" } as const;
 export type LowerCode = (typeof LOWER_LEAGUE)[WorldCountry];
 
 /** A real club a world starts with in the league below a country's bottom division (src/config/nationalLeague.ts, src/config/serieC.ts). */
@@ -65,10 +68,11 @@ export interface LowerLeagueClub {
  * The clubs each country's league below starts with: England's two National
  * League clubs, Italy's four Serie C clubs (as many as Serie B relegates, so
  * its first swap needs no fictional club); none in Spain and Germany, whose
- * first relegated clubs swap with sides from the cup pool. In a fixed order:
+ * first relegated clubs swap with sides from the cup pool (Argentina's too:
+ * the Copa Argentina's Primera B, Federal A and Primera C clubs). In a fixed order:
  * a club's world id is its place in the whole list (src/lib/myWorld.ts).
  */
-export const LOWER_LEAGUE_CLUBS: Record<WorldCountry, readonly LowerLeagueClub[]> = { ENG: NATIONAL_LEAGUE_CLUBS, ESP: [], GER: [], ITA: SERIE_C_CLUBS, BRA: SERIE_D_CLUBS };
+export const LOWER_LEAGUE_CLUBS: Record<WorldCountry, readonly LowerLeagueClub[]> = { ENG: NATIONAL_LEAGUE_CLUBS, ESP: [], GER: [], ITA: SERIE_C_CLUBS, BRA: SERIE_D_CLUBS, ARG: [] };
 
 /**
  * A play-off for one place between a country's two divisions, over two legs
@@ -104,18 +108,18 @@ export const PLAYOUTS: readonly Playout[] = [{ code: "SB", places: [16, 17], gap
 export const playoutOf = (code: string): Playout | undefined => PLAYOUTS.find((p) => p.code === code);
 
 /** Each country's cups (src/lib/worldCups.ts), in the order shown. */
-export const WORLD_CUPS = ["FAC", "EFC", "CDR", "DFB", "CIT", "CDB"] as const;
+export const WORLD_CUPS = ["FAC", "EFC", "CDR", "DFB", "CIT", "CDB", "CAR"] as const;
 export type WorldCupCode = (typeof WORLD_CUPS)[number];
-export const COUNTRY_CUPS: Record<WorldCountry, readonly WorldCupCode[]> = { ENG: ["FAC", "EFC"], ESP: ["CDR"], GER: ["DFB"], ITA: ["CIT"], BRA: ["CDB"] };
+export const COUNTRY_CUPS: Record<WorldCountry, readonly WorldCupCode[]> = { ENG: ["FAC", "EFC"], ESP: ["CDR"], GER: ["DFB"], ITA: ["CIT"], BRA: ["CDB"], ARG: ["CAR"] };
 export const isWorldCup = (code: string): code is WorldCupCode => (WORLD_CUPS as readonly string[]).includes(code);
 export const cupCountry = (code: WorldCupCode): WorldCountry => WORLD_COUNTRIES.find((c) => COUNTRY_CUPS[c].includes(code))!;
 /** The cups a world with these countries plays, in the countries' order. */
 export const worldCups = (countries: readonly WorldCountry[]): WorldCupCode[] => countries.flatMap((c) => [...COUNTRY_CUPS[c]]);
 
-export const COUNTRY_FLAG: Record<WorldCountry, FlagCode> = { ENG: "gb-eng", ESP: "es", GER: "de", ITA: "it", BRA: "br" };
+export const COUNTRY_FLAG: Record<WorldCountry, FlagCode> = { ENG: "gb-eng", ESP: "es", GER: "de", ITA: "it", BRA: "br", ARG: "ar" };
 
-/** Countries whose seasons follow the calendar year (Brazil's 2026 season, not "2026/27"). */
-export const CALENDAR_YEAR: readonly WorldCountry[] = ["BRA"];
+/** Countries whose seasons follow the calendar year (Brazil's and Argentina's 2026 season, not "2026/27"). */
+export const CALENDAR_YEAR: readonly WorldCountry[] = ["BRA", "ARG"];
 /** A season's label for these countries: "2026" when every one plays the calendar year, else "2026/27". */
 export const seasonLabelFor = (countries: readonly WorldCountry[], year: number) =>
   countries.length > 0 && countries.every((c) => CALENDAR_YEAR.includes(c)) ? String(year) : `${year}/${String((year + 1) % 100).padStart(2, "0")}`;

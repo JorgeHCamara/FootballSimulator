@@ -1321,8 +1321,8 @@
     }
   },
   "World": {
-    "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol, alemão, italiano ou brasileiro",
-    "metaDescription": "Escolha um clube da Inglaterra, da Espanha, da Alemanha, da Itália ou do Brasil e jogue temporada após temporada de suas ligas e copas, com playoffs, acesso e rebaixamento. Salvo no seu navegador, com as tabelas de todas as temporadas.",
+    "metaTitle": "Meu mundo: leve seu clube ao topo do futebol inglês, espanhol, alemão, italiano, brasileiro ou argentino",
+    "metaDescription": "Escolha um clube da Inglaterra, da Espanha, da Alemanha, da Itália, do Brasil ou da Argentina e jogue temporada após temporada de suas ligas e copas, com playoffs, acesso e rebaixamento. Salvo no seu navegador, com as tabelas de todas as temporadas.",
     "hero": {
       "badge": "Modo de jogo",
       "start": "Começar seu mundo",
@@ -1442,6 +1442,21 @@
         "name": "Série D",
         "the": "a Série D",
         "in": "na Série D"
+      },
+      "ARG": {
+        "name": "Liga Profesional",
+        "the": "a Liga Profesional",
+        "in": "na Liga Profesional"
+      },
+      "PN": {
+        "name": "Primera Nacional",
+        "the": "a Primera Nacional",
+        "in": "na Primera Nacional"
+      },
+      "AR3": {
+        "name": "Terceira divisão",
+        "the": "a terceira divisão (Primera B e Federal A)",
+        "in": "na terceira divisão"
       }
     },
     "cups": {
@@ -1474,6 +1489,11 @@
         "name": "Copa do Brasil",
         "the": "a Copa do Brasil",
         "in": "na Copa do Brasil"
+      },
+      "CAR": {
+        "name": "Copa Argentina",
+        "the": "a Copa Argentina",
+        "in": "na Copa Argentina"
       }
     },
     "countries": {
@@ -1481,7 +1501,8 @@
       "ESP": "Espanha",
       "GER": "Alemanha",
       "ITA": "Itália",
-      "BRA": "Brasil"
+      "BRA": "Brasil",
+      "ARG": "Argentina"
     },
     "setup": {
       "title": "Crie seu mundo",
@@ -1610,6 +1631,16 @@
       "classification": "Classificação final",
       "secondPending": "Os dois quadrangulares da 2ª fase (1º, 4º, 5º e 8º; 2º, 3º, 6º e 7º) saem da tabela da 1ª fase quando ela terminar.",
       "secondPendingGroups": "Os quatro primeiros de cada grupo jogam um quadrangular de acesso quando a 1ª fase terminar."
+    },
+    "zones": {
+      "zone": "Zona {zone}",
+      "apertura": "Apertura",
+      "clausura": "Clausura",
+      "annual": "Tabela anual",
+      "round": "Rodada {round}",
+      "annualNote": "Os jogos dos dois torneios: os dois últimos caem (o segundo rebaixamento real sai da média das três temporadas, que não é calculada aqui).",
+      "champion": "{tournament}: {club} campeão, vencendo {runnerUp} na final.",
+      "championPromoted": "{tournament}: {club} campeão e promovido; {promoted} venceu o Reducido e também sobe."
     }
   }
 }

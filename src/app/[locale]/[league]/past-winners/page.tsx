@@ -21,14 +21,16 @@ import { historySlugs, leagueWinners, pastWinnersPath } from "../../../../lib/wi
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  const slugs = [...new Set([...historySlugs(), ...CUPS.map((c) => c.slug)])];
+  // Cups with a page of their own (the Copa Argentina's Past Winners are My World's only, for now).
+  const slugs = [...new Set([...historySlugs(), ...CUPS.filter((c) => !c.noPastWinnersPage).map((c) => c.slug)])];
   return routing.locales.flatMap((locale) => slugs.map((league) => ({ locale, league })));
 }
 
 /** The competition and its rows: a league with a history file, or a cup (no rows until its file comes). */
 function competitionOf(slug: string) {
   const league = getLeagueBySlug(slug);
-  const cup = league ? undefined : getCupBySlug(slug);
+  const found = league ? undefined : getCupBySlug(slug);
+  const cup = found?.noPastWinnersPage ? undefined : found;
   const competition = league ?? cup;
   const rows = leagueWinners(slug) ?? (cup ? [] : undefined);
   return competition && rows ? { competition, rows, cup: Boolean(cup) } : undefined;
