@@ -8,7 +8,7 @@ import { cachedLeagueOutlook, dataAsOf, dataVersion, leagueOutlook, outlookSetup
 import { withClubPages } from "./clubs.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { findMatch, inIndexWindow, leagueMatches, localDate, matchesBetween, matchSlug, MOVED_WITHIN_DAYS, slugDate } from "./matches.ts";
-import { impactRows, isMatchDay, resultScores } from "./matchPreview.ts";
+import { EARLY_MATCH_DAY_REVALIDATE, impactRows, isMatchDay, MATCH_DAY_REVALIDATE, matchDayRevalidate, resultScores } from "./matchPreview.ts";
 import { addSnapshots, completedRounds, pendingRounds, snapshotAfter, type OddsSnapshot } from "./snapshots.ts";
 
 const pl = getLeagueByCode("PL")!;
@@ -83,6 +83,15 @@ describe("match page addresses", () => {
     assert.equal(isMatchDay(k, Date.parse("2026-11-08T10:00:00Z")), true);
     assert.equal(isMatchDay(k, Date.parse("2026-11-09T02:00:00Z")), true);
     assert.equal(isMatchDay(k, Date.parse("2026-11-09T04:00:00Z")), false);
+  });
+
+  it("match day: the game checked hourly until an hour before kick-off, then every 10 minutes", () => {
+    const k = "2026-11-08T15:00:00Z";
+    assert.equal(matchDayRevalidate(k, Date.parse("2026-11-08T09:30:00Z")), EARLY_MATCH_DAY_REVALIDATE);
+    assert.equal(matchDayRevalidate(k, Date.parse("2026-11-08T13:30:00Z")), EARLY_MATCH_DAY_REVALIDATE);
+    assert.equal(matchDayRevalidate(k, Date.parse("2026-11-08T14:00:00Z")), MATCH_DAY_REVALIDATE);
+    assert.equal(matchDayRevalidate(k, Date.parse("2026-11-08T16:30:00Z")), MATCH_DAY_REVALIDATE);
+    assert.equal(matchDayRevalidate(k, Date.parse("2026-11-09T02:00:00Z")), MATCH_DAY_REVALIDATE);
   });
 });
 

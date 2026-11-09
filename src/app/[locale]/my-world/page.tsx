@@ -11,8 +11,13 @@ import { leagueWinners } from "../../../lib/winnersData.ts";
 import { MY_WORLD_LISTED, OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
 import { PLAY_ANCHOR } from "../../../lib/worldHero.ts";
 
-/** The live data a new world starts from, refreshed as the league pages are (hourly). A saved world needs none of it. */
-export const revalidate = 3600;
+/**
+ * The live data a new world starts from, refreshed as the league pages are:
+ * every six hours at most while /api/revalidate/leagues brings new results in
+ * (the leagues' data and each cup's start, keptStartCup, are kept that long),
+ * hourly without it. A saved world needs none of it.
+ */
+export const revalidate = 21600;
 /** Room for the four leagues' data on a cold server. */
 export const maxDuration = 60;
 
