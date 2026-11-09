@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { getLeagueBySlug, type SiteLocale, type ZoneKind } from "../../../../../config/leagues.ts";
 import type { TeamId } from "../../../../../engine/types.ts";
+import { crestsDrawn } from "../../../../../lib/cardCache.ts";
 import { firstCardThatRenders } from "../../../../../lib/cardFallback.ts";
 import { OG_SIZE } from "../../../../../lib/ogImage.tsx";
 import { cardRows, scenarioOutcome, SCENARIO_ITERATIONS } from "../../../../../lib/scenario.ts";
@@ -20,7 +21,12 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   const { locale, league: slug, code } = await params;
   const lang = (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
   const [t, tz] = await Promise.all([getTranslations({ locale: lang, namespace: "ShareCard" }), getTranslations({ locale: lang, namespace: "Zones" })]);
-  const shared = await loadSharedScenario(slug, code).catch(() => undefined);
+  // A scenario that couldn't be loaded (as opposed to a link that holds none): its branded card is a stand-in, kept briefly.
+  let failed = false;
+  const shared = await loadSharedScenario(slug, code).catch(() => {
+    failed = true;
+    return undefined;
+  });
   const league = shared?.league ?? getLeagueBySlug(slug);
   const season = shared?.data.season ?? "";
   const outcome = shared?.predictions ? scenarioOutcome(shared.league, shared.data, shared.predictions) : null;
@@ -29,7 +35,7 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
       title: league ? t("genericTitle", { league: league.name, season }).trim() : "FootSimu",
       subtitle: t("genericSubtitle"),
       cta: t("cta"),
-    });
+    }, failed ? "brief" : "final");
   if (!shared || !outcome) return firstCardThatRenders([generic]);
   const teams = new Map(shared.data.teams.map((team) => [team.id, team]));
   const percentFormat = new Intl.NumberFormat(lang, { style: "percent", maximumFractionDigits: 0 });
@@ -53,6 +59,8 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
     outcome,
     teams,
     ...(withCrests ? { crests } : {}),
+    // Every crest on it, or kept only briefly.
+    cache: crestsDrawn(cardRows(outcome.rows).flatMap((row) => (row === "gap" ? [] : [[teams.get(row.teamId)?.crest, crests.get(row.teamId)] as const]))) ? "final" : "brief",
     text: {
       pill: `${shared.league.name} ${season}`.toUpperCase(),
       myPrediction: t("myPrediction"),

@@ -5,16 +5,12 @@ import { BrandMark } from "../components/BrandMark.tsx";
 import { zoneHex } from "../components/zones.ts";
 import type { LeagueConfig, ZoneKind } from "../config/leagues.ts";
 import type { Team, TeamId } from "../engine/types.ts";
+import { CARD_CACHE_HEADERS, type CardCache } from "./cardCache.ts";
 import { OG_SIZE } from "./ogImage.tsx";
 import { cardRows, legendKinds, type ScenarioOutcome } from "./scenario.ts";
 
 const PITCH_700 = "#166534";
 
-/**
- * The same link always shows the same card: browsers keep it a day, the CDN
- * keeps the first rendering (no re-simulating on every crawler visit).
- */
-export const CARD_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=31536000, stale-while-revalidate=86400" };
 const PITCH_900 = "#0b3b20";
 
 /** Inter, bundled (src/assets/fonts, SIL Open Font License): next/og needs the font files themselves. */
@@ -54,6 +50,7 @@ export async function renderShareCard({
   teams,
   text,
   crests,
+  cache = "final",
 }: {
   league: LeagueConfig;
   outcome: ScenarioOutcome;
@@ -61,6 +58,8 @@ export async function renderShareCard({
   text: ShareCardText;
   /** Each row's crest (a data URI, see crestDataUri) beside its name; without, names only. */
   crests?: ReadonlyMap<TeamId, string>;
+  /** The same link always shows the same card: kept (see CardCache), unless a crest didn't load. */
+  cache?: CardCache;
 }) {
   const rows = cardRows(outcome.rows);
   const legend = legendKinds(outcome.places, !league.playoff?.title);
@@ -149,12 +148,16 @@ export async function renderShareCard({
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_HEADERS },
+    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_CACHE_HEADERS[cache] },
   );
 }
 
-/** A league's card without a scenario (no or unreadable predictions): brand, league and call to action. */
-export async function renderGenericShareCard({ title, subtitle, cta }: { title: string; subtitle: string; cta: string }) {
+/**
+ * A league's card without a scenario (no or unreadable predictions): brand,
+ * league and call to action. Kept for good ("final") when there's nothing else
+ * to show; "brief" when it stands in for a card whose data didn't load.
+ */
+export async function renderGenericShareCard({ title, subtitle, cta }: { title: string; subtitle: string; cta: string }, cache: CardCache = "final") {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 72, background: PITCH_700, fontFamily: "Inter", color: "#ffffff" }}>
@@ -171,7 +174,7 @@ export async function renderGenericShareCard({ title, subtitle, cta }: { title: 
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_HEADERS },
+    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_CACHE_HEADERS[cache] },
   );
 }
 
@@ -199,9 +202,7 @@ const clubNameSize = (name: string) => (name.length <= 12 ? 60 : name.length <= 
 const chanceLabelSize = (label: string) => (label.length <= 24 ? 26 : label.length <= 30 ? 22 : 20);
 
 /** Club pages change with every result: the CDN keeps a card for an hour (the page's own refresh). */
-const CLUB_CARD_HEADERS = { "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400" };
-
-export async function renderClubCard(text: ClubCardText) {
+export async function renderClubCard(text: ClubCardText, cache: CardCache = "live") {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", background: PITCH_700, fontFamily: "Inter", color: "#ffffff" }}>
@@ -249,7 +250,7 @@ export async function renderClubCard(text: ClubCardText) {
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
+    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_CACHE_HEADERS[cache] },
   );
 }
 
@@ -307,7 +308,7 @@ const crest = (side: MatchCardText["home"], size: number) =>
   );
 
 /** A match page's card: the two clubs, when they meet, and the model's odds (or the final score). */
-export async function renderMatchCard(text: MatchCardText) {
+export async function renderMatchCard(text: MatchCardText, cache: CardCache = "live") {
   const nameSize = (name: string) => (name.length <= 14 ? 46 : name.length <= 20 ? 38 : 32);
   return new ImageResponse(
     (
@@ -356,7 +357,7 @@ export async function renderMatchCard(text: MatchCardText) {
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
+    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_CACHE_HEADERS[cache] },
   );
 }
 
@@ -389,7 +390,7 @@ const trend = (up: boolean, color: string) => (
 );
 
 /** A "what changed" report's card: the race after the round, its top five with their changes. */
-export async function renderOddsCard(text: OddsCardText) {
+export async function renderOddsCard(text: OddsCardText, cache: CardCache = "live") {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", background: PITCH_700, fontFamily: "Inter", color: "#ffffff" }}>
@@ -436,7 +437,7 @@ export async function renderOddsCard(text: OddsCardText) {
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts: await interFonts(), headers: CLUB_CARD_HEADERS },
+    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_CACHE_HEADERS[cache] },
   );
 }
 
@@ -467,7 +468,7 @@ export interface MoversCardText {
 }
 
 /** A round's biggest-movers card: up to three races, each with its biggest risers and fallers. The round never changes: kept as the share cards. */
-export async function renderMoversCard(text: MoversCardText) {
+export async function renderMoversCard(text: MoversCardText, cache: CardCache = "final") {
   const rowHeight = text.sections.length > 2 ? 46 : 54;
   // On the white panel: the crest, or the club's initials in a grey circle.
   const badge = (r: MoverCardRow) =>
@@ -568,6 +569,6 @@ export async function renderMoversCard(text: MoversCardText) {
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_HEADERS },
+    { ...OG_SIZE, fonts: await interFonts(), headers: CARD_CACHE_HEADERS[cache] },
   );
 }

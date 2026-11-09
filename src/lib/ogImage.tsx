@@ -2,10 +2,11 @@ import { ImageResponse } from "next/og";
 import { BrandMark } from "../components/BrandMark.tsx";
 import { Flag } from "../components/Flag.tsx";
 import type { FlagCode } from "../config/leagues.ts";
+import { CARD_CACHE_HEADERS } from "./cardCache.ts";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
-/** Shared 1200×630 social preview: brand bar, optional flag, title and tagline. */
+/** Shared 1200×630 social preview: brand bar, optional flag, title and tagline. Nothing in it changes between deployments. */
 export function renderOgImage({ title, subtitle, flag }: { title: string; subtitle: string; flag?: FlagCode }) {
   return new ImageResponse(
     (
@@ -35,6 +36,6 @@ export function renderOgImage({ title, subtitle, flag }: { title: string; subtit
         <span style={{ fontSize: 28, color: "#bbf7d0" }}>footsimu.com</span>
       </div>
     ),
-    OG_SIZE,
+    { ...OG_SIZE, headers: CARD_CACHE_HEADERS.final },
   );
 }
