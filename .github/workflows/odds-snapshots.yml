@@ -2,11 +2,15 @@ name: Odds snapshots
 
 # After each completed round of each domestic league, every club's season
 # chances are added to src/data/snapshots/<CODE>.json (scripts/snapshot-odds.ts)
-# and committed to main, along with new games' xG (src/data/xg). Runs every
-# six hours; a run with no newly completed round and no new xG commits nothing.
+# and committed to main, along with new games' xG (src/data/xg). Runs once a
+# day, at 06:41 UTC, after the Americas' last games of the night; a run with no
+# newly completed round and no new xG commits nothing. Once a day because each
+# commit deploys production, and each deployment starts Vercel's page cache
+# afresh: every page is rebuilt on its next visit. League tables, results and
+# chances come from the live data, not from here, and don't wait for it.
 on:
   schedule:
-    - cron: "41 */6 * * *"
+    - cron: "41 6 * * *"
   workflow_dispatch:
 
 permissions:
