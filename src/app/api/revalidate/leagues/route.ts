@@ -34,8 +34,12 @@ export async function GET(request: NextRequest) {
     const [cached, fresh] = await Promise.all([getLeagueData(league).catch(() => undefined), freshLeagueData(league)]);
     const reason = refreshReason(cached, fresh);
     if (reason === "changed") {
-      revalidateTag(dataTag(league.code), "max");
-      revalidateTag(outlookTag(league.code), "max");
+      // Expired at once, not served stale while it refreshes: a page rebuilt from a stale copy of the league's
+      // data would keep the old results for hours (the copy and the pages are kept that long, see keptEspn).
+      // The next visit to each page waits for its rebuild instead. Next's advice for an invalidation from
+      // outside a Server Action (a webhook, a cron job).
+      revalidateTag(dataTag(league.code), { expire: 0 });
+      revalidateTag(outlookTag(league.code), { expire: 0 });
     }
     results.push({ league: league.code, reason });
   };

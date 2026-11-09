@@ -1,3 +1,5 @@
+// The file itself (".js"): these modules also run outside Next (scripts, tests), whose Node needs the extension.
+import { unstable_cache } from "next/cache.js";
 import { domesticModelOptions } from "./priors.ts";
 import type { CupConfig, CupRoundKey } from "../config/cups.ts";
 import { LEAGUES, type CompetitionCode } from "../config/leagues.ts";
@@ -9,7 +11,7 @@ import { buildLeagueModel, type TeamStrength } from "../engine/ratings.ts";
 import { realResults } from "../engine/results.ts";
 import type { Fixture, Team, TeamId } from "../engine/types.ts";
 import { EspnError, espnFixtures, espnTeams, fetchEspnYear, type EspnCalendarEntry, type EspnEvent } from "./espn.ts";
-import { getLeagueData } from "./leagueData.ts";
+import { DEPLOYMENT, getLeagueData, noDataCache } from "./leagueData.ts";
 import { sampleCup } from "./sampleLeague.ts";
 
 export interface CupData {
@@ -86,7 +88,7 @@ export function getCupData(cup: CupConfig): Promise<CupData> {
 async function loadCupData(cup: CupConfig): Promise<CupData> {
   if (process.env.FOOTSIMU_SAMPLE_DATA === "1") return sampleCup(cup);
   try {
-    return await loadEspnCup(cup);
+    return await keptEspnCup(cup);
   } catch (error) {
     const reason = error instanceof EspnError ? `HTTP ${error.status}` : String(error);
     if (process.env.NODE_ENV === "production" && (!isBuildPhase() || process.env.VERCEL)) {
@@ -124,6 +126,23 @@ async function loadFeeders(cup: CupConfig) {
     }),
   );
   return { strengths: Object.fromEntries(buildCupStrengths(feeders)), teams, divisions, members };
+}
+
+/**
+ * A cup's data, kept in the data cache as read (an hour at a time, as
+ * before), not as ESPN sends it: a cup's season scoreboard is up to 1.5 MB
+ * and growing, and Next's data cache keeps no fetch over 2 MB (see keptEspn
+ * in leagueData.ts). Inside the cached function ESPN's requests skip the data
+ * cache. A load that fails isn't kept.
+ */
+async function keptEspnCup(cup: CupConfig): Promise<CupData> {
+  const load = () => loadEspnCup(cup);
+  try {
+    return await unstable_cache(load, ["cup-data", cup.code, DEPLOYMENT], { tags: [`cup:${cup.code}`], revalidate: REVALIDATE_SECONDS })();
+  } catch (error) {
+    if (noDataCache(error)) return load();
+    throw error;
+  }
 }
 
 async function loadEspnCup(cup: CupConfig): Promise<CupData> {

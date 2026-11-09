@@ -6,15 +6,16 @@ import type { LeagueData } from "./leagueData.ts";
 /*
  * When to refresh a league's pages together (src/app/api/revalidate/leagues):
  * the route compares ESPN's data now with the cached copy the pages are built
- * from and, only when they differ, revalidates the league's tags, so every
- * page is rebuilt from the new data on its next visit, and none before.
+ * from and, only when they differ, expires the league's tags, so every page
+ * is rebuilt from the new data on its next visit, and none before.
  *
- * With the route on, it is how new results come in: the cached copy is kept
- * for hours (leagueDataKeepSeconds in src/lib/leagueData.ts), so a page
- * rebuilt on its own reads the same copy as the others and can't run ahead of
- * them, and pages aren't rebuilt for nothing. Every rebuild costs (a function, the cache reads of
- * the league's data and outlook, the page written again), so it waits for new
- * results.
+ * With the route on, it is how new results come in: the cached copy (keptEspn
+ * in src/lib/leagueData.ts, the data as read) is kept for hours
+ * (leagueDataKeepSeconds) and expired at once with the pages when the route
+ * sees new results. So a page rebuilt on its own reads the same copy as the
+ * others and can't run ahead of them, and pages aren't rebuilt for nothing:
+ * every rebuild costs (a function, the cache reads of the league's data and
+ * outlook, the page written again), so it waits for new results.
  */
 
 export type RefreshReason = "changed" | "unchanged" | "unavailable";
