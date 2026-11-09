@@ -6,8 +6,8 @@ import { reportMetadata } from "../../../../lib/oddsText.ts";
 import { loadReport } from "../../../../lib/oddsPage.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../../lib/site.ts";
 
-/** The latest round's report; it changes when a new round's snapshot is deployed, the results in its sentences hourly. */
-export const revalidate = 3600;
+/** The latest round's report; it changes when a new round's snapshot is deployed, the results in its sentences with the league's data (as the league page). */
+export const revalidate = 21600;
 
 type Params = Promise<{ locale: string; league: string }>;
 

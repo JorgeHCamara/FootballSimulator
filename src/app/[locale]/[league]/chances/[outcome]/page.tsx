@@ -16,8 +16,8 @@ import { loadLeague, type LoadedLeague } from "../../../../../lib/clubPage.ts";
 import { latestReportPath, readSnapshots, seasonReports } from "../../../../../lib/oddsReports.ts";
 import { OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd } from "../../../../../lib/site.ts";
 
-/** As the league's club pages: refreshed at most every hour (ISR). */
-export const revalidate = 3600;
+/** As the league page: rebuilt when the league's results change, else every six hours at most (ISR). */
+export const revalidate = 21600;
 /** Room for the shared outlook on a cold server (see the club page). */
 export const maxDuration = 60;
 

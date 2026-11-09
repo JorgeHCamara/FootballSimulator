@@ -7,8 +7,8 @@ import type { Fixture, Team } from "../engine/types.ts";
 import { cachedLeagueOutlook, dataVersion, outlookFromRun, outlookSetup, type LeagueOutlook } from "./clubOutlook.ts";
 import { loadClub } from "./clubPage.ts";
 import { withClubPages } from "./clubs.ts";
-import { getLeagueData, withRetry, type LeagueData } from "./leagueData.ts";
-import { authorized, refreshReason, RECENT_KICKOFF_MS } from "./leagueRefresh.ts";
+import { getLeagueData, KEEP_WITH_ROUTE_SECONDS, leagueDataKeepSeconds, withRetry, type LeagueData } from "./leagueData.ts";
+import { authorized, refreshReason } from "./leagueRefresh.ts";
 import { SCENARIO_ITERATIONS, SCENARIO_SEED } from "./scenario.ts";
 import { dataTag, outlookKey, outlookTag, runTag, sharedLeagueOutlook } from "./sharedOutlook.ts";
 import { SIM_VERSION } from "./simVersion.ts";
@@ -79,21 +79,39 @@ describe("refreshing a league's pages together", () => {
   const now = Date.parse("2026-11-07T18:00:00Z");
   const upcoming = plData.fixtures.find((f) => !f.result)!;
 
-  it("when ESPN's results differ from the cached copy, or a game kicked off in the last four hours", () => {
-    // The same data, nothing just played (the snapshot's games are weeks before `now`).
-    const later = Date.parse("2027-08-01T00:00:00Z");
-    assert.equal(refreshReason(plData, plData, later), "unchanged");
+  it("only when ESPN's data differs from the cached copy: not while a game is on with nothing new", () => {
+    assert.equal(refreshReason(plData, plData), "unchanged");
     // A result in.
     const played: LeagueData = { ...plData, fixtures: plData.fixtures.map((f) => (f.id === upcoming.id ? { ...f, result: { home: 1, away: 0 } } : f)) };
     assert.notEqual(dataVersion(played), dataVersion(plData));
-    assert.equal(refreshReason(plData, played, later), "changed");
-    // A game an hour old, its result not in yet: refreshed while it comes in.
+    assert.equal(refreshReason(plData, played), "changed");
+    // A game moved to another day.
+    const moved: LeagueData = { ...plData, fixtures: plData.fixtures.map((f) => (f.id === upcoming.id ? { ...f, utcDate: new Date(Date.parse(f.utcDate) + 86_400_000).toISOString() } : f)) };
+    assert.equal(refreshReason(plData, moved), "changed");
+    // A game that kicked off an hour ago, its result not in yet: nothing new to show, so nothing rebuilt.
     const kickedOff: LeagueData = { ...plData, fixtures: plData.fixtures.map((f) => (f.id === upcoming.id ? { ...f, utcDate: new Date(now - 3_600_000).toISOString() } : f)) };
-    assert.equal(refreshReason(kickedOff, kickedOff, now), "recent");
-    assert.equal(refreshReason(kickedOff, kickedOff, now + RECENT_KICKOFF_MS), "unchanged");
+    assert.equal(refreshReason(kickedOff, kickedOff), "unchanged");
     // ESPN down: nothing to compare with.
-    assert.equal(refreshReason(plData, undefined, now), "unavailable");
-    assert.equal(refreshReason(undefined, plData, now), "changed");
+    assert.equal(refreshReason(plData, undefined), "unavailable");
+    assert.equal(refreshReason(undefined, plData), "changed");
+  });
+
+  it("also when a play-off game, a points deduction or the order of level clubs changes", () => {
+    const leg = { ...upcoming, id: 990001, utcDate: "2027-05-20T19:00:00Z", result: null };
+    const withPlayoff: LeagueData = { ...plData, postseason: [leg] };
+    assert.equal(refreshReason(plData, withPlayoff), "changed");
+    assert.equal(refreshReason(withPlayoff, { ...plData, postseason: [{ ...leg, result: { home: 2, away: 1 } }] }), "changed");
+    assert.equal(refreshReason(withPlayoff, { ...plData, postseason: [{ ...leg }] }), "unchanged");
+    const club = plData.teams[0]!.id;
+    assert.equal(refreshReason(plData, { ...plData, deductions: { [club]: 6 } }), "changed");
+    assert.equal(refreshReason({ ...plData, deductions: { [club]: 6 } }, { ...plData, deductions: { [club]: 6 } }), "unchanged");
+    assert.equal(refreshReason(plData, { ...plData, fallbackOrder: [club] }), "changed");
+  });
+
+  it("keeps a league's cached data for hours while the route brings new results in, an hour without it", () => {
+    assert.equal(leagueDataKeepSeconds({}), 3600);
+    assert.equal(leagueDataKeepSeconds({ REVALIDATE_TOKEN: "s3cret" }), KEEP_WITH_ROUTE_SECONDS);
+    assert.ok(KEEP_WITH_ROUTE_SECONDS >= 6 * 3600);
   });
 
   it("only with the site's token", () => {

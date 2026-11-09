@@ -26,7 +26,11 @@ import { latestReportPath, readSnapshots, seasonReports } from "../../../lib/odd
 import { leagueChancePath, snapshotOutcomeKey, snapshotOutcomes } from "../../../lib/chancePages.ts";
 import { hasPastWinners, pastWinnersPath } from "../../../lib/winnersData.ts";
 
-export const revalidate = 3600;
+/**
+ * Rebuilt when the league's results change, else every six hours at most:
+ * the league's data is only replaced when new results are in (/api/revalidate/leagues revalidates its tags; see leagueDataKeepSeconds), and a league whose data is kept an hour (no route, football-data.org, the cups) still refreshes hourly through its fetches.
+ */
+export const revalidate = 21600;
 
 type Params = Promise<{ locale: string; league: string }>;
 
