@@ -4,10 +4,11 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import type { Zone } from "../config/leagues.ts";
 import type { Fixture, ResultMap, Score, Team, TeamId } from "../engine/types.ts";
-import { divisionConfig, tableRows, type DivisionCode, type World } from "../lib/myWorld.ts";
+import { divisionConfig, tableRows, worldSeasonLabel, type DivisionCode, type World } from "../lib/myWorld.ts";
 import { stageOfMatchday, TOURNAMENT_ROUNDS, type ZoneSeason, type ZoneStage } from "../lib/worldZones.ts";
 import { FixtureList, PLAYOFF_MATCHDAY, type PlayoffView } from "./FixtureList.tsx";
 import { Icon } from "./Icon.tsx";
+import { PromotedClubs } from "./PromotedClubs.tsx";
 import { WorldTable } from "./WorldTable.tsx";
 
 /*
@@ -53,6 +54,7 @@ function playoffView(stage: ZoneStage, zoneNames: string[], title: string): Play
  */
 export function ZoneColumns({
   world,
+  year,
   code,
   season,
   fixtures,
@@ -67,6 +69,8 @@ export function ZoneColumns({
   onPlayoffStage,
 }: {
   world: World;
+  /** The season shown (world.year, or a finished one). */
+  year: number;
   code: DivisionCode;
   season: ZoneSeason;
   fixtures: readonly Fixture[];
@@ -84,6 +88,9 @@ export function ZoneColumns({
 }) {
   const t = useTranslations("World");
   const [annual, setAnnual] = useState(false);
+  // The Liga Profesional: one zone at a time, as on its league page (the user's club's zone to begin with).
+  const zoneSwitch = code === "ARG" && season.zones.length > 1;
+  const [zone, setZone] = useState(() => Math.max(0, season.zones.findIndex((ids) => ids.includes(world.userClub))));
   const league = divisionConfig(code);
   const zoneNames = (league.groups ?? []).map((g) => t("zones.zone", { zone: g.id }));
   const index = zoneStageShown(season, code, matchday, playoffStage);
@@ -112,6 +119,7 @@ export function ZoneColumns({
   return (
     <>
       <div className="min-w-0 space-y-3 lg:col-span-2 lg:col-start-1 lg:row-start-2" data-testid="world-zones" data-league={code}>
+        <div className="flex flex-wrap items-center gap-2">
         {season.stages.length > 1 && (
           <div role="tablist" className="flex w-fit gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800" data-testid="world-tournaments">
             {season.stages.map((s) => (
@@ -126,23 +134,54 @@ export function ZoneColumns({
             )}
           </div>
         )}
+        {/* The zone switch, as the league page's. */}
+        {zoneSwitch && !annual && (
+          <div className="flex max-w-full overflow-x-auto rounded-lg bg-zinc-200/70 p-1 dark:bg-zinc-800" role="group" aria-label={t("zones.switch")} data-testid="world-zone-switch">
+            {zoneNames.map((name, z) => (
+              <button
+                key={z}
+                type="button"
+                aria-pressed={z === zone}
+                className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold ${z === zone ? "bg-white shadow-sm dark:bg-zinc-700" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"}`}
+                onClick={() => setZone(z)}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        )}
+        </div>
         {annual && season.annual ? (
           <WorldTable rows={tableRows(season.annual)} code={code} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-annual-table" zones={annualZones} title={t("zones.annual")} />
         ) : (
-          stage.tables.map((rows, z) => (
-            <WorldTable key={z} rows={tableRows(rows)} code={code} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-zone-table" title={zoneNames[z] ?? ""} />
-          ))
+          stage.tables.map((rows, z) =>
+            zoneSwitch && z !== zone ? null : (
+              <WorldTable key={z} rows={tableRows(rows)} code={code} clubs={world.clubs} highlight={world.userClub} final={false} testId="world-zone-table" {...(zoneSwitch ? {} : { title: zoneNames[z] ?? "" })} />
+            ),
+          )
         )}
         {annual && season.annual && <p className="text-xs text-zinc-500">{t("zones.annualNote")}</p>}
-        {/* Each tournament's champion (and the Primera Nacional's two promoted) once decided. */}
+        {/* The Primera Nacional's promoted clubs, as the other leagues' (the final's winner, then the Reducido's). */}
+        {stage.config.promotedTo && (
+          <PromotedClubs
+            bracket={stage.bracket}
+            rows={[]}
+            teams={teams}
+            predictions={picks}
+            seasonComplete={stage.complete}
+            directPromotion={[]}
+            promotedTo={stage.config.promotedTo}
+            nextSeason={worldSeasonLabel(world, year + 1, "ARG")}
+            {...(stage.config.titleRound !== undefined ? { titleRound: stage.config.titleRound } : {})}
+          />
+        )}
+        {/* The Liga Profesional's champion of each tournament once decided. */}
         {season.stages
-          .filter((s) => s.champion !== null)
+          .filter((s) => s.champion !== null && !s.config.promotedTo)
           .map((s) => (
             <p key={s.index} className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300" data-testid="world-zone-champion" data-stage={s.key}>
               <Icon name="trophy" size={16} className="shrink-0 text-amber-500" />
-              {s.promoted !== null
-                ? t("zones.championPromoted", { tournament: tournament(s), club: club(s.champion), promoted: club(s.promoted) })
-                : t("zones.champion", { tournament: tournament(s), club: club(s.champion), runnerUp: club(s.runnerUp) })}
+              {t("zones.champion", { tournament: tournament(s), club: club(s.champion), runnerUp: club(s.runnerUp) })}
             </p>
           ))}
       </div>

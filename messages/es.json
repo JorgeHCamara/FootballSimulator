@@ -1639,7 +1639,7 @@
       "round": "Fecha {round}",
       "annualNote": "Los partidos de los dos torneos: los dos últimos descienden (el segundo descenso real sale de los promedios de tres temporadas, que aquí no se calculan).",
       "champion": "{tournament}: {club} campeón, al ganarle la final a {runnerUp}.",
-      "championPromoted": "{tournament}: {club} campeón y ascendido; {promoted} ganó el Reducido y también asciende."
+      "switch": "Zona"
     }
   }
 }
