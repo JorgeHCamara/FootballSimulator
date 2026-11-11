@@ -5,7 +5,7 @@ import { Icon } from "../../../components/Icon.tsx";
 import { TeamBadge } from "../../../components/TeamBadge.tsx";
 import { CONTINENTS, continentOf } from "../../../config/competitions.ts";
 import type { SiteLocale } from "../../../config/leagues.ts";
-import { Link } from "../../../i18n/navigation.ts";
+import { IntentLink } from "../../../components/IntentLink.tsx";
 import { percent } from "../../../lib/clubText.ts";
 import { latestReports } from "../../../lib/oddsPage.ts";
 import { latestReportPath } from "../../../lib/oddsReports.ts";
@@ -68,7 +68,7 @@ export default async function OddsHubPage({ params }: { params: Params }) {
                 const team = leader ? teams.get(leader.teamId) : undefined;
                 return (
                   <li key={league.code}>
-                    <Link
+                    <IntentLink
                       href={latestReportPath(league)}
                       className="flex h-full flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-4 hover:border-pitch-600 dark:border-zinc-800 dark:bg-zinc-900"
                       data-testid="odds-hub-item"
@@ -88,7 +88,7 @@ export default async function OddsHubPage({ params }: { params: Params }) {
                           <span className="shrink-0 font-bold tabular-nums">{percent(leader.values[report.lead.kind]!.now, lang)}</span>
                         </span>
                       )}
-                    </Link>
+                    </IntentLink>
                   </li>
                 );
               })}

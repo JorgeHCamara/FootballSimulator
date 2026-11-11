@@ -1,3 +1,5 @@
+// The file itself (".js"): these modules also run outside Next (scripts, tests), whose Node needs the extension.
+import { unstable_cache } from "next/cache.js";
 import { cache } from "react";
 import { getLeagueBySlug, type LeagueConfig, type ZoneKind } from "../config/leagues.ts";
 import { leagueTimeZone } from "../config/timezones.ts";
@@ -5,10 +7,10 @@ import { expectedGoals, expectedGoalsNeutral, likelyScores, outcomeProbabilities
 import type { LeagueModel } from "../engine/ratings.ts";
 import type { Fixture, Score, TeamId } from "../engine/types.ts";
 import { dataAsOf, outlookSetup, type ClubChances, type ClubOutlook, type HeadlineKind, type LeagueOutlook, type ResultScenarios } from "./clubOutlook.ts";
-import { sharedLeagueOutlook } from "./sharedOutlook.ts";
+import { dataTag, sharedLeagueOutlook } from "./sharedOutlook.ts";
 import { hasClubPages } from "./clubs.ts";
-import { fetchEspnGameState } from "./espn.ts";
-import { getLeagueData, getPastSeasonData, type LeagueData } from "./leagueData.ts";
+import { fetchEspnGameState, type EspnGameState } from "./espn.ts";
+import { getLeagueData, getPastSeasonData, noDataCache, type LeagueData } from "./leagueData.ts";
 import { findMatch, slugDate, type MatchRef } from "./matches.ts";
 
 /** Where a game stands when its page is rendered. */
@@ -66,6 +68,61 @@ export const isMatchDay = (kickoff: string, now = Date.now()) => {
   return now >= time - MATCH_DAY_BEFORE && now <= time + MATCH_DAY_AFTER;
 };
 
+/** A game can't be over sooner than this after kick-off (two halves and the break, less a margin). */
+const EARLIEST_FULL_TIME = 100 * 60_000;
+
+/** Can the game be over by now? Before that, its final score isn't looked for. */
+export const canBeOver = (kickoff: string, now = Date.now()) => now >= Date.parse(kickoff) + EARLIEST_FULL_TIME;
+
+/** How long a game's final score is kept before it's read again (seconds): the page's own six hours. */
+export const SETTLED_KEEP_SECONDS = 21600;
+
+/** A game's state is settled once it has its final, official score: nothing more comes from following it minute by minute. */
+export const isSettled = (state: EspnGameState | null | undefined): state is EspnGameState & { result: { home: number; away: number } } => Boolean(state?.result);
+
+/** The data cache key of a game's final score: the league, the game and its kick-off (a game played again another day starts afresh). */
+export const settledKey = (code: string, eventId: number, kickoff: string) => ["match-settled", code, String(eventId), kickoff];
+
+class NotSettled extends Error {}
+
+/**
+ * A game's final score, once it has one, from the data cache; undefined
+ * while it has none (or ESPN can't be read).
+ *
+ * A match page follows the shortest-lived thing it reads (Next takes the
+ * lowest `revalidate` among a route's fetches as the route's own: node_modules/
+ * next/dist/docs, guides/incremental-static-regeneration), and on match day
+ * that is the game's state, fetched to last ten minutes. It kept being read
+ * that way after full time, until the league's data had the result (the next
+ * run of the refresh job, or hours without it) or twelve hours after
+ * kick-off: a page rebuilt every ten minutes to say the same score.
+ *
+ * So once the game can be over (canBeOver), its state is first asked for
+ * here: ESPN is read inside this entry, which is stored only when the score
+ * is final (an entry that throws isn't kept) and then lasts
+ * SETTLED_KEEP_SECONDS. A page that finds it reads nothing shorter-lived: it
+ * is back to its own six hours. Tagged with the league's data: when the
+ * result reaches the league's data, the refresh job expires this entry and
+ * the page together, and the page is then built from the league's data alone.
+ * A live game, or one not started, finds nothing here and reads its state the
+ * ten-minute way, as before.
+ */
+export async function settledGameState(code: string, slug: string, eventId: number, kickoff: string): Promise<EspnGameState | undefined> {
+  const load = async () => {
+    const state = await fetchEspnGameState(slug, eventId, kickoff, 0);
+    if (!isSettled(state)) throw new NotSettled();
+    return state;
+  };
+  try {
+    return await unstable_cache(load, settledKey(code, eventId, kickoff), { tags: [dataTag(code)], revalidate: SETTLED_KEEP_SECONDS })();
+  } catch (error) {
+    // Outside a Next.js server (scripts, tests) there's no data cache: ESPN itself.
+    if (noDataCache(error)) return load().catch(() => undefined);
+    if (!(error instanceof NotSettled)) console.warn(`${code} ${eventId}: no final score yet:`, error);
+    return undefined;
+  }
+}
+
 const seasonLabel = (data: LeagueData) => (data.tournaments ? (data.season.split(" ").at(-1) ?? data.season) : data.season);
 
 const preMatchModels = new Map<string, LeagueModel>();
@@ -120,14 +177,20 @@ export const locateMatch = cache(async (leagueSlug: string, slug: string): Promi
   const { match } = found;
   const { fixture } = match;
 
-  // Match day: the game's own state, fresher than the league's hourly data.
+  // Match day: the game's own state, fresher than the league's data.
   let result = fixture.result;
   let state: MatchState = result ? "played" : "upcoming";
   if (!result && data.provider === "espn" && league.espn && isMatchDay(fixture.utcDate)) {
-    const live = await fetchEspnGameState(league.espn.slug, fixture.id, fixture.utcDate, matchDayRevalidate(fixture.utcDate)).catch((error: unknown) => {
-      console.warn(`${league.code} ${fixture.id}: no match-day state:`, error);
-      return null;
-    });
+    const slug = league.espn.slug;
+    // Once it can be over: its final score, read once and kept (the page then lasts its six hours, not ten minutes).
+    const settled = canBeOver(fixture.utcDate) ? await settledGameState(league.code, slug, fixture.id, fixture.utcDate) : undefined;
+    // Not over yet (or not known to be): the state kept a few minutes, and so the page.
+    const live =
+      settled ??
+      (await fetchEspnGameState(slug, fixture.id, fixture.utcDate, matchDayRevalidate(fixture.utcDate)).catch((error: unknown) => {
+        console.warn(`${league.code} ${fixture.id}: no match-day state:`, error);
+        return null;
+      }));
     if (live?.result) {
       result = live.result;
       state = "played";

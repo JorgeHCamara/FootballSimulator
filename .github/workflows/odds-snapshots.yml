@@ -4,10 +4,18 @@ name: Odds snapshots
 # chances are added to src/data/snapshots/<CODE>.json (scripts/snapshot-odds.ts)
 # and committed to main, along with new games' xG (src/data/xg). Runs once a
 # day, at 06:41 UTC, after the Americas' last games of the night; a run with no
-# newly completed round and no new xG commits nothing. Once a day because each
-# commit deploys production, and each deployment starts Vercel's page cache
-# afresh: every page is rebuilt on its next visit. League tables, results and
-# chances come from the live data, not from here, and don't wait for it.
+# newly completed round and no new xG commits nothing.
+#
+# The commit doesn't deploy the site (scripts/vercel-ignore.mjs skips a build
+# that only changes these files: a deployment starts Vercel's page cache
+# afresh, and every page was rebuilt on its next visit, every night). The
+# running site reads the files from main itself (src/lib/publishedData.ts), and
+# the last step tells it which ones are new, so it reads them at once and
+# rebuilds the pages that show them: a league's odds reports for new snapshots,
+# a league's pages for new xG where its ratings use it. Without that step (no
+# REVALIDATE_TOKEN secret, or the site unreachable) the site still reads them
+# within six hours. League tables and results come from the live data, not
+# from here.
 on:
   schedule:
     - cron: "41 6 * * *"
@@ -40,6 +48,7 @@ jobs:
         continue-on-error: true
       - run: npm run snapshots
       - name: Commit new snapshots and xG
+        id: commit
         run: |
           if [ -z "$(git status --porcelain -- src/data/snapshots src/data/xg)" ]; then
             echo "No new snapshots or xG."
@@ -52,3 +61,38 @@ jobs:
           # main may have moved while the job ran.
           git pull --rebase origin main
           git push origin HEAD:main
+          # The files this run published, each with its fingerprint: "snapshots:PL:<sha256>,xg:PL:<sha256>".
+          PUBLISHED=$(git diff --name-only HEAD~1 HEAD -- src/data/snapshots src/data/xg | while read -r file; do
+            kind=$(basename "$(dirname "$file")"); code=$(basename "$file" .json)
+            [ -f "$file" ] && echo "$kind:$code:$(sha256sum "$file" | cut -d' ' -f1)"
+          done | paste -sd, -)
+          echo "published=$PUBLISHED" >> "$GITHUB_OUTPUT"
+      # Tells the running site which files are new (/api/revalidate/leagues?publish=…). The site checks each at
+      # the source first; GitHub serves a changed file within about five minutes, so "pending" ones are asked
+      # for again. Never fails the run for long: the site reads new files within six hours on its own.
+      - name: Announce the new files to the site
+        if: steps.commit.outputs.published != ''
+        env:
+          TOKEN: ${{ secrets.REVALIDATE_TOKEN }}
+          SITE: ${{ vars.SITE_URL || 'https://footsimu.com' }}
+          PUBLISHED: ${{ steps.commit.outputs.published }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::notice::REVALIDATE_TOKEN is not set: the site reads the new files on its own, within six hours."
+            exit 0
+          fi
+          REMAINING="$PUBLISHED"
+          for attempt in 1 2 3 4 5 6 7 8; do
+            RESPONSE=$(curl --fail-with-body --silent --show-error --max-time 60 --get \
+              -H "Authorization: Bearer $TOKEN" --data-urlencode "publish=$REMAINING" \
+              "$SITE/api/revalidate/leagues") || { echo "$RESPONSE"; RESPONSE=""; }
+            echo "$RESPONSE"
+            if [ -n "$RESPONSE" ]; then
+              # What the site hasn't read yet, with the fingerprints it is waiting for.
+              WAITING=$(echo "$RESPONSE" | jq -r '[.pending[], .unavailable[]] | .[]')
+              [ -z "$WAITING" ] && exit 0
+              REMAINING=$(echo "$PUBLISHED" | tr ',' '\n' | grep -F -f <(echo "$WAITING" | sed 's/$/:/') | paste -sd, -)
+            fi
+            [ "$attempt" -lt 8 ] && sleep 60
+          done
+          echo "::warning::The site hasn't confirmed: $REMAINING. It reads them on its own within six hours."

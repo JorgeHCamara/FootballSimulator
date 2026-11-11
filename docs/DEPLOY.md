@@ -1,7 +1,7 @@
 # Deploying Foot Simu to footsimu.com
 
 Foot Simu is hosted on [Vercel](https://vercel.com), the platform built by the Next.js team. It supports everything the app uses with no extra configuration:
-- pre-rendered pages that refresh every hour
+- pre-rendered pages that refresh when their league's results change
 - generated share images
 - language redirects
 
@@ -34,6 +34,8 @@ In **Settings → Environment Variables**, add these for *Production* and *Previ
 | `NEXT_PUBLIC_SITE_URL` | `https://footsimu.com` |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Added in step 7 |
 | `REVALIDATE_TOKEN` | Optional: a long random string (e.g. `openssl rand -hex 32`). With it, and the same value as the GitHub repository secret `REVALIDATE_TOKEN`, a scheduled job refreshes a league's page and all its club pages together when new results come in (see "Shared outlook" in the README). Production only. |
+| `FOOTSIMU_DATA_URL` | Optional, and normally left unset. Where the running site reads the daily job's odds snapshots and xG from, so their commit needs no deployment (see "Published data" in the README). Unset on Vercel: main's files on GitHub (`https://raw.githubusercontent.com/JorgeHCamara/FootballSimulator/main`), which works while the repository is public. `off` reads only the files the deployment was built with (then a data commit must be deployed by hand). |
+| `FOOTSIMU_DATA_TOKEN` | Only if the repository is made private: a GitHub token with read access to its contents, sent when reading those files. |
 
 Ad slots (see "Ad slots" in the README) stay off unless these are set, after the AdSense review and alongside `NEXT_PUBLIC_ADSENSE_CLIENT`:
 
@@ -93,3 +95,7 @@ To set it up again from scratch:
 
 - **Data API usage:** data is cached for an hour, so the site makes about a dozen football-data.org requests per hour. That is far below the free tier's 10 requests per minute.
 - **Commercial use:** football-data.org's free tier is for non-commercial use. If Foot Simu starts making money, check their paid plans.
+
+## Data commits don't deploy
+
+The daily "Odds snapshots" job commits new snapshots and xG to `main`. `vercel.json` (`ignoreCommand`, `scripts/vercel-ignore.mjs`) skips the build of a commit to `main` that changes nothing but `src/data/snapshots` and `src/data/xg` since the last successful deployment; the deployment shows as **Canceled** ("Ignored Build Step") in the dashboard, which is expected. The running site reads the new files from the repository and the job tells it which ones are new (see "Published data" in the README). Every other commit, every other branch and every manual **Redeploy** builds as before. `vercel.json` takes the place of a dashboard "Ignored Build Step" setting, so leave that field on its default.

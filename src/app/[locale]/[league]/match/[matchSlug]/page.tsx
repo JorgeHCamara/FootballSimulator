@@ -11,6 +11,7 @@ import { TeamBadge } from "../../../../../components/TeamBadge.tsx";
 import type { SiteLocale } from "../../../../../config/leagues.ts";
 import type { FormResult, Team } from "../../../../../engine/types.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
+import { IntentLink } from "../../../../../components/IntentLink.tsx";
 import type { ClubOutlook } from "../../../../../lib/clubOutlook.ts";
 import { ordinal, percent } from "../../../../../lib/clubText.ts";
 import { hasImpact } from "../../../../../lib/matchImpact.ts";
@@ -20,10 +21,12 @@ import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../.
 
 /**
  * Rebuilt when the league's results change (as the league page), else every
- * six hours at most; and on match day, when the game's own state is fetched,
- * hourly until an hour before kick-off and every 10 minutes from then
- * (matchDayRevalidate: match day starts six hours before kick-off, so a page
- * built before it is rebuilt in time).
+ * six hours at most; and on match day, while the game has no final score,
+ * when its own state is fetched: hourly until an hour before kick-off and
+ * every 10 minutes from then (matchDayRevalidate: match day starts six hours
+ * before kick-off, so a page built before it is rebuilt in time). Once the
+ * game has its final score the page is back to six hours (settledGameState
+ * in src/lib/matchPreview.ts).
  */
 export const revalidate = 21600;
 /** Three season simulations for "What this result means" on a first visit. */
@@ -120,9 +123,9 @@ export default async function MatchPage({ params }: { params: Params }) {
   const teamName = (team: Team, className = "") => {
     const page = clubPage(team);
     return page ? (
-      <Link href={page} className={`hover:underline ${className}`} data-testid="match-club-link">
+      <IntentLink href={page} className={`hover:underline ${className}`} data-testid="match-club-link">
         {team.name}
-      </Link>
+      </IntentLink>
     ) : (
       <span className={className}>{team.name}</span>
     );
@@ -176,10 +179,10 @@ export default async function MatchPage({ params }: { params: Params }) {
         </dl>
       ) : null}
       {clubPage(team) && (
-        <Link href={clubPage(team)!} className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-pitch-700 hover:underline dark:text-pitch-300">
+        <IntentLink href={clubPage(team)!} className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-pitch-700 hover:underline dark:text-pitch-300">
           {t("seasonChances", { club: team.shortName })}
           <Icon name="chevron-right" size={14} />
-        </Link>
+        </IntentLink>
       )}
     </div>
   );

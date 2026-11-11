@@ -8,6 +8,8 @@ import { getLeagueData, type LeagueData } from "./leagueData.ts";
 import { INDEX_NEXT_DAYS, INDEX_PAST_DAYS, matchesBetween } from "./matches.ts";
 import { readSnapshots, seasonReports } from "./oddsReports.ts";
 import { sharedLeagueOutlook } from "./sharedOutlook.ts";
+import { allGames } from "./leagueRefresh.ts";
+import { lastResultAt } from "./sitemapDates.ts";
 
 /** A domestic league's outlook: the shared one, as its league, club and chance pages read it. */
 export interface LoadedLeague {
@@ -136,9 +138,11 @@ async function chancePaths(league: LeagueConfig, data: LeagueData): Promise<stri
  * Every club page's path (without the locale), every match page's for games
  * inside the index window (INDEX_PAST_DAYS ago to INDEX_NEXT_DAYS ahead), and
  * the chance pages (chancePaths), league by league; a league whose data
- * can't load is left out.
+ * can't load is left out. `results`: when each league's results last changed,
+ * by its slug (lastResultAt; undefined before its first result), for the
+ * sitemap's dates.
  */
-export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: string[]; matches: string[]; chances: string[] }> {
+export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: string[]; matches: string[]; chances: string[]; results: Map<string, Date | undefined> }> {
   const leagues = LEAGUES.filter(hasClubPages);
   const day = 86_400_000;
   const pages = await Promise.all(
@@ -148,14 +152,19 @@ export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: stri
           clubs: data.teams.flatMap((team) => (team.page ? [team.page] : [])),
           matches: matchesBetween(league, data, now - INDEX_PAST_DAYS * day, now + INDEX_NEXT_DAYS * day).map((m) => m.path),
           chances: await chancePaths(league, data).catch(() => []),
+          result: [league.slug, lastResultAt(allGames(data), now)] as const,
         }),
         (error: unknown) => {
           console.warn(`sitemap: no club or match pages for ${league.code}:`, error);
-          return { clubs: [], matches: [], chances: [] };
+          return { clubs: [], matches: [], chances: [], result: undefined };
         },
       ),
     ),
   );
-  return { clubs: pages.flatMap((p) => p.clubs), matches: pages.flatMap((p) => p.matches), chances: pages.flatMap((p) => p.chances) };
+  return {
+    clubs: pages.flatMap((p) => p.clubs),
+    matches: pages.flatMap((p) => p.matches),
+    chances: pages.flatMap((p) => p.chances),
+    results: new Map(pages.flatMap((p) => (p.result ? [p.result] : []))),
+  };
 }
-

@@ -81,19 +81,41 @@ export interface EspnGameState {
 
 const yyyymmdd = (time: number) => new Date(time).toISOString().slice(0, 10).replaceAll("-", "");
 
+/** The calendar months (UTC) a span of time touches, as ESPN's "dates" filter takes them: "202611". */
+export function monthsBetween(from: number, to: number): string[] {
+  const out: string[] = [];
+  const start = new Date(from);
+  for (let year = start.getUTCFullYear(), month = start.getUTCMonth(); Date.UTC(year, month, 1) <= to; month === 11 ? (year++, (month = 0)) : month++) {
+    out.push(`${year}${String(month + 1).padStart(2, "0")}`);
+  }
+  return out;
+}
+
 /**
- * One game's state from the league's scoreboard around its kick-off (a day
- * either side: ESPN's days are US time). For match pages on match day, kept
- * for `revalidate` seconds so the final score shows soon after the whistle.
+ * A league's events around a span of time, from its scoreboard: a small
+ * download (tens to a few hundred KB) next to the season's (4–6 MB, see
+ * fetchEspnSeason). Asked for by day range (a day either side: ESPN's days
+ * are US time); when ESPN refuses the range (HTTP 400, as it does at times),
+ * by the calendar months the span touches instead. Events of every stage and
+ * season in those days come back: the caller picks its own.
  */
-export async function fetchEspnGameState(slug: string, eventId: number, kickoff: string, revalidate: number): Promise<EspnGameState | null> {
-  const time = Date.parse(kickoff);
-  const range = `${yyyymmdd(time - 86_400_000)}-${yyyymmdd(time + 86_400_000)}`;
-  const res = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${range}&limit=200`, { next: { revalidate } });
-  if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} ${range}: HTTP ${res.status}`);
-  const board = (await res.json()) as EspnScoreboard;
-  const event = board.events?.find((e) => Number(e.id) === eventId);
-  if (!event) return null;
+export async function fetchEspnDays(slug: string, from: number, to: number, init: RequestInit = {}): Promise<EspnEvent[]> {
+  const day = 86_400_000;
+  const range = `${yyyymmdd(from - day)}-${yyyymmdd(to + day)}`;
+  const res = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${range}&limit=300`, init);
+  if (res.ok) return ((await res.json()) as EspnScoreboard).events ?? [];
+  if (res.status !== 400) throw new EspnError(res.status, `ESPN ${slug} ${range}: HTTP ${res.status}`);
+  const byId = new Map<string, EspnEvent>();
+  for (const month of monthsBetween(from - day, to + day)) {
+    const board = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${month}&limit=300`, init);
+    if (!board.ok) throw new EspnError(board.status, `ESPN ${slug} ${month}: HTTP ${board.status}`);
+    for (const event of ((await board.json()) as EspnScoreboard).events ?? []) byId.set(event.id, event);
+  }
+  return [...byId.values()];
+}
+
+/** Where a game stands from its scoreboard event. */
+export function espnGameState(event: EspnEvent): EspnGameState {
   const type = event.status.type;
   const competitors = event.competitions[0]?.competitors ?? [];
   const goals = (side: "home" | "away") => Number(competitors.find((c) => c.homeAway === side)?.score);
@@ -105,6 +127,19 @@ export async function fetchEspnGameState(slug: string, eventId: number, kickoff:
     result: finished && Number.isFinite(home) && Number.isFinite(away) ? { home, away } : null,
     off: REPLACEABLE_STATUSES.has(type.name),
   };
+}
+
+/**
+ * One game's state from the league's scoreboard around its kick-off. For
+ * match pages on match day, kept for `revalidate` seconds so the final score
+ * shows soon after the whistle; `revalidate` 0 asks ESPN itself (for a read
+ * that is itself kept, see settledGameState in matchPreview.ts).
+ */
+export async function fetchEspnGameState(slug: string, eventId: number, kickoff: string, revalidate: number): Promise<EspnGameState | null> {
+  const time = Date.parse(kickoff);
+  const events = await fetchEspnDays(slug, time, time, revalidate > 0 ? { next: { revalidate } } : { cache: "no-store" });
+  const event = events.find((e) => Number(e.id) === eventId);
+  return event ? espnGameState(event) : null;
 }
 
 interface EspnStandings {
@@ -170,7 +205,7 @@ export async function fetchEspnSeason(
 const isPlaceholder = (c: EspnCompetitor) => /^TBD\b/i.test(c.team.displayName) || !/^\d+$/.test(c.team.id);
 
 /** Games that may be listed again under a new date. */
-const REPLACEABLE_STATUSES = new Set(["STATUS_POSTPONED", "STATUS_CANCELED", "STATUS_ABANDONED", "STATUS_SUSPENDED"]);
+export const REPLACEABLE_STATUSES = new Set(["STATUS_POSTPONED", "STATUS_CANCELED", "STATUS_ABANDONED", "STATUS_SUSPENDED"]);
 
 interface LeagueMatch {
   event: EspnEvent;

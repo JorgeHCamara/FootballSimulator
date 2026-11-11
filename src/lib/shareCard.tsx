@@ -5,7 +5,7 @@ import { BrandMark } from "../components/BrandMark.tsx";
 import { zoneHex } from "../components/zones.ts";
 import type { LeagueConfig, ZoneKind } from "../config/leagues.ts";
 import type { Team, TeamId } from "../engine/types.ts";
-import { CARD_CACHE_HEADERS, type CardCache } from "./cardCache.ts";
+import { CARD_CACHE_HEADERS, ownCrestOrigins, type CardCache } from "./cardCache.ts";
 import { OG_SIZE } from "./ogImage.tsx";
 import { cardRows, legendKinds, type ScenarioOutcome } from "./scenario.ts";
 
@@ -254,6 +254,36 @@ export async function renderClubCard(text: ClubCardText, cache: CardCache = "liv
   );
 }
 
+/** The site's own crests (Série C's, a cut-out, a saved fallback): files under public/crests. */
+const OWN_CREST = /^\/crests\/(?:[a-z-]+\/)?\d+\.png$/;
+
+/**
+ * One of the site's own crests. From the deployment's files where they're on
+ * disk (a local server, the tests); on Vercel they aren't in the functions
+ * any more (all 11 MB of them went into each of the 11 card functions: see
+ * src/config/fileTracing.ts), so the one crest a card draws is fetched from
+ * the site's static files instead, and kept in the data cache like a club's
+ * crest from ESPN.
+ */
+async function ownCrest(path: string, env: Record<string, string | undefined> = process.env): Promise<Buffer | undefined> {
+  if (env.FOOTSIMU_CRESTS_FROM_DISK !== "0") {
+    try {
+      return await readFile(join(process.cwd(), "public", path));
+    } catch {
+      // Not in this function's files: over HTTP.
+    }
+  }
+  for (const origin of ownCrestOrigins(env)) {
+    try {
+      const res = await fetch(`${origin}${path}`, { signal: AbortSignal.timeout(2500), next: { revalidate: 604800 } });
+      if (res.ok && res.headers.get("content-type")?.startsWith("image/png")) return Buffer.from(await res.arrayBuffer());
+    } catch {
+      // The next address.
+    }
+  }
+  return undefined;
+}
+
 /**
  * A crest as a data URI for a card (PNG or JPEG only), or undefined when it
  * can't be fetched quickly: the card then shows the club's initials.
@@ -263,10 +293,11 @@ export async function crestDataUri(url: string | undefined): Promise<string | un
   try {
     let type: string;
     let bytes: Buffer;
-    if (/^\/crests\/(?:[a-z-]+\/)?\d+\.png$/.test(url)) {
-      // The site's own crest (Série C's, a cut-out, a saved fallback): read from the deployment, no request.
+    if (OWN_CREST.test(url)) {
+      const own = await ownCrest(url);
+      if (!own) return undefined;
       type = "image/png";
-      bytes = await readFile(join(process.cwd(), "public", url));
+      bytes = own;
     } else {
       const res = await fetch(url, { signal: AbortSignal.timeout(2500), next: { revalidate: 604800 } });
       type = res.headers.get("content-type")?.split(";")[0]?.trim() ?? "";

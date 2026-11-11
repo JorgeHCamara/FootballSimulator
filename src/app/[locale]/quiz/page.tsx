@@ -5,16 +5,19 @@ import { QuizClient, type QuizItem, type QuizLabels } from "../../../components/
 import { getLeagueByCode, type SiteLocale } from "../../../config/leagues.ts";
 import { ordinal, percent } from "../../../lib/clubText.ts";
 import type { QuizQuestion } from "../../../lib/quiz.ts";
-import { todaysQuiz } from "../../../lib/quizPage.ts";
+import { quizDayClock, todaysQuiz } from "../../../lib/quizPage.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
 
 /**
- * A new set every day (UTC): rebuilt hourly, so within an hour of midnight,
- * and as the live chances move (from the leagues' data, kept as the club
- * pages'). Hourly, not every few minutes: each rebuild reads the day's leagues
- * and outlooks, and the page says only that a new set comes every day.
+ * A new set every day (UTC). The page is rebuilt:
+ * - when the day's live leagues' results change (it reads their data and
+ *   outlooks, so it carries their tags: /api/revalidate/leagues);
+ * - at the UTC day's end: quizDayClock shortens this render's lifetime to
+ *   what's left of the day, so the new set is up within about a minute of
+ *   midnight UTC (it was within the hour);
+ * - else every six hours at most, the safety net every league page has.
  */
-export const revalidate = 3600;
+export const revalidate = 21600;
 /** Room for the day's two live outlooks on a cold server (they're shared with the club pages). */
 export const maxDuration = 60;
 
@@ -74,7 +77,9 @@ export default async function Page({ params }: { params: Params }) {
   setRequestLocale(locale);
   const lang = langOf(locale);
   const [t, tz] = await Promise.all([getTranslations("Quiz"), getTranslations("Zones")]);
-  const { date, questions, iterations } = await todaysQuiz(lang);
+  const now = new Date();
+  const { date, questions, iterations } = await todaysQuiz(lang, now);
+  await quizDayClock(now);
   const count = new Intl.NumberFormat(lang).format(iterations);
   const items = questions.map((q) => itemOf(q, lang, t, tz, count));
   const keys = ["question", "right", "wrong", "next", "finish", "score", "perfect", "good", "tryAgain", "tomorrow", "share", "shareText", "copied", "simulate", "playedElsewhere", "startedElsewhere", "continueIn", "languages"] as const;

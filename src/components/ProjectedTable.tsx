@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ZoneKind } from "../config/leagues.ts";
 import type { Team } from "../engine/types.ts";
-import { Link } from "../i18n/navigation.ts";
+import { IntentLink } from "./IntentLink.tsx";
 import type { ProjectedHistory } from "../lib/projected.ts";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
@@ -72,9 +72,9 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
     const team = byId.get(id);
     const text = (short ? team?.shortName : team?.name) ?? "";
     return team?.page ? (
-      <Link href={team.page} className="hover:underline">
+      <IntentLink href={team.page} className="hover:underline">
         {text}
-      </Link>
+      </IntentLink>
     ) : (
       text
     );

@@ -5,15 +5,19 @@ import { HomeHero } from "../../components/HomeHero.tsx";
 import { Icon } from "../../components/Icon.tsx";
 import { JsonLd } from "../../components/JsonLd.tsx";
 import { COMPETITIONS } from "../../config/competitions.ts";
-import { LEAGUES, type CompetitionCode, type SiteLocale } from "../../config/leagues.ts";
+import { HOME_LEAGUES, LEAGUES, type SiteLocale } from "../../config/leagues.ts";
 import { Link } from "../../i18n/navigation.ts";
 import { HREFLANG, MY_WORLD_LISTED, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem } from "../../lib/site.ts";
 
-/** Leagues with a card on the home page; every league is still in the header menu and footer. */
-const HOME_LEAGUES: readonly CompetitionCode[] = ["PL", "ELC", "PD", "BL1", "SA", "FL1", "PPL", "BSA", "MLS"];
-
-/** The hero's card reads the featured league's data and outlook like its league page: refreshed hourly, and with its tags (src/lib/sharedOutlook.ts). */
-export const revalidate = 3600;
+/**
+ * The hero's card reads the featured league's data and outlook like its league
+ * page, so the page carries that league's tags (src/lib/sharedOutlook.ts) and
+ * is rebuilt when its results change (/api/revalidate/leagues). Nothing else
+ * on it moves with time, so its own clock is only the safety net every page
+ * of the league has (six hours; the league's data is kept an hour without the
+ * route, and the page with it: leagueDataKeepSeconds).
+ */
+export const revalidate = 21600;
 /** Room for the featured league's outlook on a cold server (shared with its league and club pages). */
 export const maxDuration = 60;
 

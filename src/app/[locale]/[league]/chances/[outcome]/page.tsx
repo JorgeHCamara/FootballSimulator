@@ -10,6 +10,7 @@ import { zoneHex } from "../../../../../components/zones.ts";
 import type { SiteLocale } from "../../../../../config/leagues.ts";
 import type { Team, TeamId } from "../../../../../engine/types.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
+import { IntentLink } from "../../../../../components/IntentLink.tsx";
 import { isOutcome, leagueChancePath, leagueOutcomes, outcomeChance, type Outcome } from "../../../../../lib/chancePages.ts";
 import { leagueChanceText, leagueOutcomeKey, type ChanceTranslators } from "../../../../../lib/chanceText.ts";
 import { loadLeague, type LoadedLeague } from "../../../../../lib/clubPage.ts";
@@ -87,7 +88,7 @@ export default async function LeagueChancePage({ params }: { params: Params }) {
   const pageUrl = `${SITE_URL}/${locale}${path}`;
   const zone = outcomeChance([...outlook.clubs.values()].find((c) => outcomeChance(c, outcome))!, outcome)!.zone;
   const others = leagueOutcomes(outlook).filter((o) => o !== outcome);
-  const hasReport = Boolean(seasonReports(await readSnapshots(league.code), data.seasonKey)?.snapshots.length);
+  const hasReport = Boolean(seasonReports(await readSnapshots(league.code, { quiet: true }), data.seasonKey)?.snapshots.length);
   const chip = (o: Outcome) => {
     const { key, name } = leagueOutcomeKey(outlook, o);
     return t("chip", { Topic: t(`Topic.${key}`, { name }), topic: t(`topic.${key}`, { name }) });
@@ -141,14 +142,14 @@ export default async function LeagueChancePage({ params }: { params: Params }) {
             {t("simulate", { simulator: league.simulatorName[lang] })}
           </Link>
           {hasReport && (
-            <Link
+            <IntentLink
               href={latestReportPath(league)}
               className="flex h-11 items-center justify-center gap-2 rounded-lg border border-zinc-300 px-4 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
               data-testid="chance-report"
             >
               <Icon name="trending-up" size={18} />
               {t("latestReport")}
-            </Link>
+            </IntentLink>
           )}
         </div>
       </header>
@@ -170,13 +171,13 @@ export default async function LeagueChancePage({ params }: { params: Params }) {
           <ul className="flex flex-wrap gap-2">
             {others.map((o) => (
               <li key={o}>
-                <Link
+                <IntentLink
                   href={leagueChancePath(league, o)}
                   className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold hover:border-pitch-500 hover:bg-pitch-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-pitch-900/30"
                 >
                   <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: zoneHex(outcomeChance([...outlook.clubs.values()].find((c) => outcomeChance(c, o))!, o)!.zone) }} />
                   {chip(o)}
-                </Link>
+                </IntentLink>
               </li>
             ))}
           </ul>

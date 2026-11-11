@@ -15,6 +15,7 @@ import { COMPETITIONS, getCompetitionBySlug, type CompetitionConfig } from "../.
 import type { CupConfig } from "../../../config/cups.ts";
 import type { LeagueConfig, SiteLocale } from "../../../config/leagues.ts";
 import { Link } from "../../../i18n/navigation.ts";
+import { IntentLink } from "../../../components/IntentLink.tsx";
 import { routing } from "../../../i18n/routing.ts";
 import { getCupData, type CupData } from "../../../lib/cupData.ts";
 import { getContinentalPriors, getExternalSeeds } from "../../../lib/continental.ts";
@@ -159,7 +160,7 @@ export default async function LeaguePage({ params }: { params: Params }) {
 
   // The latest "what changed" report (domestic leagues with snapshots), and the chance pages its places make.
   const latestSnapshot =
-    loaded.kind === "league" && hasClubPages(loaded.config) ? seasonReports(await readSnapshots(loaded.config.code), loaded.data.seasonKey)?.snapshots.at(-1) : undefined;
+    loaded.kind === "league" && hasClubPages(loaded.config) ? seasonReports(await readSnapshots(loaded.config.code, { quiet: true }), loaded.data.seasonKey)?.snapshots.at(-1) : undefined;
   const latestOdds = latestSnapshot?.round;
   const chanceLinks = loaded.kind === "league" && latestSnapshot ? snapshotOutcomes(loaded.config, latestSnapshot).map((o) => ({ outcome: o, ...snapshotOutcomeKey(loaded.config, latestSnapshot, o) })) : [];
   const [oddsT, chancesT] = await Promise.all([getTranslations("Odds"), getTranslations("Chances")]);
@@ -312,27 +313,27 @@ export default async function LeaguePage({ params }: { params: Params }) {
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{seo(intro, values)}</p>
         {data.source === "live" && <p className="text-xs text-zinc-500">{"provider" in data && data.provider === "first-party" ? t(`firstPartySource.${config.code}` as "liveSource") : t("liveSource")}</p>}
         {latestOdds && (
-          <Link
+          <IntentLink
             href={latestReportPath(config)}
             className="inline-flex items-center gap-1.5 rounded-lg border border-pitch-600/40 bg-pitch-50 px-3 py-1.5 text-sm font-semibold text-pitch-800 hover:bg-pitch-100 dark:bg-pitch-900/30 dark:text-pitch-100 dark:hover:bg-pitch-900/50"
             data-testid="league-latest-odds"
           >
             <Icon name="trending-up" size={16} className="shrink-0" />
             {oddsT("leagueLink", { round: oddsT("round", { n: latestOdds }) })}
-          </Link>
+          </IntentLink>
         )}
         {chanceLinks.length > 0 && (
           // Every club's title, promotion, play-off and relegation chances, each on its own page.
           <ul className="flex flex-wrap gap-2" data-testid="league-chances">
             {chanceLinks.map((c) => (
               <li key={c.outcome}>
-                <Link
+                <IntentLink
                   href={leagueChancePath(config, c.outcome)}
                   className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-semibold hover:border-pitch-500 hover:bg-pitch-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-pitch-900/30"
                 >
                   <Icon name="chart-column" size={16} className="shrink-0 text-zinc-500" />
                   {chancesT("chip", { Topic: chancesT(`Topic.${c.key}`, { name: c.name }), topic: chancesT(`topic.${c.key}`, { name: c.name }) })}
-                </Link>
+                </IntentLink>
               </li>
             ))}
           </ul>

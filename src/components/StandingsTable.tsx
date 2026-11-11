@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { zoneForPosition, type LeagueConfig, type Zone } from "../config/leagues.ts";
 import type { FormResult, StandingRow, Team, TeamId } from "../engine/types.ts";
-import { Link } from "../i18n/navigation.ts";
+import { IntentLink } from "./IntentLink.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
 import { ZONE_STYLES } from "./zones.ts";
 import { Icon } from "./Icon.tsx";
@@ -101,10 +101,10 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
                       <TeamBadge team={team} />
                       {team.page ? (
                         // The club's own page (chances, fixtures and odds).
-                        <Link href={team.page} className="min-w-0 truncate font-medium hover:underline" data-testid="club-link">
+                        <IntentLink href={team.page} className="min-w-0 truncate font-medium hover:underline" data-testid="club-link">
                           <span className="sm:hidden">{team.shortName}</span>
                           <span className="hidden sm:inline">{team.name}</span>
-                        </Link>
+                        </IntentLink>
                       ) : (
                         <>
                           <span className="truncate font-medium sm:hidden">{team.shortName}</span>

@@ -14,16 +14,29 @@
  *   history, chance pages, the sitemap);
  * - xg: src/lib/xgStore.ts and src/lib/impactCache.ts (every league model
  *   with xG in its ratings);
- * - cards: src/lib/shareCard.tsx (the card images' fonts and the site's own
- *   crests, read from public/).
+ * - cards: src/lib/shareCard.tsx (the card images' fonts).
+ *
+ * The snapshots and the xG are the deployment's own copy: the running site
+ * reads the published ones from the repository (src/lib/publishedData.ts) and
+ * these when it can't, or when they're the newer.
+ *
+ * The site's own crests (public/crests, 11 MB) are in no function: each of
+ * the 11 card functions carried them all to draw the one or two a card shows.
+ * A card fetches the crest it draws from the site's static files instead
+ * (ownCrest in src/lib/shareCard.tsx), so they're excluded from every entry
+ * (NEVER_TRACED), the card functions included: Turbopack's own tracing would
+ * otherwise still find them through the card's read from public/.
  */
 
 export const TRACED_FILES = {
   history: ["./src/data/history/**/*"],
   snapshots: ["./src/data/snapshots/**/*"],
   xg: ["./src/data/xg/**/*"],
-  cards: ["./src/assets/fonts/**/*", "./public/crests/**/*"],
+  cards: ["./src/assets/fonts/**/*"],
 } as const;
+
+/** Files no function carries, though a function's code names their folder: the site's own crests (see above). */
+export const NEVER_TRACED = ["./public/crests/**/*"] as const;
 
 export type TracedGroup = keyof typeof TRACED_FILES;
 
@@ -75,15 +88,12 @@ export function tracingIncludes(): Record<string, string[]> {
 }
 
 /**
- * outputFileTracingExcludes: the card files (fonts, crests) out of every
- * listed entry that doesn't draw a card. A page imports its own card's module
- * for the card's size and alt text in its metadata, so Turbopack's tracing
- * finds the card's file reads in the page too; the page never draws it.
+ * outputFileTracingExcludes: the site's own crests out of every listed entry
+ * (NEVER_TRACED), and the card files (fonts) out of every listed entry that
+ * doesn't draw a card. A page imports its own card's module for the card's
+ * size and alt text in its metadata, so Turbopack's tracing finds the card's
+ * file reads in the page too; the page never draws it.
  */
 export function tracingExcludes(): Record<string, string[]> {
-  return Object.fromEntries(
-    Object.entries(ROUTE_FILES)
-      .filter(([, groups]) => !groups.includes("cards"))
-      .map(([entry]) => [routeGlob(entry), [...TRACED_FILES.cards]]),
-  );
+  return Object.fromEntries(Object.entries(ROUTE_FILES).map(([entry, groups]) => [routeGlob(entry), [...NEVER_TRACED, ...(groups.includes("cards") ? [] : TRACED_FILES.cards)]]));
 }

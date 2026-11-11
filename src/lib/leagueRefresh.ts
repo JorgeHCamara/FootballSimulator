@@ -2,7 +2,8 @@ import { timingSafeEqual } from "node:crypto";
 import type { LeagueConfig } from "../config/leagues.ts";
 import type { Fixture } from "../engine/types.ts";
 import { dataVersion } from "./clubOutlook.ts";
-import type { LeagueData } from "./leagueData.ts";
+import { espnFixtures, REPLACEABLE_STATUSES, type EspnEvent } from "./espn.ts";
+import { standingResults, type LeagueData } from "./leagueData.ts";
 
 /*
  * When to refresh a league's pages together (src/app/api/revalidate/leagues):
@@ -22,7 +23,7 @@ import type { LeagueData } from "./leagueData.ts";
 export type RefreshReason = "changed" | "unchanged" | "unavailable" | "skipped";
 
 /*
- * Which leagues to check on a run (refreshPlan). A check downloads the
+ * Which leagues to check on a run (refreshPlan). A full check downloads the
  * league's whole season from ESPN (4–6 MB) to compare it with the cached
  * copy; most leagues, most of the time, have nothing that can change. So a
  * league is checked on every run (every 30 minutes) only while one of its
@@ -31,13 +32,28 @@ export type RefreshReason = "changed" | "unchanged" | "unavailable" | "skipped";
  * spread over the runs by its code. Nothing is stored between runs: the turn
  * comes from the clock, the rest from the cached copy the run reads anyway.
  *
+ * And a league with a game near is first checked with the small feed: the
+ * scoreboard of the days around now (fetchEspnDays, a few hundred KB at
+ * most), compared with the cached copy's games of those days
+ * (scoreboardVerdict). While it shows the same games, at the same times,
+ * with the same results, nothing the pages show from those days has changed
+ * and the season isn't downloaded. The season is still downloaded, on the
+ * same run, when the small feed differs in any way or can't be read, when one
+ * of the games around now is postponed, abandoned or suspended (its new date
+ * is only in the season), on the league's periodic turn (what the small feed
+ * can't see: a fixture added or rescheduled outside those days, a later
+ * correction, a points deduction, new groups, the season's rollover), and for
+ * a cached copy that's missing or not ESPN's. So nothing below is slower than
+ * it was.
+ *
  * The longest a change can wait to reach the pages (plus however late
  * GitHub starts the run; a run that doesn't start at all moves a periodic
  * check to the league's next turn, three hours later):
  * - a result, a live game's final score, a kick-off moved within two hours
  *   of the game, a postponement announced then, a correction within six hours
  *   of kick-off, a game still without a result up to two days after kick-off:
- *   one run (30 minutes) after ESPN has it;
+ *   one run (30 minutes) after ESPN has it (the small feed shows each of
+ *   them, and the season is then downloaded on that same run);
  * - anything else (a fixture added or rescheduled, a postponement announced
  *   earlier, a later correction, a points deduction, new groups, the season's
  *   rollover): three hours, six if the league's turn is missed;
@@ -93,15 +109,71 @@ export type CheckWhy = "forced" | "cold" | "untrusted" | "active" | "periodic" |
  * ESPN's live data ("untrusted"); a game near, under way or just over
  * ("active"); its periodic turn ("periodic"); else not ("idle"). A
  * first-party league (Série C) has no feed to ask ("own-data").
+ *
+ * `scoreboardFirst`: an active league off its periodic turn, whose check
+ * starts with the small feed (see above); every other check downloads the
+ * season.
  */
-export function refreshPlan(league: Pick<LeagueConfig, "code" | "firstParty">, cached: LeagueData | undefined, now: number, forced = false): { check: boolean; why: CheckWhy } {
+export function refreshPlan(
+  league: Pick<LeagueConfig, "code" | "firstParty">,
+  cached: LeagueData | undefined,
+  now: number,
+  forced = false,
+): { check: boolean; why: CheckWhy; scoreboardFirst?: boolean } {
   if (league.firstParty) return { check: false, why: "own-data" };
   if (forced) return { check: true, why: "forced" };
   if (!cached || cached.fixtures.length === 0) return { check: true, why: "cold" };
   if (cached.source !== "live" || cached.provider !== "espn") return { check: true, why: "untrusted" };
-  if (activeGame(cached, now)) return { check: true, why: "active" };
-  if (periodicTurn(league.code, now)) return { check: true, why: "periodic" };
+  const turn = periodicTurn(league.code, now);
+  if (activeGame(cached, now)) return { check: true, why: "active", scoreboardFirst: !turn };
+  if (turn) return { check: true, why: "periodic" };
   return { check: false, why: "idle" };
+}
+
+/** The span of kick-offs that make a league active at `now` (activeGame): what the small feed is asked for. */
+export const activeSpan = (now: number) => ({ from: now - OVERDUE_MS, to: now + ACTIVE_BEFORE_MS });
+
+/**
+ * Does the small feed (the scoreboard's events around now) show anything the
+ * cached copy doesn't? "same": every cached game of those days is in it, at
+ * the same time, with the same result (and shoot-out), none of them called
+ * off while it would be played, and it lists no game the copy lacks.
+ * "differs": anything else; the season is then downloaded and compared as
+ * before (refreshReason), so a difference the pages don't show (a game the
+ * copy leaves out on purpose) costs that download and nothing more.
+ *
+ * `resultsStand`: the league's abandoned games whose score stood
+ * (EspnFeed.resultsStand), counted as played, as in the copy.
+ */
+export function scoreboardVerdict(cached: LeagueData, events: readonly EspnEvent[], now: number, resultsStand?: readonly string[]): "same" | "differs" {
+  const games = new Map(allGames(cached).map((f) => [f.id, f]));
+  const { from, to } = activeSpan(now);
+  const listed = new Set<number>();
+  for (const event of standingResults([...events], resultsStand)) {
+    const id = Number(event.id);
+    const known = games.get(id);
+    const called = REPLACEABLE_STATUSES.has(event.status.type.name);
+    const [fresh] = espnFixtures([event]);
+    if (!known) {
+      // A game the copy doesn't have: new, unless it's one the copy never holds (sides not known yet, or called
+      // off and listed again under another date, which the season's download drops).
+      if (fresh && !called) return "differs";
+      continue;
+    }
+    listed.add(id);
+    if (!fresh || fresh.utcDate !== known.utcDate) return "differs";
+    if ((fresh.result?.home ?? null) !== (known.result?.home ?? null) || (fresh.result?.away ?? null) !== (known.result?.away ?? null)) return "differs";
+    if ((fresh.penalties?.home ?? null) !== (known.penalties?.home ?? null) || (fresh.penalties?.away ?? null) !== (known.penalties?.away ?? null)) return "differs";
+    // Called off around its own kick-off: its new date, if any, is in the season only.
+    const kickoff = Date.parse(known.utcDate);
+    if (called && now >= kickoff - ACTIVE_BEFORE_MS && now <= kickoff + ACTIVE_AFTER_MS) return "differs";
+  }
+  // A cached game of those days the feed no longer lists there: moved away, or removed.
+  for (const f of games.values()) {
+    const kickoff = Date.parse(f.utcDate);
+    if (kickoff >= from && kickoff <= to && !listed.has(f.id)) return "differs";
+  }
+  return "same";
 }
 
 /**

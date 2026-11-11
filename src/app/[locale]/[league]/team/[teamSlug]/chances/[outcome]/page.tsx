@@ -11,6 +11,7 @@ import { zoneHex } from "../../../../../../../components/zones.ts";
 import type { SiteLocale } from "../../../../../../../config/leagues.ts";
 import type { Team, TeamId } from "../../../../../../../engine/types.ts";
 import { Link } from "../../../../../../../i18n/navigation.ts";
+import { IntentLink } from "../../../../../../../components/IntentLink.tsx";
 import { clubChancePath, isOutcome, leagueChancePath, leagueOutcomes, outcomeChance, outcomeRace, raceAround, type Outcome } from "../../../../../../../lib/chancePages.ts";
 import { clubChanceText, outcomeKey, type ChanceTranslators } from "../../../../../../../lib/chanceText.ts";
 import { loadClub, type LoadedClub } from "../../../../../../../lib/clubPage.ts";
@@ -116,9 +117,9 @@ export default async function ClubChancePage({ params }: { params: Params }) {
           {league.simulatorName[lang]}
         </Link>
         <Icon name="chevron-right" size={12} className="mx-1 shrink-0" />
-        <Link href={team.page!} className="truncate hover:underline">
+        <IntentLink href={team.page!} className="truncate hover:underline">
           {team.name}
-        </Link>
+        </IntentLink>
       </nav>
 
       <header className="space-y-4">
@@ -169,10 +170,10 @@ export default async function ClubChancePage({ params }: { params: Params }) {
         </div>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Link href={team.page!} className="flex h-11 items-center justify-center gap-2 rounded-lg bg-pitch-600 px-4 text-sm font-semibold text-white hover:bg-pitch-700" data-testid="club-chance-club">
+          <IntentLink href={team.page!} className="flex h-11 items-center justify-center gap-2 rounded-lg bg-pitch-600 px-4 text-sm font-semibold text-white hover:bg-pitch-700" data-testid="club-chance-club">
             <Icon name="shield" size={18} />
             {t("club.fullPage", { club: team.shortName })}
-          </Link>
+          </IntentLink>
           <Link
             href={leaguePath}
             className="flex h-11 items-center justify-center gap-2 rounded-lg border border-zinc-300 px-4 text-sm font-semibold hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
@@ -188,10 +189,10 @@ export default async function ClubChancePage({ params }: { params: Params }) {
         <h2 className="text-xl font-bold tracking-tight">{t("club.raceTitle", topicOf(outcome))}</h2>
         <ChanceRace rows={race} teams={teams} outcome={outcome} color={zoneHex(h.zone)} lang={lang} standing={(position, points) => t("standing", { position, points })} highlight={team.id} />
         <p className="text-xs text-zinc-500">{t("club.raceNote", { count: Math.min(8, race.length) })}</p>
-        <Link href={leagueChancePath(league, outcome)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-pitch-700 hover:underline dark:text-pitch-100" data-testid="club-chance-league">
+        <IntentLink href={leagueChancePath(league, outcome)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-pitch-700 hover:underline dark:text-pitch-100" data-testid="club-chance-league">
           {t("club.allClubs", topicOf(outcome))}
           <Icon name="chevron-right" size={16} />
-        </Link>
+        </IntentLink>
       </section>
 
       {others.length > 0 && (
@@ -200,13 +201,13 @@ export default async function ClubChancePage({ params }: { params: Params }) {
           <ul className="flex flex-wrap gap-2">
             {others.map((o) => (
               <li key={o}>
-                <Link
+                <IntentLink
                   href={clubChancePath(team.page!, o)}
                   className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold hover:border-pitch-500 hover:bg-pitch-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-pitch-900/30"
                 >
                   <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: zoneHex(outcomeChance(club, o)!.zone) }} />
                   {t("chip", topicOf(o))}
-                </Link>
+                </IntentLink>
               </li>
             ))}
           </ul>
