@@ -1,6 +1,4 @@
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { SIM_VERSION } from "./simVersion.ts";
 
 /*
@@ -13,20 +11,14 @@ import { SIM_VERSION } from "./simVersion.ts";
 /** A short fingerprint of a text: the first 12 hex digits of its SHA-256. */
 export const fingerprintOf = (text: string) => createHash("sha256").update(text).digest("hex").slice(0, 12);
 
-const prints = new Map<string, Promise<string>>();
-
 /**
- * The fingerprint of a league's xG file (src/data/xg/<CODE>.json), "none"
- * when it has none: new xG (the snapshots job's refresh) makes another key.
- * Read once per server: the files only change with a deployment.
+ * The fingerprint of the xG a league's model is built with (LeagueData.xg:
+ * the played games' stored xG), "none" when it uses none: new xG makes
+ * another key.
  */
-export function xgFingerprint(code: string): Promise<string> {
-  let print = prints.get(code);
-  if (!print) {
-    print = readFile(join(process.cwd(), "src/data/xg", `${code}.json`), "utf8").then(fingerprintOf, () => "none");
-    prints.set(code, print);
-  }
-  return print;
+export function xgFingerprint(xg: Readonly<Record<number, readonly [number, number]>> | undefined): string {
+  const games = Object.entries(xg ?? {}).sort(([a], [b]) => Number(a) - Number(b));
+  return games.length ? fingerprintOf(games.map(([id, [home, away]]) => `${id}:${home},${away}`).join(";")) : "none";
 }
 
 export interface ImpactKeyParts {
@@ -36,7 +28,7 @@ export interface ImpactKeyParts {
   slug: string;
   /** The league's data version (dataVersion in clubOutlook.ts: every game's date and result). */
   dataVersion: string;
-  /** Its xG file's fingerprint (xgFingerprint). */
+  /** The fingerprint of the xG its model uses (xgFingerprint). */
   xg: string;
 }
 

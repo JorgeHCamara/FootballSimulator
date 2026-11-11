@@ -1,8 +1,9 @@
 /**
  * After `npm run build`: checks the built functions' file traces (.next/server/app/**\/*.nft.json)
  * against src/config/fileTracing.ts. Every listed entry must carry each group of files it reads
- * (Past Winners' history, the odds snapshots, the stored xG, the cards' fonts and crests), and no
- * entry may carry a group it doesn't read: what ships in each function is what it uses.
+ * (Past Winners' history, the odds snapshots, the stored xG, the cards' fonts), and no
+ * entry may carry a group it doesn't read, or any of the site's own crests (public/crests): what
+ * ships in each function is what it uses.
  *
  *   npm run build && npm run traces:check
  */
@@ -16,8 +17,10 @@ const GROUP_DIRS: Record<TracedGroup, RegExp> = {
   history: /\/src\/data\/history\//,
   snapshots: /\/src\/data\/snapshots\//,
   xg: /\/src\/data\/xg\//,
-  cards: /\/(src\/assets\/fonts|public\/crests)\//,
+  cards: /\/src\/assets\/fonts\//,
 };
+/** In no function at all (NEVER_TRACED in src/config/fileTracing.ts): a card fetches the crest it draws. */
+const NEVER = /\/public\/crests\//;
 
 const walk = (dir: string): string[] => readdirSync(dir).flatMap((name) => (statSync(join(dir, name)).isDirectory() ? walk(join(dir, name)) : name.endsWith(".nft.json") ? [join(dir, name)] : []));
 
@@ -41,8 +44,10 @@ for (const trace of walk(app)) {
   const wanted = ROUTE_FILES[entry] ?? [];
   const missing = wanted.filter((g) => !carried.includes(g));
   const extra = carried.filter((g) => !wanted.includes(g));
-  if (missing.length || extra.length) failures++;
-  rows.push(`${missing.length || extra.length ? "FAIL" : "ok  "} ${entry.padEnd(62)} ${(bytes / 1048576).toFixed(1).padStart(6)} MB  ${carried.join(",") || "-"}${missing.length ? `  missing: ${missing.join(",")}` : ""}${extra.length ? `  extra: ${extra.join(",")}` : ""}`);
+  const crests = paths.filter((p) => NEVER.test(p)).length;
+  const failed = missing.length > 0 || extra.length > 0 || crests > 0;
+  if (failed) failures++;
+  rows.push(`${failed ? "FAIL" : "ok  "} ${entry.padEnd(62)} ${(bytes / 1048576).toFixed(1).padStart(6)} MB  ${carried.join(",") || "-"}${missing.length ? `  missing: ${missing.join(",")}` : ""}${extra.length ? `  extra: ${extra.join(",")}` : ""}${crests ? `  carries ${crests} of public/crests` : ""}`);
 }
 for (const entry of Object.keys(ROUTE_FILES)) {
   if (!walk(app).some((t) => t.endsWith(`${entry}.js.nft.json`))) {

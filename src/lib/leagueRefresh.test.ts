@@ -3,7 +3,8 @@ import { describe, it } from "node:test";
 import { LEAGUES } from "../config/leagues.ts";
 import type { Fixture } from "../engine/types.ts";
 import type { LeagueData } from "./leagueData.ts";
-import { ACTIVE_AFTER_MS, ACTIVE_BEFORE_MS, activeGame, OVERDUE_MS, PERIODIC_RUNS, periodicTurn, refreshPlan, refreshReason, RUN_MS } from "./leagueRefresh.ts";
+import type { EspnEvent } from "./espn.ts";
+import { ACTIVE_AFTER_MS, ACTIVE_BEFORE_MS, activeGame, activeSpan, OVERDUE_MS, PERIODIC_RUNS, periodicTurn, refreshPlan, refreshReason, RUN_MS, scoreboardVerdict } from "./leagueRefresh.ts";
 
 const HOUR = 3_600_000;
 // A run of the job: Monday 9 November 2026, 12:07 UTC.
@@ -61,7 +62,7 @@ describe("which leagues a refresh run checks", () => {
     assert.deepEqual(refreshPlan(PL, data([]), idleRun), { check: true, why: "cold" });
     assert.deepEqual(refreshPlan(PL, { ...quiet, provider: "football-data" }, idleRun), { check: true, why: "untrusted" });
     assert.deepEqual(refreshPlan(PL, { ...quiet, source: "sample" }, idleRun), { check: true, why: "untrusted" });
-    assert.deepEqual(refreshPlan(PL, data([game(1, idleRun + HOUR)]), idleRun), { check: true, why: "active" });
+    assert.deepEqual(refreshPlan(PL, data([game(1, idleRun + HOUR)]), idleRun), { check: true, why: "active", scoreboardFirst: true });
     let turn = idleRun;
     while (!periodicTurn("PL", turn)) turn += RUN_MS;
     assert.deepEqual(refreshPlan(PL, quiet, turn), { check: true, why: "periodic" });
@@ -78,4 +79,92 @@ describe("which leagues a refresh run checks", () => {
     assert.equal(refreshReason(before, undefined), "unavailable", "ESPN failed");
     assert.equal(refreshReason(undefined, before), "changed", "no cached copy");
   });
+
+  it("the plan for a league with a game near: the small feed first, except on its periodic turn (the season, as every three hours)", () => {
+    let turn = idleRun;
+    while (!periodicTurn("PL", turn)) turn += RUN_MS;
+    assert.deepEqual(refreshPlan(PL, data([game(1, turn + HOUR)]), turn), { check: true, why: "active", scoreboardFirst: false });
+    assert.equal(refreshPlan(PL, data([game(1, idleRun - HOUR)]), idleRun).scoreboardFirst, true, "under way");
+    // Never for a check that needs the season: a copy that's missing or not ESPN's, a league asked for by name.
+    for (const plan of [refreshPlan(PL, undefined, idleRun), refreshPlan(PL, { ...data([game(1, idleRun + HOUR)]), provider: "football-data" }, idleRun), refreshPlan(PL, data([game(1, idleRun + HOUR)]), idleRun, true)]) {
+      assert.equal(plan.check, true);
+      assert.ok(!plan.scoreboardFirst);
+    }
+  });
 });
+
+describe("the small feed against the cached copy", () => {
+  const iso = (time: number) => new Date(time).toISOString();
+  /** A scoreboard event as ESPN sends it. */
+  const event = (id: number, kickoff: number, { score, status = score ? "STATUS_FULL_TIME" : "STATUS_SCHEDULED", teams = ["1", "2"] }: { score?: [number, number]; status?: string; teams?: [string, string] } = {}): EspnEvent => ({
+    id: String(id),
+    date: iso(kickoff),
+    status: { type: { name: status, state: score ? "post" : status === "STATUS_FIRST_HALF" ? "in" : "pre", completed: Boolean(score) } },
+    competitions: [
+      {
+        competitors: [
+          { homeAway: "home", team: { id: teams[0], displayName: "Home" }, ...(score ? { score: String(score[0]) } : {}) },
+          { homeAway: "away", team: { id: teams[1], displayName: "Away" }, ...(score ? { score: String(score[1]) } : {}) },
+        ],
+      },
+    ],
+  });
+  // Yesterday's game with its result, one under way, one tonight; and one far off, outside the feed's days.
+  const yesterday = now - 26 * HOUR;
+  const underWay = now - HOUR;
+  const tonight = now + HOUR;
+  const cached = data([game(1, yesterday, { home: 2, away: 1 }), game(2, underWay), game(3, tonight), game(4, now + 20 * 24 * HOUR)]);
+  const feed = [event(1, yesterday, { score: [2, 1] }), event(2, underWay, { status: "STATUS_FIRST_HALF" }), event(3, tonight)];
+
+  it("the same games, times and results: nothing to download", () => {
+    assert.equal(scoreboardVerdict(cached, feed, now), "same");
+    // A live score isn't a result yet: the pages show none.
+    const live = { ...event(2, underWay, { status: "STATUS_FIRST_HALF" }) };
+    live.competitions[0]!.competitors[0]!.score = "1";
+    live.competitions[0]!.competitors[1]!.score = "0";
+    assert.equal(scoreboardVerdict(cached, [feed[0]!, live, feed[2]!], now), "same");
+    // The span asked for is the one that makes a league active.
+    assert.deepEqual(activeSpan(now), { from: now - OVERDUE_MS, to: now + ACTIVE_BEFORE_MS });
+  });
+
+  it("a final score, a corrected one, a shoot-out: the season is downloaded on the same run", () => {
+    assert.equal(scoreboardVerdict(cached, [feed[0]!, event(2, underWay, { score: [1, 0] }), feed[2]!], now), "differs", "full time");
+    assert.equal(scoreboardVerdict(cached, [event(1, yesterday, { score: [2, 2] }), feed[1]!, feed[2]!], now), "differs", "a correction");
+    const shootout = event(1, yesterday, { score: [2, 1] });
+    shootout.competitions[0]!.competitors[0]!.shootoutScore = 4;
+    shootout.competitions[0]!.competitors[1]!.shootoutScore = 3;
+    assert.equal(scoreboardVerdict(cached, [shootout, feed[1]!, feed[2]!], now), "differs", "penalties the copy lacks");
+  });
+
+  it("a kick-off moved, a game added, a game gone from those days", () => {
+    assert.equal(scoreboardVerdict(cached, [feed[0]!, feed[1]!, event(3, tonight + HOUR)], now), "differs", "moved by an hour");
+    assert.equal(scoreboardVerdict(cached, [...feed, event(9, tonight, { teams: ["5", "6"] })], now), "differs", "a new fixture");
+    assert.equal(scoreboardVerdict(cached, [feed[0]!, feed[1]!], now), "differs", "tonight's game no longer listed");
+    // A game whose sides aren't known yet is never in the copy: not a difference.
+    assert.equal(scoreboardVerdict(cached, [...feed, event(9, tonight, { teams: ["TBD-1", "TBD-2"] })], now), "same");
+    // Nor is the feed's game from outside the copy's own days a problem when the copy has it at the same time.
+    assert.equal(scoreboardVerdict(cached, [...feed, event(4, now + 20 * 24 * HOUR)], now), "same");
+  });
+
+  it("a postponement around kick-off needs the season (its new date is only there); days later it no longer does", () => {
+    assert.equal(scoreboardVerdict(cached, [feed[0]!, feed[1]!, event(3, tonight, { status: "STATUS_POSTPONED" })], now), "differs");
+    assert.equal(scoreboardVerdict(cached, [feed[0]!, event(2, underWay, { status: "STATUS_ABANDONED" }), feed[2]!], now), "differs");
+    // The same postponed game a day later, still in the copy without a result: nothing new to find every 30 minutes
+    // (the periodic turn downloads the season every three hours).
+    const later = now + 30 * HOUR;
+    const then = data([game(3, tonight)]);
+    assert.equal(scoreboardVerdict(then, [event(3, tonight, { status: "STATUS_POSTPONED" })], later), "same");
+    // A called-off game listed again under another date, which the copy doesn't hold: not a new fixture.
+    assert.equal(scoreboardVerdict(cached, [...feed, event(8, tonight, { status: "STATUS_POSTPONED", teams: ["5", "6"] })], now), "same");
+  });
+
+  it("an abandoned game whose score stood counts as played, as in the copy", () => {
+    const stood = data([game(1, yesterday, { home: 1, away: 0 })]);
+    const abandoned = event(1, yesterday, { status: "STATUS_ABANDONED" });
+    abandoned.competitions[0]!.competitors[0]!.score = "1";
+    abandoned.competitions[0]!.competitors[1]!.score = "0";
+    assert.equal(scoreboardVerdict(stood, [abandoned], now), "differs", "without the league's list");
+    assert.equal(scoreboardVerdict(stood, [abandoned], now, ["1"]), "same");
+  });
+});
+

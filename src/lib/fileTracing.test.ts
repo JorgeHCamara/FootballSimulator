@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
 import { describe, it } from "node:test";
-import { ROUTE_FILES, routeGlob, tracingExcludes, tracingIncludes, type TracedGroup } from "../config/fileTracing.ts";
+import { NEVER_TRACED, ROUTE_FILES, routeGlob, TRACED_FILES, tracingExcludes, tracingIncludes, type TracedGroup } from "../config/fileTracing.ts";
 
 /*
  * The files a server function reads at run time must be traced into it
@@ -19,7 +19,6 @@ const READERS: Record<string, TracedGroup> = {
   "src/lib/winnersData.ts": "history",
   "src/lib/oddsReports.ts": "snapshots",
   "src/lib/xgStore.ts": "xg",
-  "src/lib/impactCache.ts": "xg",
   "src/lib/shareCard.tsx": "cards",
 };
 
@@ -93,17 +92,21 @@ describe("files traced into the server functions", () => {
     for (const route of ["/robots.txt/route", "/[locale]/about/page", "/[locale]/privacy/page", "/[locale]/contact/page", "/[locale]/opengraph-image/route", "/[locale]/[league]/opengraph-image/route"]) {
       assert.deepEqual(Object.keys(includes).filter((glob) => matches(glob, route)), [], route);
     }
-    // The crests and fonts only where a card is drawn.
+    // The fonts only where a card is drawn.
     const withCards = Object.entries(ROUTE_FILES).filter(([, groups]) => groups.includes("cards")).map(([route]) => route);
     assert.ok(withCards.every((route) => /(opengraph-image|twitter-image|movers-image)\/route$/.test(route)));
   });
 
-  it("the card files are excluded only from routes that don't draw a card", () => {
+  it("the fonts are excluded only from routes that don't draw a card; the site's own crests from every listed route", () => {
     const excludes = tracingExcludes();
-    for (const { route } of entries) {
-      const excluded = Object.keys(excludes).some((glob) => matches(glob, route));
-      if (excluded) assert.ok(!groupsRead(entries.find((e) => e.route === route)!.file).has("cards") || /\/page\.tsx?$/.test(entries.find((e) => e.route === route)!.file), route);
-      if ((ROUTE_FILES[route] ?? []).includes("cards")) assert.equal(excluded, false, `${route} draws cards`);
+    for (const [route, groups] of Object.entries(ROUTE_FILES)) {
+      const excluded = excludes[routeGlob(route)] ?? [];
+      // A card fetches the crest it draws (ownCrest in shareCard.tsx): no function carries public/crests.
+      for (const files of NEVER_TRACED) assert.ok(excluded.includes(files), `${route} carries ${files}`);
+      assert.equal(TRACED_FILES.cards.every((files) => excluded.includes(files)), !groups.includes("cards"), `${route}: the fonts`);
     }
+    assert.ok(!Object.values(tracingIncludes()).flat().some((files) => files.includes("public/crests")), "no route is given the crests");
+    // Every route that draws a card is listed, so its crests are excluded too.
+    for (const { route, file } of entries) if (groupsRead(file).has("cards") && !/\/page$/.test(route)) assert.ok(ROUTE_FILES[route]?.includes("cards"), `${route} draws a card`);
   });
 });

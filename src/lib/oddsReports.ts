@@ -4,23 +4,21 @@ import type { LeagueConfig, ZoneKind } from "../config/leagues.ts";
 import type { Fixture, TeamId } from "../engine/types.ts";
 import { CONTINENTAL, leagueFacts } from "./leagueFacts.ts";
 import type { LeagueData } from "./leagueData.ts";
+import { fresher, readPublished } from "./publishedData.ts";
 import { snapshotModel, type LeagueSnapshots, type OddsSnapshot, type TeamSnapshot } from "./snapshots.ts";
 
 /*
  * "What changed" reports: one per league and completed round, from the odds
  * snapshots in src/data/snapshots (see src/lib/snapshots.ts). A new round's
- * snapshot is committed by the scheduled job, the site redeploys, and its
- * report exists: nothing to write by hand.
+ * snapshot is committed by the scheduled job, the running site reads it
+ * (src/lib/publishedData.ts: no deployment), and its report exists: nothing
+ * to write by hand.
  */
 
 const files = new Map<string, Promise<LeagueSnapshots | undefined>>();
 
-/**
- * A league's stored snapshots (read once per server; the files change only
- * with a deploy). With the generated sample leagues (local development,
- * tests), snapshots of their own rounds instead, worked out on the spot.
- */
-export function readSnapshots(code: string): Promise<LeagueSnapshots | undefined> {
+/** A league's snapshots as the deployment was built with them (read once per server), or its sample ones. */
+function bundledSnapshots(code: string): Promise<LeagueSnapshots | undefined> {
   let file = files.get(code);
   if (!file) {
     file =
@@ -33,6 +31,34 @@ export function readSnapshots(code: string): Promise<LeagueSnapshots | undefined
     files.set(code, file);
   }
   return file;
+}
+
+/** When a snapshots file was last added to: its latest snapshot's `takenAt` (a retaken round counts too). */
+export function snapshotsStamp(file: LeagueSnapshots): string {
+  let latest = "";
+  for (const season of Object.values(file.seasons ?? {})) for (const s of season.snapshots ?? []) if (s.takenAt > latest) latest = s.takenAt;
+  return latest;
+}
+
+const isSnapshots = (file: LeagueSnapshots | null | undefined): file is LeagueSnapshots => Boolean(file && typeof file === "object" && file.seasons && typeof file.seasons === "object");
+
+/**
+ * A league's stored snapshots: the published file (main's, read through the
+ * data cache: src/lib/publishedData.ts), or the one the deployment was built
+ * with when that is newer or the published one can't be read. With the
+ * generated sample leagues (local development, tests), snapshots of their own
+ * rounds instead, worked out on the spot.
+ *
+ * A page that reads them is tagged with the league's snapshots tag, so a new
+ * round's publication rebuilds it; `quiet` for a page that only shows a detail
+ * of the latest round (the league page, a chance page): it follows within
+ * hours instead. `keep`: see readPublished (a past round's report page keeps
+ * its entry, and itself, for 30 days).
+ */
+export async function readSnapshots(code: string, options: { keep?: number; quiet?: boolean } = {}): Promise<LeagueSnapshots | undefined> {
+  const [bundled, published] = await Promise.all([bundledSnapshots(code), readPublished<LeagueSnapshots>("snapshots", code, options)]);
+  const file = published?.file;
+  return fresher(bundled, file === null || isSnapshots(file) ? file : undefined, snapshotsStamp);
 }
 
 /** Fewer seasons, and only the last rounds, than the real snapshots: they're worked out on the spot (the sitemap needs every league's). */

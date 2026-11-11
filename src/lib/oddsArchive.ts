@@ -18,9 +18,11 @@ import type { LeagueSnapshots } from "./snapshots.ts";
  * round this can't place, keep reading the league's live data (oddsPage.ts).
  *
  * What it doesn't do: outlive a deployment as a page. Each deployment starts
- * Vercel's page cache afresh (and the daily snapshot commit deploys), so each
- * page is rendered once again after one, from this entry (no ESPN download,
- * no live data read); the entry itself outlives deployments.
+ * Vercel's page cache afresh, so each page is rendered once again after one,
+ * from this entry (no ESPN download, no live data read); the entry itself
+ * outlives deployments. The daily snapshot commit no longer deploys
+ * (src/lib/publishedData.ts): a league's new round expires its past rounds'
+ * pages (their list of rounds grows), and no other league's.
  *
  * Corrections:
  * - A snapshot retaken (`npm run snapshots -- <CODE> --rebuild`) changes the

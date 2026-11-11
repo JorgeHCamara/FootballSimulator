@@ -1,6 +1,6 @@
 import type { SiteLocale } from "../config/leagues.ts";
 import type { Team, TeamId } from "../engine/types.ts";
-import { Link } from "../i18n/navigation.ts";
+import { IntentLink } from "./IntentLink.tsx";
 import { clubChancePath, type Outcome, type RaceRow } from "../lib/chancePages.ts";
 import { ordinal, percent } from "../lib/clubText.ts";
 import { TeamBadge } from "./TeamBadge.tsx";
@@ -40,9 +40,9 @@ export function ChanceRace({
             <TeamBadge team={team} size={24} />
             <span className="min-w-0 flex-1">
               {team.page && !own ? (
-                <Link href={clubChancePath(team.page, outcome)} className="block truncate font-semibold hover:underline">
+                <IntentLink href={clubChancePath(team.page, outcome)} className="block truncate font-semibold hover:underline">
                   {team.name}
-                </Link>
+                </IntentLink>
               ) : (
                 <span className="block truncate font-semibold">{team.name}</span>
               )}

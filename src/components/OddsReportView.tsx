@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import type { SiteLocale } from "../config/leagues.ts";
 import type { TeamId } from "../engine/types.ts";
 import { Link } from "../i18n/navigation.ts";
+import { IntentLink } from "./IntentLink.tsx";
 import { percent } from "../lib/clubText.ts";
 import { matchPath, matchSlug } from "../lib/matchSlug.ts";
 import type { LoadedReport } from "../lib/oddsPage.ts";
@@ -36,9 +37,9 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
   const clubLink = (id: TeamId, label = name(id)) => {
     const page = teams.get(id)?.page;
     return page ? (
-      <Link href={page} className="hover:underline">
+      <IntentLink href={page} className="hover:underline">
         {label}
-      </Link>
+      </IntentLink>
     ) : (
       <span>{label}</span>
     );
@@ -302,10 +303,10 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
                   {[keyLead, biggest(key.fixture.homeId), biggest(key.fixture.awayId)].filter(Boolean).join(" ")}
                 </p>
                 {keyHref && (
-                  <Link href={keyHref} className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-pitch-700 hover:underline dark:text-pitch-300" data-testid="odds-result-link">
+                  <IntentLink href={keyHref} className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-pitch-700 hover:underline dark:text-pitch-300" data-testid="odds-result-link">
                     <Icon name="chart-column" size={16} />
                     {t("matchPreview")}
-                  </Link>
+                  </IntentLink>
                 )}
                 <p className="mt-2 text-xs text-zinc-500">{t("resultNote")}</p>
               </>
@@ -398,14 +399,14 @@ export async function OddsReportView({ loaded, locale }: { loaded: LoadedReport;
             const day = new Intl.DateTimeFormat(dateLocale(lang), { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${s.date}T12:00:00Z`));
             return (
               <li key={s.round}>
-                <Link
+                <IntentLink
                   href={reportPath(league, s.round)}
                   aria-current={current ? "page" : undefined}
                   className={`flex flex-col rounded-lg border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 ${current ? "border-pitch-600 bg-pitch-50 dark:bg-pitch-900/30" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"}`}
                 >
                   <span className="font-semibold">{t("round", { n: s.round })}</span>
                   <span className="text-xs text-zinc-500">{day}</span>
-                </Link>
+                </IntentLink>
               </li>
             );
           })}

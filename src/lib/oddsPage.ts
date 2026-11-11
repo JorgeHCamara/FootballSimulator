@@ -5,7 +5,7 @@ import { hasClubPages } from "./clubs.ts";
 import { unstable_cache } from "next/cache.js";
 import { getLeagueData, getPastSeasonData, leagueDataKeepSeconds, noDataCache } from "./leagueData.ts";
 import { dataTag } from "./sharedOutlook.ts";
-import { pastRound, readArchivedRound } from "./oddsArchive.ts";
+import { ARCHIVE_KEEP_SECONDS, pastRound, readArchivedRound } from "./oddsArchive.ts";
 import { buildReport, latestReportPath, readSnapshots, reportGames, reportPath, seasonReports, type OddsReport } from "./oddsReports.ts";
 
 export interface LoadedReport {
@@ -48,7 +48,9 @@ export const loadReport = cache(async (leagueSlug: string, round?: number): Prom
   const league = getLeagueBySlug(leagueSlug);
   if (!league || !hasClubPages(league)) return undefined;
   if (round !== undefined) {
-    const past = pastRound(league, await readSnapshots(league.code), round);
+    // A past round's page is kept as long as its archive entry: it accepts snapshots read that long ago (a new
+    // round's publication expires them, and it, at once).
+    const past = pastRound(league, await readSnapshots(league.code, { keep: ARCHIVE_KEEP_SECONDS }), round);
     const archived = past && (await readArchivedRound(league, past.report));
     if (past && archived) return { league, report: past.report, games: archived.games, teams: new Map(archived.teams.map((t) => [t.id, t])), latest: false };
   }
@@ -67,17 +69,17 @@ export const loadReport = cache(async (leagueSlug: string, round?: number): Prom
   return { league, report, games: data ? reportGames(report, data) : [], teams, latest: report.snapshot.round === season.snapshots.at(-1)!.round };
 });
 
-/** Every report's address (without the locale), and each league's latest-report page, for the sitemap. */
-export async function reportPaths(): Promise<{ latest: string[]; rounds: { path: string; date: string }[] }> {
+/** Every report's address (without the locale) with its round's day, and each league's latest-report page with its latest round's, for the sitemap. */
+export async function reportPaths(): Promise<{ latest: { path: string; date: string }[]; rounds: { path: string; date: string }[] }> {
   const leagues = LEAGUES.filter(hasClubPages);
-  const latest: string[] = [];
+  const latest: { path: string; date: string }[] = [];
   const rounds: { path: string; date: string }[] = [];
   await Promise.all(
     leagues.map(async (league) => {
       const season = seasonReports(await readSnapshots(league.code));
       if (!season) return;
       // The season's first report has no changes (noindex): left out, as is the latest page while it's the only one.
-      if (season.snapshots.length > 1) latest.push(latestReportPath(league));
+      if (season.snapshots.length > 1) latest.push({ path: latestReportPath(league), date: season.snapshots.at(-1)!.date });
       for (const s of season.snapshots.slice(1)) rounds.push({ path: reportPath(league, s.round), date: s.date });
     }),
   );

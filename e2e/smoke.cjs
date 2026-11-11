@@ -3933,6 +3933,119 @@ async function step(name, fn) {
       await r.close();
     });
 
+    await step("prefetching: a league table's clubs, the chance pages, the odds reports and the other languages wait for intent; the links stay real", async () => {
+      const prefetches = (page) => {
+        const seen = [];
+        page.on("request", (r) => {
+          const h = r.headers();
+          if (h["next-router-prefetch"] || (r.url().includes("_rsc=") && h.rsc)) seen.push(new URL(r.url()).pathname);
+        });
+        return seen;
+      };
+      // Pages built on demand (a club's, a game's, a chance page, an odds report): each prefetch of one not built yet runs a function.
+      // (The reports' hub, /en/odds, is built with the site: the header's link to it prefetches as before.)
+      const onDemand = (path) => /^\/[a-z]{2}\/[^/]+\/(team|match|chances|odds)(\/|$)/.test(path);
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const seen = prefetches(p);
+      await p.goto(`${BASE_URL}/en/premier-league`, { waitUntil: "networkidle" });
+      // The whole page through the viewport, a screen at a time: a plain link prefetches as it comes on screen.
+      const height = await p.evaluate(() => document.body.scrollHeight);
+      for (let y = 0; y <= height; y += 700) {
+        await p.evaluate((to) => window.scrollTo(0, to), y);
+        await p.waitForTimeout(250);
+      }
+      await p.waitForTimeout(1500);
+      const clubs = await p.locator('[data-testid="standings"] [data-testid="club-link"]').evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+      assert.equal(clubs.length, 20, "every club in the table is still a link");
+      assert.ok(clubs.every((href) => /^\/en\/premier-league\/team\/[a-z0-9-]+$/.test(href)), "to its own page, a real address");
+      const previews = await p.locator('[data-testid="match-preview-link"]').evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+      // The one prefetch kept on sight: the matchday's next game's preview.
+      assert.deepEqual([...new Set(seen.filter(onDemand))], previews.slice(0, 1), "no club, chance or report page is fetched for showing its link");
+      assert.deepEqual(seen.filter((path) => /^\/(pt|es)(\/|$)/.test(path)), [], "nor the page in the other languages");
+      // The pointer on a club's name in the table.
+      await p.evaluate(() => window.scrollTo(0, 0));
+      const club = p.locator('[data-testid="standings"] [data-testid="club-link"]').first();
+      await club.scrollIntoViewIfNeeded();
+      await club.hover();
+      await p.waitForTimeout(1200);
+      assert.ok(seen.includes(clubs[0]), "hovering a club prefetches its page");
+      assert.ok(!seen.includes(clubs[1]), "and only that one");
+      // The latest odds report, when the page links it.
+      const odds = p.locator('[data-testid="league-latest-odds"]');
+      if (await odds.count()) {
+        const href = await odds.getAttribute("href");
+        assert.ok(!seen.includes(href));
+        await odds.hover();
+        await p.waitForTimeout(1200);
+        assert.ok(seen.includes(href), "hovering the report's link prefetches it");
+      }
+      await p.close();
+      // Keyboard focus, then Enter: prefetched, and it navigates. (On a page of its own: once Next knows a route's
+      // shape from one club's prefetch, another club's needs no request.)
+      const k = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const focused = prefetches(k);
+      await k.goto(`${BASE_URL}/en/premier-league`, { waitUntil: "networkidle" });
+      await k.waitForTimeout(800);
+      const second = k.locator('[data-testid="standings"] [data-testid="club-link"]').nth(1);
+      await second.focus();
+      await k.waitForTimeout(1200);
+      assert.deepEqual(focused.filter((path) => path.includes("/team/")), [clubs[1]], "keyboard focus prefetches that club, and only it");
+      await k.keyboard.press("Enter");
+      await k.waitForURL(`**${clubs[1]}`);
+      await k.locator("h1").waitFor();
+      await k.close();
+      // A phone: a finger on the link is the intent.
+      const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+      const m = await ctx.newPage();
+      const touched = prefetches(m);
+      await m.goto(`${BASE_URL}/pt/premier-league`, { waitUntil: "networkidle" });
+      await m.waitForTimeout(800);
+      const link = m.locator('[data-testid="standings"] [data-testid="club-link"]').first();
+      const href = await link.getAttribute("href");
+      await link.scrollIntoViewIfNeeded();
+      await m.waitForTimeout(800);
+      assert.ok(!touched.includes(href), "on screen, not touched: not fetched");
+      await link.dispatchEvent("touchstart");
+      await m.waitForTimeout(1200);
+      assert.ok(touched.includes(href), "a finger on the link prefetches it");
+      await link.tap();
+      await m.waitForURL(`**${href}`);
+      await ctx.close();
+    });
+
+    await step("sitemap: every address in three languages; dates say when each last changed, never when the sitemap was built", async () => {
+      const started = Date.now();
+      const xml = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
+      const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => ({ loc: /<loc>([^<]+)<\/loc>/.exec(m[1])[1], lastmod: /<lastmod>([^<]+)<\/lastmod>/.exec(m[1])?.[1] }));
+      const path = (e) => new URL(e.loc).pathname;
+      const of = (pathname) => entries.find((e) => path(e) === pathname);
+      assert.ok(entries.length > 1000, `${entries.length} addresses`);
+      for (const locale of ["en", "pt", "es"]) {
+        for (const page of ["", "/premier-league", "/fa-cup", "/about", "/privacy", "/contact", "/odds", "/quiz", "/premier-league/past-winners", "/premier-league/odds"]) assert.ok(of(`/${locale}${page}`), `/${locale}${page}`);
+        assert.ok(entries.filter((e) => path(e).startsWith(`/${locale}/premier-league/team/`) && !path(e).includes("/chances/")).length === 20, `${locale}: the 20 club pages`);
+        assert.ok(entries.some((e) => path(e).startsWith(`/${locale}/premier-league/match/`)), `${locale}: match pages`);
+        assert.ok(entries.some((e) => path(e).startsWith(`/${locale}/premier-league/chances/`)), `${locale}: chance pages`);
+        assert.ok(entries.some((e) => /^\/[a-z]{2}\/premier-league\/odds\/matchday-\d+$/.test(path(e))), `${locale}: past rounds' reports`);
+      }
+      // No date where none is known.
+      for (const page of ["/en/about", "/en/privacy", "/en/contact", "/en/fa-cup", "/en/premier-league/past-winners"]) assert.equal(of(page).lastmod, undefined, page);
+      // A league's pages share its latest result's moment, the same in every language; another league has its own.
+      const league = of("/en/premier-league").lastmod;
+      assert.ok(league, "the league's latest result");
+      assert.ok(Date.parse(league) < started - 60_000, `not the build's time: ${league}`);
+      const own = entries.filter((e) => /^\/(en|pt|es)\/premier-league(\/(team|match|chances)\/.+)?$/.test(path(e)));
+      assert.ok(own.length > 100);
+      assert.deepEqual([...new Set(own.map((e) => e.lastmod))], [league], "its club, match and chance pages, in three languages");
+      // Asked for again: the same dates (nothing is stamped "now").
+      const again = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
+      const strip = (text) => text.replace(/<lastmod>[^<]*<\/lastmod>/g, "");
+      assert.equal(strip(again), strip(xml));
+      const datesOf = (text) => [...text.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]);
+      assert.deepEqual(datesOf(again), datesOf(xml));
+      // The quiz changes with the UTC day.
+      assert.equal(of("/en/quiz").lastmod.slice(0, 10), new Date().toISOString().slice(0, 10));
+    });
+
     console.log("\nAll e2e checks passed.");
   } finally {
     await browser.close();

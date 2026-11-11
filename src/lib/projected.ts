@@ -108,7 +108,7 @@ function fromOutlook(outlook: LeagueOutlook): Record<string, ProjectedClub> {
 
 /** A domestic league's projected table now and after each round of its current season (undefined: none to show). */
 export async function projectedHistory(league: LeagueConfig, data: LeagueData): Promise<ProjectedHistory | undefined> {
-  const [file, outlook] = await Promise.all([readSnapshots(league.code), sharedLeagueOutlook(league, data)]);
+  const [file, outlook] = await Promise.all([readSnapshots(league.code, { quiet: true }), sharedLeagueOutlook(league, data)]);
   const season = seasonReports(file, data.seasonKey);
   const snapshots = season?.seasonKey === data.seasonKey ? season.snapshots : [];
   const first = outlook?.clubs.values().next().value;

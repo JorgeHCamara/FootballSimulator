@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { fingerprintOf, impactCacheKey, xgFingerprint } from "./impactCache.ts";
 import { SIM_VERSION } from "./simVersion.ts";
@@ -25,11 +24,13 @@ describe("the match impact cache key", () => {
     delete process.env.VERCEL_GIT_COMMIT_SHA;
   });
 
-  it("the xG file's fingerprint: a short hash of its contents, \"none\" without one", async () => {
-    const text = readFileSync(new URL("../data/xg/PL.json", import.meta.url), "utf8");
-    assert.equal(await xgFingerprint("PL"), fingerprintOf(text));
-    assert.match(fingerprintOf(text), /^[0-9a-f]{12}$/);
-    assert.notEqual(fingerprintOf(`${text} `), fingerprintOf(text), "new xG, another fingerprint");
-    assert.equal(await xgFingerprint("NOPE"), "none");
+  it("the xG fingerprint: a short hash of the xG the model uses, \"none\" without any", () => {
+    const xg = { 2: [1.2, 0.4], 1: [0.9, 1.1] } as const;
+    assert.match(xgFingerprint(xg), /^[0-9a-f]{12}$/);
+    assert.equal(xgFingerprint({ 1: [0.9, 1.1], 2: [1.2, 0.4] }), xgFingerprint(xg), "whatever order the games come in");
+    assert.notEqual(xgFingerprint({ ...xg, 3: [2.1, 0.2] }), xgFingerprint(xg), "new xG, another fingerprint");
+    assert.notEqual(xgFingerprint({ ...xg, 2: [1.3, 0.4] }), xgFingerprint(xg), "a corrected game too");
+    assert.equal(xgFingerprint(undefined), "none");
+    assert.equal(xgFingerprint({}), "none");
   });
 });
