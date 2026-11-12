@@ -12,6 +12,7 @@ import { zoneHex, ZONE_STYLES } from "../../../../../components/zones.ts";
 import type { SiteLocale, ZoneKind } from "../../../../../config/leagues.ts";
 import type { FormResult, Team, TeamId } from "../../../../../engine/types.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
+import { IntentLink } from "../../../../../components/IntentLink.tsx";
 import { mustWinGames, toughestGames, type ClubFixture } from "../../../../../lib/clubOutlook.ts";
 import { clubChancePath, OUTCOMES, outcomeChance } from "../../../../../lib/chancePages.ts";
 import { outcomeKey } from "../../../../../lib/chanceText.ts";
@@ -146,9 +147,9 @@ export default async function ClubPage({ params }: { params: Params }) {
       </>
     );
     return other.page ? (
-      <Link href={other.page} className="flex min-w-0 items-center gap-2 hover:underline">
+      <IntentLink href={other.page} className="flex min-w-0 items-center gap-2 hover:underline">
         {name}
-      </Link>
+      </IntentLink>
     ) : (
       <span className="flex min-w-0 items-center gap-2">{name}</span>
     );
@@ -177,9 +178,9 @@ export default async function ClubPage({ params }: { params: Params }) {
   const withPreview = (f: ClubFixture, content: React.ReactNode, className = "") => {
     const href = preview(f);
     return href ? (
-      <Link href={href} className={`hover:underline ${className}`} data-testid="club-match-link">
+      <IntentLink href={href} className={`hover:underline ${className}`} data-testid="club-match-link">
         {content}
-      </Link>
+      </IntentLink>
     ) : (
       <span className={className}>{content}</span>
     );
@@ -369,14 +370,14 @@ export default async function ClubPage({ params }: { params: Params }) {
           <ul className="flex flex-wrap gap-2" data-testid="club-chance-links">
             {chanceLinks.map((c) => (
               <li key={c.outcome}>
-                <Link
+                <IntentLink
                   href={clubChancePath(team.page!, c.outcome)}
                   className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold hover:border-pitch-500 hover:bg-pitch-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-pitch-900/30"
                 >
                   <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: zoneHex(c.zone) }} />
                   {chancesT("chip", { Topic: chancesT(`Topic.${c.key}`, { name: c.name }), topic: chancesT(`topic.${c.key}`, { name: c.name }) })}
                   <Icon name="chevron-right" size={16} className="shrink-0 text-zinc-400" />
-                </Link>
+                </IntentLink>
               </li>
             ))}
           </ul>
@@ -484,13 +485,13 @@ export default async function ClubPage({ params }: { params: Params }) {
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {others.map((other) => (
             <li key={other.id}>
-              <Link
+              <IntentLink
                 href={other.page ?? leaguePath}
                 className="flex min-w-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
               >
                 <TeamBadge team={other} size={20} />
                 <span className="truncate">{other.name}</span>
-              </Link>
+              </IntentLink>
             </li>
           ))}
         </ul>

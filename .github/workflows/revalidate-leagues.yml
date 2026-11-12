@@ -2,8 +2,10 @@ name: Refresh league pages
 
 # Every 30 minutes, asks the site to compare each domestic league's ESPN data
 # with the cached copy its pages are built from (src/app/api/revalidate/leagues;
-# a league only while one of its games is near, under way or just over, and
-# every three hours otherwise, see refreshPlan in src/lib/leagueRefresh.ts):
+# a league only while one of its games is near, under way or just over (with
+# the small scoreboard feed first, its season only when that differs), and
+# its season every three hours in any case, see refreshPlan in
+# src/lib/leagueRefresh.ts):
 # only when new results are in are the league page and every club and match
 # page of that league revalidated together, so they all show the same, new
 # chances. With the token set, this is how new results reach the pages: the

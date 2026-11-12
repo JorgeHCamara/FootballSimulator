@@ -1,3 +1,5 @@
+import { SITE_URL } from "./site.ts";
+
 /**
  * How long a share card may be kept by the CDN and by browsers. Every card is
  * drawn by a function (fonts, crests, the league's data), so a card that's
@@ -21,3 +23,14 @@ export const CARD_CACHE_HEADERS: Record<CardCache, { "Cache-Control": string }> 
   live: { "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400" },
   brief: { "Cache-Control": "public, max-age=300, s-maxage=300" },
 };
+
+/**
+ * Where a card reads the site's own crests from over HTTP: this deployment's
+ * address, then the site's. The files are public/'s, served by the CDN
+ * without a function. (A preview deployment's own address may ask visitors to
+ * sign in; the site's has the same crest unless it's new in that preview.)
+ */
+export function ownCrestOrigins(env: Record<string, string | undefined> = process.env): string[] {
+  const hosts = [env.VERCEL_ENV === "production" ? undefined : env.VERCEL_URL, env.VERCEL_PROJECT_PRODUCTION_URL];
+  return [...new Set([...hosts.flatMap((host) => (host ? [`https://${host}`] : [])), SITE_URL])];
+}

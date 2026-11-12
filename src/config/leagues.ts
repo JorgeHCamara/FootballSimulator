@@ -281,6 +281,9 @@ const UEFA_KNOCKOUT = (venue: string, title: string): PlayoffConfig => ({
   title,
 });
 
+/** Leagues with a card on the home page; every league is still in the header menu and footer. */
+export const HOME_LEAGUES: readonly CompetitionCode[] = ["PL", "ELC", "PD", "BL1", "SA", "FL1", "PPL", "BSA", "MLS"];
+
 export const LEAGUES: readonly LeagueConfig[] = [
   {
     code: "PL",

@@ -25,7 +25,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   if (!found || "moved" in found) return Response.json(null, { status: 404 });
   if (!impactPossible(found)) return Response.json(null, { headers: HEADERS });
   // The numbers, once per game whatever the language: kept in Next's data cache by what they depend on (impactCacheKey).
-  const key = impactCacheKey({ league: found.league.code, slug: matchSlug, dataVersion: dataVersion(found.data), xg: await xgFingerprint(found.league.code) });
+  const key = impactCacheKey({ league: found.league.code, slug: matchSlug, dataVersion: dataVersion(found.data), xg: xgFingerprint(found.data.xg) });
   const numbers = await unstable_cache(async () => impactNumbers(found), key, { revalidate: KEEP })();
   if (!numbers) return Response.json(null, { headers: HEADERS });
   const [t, tz] = await Promise.all([getTranslations({ locale: lang, namespace: "Match" }), getTranslations({ locale: lang, namespace: "Zones" })]);

@@ -523,7 +523,13 @@ export function dataAsOf(data: LeagueData, cutoff: string): LeagueData {
  */
 const cache = new Map<string, { version: string; outlook: LeagueOutlook | null; setup: OutlookSetup | null }>();
 
-/** A fingerprint of a league's data: every game's id, date and result, and the groups. */
+/**
+ * A fingerprint of a league's data: every game's id, date and result, the
+ * groups, and the xG its ratings use (LeagueData.xg, only where they do).
+ * Everything the season's simulation is worked out from: the shared run is
+ * kept under it (src/lib/sharedOutlook.ts), so a new result, a moved game or
+ * newly published xG each start a new run, and nothing else does.
+ */
 export function dataVersion(data: LeagueData): string {
   const fixtures = data.tournaments?.flatMap((t) => t.fixtures) ?? data.fixtures;
   // FNV-1a over each game, so a moved or newly played game changes it.
@@ -533,6 +539,8 @@ export function dataVersion(data: LeagueData): string {
   };
   for (const f of fixtures) add(`${f.id}@${f.utcDate}=${f.result ? `${f.result.home}-${f.result.away}` : ""};`);
   add(data.groups?.map((g) => g.teamIds.join(",")).join("|") ?? "");
+  // Nothing added for a league without xG: its fingerprint is what it was before xG counted here.
+  for (const [id, xg] of Object.entries(data.xg ?? {}).sort(([a], [b]) => Number(a) - Number(b))) add(`x${id}:${xg[0]},${xg[1]};`);
   return `${data.seasonKey}:${fixtures.length}:${hash.toString(36)}`;
 }
 
