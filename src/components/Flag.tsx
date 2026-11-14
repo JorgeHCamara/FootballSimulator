@@ -1,9 +1,16 @@
 import type { FlagCode } from "../config/leagues.ts";
 
+/** Every flag drawn here (the footer's sprite, src/lib/flagSprite.tsx, holds them all). */
+export const FLAG_CODES = ["gb-eng", "es", "de", "it", "fr", "pt", "nl", "br", "us", "eu", "conmebol", "ar", "cl", "co", "uy", "py", "mx", "ec", "pe", "sa", "jp", "gb-sct", "tr", "be", "gr", "at"] as const satisfies readonly FlagCode[];
+// Every FlagCode is listed above (a code added to the type but not here fails to compile).
+const _allListed: readonly FlagCode[] extends readonly (typeof FLAG_CODES)[number][] ? true : never = true;
+void _allListed;
+
 // Inline SVG flags (3:2). Emoji flags render inconsistently (e.g. as letters on
 // Windows), and inline SVG needs no network request. Also used in OG images.
 
-function shapes(code: FlagCode) {
+/** A flag's shapes, on a 30×20 canvas. */
+export function shapes(code: FlagCode) {
   switch (code) {
     case "gb-eng":
       return (

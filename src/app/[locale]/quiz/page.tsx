@@ -16,8 +16,12 @@ import { OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
  *   what's left of the day, so the new set is up within about a minute of
  *   midnight UTC (it was within the hour);
  * - else every six hours at most, the safety net every league page has.
+ * Its own literal is the longest it may go (Next only takes a literal here): what it
+ * reads sets the real clock, six hours (24 with choice A, src/lib/costChoices.ts: the
+ * league's data and the outlook marker are kept that long, and a page follows the
+ * shortest-lived entry it reads).
  */
-export const revalidate = 21600;
+export const revalidate = 86400;
 /** Room for the day's two live outlooks on a cold server (they're shared with the club pages). */
 export const maxDuration = 60;
 

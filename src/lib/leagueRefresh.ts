@@ -4,6 +4,7 @@ import type { Fixture } from "../engine/types.ts";
 import { dataVersion } from "./clubOutlook.ts";
 import { espnFixtures, REPLACEABLE_STATUSES, type EspnEvent } from "./espn.ts";
 import { standingResults, type LeagueData } from "./leagueData.ts";
+import { periodicRuns } from "./costChoices.ts";
 
 /*
  * When to refresh a league's pages together (src/app/api/revalidate/leagues):
@@ -75,8 +76,8 @@ export const OVERDUE_MS = 48 * HOUR;
 /** The job's runs: every 30 minutes, at :07 and :37 (.github/workflows/revalidate-leagues.yml). */
 export const RUN_MS = 30 * MINUTE;
 const RUN_OFFSET_MS = 7 * MINUTE;
-/** An idle league is checked on one run in this many: every three hours. */
-export const PERIODIC_RUNS = 6;
+/** An idle league is checked on one run in this many: every three hours (every six with choice B, src/lib/costChoices.ts). */
+export const PERIODIC_RUNS = periodicRuns();
 
 /** Every game in a league's data: the season's, its play-offs', each tournament's. */
 export function allGames(data: LeagueData): Fixture[] {

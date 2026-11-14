@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { LeagueConfig, SiteLocale } from "../config/leagues.ts";
+import { unpackFixtures, type FixtureInput } from "../lib/fixturePack.ts";
 import { expectedGoals, expectedGoalsNeutral, sampleLikelyScore, simulateFixtures } from "../engine/match.ts";
 import type { MonteCarloInput } from "../engine/montecarlo.ts";
 import { buildLeagueModel, DOMESTIC_PRIOR_GAMES, matchParamOptions, NO_DATA_PRIOR, ratingHalfLife, type MatchParams, type TeamStrength } from "../engine/ratings.ts";
@@ -50,7 +51,8 @@ import { matchPath, matchSlug } from "../lib/matchSlug.ts";
 interface Props {
   league: LeagueConfig;
   teams: Team[];
-  fixtures: Fixture[];
+  /** As objects, or packed by the server (src/lib/fixturePack.ts: a page carries far fewer bytes). */
+  fixtures: FixtureInput;
   seasonKey: string;
   /** Season label, e.g. "2026"; the play-off promotes to the next one. */
   season: string;
@@ -104,7 +106,7 @@ function nextSeasonLabel(season: string): string {
 export function LeagueSimulator({
   league,
   teams,
-  fixtures,
+  fixtures: givenFixtures,
   seasonKey,
   season: seasonLabel,
   postseason,
@@ -120,6 +122,8 @@ export function LeagueSimulator({
   fallbackOrder,
   pastWinners,
 }: Props) {
+  // The same objects whichever way they came (unpacked once).
+  const fixtures = useMemo(() => unpackFixtures(givenFixtures), [givenFixtures]);
   const t = useTranslations("Simulator");
   const lang = useLocale() as SiteLocale;
   const readOnly = scenario !== undefined;

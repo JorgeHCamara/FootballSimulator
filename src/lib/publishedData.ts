@@ -1,7 +1,9 @@
 // The file itself (".js"): these modules also run outside Next (scripts, tests), whose Node needs the extension.
 import { unstable_cache } from "next/cache.js";
 import { createHash } from "node:crypto";
+import { cache } from "react";
 import { cacheScope } from "./dataCacheKey.ts";
+import { safetyNetSeconds } from "./costChoices.ts";
 
 /*
  * The data the daily job publishes (.github/workflows/odds-snapshots.yml): the
@@ -30,8 +32,11 @@ import { cacheScope } from "./dataCacheKey.ts";
 
 export type PublishedKind = "snapshots" | "xg";
 
-/** How long a published file's entry is kept at most: the safety net for a publication nobody announced. */
+/** How long a published file's entry is kept at most: the safety net for a publication nobody announced (24 hours with choice A, src/lib/costChoices.ts). */
 export const PUBLISHED_KEEP_SECONDS = 21600;
+
+/** PUBLISHED_KEEP_SECONDS, or 24 hours with choice A and the refresh job on. */
+export const publishedKeepSeconds = (env: Record<string, string | undefined> = process.env) => safetyNetSeconds(env);
 
 /** Where main's files are served from when nothing else is configured (the repository is public). */
 export const DEFAULT_DATA_URL = "https://raw.githubusercontent.com/JorgeHCamara/FootballSimulator/main";
@@ -96,11 +101,20 @@ const noDataCache = (error: unknown) => error instanceof Error && error.message.
  * without the tag, for a page a new publication mustn't rebuild at once (it
  * follows within PUBLISHED_KEEP_SECONDS).
  */
-export async function readPublished<T>(
+export function readPublished<T>(
   kind: PublishedKind,
   code: string,
-  { keep = PUBLISHED_KEEP_SECONDS, quiet = false, env = process.env }: { keep?: number; quiet?: boolean; env?: Record<string, string | undefined> } = {},
+  { keep: asked, quiet = false, env = process.env }: { keep?: number; quiet?: boolean; env?: Record<string, string | undefined> } = {},
 ): Promise<{ file: T | null } | undefined> {
+  const keep = asked ?? publishedKeepSeconds(env);
+  // Once per render for the same entry (a league page read its snapshots twice): each is a billed Runtime Cache read.
+  return env === process.env ? (readOnce(kind, code, keep, quiet) as Promise<{ file: T | null } | undefined>) : readEntry<T>(kind, code, keep, quiet, env);
+}
+
+/** readPublished's entry, shared within a render (React's cache: the arguments are its key). */
+const readOnce = cache((kind: PublishedKind, code: string, keep: number, quiet: boolean) => readEntry<unknown>(kind, code, keep, quiet, process.env));
+
+async function readEntry<T>(kind: PublishedKind, code: string, keep: number, quiet: boolean, env: Record<string, string | undefined>): Promise<{ file: T | null } | undefined> {
   const source = publishedSource(env);
   if (!source || !isDataCode(code)) return undefined;
   const load = async (): Promise<{ file: T | null }> => {

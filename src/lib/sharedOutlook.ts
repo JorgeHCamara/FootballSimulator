@@ -1,11 +1,13 @@
 // The file itself (".js"): these modules also run outside Next (scripts, tests), whose Node needs the extension.
 import { unstable_cache } from "next/cache.js";
+import { cache } from "react";
 import type { LeagueConfig } from "../config/leagues.ts";
 import { runMonteCarlo, type MonteCarloResult } from "../engine/montecarlo.ts";
 import { dataVersion, outlookFromRun, outlookSetup, peekLeagueOutlook, primeLeagueOutlook, type LeagueOutlook, type OutlookSetup } from "./clubOutlook.ts";
 import type { LeagueData } from "./leagueData.ts";
 import { SCENARIO_ITERATIONS, SCENARIO_SEED } from "./scenario.ts";
 import { SIM_VERSION } from "./simVersion.ts";
+import { safetyNetSeconds } from "./costChoices.ts";
 
 /*
  * One season outlook per league, data version and model, shared by every page
@@ -46,9 +48,9 @@ export const outlookKey = (code: string, version: string, shape: RunShape = "tab
 const noDataCache = (error: unknown) => error instanceof Error && error.message.includes("incrementalCache missing");
 
 /** A data cache read, or the value worked out on the spot without a data cache. */
-async function fromDataCache<T>(work: () => Promise<T>, key: string[], tags: string[]): Promise<T> {
+async function fromDataCache<T>(work: () => Promise<T>, key: string[], tags: string[], revalidate: number | false = false): Promise<T> {
   try {
-    return await unstable_cache(work, key, { tags, revalidate: false })();
+    return await unstable_cache(work, key, { tags, revalidate })();
   } catch (error) {
     if (noDataCache(error)) return work();
     throw error;
@@ -59,8 +61,13 @@ async function fromDataCache<T>(work: () => Promise<T>, key: string[], tags: str
  * Tags the page being rendered with outlookTag: a tiny entry read on every
  * render (a page is tagged with the entries it reads, and only then: a render
  * that reused another's data or run in flight would otherwise miss the tags).
+ * Also the page's safety net (safetyNetSeconds: six hours, 24 with choice A):
+ * a page follows the shortest-lived entry it reads, and its own `revalidate`
+ * export is the longer one, so every page that shows an outlook (a league's,
+ * its clubs', chances' and matches', the home page) is rebuilt within it even
+ * when its league's data isn't in the data cache (a first-party league).
  */
-const markPage = (code: string) => fromDataCache(async () => code, ["league-pages", code], [outlookTag(code)]);
+const markPage = (code: string) => fromDataCache(async () => code, ["league-pages", code], [outlookTag(code)], safetyNetSeconds());
 
 /** Runs being worked out on this server, so renders at the same moment share one (each still reads the cache). */
 const pending = new Map<string, Promise<MonteCarloResult>>();
@@ -87,8 +94,10 @@ function sharedRun(league: LeagueConfig, setup: OutlookSetup, version: string): 
  * The league's outlook for its data, as every page shows it: the shared run
  * (see above), turned into the outlook here, and kept as this server's copy
  * (cachedLeagueOutlook and the match pages' results then read the same).
+ * Once per render for the same data (React's cache): a page and its metadata
+ * read its marker and run once, not twice.
  */
-export async function sharedLeagueOutlook(league: LeagueConfig, data: LeagueData): Promise<LeagueOutlook | null> {
+export const sharedLeagueOutlook = cache(async function sharedLeagueOutlook(league: LeagueConfig, data: LeagueData): Promise<LeagueOutlook | null> {
   await markPage(league.code);
   const setup = outlookSetup(league, data);
   if (!setup) {
@@ -103,4 +112,4 @@ export async function sharedLeagueOutlook(league: LeagueConfig, data: LeagueData
   const outlook = outlookFromRun(league, data, setup, run);
   primeLeagueOutlook(league, data, setup, outlook);
   return outlook;
-}
+});

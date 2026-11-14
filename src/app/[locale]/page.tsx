@@ -15,9 +15,12 @@ import { HREFLANG, MY_WORLD_LISTED, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem
  * is rebuilt when its results change (/api/revalidate/leagues). Nothing else
  * on it moves with time, so its own clock is only the safety net every page
  * of the league has (six hours; the league's data is kept an hour without the
- * route, and the page with it: leagueDataKeepSeconds).
+ * route, and the page with it: leagueDataKeepSeconds). Its own literal is the longest it may go (Next only takes a literal here): what it
+ * reads sets the real clock, six hours (24 with choice A, src/lib/costChoices.ts: the
+ * league's data and the outlook marker are kept that long, and a page follows the
+ * shortest-lived entry it reads).
  */
-export const revalidate = 21600;
+export const revalidate = 86400;
 /** Room for the featured league's outlook on a cold server (shared with its league and club pages). */
 export const maxDuration = 60;
 
