@@ -8,6 +8,7 @@ import { COMPETITIONS } from "../../config/competitions.ts";
 import { HOME_LEAGUES, LEAGUES, type SiteLocale } from "../../config/leagues.ts";
 import { Link } from "../../i18n/navigation.ts";
 import { HREFLANG, MY_WORLD_LISTED, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem } from "../../lib/site.ts";
+import { pageClock } from "../../lib/sharedOutlook.ts";
 
 /**
  * The hero's card reads the featured league's data and outlook like its league
@@ -27,6 +28,8 @@ export const maxDuration = 60;
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  // The safety net whatever its leagues' data does (a render that loads none reads no other entry): see pageClock.
+  await pageClock("home");
   const t = await getTranslations("Home");
   const worldT = await getTranslations("World");
   const meta = await getTranslations("Metadata");

@@ -69,6 +69,15 @@ async function fromDataCache<T>(work: () => Promise<T>, key: string[], tags: str
  */
 const markPage = (code: string) => fromDataCache(async () => code, ["league-pages", code], [outlookTag(code)], safetyNetSeconds());
 
+/**
+ * The safety net (safetyNetSeconds) for a page that shows no outlook (a cup's,
+ * a continental competition's): a tiny entry read on every render, as
+ * markPage's, without its tag. Such a page's own data is kept as long or
+ * shorter, but a render that shares another's load in flight (the three
+ * languages during a build) reads none of it.
+ */
+export const pageClock = (code: string) => fromDataCache(async () => code, ["page-clock", code], [], safetyNetSeconds());
+
 /** Runs being worked out on this server, so renders at the same moment share one (each still reads the cache). */
 const pending = new Map<string, Promise<MonteCarloResult>>();
 

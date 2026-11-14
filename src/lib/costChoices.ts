@@ -16,14 +16,15 @@
  * Saves the rebuilds of pages whose league didn't change all day, and their
  * ISR writes. Costs: if the GitHub job stops running, pages can be up to 24
  * hours stale instead of six; a publication the job doesn't announce (a run
- * that fails before its last step) shows up to 24 hours later; and whatever
- * the job doesn't watch is only seen by the 24-hour safety net: the cups'
- * draws and continental pages' feeder data read through these pages.
+ * that fails before its last step) shows up to 24 hours later; and what the
+ * job doesn't check, the continental competitions' data, refreshes daily
+ * (the cups' pages keep their hourly draws). The quiz still turns at midnight
+ * UTC, and a game due within a day keeps its match page on six hours.
  * The pages' own `revalidate` exports are 86400 for this: Next only takes a
  * literal there, and a page follows the shortest-lived entry it reads, so with
- * the choice off every one of them reads an entry kept six hours (its
- * league's data or the outlook marker, src/lib/sharedOutlook.ts) and stays at
- * six, as before.
+ * the choice off every one of them reads an entry kept six hours on every
+ * render (the outlook marker, or pageClock for a page that shows no outlook or
+ * may load no league: src/lib/sharedOutlook.ts) and stays at six, as before.
  *
  * CHOICE B, SLOWER_IDLE_TURN: a league with no game near is checked against
  * ESPN on one run in 12 (every six hours) instead of one in six (three

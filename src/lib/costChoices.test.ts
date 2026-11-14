@@ -49,9 +49,15 @@ describe("the cost choices, as shipped", () => {
       const source = readFileSync(new URL(`../app/${page}`, import.meta.url), "utf8");
       assert.match(source, new RegExp(`export const revalidate = ${LONG_SAFETY_NET_SECONDS};`), page);
     }
-    // The outlook marker every one of them reads (directly, or through the featured league's card) is the net.
+    // The outlook marker the league, club, chance and match pages read on every render is the net, and pageClock
+    // for the pages that may read none (a cup's or continental competition's page, the home page, the quiz).
     const outlook = readFileSync(new URL("./sharedOutlook.ts", import.meta.url), "utf8");
     assert.match(outlook, /\["league-pages", code\], \[outlookTag\(code\)\], safetyNetSeconds\(\)\)/);
+    assert.match(outlook, /\["page-clock", code\], \[\], safetyNetSeconds\(\)\)/);
+    const read = (page: string) => readFileSync(new URL(`../app/${page}`, import.meta.url), "utf8");
+    assert.match(read("[locale]/page.tsx"), /await pageClock\("home"\)/);
+    assert.match(read("[locale]/quiz/page.tsx"), /await pageClock\("quiz"\)/);
+    assert.match(read("[locale]/[league]/page.tsx"), /if \(loaded\.kind === "cup" \|\| !hasClubPages\(loaded\.config\)\) await pageClock\(loaded\.config\.code\)/);
   });
 });
 

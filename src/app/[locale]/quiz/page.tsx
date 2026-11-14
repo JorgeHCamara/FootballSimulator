@@ -7,6 +7,7 @@ import { ordinal, percent } from "../../../lib/clubText.ts";
 import type { QuizQuestion } from "../../../lib/quiz.ts";
 import { quizDayClock, todaysQuiz } from "../../../lib/quizPage.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
+import { pageClock } from "../../../lib/sharedOutlook.ts";
 
 /**
  * A new set every day (UTC). The page is rebuilt:
@@ -79,6 +80,8 @@ function itemOf(q: QuizQuestion, lang: SiteLocale, t: Translate, tz: TranslateZo
 export default async function Page({ params }: { params: Params }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  // The safety net whatever its leagues' data does (a render that loads none reads no other entry): see pageClock.
+  await pageClock("quiz");
   const lang = langOf(locale);
   const [t, tz] = await Promise.all([getTranslations("Quiz"), getTranslations("Zones")]);
   const now = new Date();

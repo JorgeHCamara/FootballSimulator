@@ -26,6 +26,7 @@ import { packFixtures } from "../../../lib/fixturePack.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd, fill, type FaqItem } from "../../../lib/site.ts";
 import { Icon } from "../../../components/Icon.tsx";
 import { hasClubPages } from "../../../lib/clubs.ts";
+import { pageClock } from "../../../lib/sharedOutlook.ts";
 import { latestReportPath, readSnapshots, seasonReports } from "../../../lib/oddsReports.ts";
 import { leagueChancePath, snapshotOutcomeKey, snapshotOutcomes } from "../../../lib/chancePages.ts";
 import { hasPastWinners, pastWinnersPath } from "../../../lib/winnersData.ts";
@@ -164,6 +165,10 @@ export default async function LeaguePage({ params }: { params: Params }) {
   setRequestLocale(locale);
   const loaded = await load(slug);
   if (!loaded) notFound();
+  // A cup's or a continental competition's page reads no outlook marker (the safety net every page with club
+  // pages reads, see markPage), and a render that shares another language's load in flight (a build) reads no
+  // entry of its own: the net, as before this page's literal became the longer one.
+  if (loaded.kind === "cup" || !hasClubPages(loaded.config)) await pageClock(loaded.config.code);
 
   // The latest "what changed" report (domestic leagues with snapshots), and the chance pages its places make.
   const latestSnapshot =
