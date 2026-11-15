@@ -3472,7 +3472,8 @@ async function step(name, fn) {
       assert.deepEqual(annualZones.slice(28), ["relegation", "relegation"]);
       assert.match(await p.getByTestId("world-qualified-note").innerText(), /Already in the Copa Libertadores as tournament champion: .+ \(Apertura champion\)/);
       // Whole rows in their place's colour, with the legend, as on the league pages.
-      assert.match(await annualRows.first().getAttribute("class"), /bg-blue-100/);
+      // (The Libertadores' tint: .zone-blue, bg-blue-100 in src/app/globals.css.)
+      assert.match(await annualRows.first().getAttribute("class"), /\bzone-blue\b/);
       assert.deepEqual(await p.getByTestId("world-zone-legend").locator("li").allInnerTexts(), ["Libertadores", "Sudamericana", "Relegation"]);
       // The Primera Nacional: two zones of 18, the zone winners' final then the Reducido.
       await p.locator('[data-testid="world-tabs"] [data-league="PN"]').click();
@@ -4035,7 +4036,17 @@ async function step(name, fn) {
       assert.ok(Date.parse(league) < started - 60_000, `not the build's time: ${league}`);
       const own = entries.filter((e) => /^\/(en|pt|es)\/premier-league(\/(team|match|chances)\/.+)?$/.test(path(e)));
       assert.ok(own.length > 100);
-      assert.deepEqual([...new Set(own.map((e) => e.lastmod))], [league], "its club, match and chance pages, in three languages");
+      // A settled game's page (src/lib/settledMatch.ts: its final score in, kicked off over a week ago) no longer
+      // follows the league: it's dated when it settled, its address's date plus eight days, noon UTC.
+      const settledAt = (e) => {
+        const date = /\/match\/.*-(\d{4}-\d{2}-\d{2})$/.exec(path(e))?.[1];
+        const at = date && Date.parse(`${date}T12:00:00Z`) + 8 * 86_400_000;
+        return at && at <= started ? new Date(at).toISOString() : undefined;
+      };
+      const settled = own.filter((e) => settledAt(e) && e.lastmod !== league);
+      assert.ok(settled.length >= 3 * 10, `settled match pages: ${settled.length}`);
+      for (const e of settled) assert.equal(e.lastmod, settledAt(e), path(e));
+      assert.deepEqual([...new Set(own.filter((e) => !settled.includes(e)).map((e) => e.lastmod))], [league], "its club, match and chance pages, in three languages");
       // Asked for again: the same dates (nothing is stamped "now").
       const again = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
       const strip = (text) => text.replace(/<lastmod>[^<]*<\/lastmod>/g, "");

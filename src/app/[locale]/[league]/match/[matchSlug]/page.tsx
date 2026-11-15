@@ -12,10 +12,9 @@ import type { SiteLocale } from "../../../../../config/leagues.ts";
 import type { FormResult, Team } from "../../../../../engine/types.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
 import { IntentLink } from "../../../../../components/IntentLink.tsx";
-import type { ClubOutlook } from "../../../../../lib/clubOutlook.ts";
 import { ordinal, percent } from "../../../../../lib/clubText.ts";
-import { hasImpact } from "../../../../../lib/matchImpact.ts";
-import { loadMatch, type LoadedMatch } from "../../../../../lib/matchPreview.ts";
+import { loadMatchView, type MatchView } from "../../../../../lib/matchView.ts";
+import type { ClubCard } from "../../../../../lib/settledMatch.ts";
 import { inIndexWindow } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
 
@@ -33,8 +32,15 @@ import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../.
  * shortest-lived entry it reads). With choice A, a game
  * due within the next day keeps the six hours (matchDayClock), so its page is still
  * rebuilt by match day.
+ * A settled game (decision C: its final score in, kicked off more than
+ * SETTLED_MATCH_DAYS days ago) is built from its frozen record instead
+ * (src/lib/settledMatch.ts): no league data read, so a new result elsewhere leaves
+ * it alone; it's rebuilt when the refresh job sees the game itself corrected
+ * (matchSettledTag), or after 30 days: this literal (every other page reads an
+ * entry kept 24 hours at most). Inside the index window it lasts only until it
+ * leaves it, so it says noindex on time (indexWindowClock).
  */
-export const revalidate = 86400;
+export const revalidate = 2592000;
 /** Three season simulations for "What this result means" on a first visit. */
 export const maxDuration = 60;
 
@@ -50,7 +56,7 @@ const langOf = (locale: string) => (["en", "pt", "es"].includes(locale) ? locale
 const dateLocale = (lang: SiteLocale) => (lang === "en" ? "en-GB" : lang);
 
 /** The values every heading, title and description shares. */
-function textValues(loaded: LoadedMatch, lang: SiteLocale) {
+function textValues(loaded: MatchView, lang: SiteLocale) {
   const { match, result, odds, xg, league, timeZone } = loaded;
   const pct = (share: number) => percent(share, lang);
   return {
@@ -70,7 +76,7 @@ function textValues(loaded: LoadedMatch, lang: SiteLocale) {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, league: slug, matchSlug } = await params;
-  const loaded = await loadMatch(slug, matchSlug);
+  const loaded = await loadMatchView(slug, matchSlug);
   if (!loaded || "moved" in loaded) return {};
   const lang = langOf(locale);
   const t = await getTranslations({ locale, namespace: "Match" });
@@ -102,13 +108,13 @@ const card = "rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-80
 export default async function MatchPage({ params }: { params: Params }) {
   const { locale, league: slug, matchSlug } = await params;
   setRequestLocale(locale);
-  const loaded = await loadMatch(slug, matchSlug);
+  const loaded = await loadMatchView(slug, matchSlug);
   if (!loaded) notFound();
   // A game moved to another day: its new address.
   if ("moved" in loaded) permanentRedirect(`/${locale}${loaded.moved}`);
   const lang = langOf(locale);
   const [t, tc, seo] = await Promise.all([getTranslations("Match"), getTranslations("Club"), getTranslations("Seo")]);
-  const { league, match, result, state, odds, xg, scores, outlook, homeClub, awayClub, venue, timeZone, season } = loaded;
+  const { league, match, result, state, odds, xg, scores, scope, homeClub, awayClub, venue, timeZone, season, settled } = loaded;
   const { fixture, home, away } = match;
   const pct = (share: number) => percent(share, lang);
   const values = textValues(loaded, lang);
@@ -117,11 +123,9 @@ export default async function MatchPage({ params }: { params: Params }) {
   const simulator = league.simulatorName[lang];
   const leaguePath = `/${league.slug}`;
   const pageUrl = `${SITE_URL}/${locale}${match.path}`;
-  const count = new Intl.NumberFormat(lang).format(outlook?.iterations ?? 10_000);
   // Club pages exist for this season's clubs (an old game's club may have gone down since).
-  const clubPage = (team: Team) => loaded.current.teams.find((x) => x.slug === team.slug)?.page;
-  const tableName = (club: ClubOutlook) =>
-    outlook?.scope === "eachTable" && club.group ? club.group[lang] : outlook?.scope === "annual" && league.annual ? league.annual.name[lang] : league.name;
+  const clubPage = (team: Team): string | undefined => loaded.pages[team.id];
+  const tableName = (club: ClubCard) => (scope === "eachTable" && club.group ? club.group[lang] : scope === "annual" && league.annual ? league.annual.name[lang] : league.name);
 
 
   const scoreText = (s: { home: number; away: number }) => `${s.home}–${s.away}`;
@@ -144,11 +148,18 @@ export default async function MatchPage({ params }: { params: Params }) {
   ];
   const maxScore = Math.max(...scores.map((s) => s.p));
 
-  const teamCard = (team: Team, club: ClubOutlook | undefined) => (
+  const teamCard = (team: Team, club: ClubCard | undefined) => (
     <div className={card} data-testid="match-team">
       <div className="flex min-w-0 items-center gap-3">
         <TeamBadge team={team} size={32} />
         <h3 className="min-w-0 truncate text-base font-bold">{teamName(team)}</h3>
+        {/* A settled game: its clubs' table as it stood after it, not now (their pages have the live numbers). */}
+        {settled && club && (
+          <span className="ml-auto inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold text-zinc-500" data-testid="match-after">
+            <Icon name="history" size={12} />
+            {t("afterMatch")}
+          </span>
+        )}
       </div>
       {club ? (
         <dl className="mt-3 grid grid-cols-3 gap-2 text-sm">
@@ -195,7 +206,7 @@ export default async function MatchPage({ params }: { params: Params }) {
 
   // A change in a chance, in points, coloured by whether it's good for that club.
   return (
-    <div className="space-y-6" data-testid="match-page" data-state={state}>
+    <div className="space-y-6" data-testid="match-page" data-state={state} {...(settled ? { "data-settled": "true" } : {})}>
       <JsonLd
         data={[
           {
@@ -364,7 +375,7 @@ export default async function MatchPage({ params }: { params: Params }) {
               <h3 className="text-sm font-semibold">{t("diceTitle")}</h3>
               <MatchDice
                 xg={xg}
-                rho={loaded.model.rho ?? 0}
+                rho={loaded.rho}
                 home={home.shortName}
                 away={away.shortName}
                 labels={{ button: t("diceButton"), again: t("diceAgain"), result: t("diceResult", { score: "{score}" }) }}
@@ -377,7 +388,7 @@ export default async function MatchPage({ params }: { params: Params }) {
       </section>
 
       {/* "What this result means": three more season simulations, fetched once the page has loaded. */}
-      {hasImpact(loaded) && <MatchImpact src={`/${locale}${match.path}/impact`} title={t("impactTitle")} />}
+      {loaded.impact && <MatchImpact src={`/${locale}${match.path}/impact`} title={t("impactTitle")} />}
 
       <section className="space-y-3" data-testid="match-form-table">
         <h2 className="text-xl font-bold tracking-tight">{t("formTitle")}</h2>

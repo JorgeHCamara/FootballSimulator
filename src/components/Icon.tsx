@@ -93,32 +93,55 @@ const ICONS = {
 
 export type IconName = keyof typeof ICONS;
 
+const escape = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+/**
+ * Every icon in one SVG file (/icons.svg, src/app/icons.svg/route.ts), each a
+ * group by its name. A page drew each icon's paths inline, in its HTML and
+ * again in its RSC data for a server-rendered one: sixty on a league page. They
+ * are referenced with <use> instead (the stroke, its width and colour come
+ * from the <svg> around it, as before), one file the browser and the CDN keep.
+ */
+export function iconSprite(): string {
+  const groups = Object.entries(ICONS).map(
+    ([name, node]) => `<g id="${name}">${(node as IconNode).map(([tag, attrs]) => `<${tag}${Object.entries(attrs).map(([k, v]) => ` ${k}="${escape(v)}"`).join("")}/>`).join("")}</g>`,
+  );
+  return `<svg xmlns="http://www.w3.org/2000/svg">${groups.join("")}</svg>`;
+}
+
+/** FNV-1a of the icons' shapes: the sprite's version (the same in the browser and on the server). */
+function version(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16);
+}
+
+/** The sprite's address, versioned by its contents: a changed icon is a new address, so browsers can keep it for a year. */
+export const ICON_SPRITE_URL = `/icons.svg?v=${version(JSON.stringify(ICONS))}`;
+
 /**
  * A Lucide icon: 24×24, drawn with the current text colour. Decorative
  * (aria-hidden) unless given a `title`.
  */
-export function Icon({ name, size = 18, strokeWidth = 2, title, ...props }: { name: IconName; size?: number; strokeWidth?: number; title?: string } & Omit<SVGProps<SVGSVGElement>, "name">) {
+export function Icon({ name, size = 18, strokeWidth = 2, title, className, ...props }: { name: IconName; size?: number; strokeWidth?: number; title?: string } & Omit<SVGProps<SVGSVGElement>, "name">) {
+  // Its fill, stroke colour and caps from the .icon class (src/app/globals.css), not five attributes on every icon.
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
       strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
       {...(title ? { role: "img", "aria-label": title } : { "aria-hidden": true })}
       focusable="false"
       data-icon={name}
+      className={className ? `icon ${className}` : "icon"}
       {...props}
     >
       {title && <title>{title}</title>}
-      {(ICONS[name] as IconNode).map(([tag, attrs], i) => {
-        const Tag = tag as "path";
-        return <Tag key={i} {...(attrs as Record<string, string>)} />;
-      })}
+      <use href={`${ICON_SPRITE_URL}#${name}`} />
     </svg>
   );
 }

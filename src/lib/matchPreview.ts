@@ -144,7 +144,7 @@ export async function matchDayClock(code: string, kickoff: string, now = Date.no
   return true;
 }
 
-const seasonLabel = (data: LeagueData) => (data.tournaments ? (data.season.split(" ").at(-1) ?? data.season) : data.season);
+export const seasonLabel = (data: LeagueData) => (data.tournaments ? (data.season.split(" ").at(-1) ?? data.season) : data.season);
 
 const preMatchModels = new Map<string, LeagueModel>();
 

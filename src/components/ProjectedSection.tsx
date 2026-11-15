@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { packHistory } from "../lib/projectedPack.ts";
 import type { LeagueConfig, SiteLocale, ZoneKind } from "../config/leagues.ts";
 import type { LeagueData } from "../lib/leagueData.ts";
 import { dateLocale } from "../lib/oddsText.ts";
@@ -30,7 +31,14 @@ export async function ProjectedSection({ league, data, locale }: { league: Leagu
         <h2 className="text-xl font-bold tracking-tight">{t(history.scope === "annual" ? "titleAnnual" : "title")}</h2>
         <p className="max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("intro", { count: new Intl.NumberFormat(locale).format(history.iterations) })}</p>
       </div>
-      <ProjectedTable history={history} teams={data.teams} entryNames={entryNames} labels={labels} locale={locale} />
+      {/* Packed, and only what it shows of each club: the same table, far fewer bytes (src/lib/projectedPack.ts). */}
+      <ProjectedTable
+        history={packHistory(history)}
+        teams={data.teams.map((t) => ({ id: t.id, name: t.name, shortName: t.shortName, tla: t.tla, ...(t.crest ? { crest: t.crest } : {}), ...(t.page ? { page: t.page } : {}) }))}
+        entryNames={entryNames}
+        labels={labels}
+        locale={locale}
+      />
     </section>
   );
 }

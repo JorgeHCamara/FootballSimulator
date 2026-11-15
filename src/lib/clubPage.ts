@@ -10,6 +10,7 @@ import { readSnapshots, seasonReports } from "./oddsReports.ts";
 import { sharedLeagueOutlook } from "./sharedOutlook.ts";
 import { allGames } from "./leagueRefresh.ts";
 import { lastResultAt } from "./sitemapDates.ts";
+import { isSettled, settleTime } from "./settledMatch.ts";
 
 /** A domestic league's outlook: the shared one, as its league, club and chance pages read it. */
 export interface LoadedLeague {
@@ -142,21 +143,26 @@ async function chancePaths(league: LeagueConfig, data: LeagueData): Promise<stri
  * by its slug (lastResultAt; undefined before its first result), for the
  * sitemap's dates.
  */
-export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: string[]; matches: string[]; chances: string[]; results: Map<string, Date | undefined> }> {
+export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: string[]; matches: string[]; chances: string[]; results: Map<string, Date | undefined>; settled: Map<string, Date> }> {
   const leagues = LEAGUES.filter(hasClubPages);
   const day = 86_400_000;
   const pages = await Promise.all(
     leagues.map((league) =>
       getLeagueData(league).then(
-        async (data) => ({
-          clubs: data.teams.flatMap((team) => (team.page ? [team.page] : [])),
-          matches: matchesBetween(league, data, now - INDEX_PAST_DAYS * day, now + INDEX_NEXT_DAYS * day).map((m) => m.path),
-          chances: await chancePaths(league, data).catch(() => []),
-          result: [league.slug, lastResultAt(allGames(data), now)] as const,
-        }),
+        async (data) => {
+          const shown = matchesBetween(league, data, now - INDEX_PAST_DAYS * day, now + INDEX_NEXT_DAYS * day);
+          return {
+            clubs: data.teams.flatMap((team) => (team.page ? [team.page] : [])),
+            matches: shown.map((m) => m.path),
+            // Settled games' pages: since when (they no longer change with the league's results).
+            settled: shown.flatMap((m) => (isSettled(m, now) ? [[m.path, new Date(settleTime(m.slug))] as const] : [])),
+            chances: await chancePaths(league, data).catch(() => []),
+            result: [league.slug, lastResultAt(allGames(data), now)] as const,
+          };
+        },
         (error: unknown) => {
           console.warn(`sitemap: no club or match pages for ${league.code}:`, error);
-          return { clubs: [], matches: [], chances: [], result: undefined };
+          return { clubs: [], matches: [], chances: [], settled: [], result: undefined };
         },
       ),
     ),
@@ -166,5 +172,6 @@ export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: stri
     matches: pages.flatMap((p) => p.matches),
     chances: pages.flatMap((p) => p.chances),
     results: new Map(pages.flatMap((p) => (p.result ? [p.result] : []))),
+    settled: new Map(pages.flatMap((p) => p.settled)),
   };
 }

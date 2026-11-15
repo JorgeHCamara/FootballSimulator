@@ -8,43 +8,54 @@ import { matchDayClock } from "./matchPreview.ts";
 import { PUBLISHED_KEEP_SECONDS, publishedKeepSeconds } from "./publishedData.ts";
 
 /*
- * The two cost choices (src/lib/costChoices.ts) are off, and off means
- * today's clocks exactly: six-hour safety net, idle leagues every three hours.
+ * The two cost choices (src/lib/costChoices.ts), both on since Jorge's
+ * decision of 2026-11-15: a 24-hour safety net under the refresh job (only
+ * with its token: without it nothing changes, the data and its pages refresh
+ * hourly) and idle leagues checked every six hours. Off, each gives back the
+ * clocks before it exactly.
  */
 
 const token = { REVALIDATE_TOKEN: "x" };
 
 describe("the cost choices, as shipped", () => {
-  it("both off", () => {
-    assert.equal(LONGER_SAFETY_NET, false);
-    assert.equal(SLOWER_IDLE_TURN, false);
+  it("both on (Jorge's decisions A and B, 2026-11-15)", () => {
+    assert.equal(LONGER_SAFETY_NET, true);
+    assert.equal(SLOWER_IDLE_TURN, true);
   });
 
-  it("choice A off: six hours with the job, the data an hour without it, the published files six hours", () => {
-    assert.equal(safetyNetSeconds(token), SAFETY_NET_SECONDS);
-    assert.equal(SAFETY_NET_SECONDS, 21600);
-    assert.equal(leagueDataKeepSeconds(token), 21600);
-    assert.equal(leagueDataKeepSeconds({}), KEEP_WITHOUT_ROUTE_SECONDS);
-    assert.equal(publishedKeepSeconds(token), PUBLISHED_KEEP_SECONDS);
-  });
-
-  it("choice A on: 24 hours, only with the job (without its token nothing changes)", () => {
-    assert.equal(safetyNetSeconds(token, true), LONG_SAFETY_NET_SECONDS);
+  it("choice A on: 24 hours with the job, for the pages, the league's data and the published files", () => {
+    assert.equal(safetyNetSeconds(token), LONG_SAFETY_NET_SECONDS);
     assert.equal(LONG_SAFETY_NET_SECONDS, 86400);
-    assert.equal(safetyNetSeconds({}, true), SAFETY_NET_SECONDS);
+    assert.equal(leagueDataKeepSeconds(token), 86400);
+    assert.equal(publishedKeepSeconds(token), 86400);
   });
 
-  it("choice B off: an idle league every six runs (three hours); on: every twelve (six hours)", () => {
-    assert.equal(PERIODIC_RUNS, 6);
-    assert.equal(periodicRuns(), 6);
-    assert.equal(periodicRuns(true), 12);
+  it("choice A without the job's token: nothing changes (the data an hour, so its pages hourly; the net six hours)", () => {
+    assert.equal(leagueDataKeepSeconds({}), KEEP_WITHOUT_ROUTE_SECONDS);
+    assert.equal(KEEP_WITHOUT_ROUTE_SECONDS, 3600);
+    assert.equal(safetyNetSeconds({}), SAFETY_NET_SECONDS);
+    assert.equal(publishedKeepSeconds({}), PUBLISHED_KEEP_SECONDS);
+  });
+
+  it("choice A off would give back six hours exactly", () => {
+    assert.equal(safetyNetSeconds(token, false), SAFETY_NET_SECONDS);
+    assert.equal(SAFETY_NET_SECONDS, 21600);
+  });
+
+  it("choice B on: an idle league every twelve runs (six hours); off would be every six (three hours)", () => {
+    assert.equal(PERIODIC_RUNS, 12);
+    assert.equal(periodicRuns(), 12);
+    assert.equal(periodicRuns(false), 6);
     const now = Date.parse("2026-11-09T12:07:00Z");
-    const turns = Array.from({ length: 24 }, (_, i) => periodicTurn("PL", now + i * RUN_MS)).filter(Boolean).length;
-    assert.equal(turns, 4, "four turns in twelve hours");
+    const turns = Array.from({ length: 48 }, (_, i) => periodicTurn("PL", now + i * RUN_MS)).filter(Boolean).length;
+    assert.equal(turns, 4, "four turns in a day");
   });
 
-  it("the pages the safety net covers carry the longer literal, so the entries they read set their clock (six hours while choice A is off)", () => {
-    const pages = ["[locale]/page.tsx", "[locale]/quiz/page.tsx", "[locale]/[league]/page.tsx", "[locale]/[league]/chances/[outcome]/page.tsx", "[locale]/[league]/team/[teamSlug]/chances/[outcome]/page.tsx", "[locale]/[league]/team/[teamSlug]/page.tsx", "[locale]/[league]/match/[matchSlug]/page.tsx"];
+  it("the pages the safety net covers carry the longer literal, so the entries they read set their clock (the outlook marker or pageClock)", () => {
+    const pages = ["[locale]/page.tsx", "[locale]/quiz/page.tsx", "[locale]/[league]/page.tsx", "[locale]/[league]/chances/[outcome]/page.tsx", "[locale]/[league]/team/[teamSlug]/chances/[outcome]/page.tsx", "[locale]/[league]/team/[teamSlug]/page.tsx"];
+    // The match page's literal is a settled game's 30 days (decision C, src/lib/settledMatch.ts); its live way reads
+    // the same outlook marker as the others.
+    assert.match(readFileSync(new URL("../app/[locale]/[league]/match/[matchSlug]/page.tsx", import.meta.url), "utf8"), /export const revalidate = 2592000;/);
     for (const page of pages) {
       const source = readFileSync(new URL(`../app/${page}`, import.meta.url), "utf8");
       assert.match(source, new RegExp(`export const revalidate = ${LONG_SAFETY_NET_SECONDS};`), page);

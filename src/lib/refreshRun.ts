@@ -5,6 +5,7 @@ import { fetchEspnDays, type EspnEvent } from "./espn.ts";
 import { freshLeagueData, getLeagueBase, type LeagueData } from "./leagueData.ts";
 import { activeSpan, refreshPlan, refreshReason, scoreboardVerdict, type CheckWhy, type RefreshReason } from "./leagueRefresh.ts";
 import { parsePublications, publicationState, publishedSource, publishedTag, type PublicationState, type PublishedSource } from "./publishedData.ts";
+import { matchSettledTag, settledFactsChanged } from "./settledMatch.ts";
 import { dataTag, outlookTag } from "./sharedOutlook.ts";
 
 /*
@@ -37,6 +38,8 @@ export interface RefreshResult {
   reason: RefreshReason;
   why: CheckWhy;
   via?: "scoreboard" | "season";
+  /** A settled game's own facts changed (a correction): its league's settled match pages were expired. */
+  settled?: boolean;
 }
 
 /**
@@ -86,7 +89,12 @@ export async function refreshLeagues({ only, full }: { only?: string; full?: boo
       deps.expire(dataTag(league.code));
       deps.expire(outlookTag(league.code));
     }
-    results.push({ league: league.code, reason, why: plan.why, via: "season" });
+    // Settled match pages (src/lib/settledMatch.ts) don't follow the league: only a correction of a settled game
+    // itself (its score, date or clubs) expires them, whatever else changed. Compared on every season downloaded:
+    // a club corrected on a game isn't something refreshVersion counts.
+    const settled = settledFactsChanged(cached, fresh, now);
+    if (settled) deps.expire(matchSettledTag(league.code));
+    results.push({ league: league.code, reason, why: plan.why, via: "season", ...(settled ? { settled: true } : {}) });
   };
   for (let i = 0; i < leagues.length; i += AT_ONCE) await Promise.all(leagues.slice(i, i + AT_ONCE).map(check));
   const refreshed = results.filter((r) => r.reason === "changed").map((r) => r.league);
