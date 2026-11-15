@@ -7,6 +7,7 @@ import { IntentLink } from "./IntentLink.tsx";
 import type { ProjectedHistory } from "../lib/projected.ts";
 import { Icon } from "./Icon.tsx";
 import { TeamBadge } from "./TeamBadge.tsx";
+import { unpackHistory, type PackedHistory } from "../lib/projectedPack.ts";
 import { ZONE_STYLES } from "./zones.ts";
 
 export interface ProjectedLabels {
@@ -39,7 +40,9 @@ export interface ProjectedLabels {
 }
 
 interface Props {
-  history: ProjectedHistory;
+  /** As objects, or packed by the server (src/lib/projectedPack.ts: a page carries far fewer bytes). */
+  history: ProjectedHistory | PackedHistory;
+  /** The clubs it names: id, names, code, crest and page are enough. */
   teams: Team[];
   /** Each entry's name in full ("Round 11 · 2 Nov") and in the round-by-round grid's header ("11", "Now"). */
   entryNames: { full: string; short: string }[];
@@ -52,7 +55,9 @@ interface Props {
  * club's move since the round before, and every club's projected place round
  * by round (tap a round to see its table).
  */
-export function ProjectedTable({ history, teams, entryNames, labels, locale }: Props) {
+export function ProjectedTable({ history: given, teams, entryNames, labels, locale }: Props) {
+  // The same objects whichever way they came (unpacked once).
+  const history = useMemo(() => unpackHistory(given), [given]);
   const { entries, tables, zones } = history;
   const [index, setIndex] = useState(entries.length - 1);
   const byId = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
@@ -177,7 +182,7 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
                   if (!club || !team) return null;
                   const zone = zoneOf(club.place);
                   return (
-                    <tr key={id} className={`border-t border-zinc-200/70 dark:border-zinc-800 ${zone ? ZONE_STYLES[zone].row : ""}`} data-testid="projected-row">
+                    <tr key={id} className={`row-line ${zone ? ZONE_STYLES[zone].row : ""}`} data-testid="projected-row">
                       <td className="py-2 pl-3 font-bold">{club.place}</td>
                       <td className="overflow-hidden py-2 pr-2">
                         <span className="flex min-w-0 items-center gap-2">
@@ -185,9 +190,9 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
                           <span className="min-w-0 truncate font-medium">{name(id)}</span>
                         </span>
                       </td>
-                      <td className="py-2 pr-2 text-right text-zinc-600 dark:text-zinc-400">{club.position}</td>
+                      <td className="projected-num">{club.position}</td>
                       <td className="py-2 pr-2 text-right font-semibold">{Math.round(club.averagePoints)}</td>
-                      <td className="hidden py-2 pr-2 text-right text-zinc-600 sm:table-cell dark:text-zinc-400">{club.chance !== undefined ? pct.format(club.chance) : "–"}</td>
+                      <td className="projected-chance">{club.chance !== undefined ? pct.format(club.chance) : "–"}</td>
                       <td className="py-2 pr-3 text-right text-xs">{move(id)}</td>
                     </tr>
                   );

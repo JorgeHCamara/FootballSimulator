@@ -13,16 +13,18 @@ const assert = require("node:assert/strict");
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 
 /**
- * Uncompressed bytes, the largest of EN, PT and ES. Before these pages were lightened: league 141 KB RSC /
- * 356 KB HTML, club 171 / 314, match 97 / 173, chance 100 / 177; when the budgets were set: league 84 / 245,
- * club 118 / 225, match 58 / 114, league chance 60 / 114, club chance 56 / 107.
+ * Uncompressed bytes, the largest of EN, PT and ES. Before PR #114: league 141 KB RSC / 356 KB HTML, club
+ * 171 / 314, match 97 / 173, chance 100 / 177. After it (2026-11-15): league 83 / 245, club 118 / 225, match
+ * 58 / 114, league chance 60 / 114, club chance 56 / 107. When these budgets were set (2026-11-15, after the
+ * footer, icons, club fixtures, chance race and projected history were drawn from compact data): league 63 /
+ * 192, club 65 / 157, match 41 / 89, league chance 28 / 75, club chance 32 / 76.
  */
 const BUDGETS = {
-  league: { path: "/premier-league", rsc: 92_000, html: 270_000 },
-  club: { path: "club", rsc: 130_000, html: 248_000 },
-  match: { path: "match", rsc: 64_000, html: 125_000 },
-  leagueChance: { path: "/premier-league/chances/title", rsc: 66_000, html: 126_000 },
-  clubChance: { path: "clubChance", rsc: 62_000, html: 118_000 },
+  league: { path: "/premier-league", rsc: 70_000, html: 212_000 },
+  club: { path: "club", rsc: 72_000, html: 173_000 },
+  match: { path: "match", rsc: 46_000, html: 99_000 },
+  leagueChance: { path: "/premier-league/chances/title", rsc: 32_000, html: 84_000 },
+  clubChance: { path: "clubChance", rsc: 36_000, html: 84_000 },
 };
 
 const size = async (url, headers = {}) => {

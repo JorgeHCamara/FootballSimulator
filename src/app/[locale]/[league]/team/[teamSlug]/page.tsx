@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { AdSlot } from "../../../../../components/AdSlot.ts";
 import { ClientMessages } from "../../../../../components/ClientMessages.tsx";
+import { ClubFixtureRows, type ClubFixtureRow, type FixtureOpponent } from "../../../../../components/ClubFixtureRows.tsx";
 import { Flag } from "../../../../../components/Flag.tsx";
 import { Icon, type IconName } from "../../../../../components/Icon.tsx";
 import { JsonLd } from "../../../../../components/JsonLd.tsx";
@@ -168,20 +169,6 @@ export default async function ClubPage({ params }: { params: Params }) {
       <span className="flex min-w-0 items-center gap-2">{name}</span>
     );
   };
-  const odds = (f: ClubFixture) => (
-    <div className="w-28 shrink-0 sm:w-40" aria-label={t("oddsLabel", { win: pct(f.win), draw: pct(f.draw), loss: pct(f.loss) })} role="img">
-      <div className="flex justify-between text-xs tabular-nums">
-        <span className="font-bold text-pitch-700 dark:text-pitch-300">{pct(f.win)}</span>
-        <span className="text-zinc-500">{pct(f.draw)}</span>
-        <span className="text-red-600 dark:text-red-400">{pct(f.loss)}</span>
-      </div>
-      <div className="odds-track">
-        <span className="bg-pitch-600" style={{ width: barWidth(f.win) }} />
-        <span className="bg-zinc-400" style={{ width: barWidth(f.draw) }} />
-        <span className="bg-red-500" style={{ width: barWidth(f.loss) }} />
-      </div>
-    </div>
-  );
   // Each game's own preview page (odds, likely scores, what each result means),
   // linked only inside the window search engines are pointed at (the rest are plain text).
   const preview = (f: ClubFixture) => {
@@ -198,6 +185,22 @@ export default async function ClubPage({ params }: { params: Params }) {
     ) : (
       <span className={className}>{content}</span>
     );
+  };
+  // The fixtures' rows as ClubFixtureRows draws them: each opponent once, each row its text and widths.
+  const fixtureRows = (fixtures: readonly ClubFixture[]) => {
+    const opponents: FixtureOpponent[] = [];
+    const index = new Map<TeamId, number>();
+    const rows = fixtures.map((f): ClubFixtureRow => {
+      let i = index.get(f.opponentId);
+      const other = teams.get(f.opponentId);
+      if (i === undefined) {
+        i = other ? opponents.push({ id: other.id, shortName: other.shortName, tla: other.tla, ...(other.crest ? { crest: other.crest } : {}), ...(other.page ? { page: other.page } : {}) }) - 1 : -1;
+        index.set(f.opponentId, i);
+      }
+      const date = new Date(f.fixture.utcDate);
+      return [f.fixture.id, shortDate.format(date), dateFormat.format(date), preview(f) ?? "", f.home ? 1 : 0, i, pct(f.win), pct(f.draw), pct(f.loss), barWidth(f.win), barWidth(f.draw), barWidth(f.loss), t("oddsLabel", { win: pct(f.win), draw: pct(f.draw), loss: pct(f.loss) })];
+    });
+    return { rows, opponents };
   };
   const keyGame = (f: ClubFixture) => (
     <li key={f.fixture.id} className="flex items-center gap-3 py-2">
@@ -474,21 +477,8 @@ export default async function ClubPage({ params }: { params: Params }) {
               </span>
             </div>
             <ul className="divide-y divide-zinc-200/70 dark:divide-zinc-800">
-              {club.fixtures.map((f) => (
-                <li key={f.fixture.id} className="flex items-center gap-2 px-3 py-2 text-sm sm:gap-3" data-testid="club-fixture">
-                  {withPreview(
-                    f,
-                    <>
-                      <span className="sm:hidden">{shortDate.format(new Date(f.fixture.utcDate))}</span>
-                      <span className="hidden sm:inline">{dateFormat.format(new Date(f.fixture.utcDate))}</span>
-                    </>,
-                    "w-9 shrink-0 text-xs tabular-nums text-zinc-500 sm:w-16",
-                  )}
-                  {venue(f)}
-                  <div className="min-w-0 flex-1">{opponent(f)}</div>
-                  {odds(f)}
-                </li>
-              ))}
+              {/* The same rows, drawn by a client component from their text alone (a far smaller RSC payload). */}
+              <ClubFixtureRows {...fixtureRows(club.fixtures)} labels={{ home: t("home"), away: t("away"), homeShort: t("homeShort"), awayShort: t("awayShort") }} />
             </ul>
           </div>
         )}

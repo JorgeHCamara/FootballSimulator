@@ -29,6 +29,182 @@ body {
   .footer-league {
     @apply flex items-center gap-1.5 text-zinc-600 hover:text-pitch-700 dark:text-zinc-400 dark:hover:text-pitch-100;
   }
+  /* Zone tints (src/components/zones.ts: a zone's `row`), on every row and cell of the tables. */
+  .zone-blue {
+    @apply bg-blue-100 dark:bg-blue-900/45;
+  }
+  .zone-sky {
+    @apply bg-sky-50 dark:bg-sky-700/35;
+  }
+  .zone-orange {
+    @apply bg-orange-100 dark:bg-orange-900/40;
+  }
+  .zone-emerald {
+    @apply bg-emerald-100 dark:bg-emerald-900/40;
+  }
+  .zone-amber {
+    @apply bg-amber-100 dark:bg-amber-900/40;
+  }
+  .zone-red {
+    @apply bg-red-100 dark:bg-red-900/40;
+  }
+  .zone-yellow {
+    @apply bg-yellow-100 dark:bg-yellow-900/35;
+  }
+  .zone-teal {
+    @apply bg-teal-50 dark:bg-teal-900/35;
+  }
+  .zone-red-soft {
+    @apply bg-red-50 dark:bg-red-950/40;
+  }
+  /* Icons (src/components/Icon.tsx): what each <svg> set as five attributes. */
+  .icon {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* A club's badge at each size the site draws (src/components/TeamBadge.tsx): its crest, or its code on a disc. */
+  .crest-16 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 16px;
+    height: 16px;
+  }
+  .crest-18 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 18px;
+    height: 18px;
+  }
+  .crest-20 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 20px;
+    height: 20px;
+  }
+  .crest-22 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 22px;
+    height: 22px;
+  }
+  .crest-24 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 24px;
+    height: 24px;
+  }
+  .crest-28 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 28px;
+    height: 28px;
+  }
+  .crest-32 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 32px;
+    height: 32px;
+  }
+  .crest-40 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 40px;
+    height: 40px;
+  }
+  .crest-44 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 44px;
+    height: 44px;
+  }
+  .crest-56 {
+    flex-shrink: 0;
+    object-fit: contain;
+    width: 56px;
+    height: 56px;
+  }
+  .disc-16 {
+    width: 16px;
+    height: 16px;
+    font-size: 5.76px;
+  }
+  .disc-18 {
+    width: 18px;
+    height: 18px;
+    font-size: 6.48px;
+  }
+  .disc-20 {
+    width: 20px;
+    height: 20px;
+    font-size: 7.2px;
+  }
+  .disc-22 {
+    width: 22px;
+    height: 22px;
+    font-size: 7.92px;
+  }
+  .disc-24 {
+    width: 24px;
+    height: 24px;
+    font-size: 8.64px;
+  }
+  .disc-28 {
+    width: 28px;
+    height: 28px;
+    font-size: 10.08px;
+  }
+  .disc-32 {
+    width: 32px;
+    height: 32px;
+    font-size: 11.52px;
+  }
+  .disc-40 {
+    width: 40px;
+    height: 40px;
+    font-size: 14.4px;
+  }
+  .disc-44 {
+    width: 44px;
+    height: 44px;
+    font-size: 15.84px;
+  }
+  .disc-56 {
+    width: 56px;
+    height: 56px;
+    font-size: 20.16px;
+  }
+  .hue-0 {
+    background: hsl(210 60% 30%);
+  }
+  .hue-1 {
+    background: hsl(0 60% 30%);
+  }
+  .hue-2 {
+    background: hsl(140 60% 30%);
+  }
+  .hue-3 {
+    background: hsl(30 60% 30%);
+  }
+  .hue-4 {
+    background: hsl(270 60% 30%);
+  }
+  .hue-5 {
+    background: hsl(180 60% 30%);
+  }
+  .hue-6 {
+    background: hsl(330 60% 30%);
+  }
+  .hue-7 {
+    background: hsl(60 60% 30%);
+  }
+  .hue-8 {
+    background: hsl(100 60% 30%);
+  }
+  .hue-9 {
+    background: hsl(240 60% 30%);
+  }
   /* A club without a crest: its code on a coloured disc (src/components/TeamBadge.tsx), on every table and list. */
   .team-disc {
     @apply inline-flex shrink-0 items-center justify-center rounded-full font-bold text-white;
@@ -65,7 +241,36 @@ body {
     @apply flex h-11 w-11 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 sm:h-8 sm:w-8 dark:hover:bg-zinc-800 dark:hover:text-zinc-100;
   }
   .score-box {
-    @apply h-9 w-10 rounded-md border text-center text-base font-bold tabular-nums outline-none;
+    @apply h-9 w-10 rounded-md border text-center text-base font-bold tabular-nums outline-none focus:border-pitch-500 focus:ring-2 focus:ring-pitch-500/30 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  /* A score typed (or not): its border and background; .score-box's :focus border is the more specific, as before. */
+  .score-set {
+    @apply border-pitch-500/60 bg-pitch-50 dark:bg-pitch-900/40;
+  }
+  .score-empty {
+    @apply border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950;
+  }
+  /* A table row's line, and the standings' and projected table's cells. */
+  .row-line {
+    @apply border-t border-zinc-200/70 dark:border-zinc-800;
+  }
+  .standings-opt {
+    @apply px-1.5 py-2 text-center tabular-nums hidden sm:table-cell;
+  }
+  .standings-place {
+    @apply py-2 pl-3 font-semibold tabular-nums text-zinc-600 dark:text-zinc-300;
+  }
+  .standings-club {
+    @apply min-w-0 truncate font-medium hover:underline;
+  }
+  .form-dot {
+    @apply h-2.5 w-2.5 rounded-full;
+  }
+  .projected-num {
+    @apply py-2 pr-2 text-right text-zinc-600 dark:text-zinc-400;
+  }
+  .projected-chance {
+    @apply hidden py-2 pr-2 text-right text-zinc-600 sm:table-cell dark:text-zinc-400;
   }
   .select-option {
     @apply bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100;

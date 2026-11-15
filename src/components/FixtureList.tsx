@@ -471,11 +471,10 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
   };
 
   const showInputs = !locked || editing;
-  // The box (.score-box, src/app/globals.css); the focus colours stay utilities, so they still win over inputTone's.
-  const scoreBox = "score-box focus:border-pitch-500 focus:ring-2 focus:ring-pitch-500/30";
-  const inputTone = prediction
-    ? "border-pitch-500/60 bg-pitch-50 dark:bg-pitch-900/40"
-    : "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950";
+  // The box and its tone (src/app/globals.css: .score-box, .score-set or .score-empty, whose :focus colours win over
+  // their own borders, as the utilities did).
+  const scoreBox = "score-box";
+  const inputTone = prediction ? "score-set" : "score-empty";
 
   return (
     <li
@@ -521,7 +520,7 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
                 min={0}
                 max={99}
                 aria-label={t("homeGoals", { team: home.name })}
-                className={`${scoreBox} ${inputTone} disabled:cursor-not-allowed disabled:opacity-50`}
+                className={`${scoreBox} ${inputTone}`}
                 disabled={disabled}
                 value={draft.home}
                 onChange={(e) => update("home", e.target.value)}
@@ -533,7 +532,7 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
                 min={0}
                 max={99}
                 aria-label={t("awayGoals", { team: away.name })}
-                className={`${scoreBox} ${inputTone} disabled:cursor-not-allowed disabled:opacity-50`}
+                className={`${scoreBox} ${inputTone}`}
                 disabled={disabled}
                 value={draft.away}
                 onChange={(e) => update("away", e.target.value)}
