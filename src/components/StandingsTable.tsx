@@ -43,7 +43,7 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
   const t = useTranslations("Simulator");
   const tz = useTranslations("Zones");
   const cell = "standings-cell";
-  const optional = `${cell} hidden sm:table-cell`;
+  const optional = "standings-opt";
 
   return (
     <div>
@@ -93,15 +93,15 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
                   data-testid="standings-row"
                   data-zone={zone?.kind ?? ""}
                   title={zone ? tz(zone.kind) : undefined}
-                  className={`border-t border-zinc-200/70 dark:border-zinc-800 ${zone ? ZONE_STYLES[zone.kind].row : ""}`}
+                  className={`row-line ${zone ? ZONE_STYLES[zone.kind].row : ""}`}
                 >
-                  <td className="py-2 pl-3 font-semibold tabular-nums text-zinc-600 dark:text-zinc-300">{row.position}</td>
+                  <td className="standings-place">{row.position}</td>
                   <td className="py-2">
                     <span className="flex min-w-0 items-center gap-2">
                       <TeamBadge team={team} />
                       {team.page ? (
                         // The club's own page (chances, fixtures and odds).
-                        <IntentLink href={team.page} className="min-w-0 truncate font-medium hover:underline" data-testid="club-link">
+                        <IntentLink href={team.page} className="standings-club" data-testid="club-link">
                           <span className="sm:hidden">{team.shortName}</span>
                           <span className="hidden sm:inline">{team.name}</span>
                         </IntentLink>
@@ -146,7 +146,7 @@ export function StandingsTable({ league, rows, teams, zonePositions, qualified, 
                   <td className="hidden py-2 pr-3 lg:table-cell">
                     <span className="flex gap-1">
                       {row.form.map((f, i) => (
-                        <span key={i} title={f} className={`h-2.5 w-2.5 rounded-full ${FORM_STYLES[f]}`} />
+                        <span key={i} title={f} className={`form-dot ${FORM_STYLES[f]}`} />
                       ))}
                     </span>
                   </td>

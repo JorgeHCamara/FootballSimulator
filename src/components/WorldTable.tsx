@@ -119,7 +119,7 @@ export function WorldTable({
               return (
                 <tr
                   key={row.clubId}
-                  className={`border-t border-zinc-200/70 dark:border-zinc-800 ${zone ? ZONE_STYLES[zone].row : own ? "bg-pitch-50 dark:bg-pitch-900/30" : ""} ${own ? "font-semibold" : ""}`}
+                  className={`row-line ${zone ? ZONE_STYLES[zone].row : own ? "bg-pitch-50 dark:bg-pitch-900/30" : ""} ${own ? "font-semibold" : ""}`}
                   data-testid="world-row"
                   data-club={row.clubId}
                   data-zone={zone ?? ""}

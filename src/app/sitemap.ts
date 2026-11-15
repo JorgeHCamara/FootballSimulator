@@ -17,7 +17,7 @@ export const revalidate = 86400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = Date.now();
-  const [{ clubs, matches, chances, results }, reports] = await Promise.all([clubAndMatchPaths(now), reportPaths()]);
+  const [{ clubs, matches, chances, results, settled }, reports] = await Promise.all([clubAndMatchPaths(now), reportPaths()]);
   const reportDates = new Map(reports.rounds.map((r) => [r.path, r.date]));
   // When each address last really changed (src/lib/sitemapDates.ts): none is stamped with the moment the sitemap was built.
   const dates: SitemapDates = {
@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     rounds: reportDates,
     latestReports: new Map(reports.latest.map((r) => [r.path, r.date])),
     home: HOME_LEAGUES.flatMap((code) => LEAGUES.filter((l) => l.code === code).map((l) => l.slug)),
+    settled,
     now,
   };
   const isClub = new Set(clubs);

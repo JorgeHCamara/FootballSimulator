@@ -7,6 +7,7 @@ import type { Fixture, Team } from "../engine/types.ts";
 import { cachedLeagueOutlook, dataVersion, outlookFromRun, outlookSetup, type LeagueOutlook } from "./clubOutlook.ts";
 import { loadClub } from "./clubPage.ts";
 import { withClubPages } from "./clubs.ts";
+import { safetyNetSeconds } from "./costChoices.ts";
 import { getLeagueData, KEEP_WITH_ROUTE_SECONDS, leagueDataKeepSeconds, withRetry, type LeagueData } from "./leagueData.ts";
 import { authorized, refreshReason } from "./leagueRefresh.ts";
 import { SCENARIO_ITERATIONS, SCENARIO_SEED } from "./scenario.ts";
@@ -110,8 +111,9 @@ describe("refreshing a league's pages together", () => {
 
   it("keeps a league's cached data for hours while the route brings new results in, an hour without it", () => {
     assert.equal(leagueDataKeepSeconds({}), 3600);
-    assert.equal(leagueDataKeepSeconds({ REVALIDATE_TOKEN: "s3cret" }), KEEP_WITH_ROUTE_SECONDS);
-    assert.ok(KEEP_WITH_ROUTE_SECONDS >= 6 * 3600);
+    // Six hours, or 24 with choice A (src/lib/costChoices.ts).
+    assert.equal(leagueDataKeepSeconds({ REVALIDATE_TOKEN: "s3cret" }), safetyNetSeconds({ REVALIDATE_TOKEN: "s3cret" }));
+    assert.ok(leagueDataKeepSeconds({ REVALIDATE_TOKEN: "s3cret" }) >= KEEP_WITH_ROUTE_SECONDS);
   });
 
   it("only with the site's token", () => {

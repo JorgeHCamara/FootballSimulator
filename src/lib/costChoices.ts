@@ -1,7 +1,7 @@
 /*
- * Two ways to spend less on Vercel that cost freshness, each off until turned
- * on here. Nothing else needs changing to turn one on: the tests that pin
- * today's clocks read these constants.
+ * Ways to spend less on Vercel that cost freshness, each a constant here.
+ * Choices A and B were turned on by Jorge on 2026-11-15; turning one off again
+ * needs nothing else (the tests that pin the clocks read these constants).
  *
  * CHOICE A, LONGER_SAFETY_NET: the safety net under the refresh job, from
  * six hours to 24, when REVALIDATE_TOKEN is set (the job is what brings new
@@ -36,11 +36,11 @@
  * Results, live scores and anything around a game's kick-off are unchanged.
  */
 
-/** Choice A: a 24-hour safety net under the refresh job instead of six hours (see above). Off. */
-export const LONGER_SAFETY_NET = false;
+/** Choice A: a 24-hour safety net under the refresh job instead of six hours (see above). On: Jorge's decision of 2026-11-15. */
+export const LONGER_SAFETY_NET = true;
 
-/** Choice B: idle leagues checked every six hours instead of three (see above). Off. */
-export const SLOWER_IDLE_TURN = false;
+/** Choice B: idle leagues checked every six hours instead of three (see above). On: Jorge's decision of 2026-11-15. */
+export const SLOWER_IDLE_TURN = true;
 
 /** The safety net under the refresh job, without choice A. */
 export const SAFETY_NET_SECONDS = 21600;
@@ -58,3 +58,18 @@ export function safetyNetSeconds(env: Record<string, string | undefined> = proce
 
 /** An idle league's periodic check: one run in this many (runs are 30 minutes apart). */
 export const periodicRuns = (slower: boolean = SLOWER_IDLE_TURN) => (slower ? 12 : 6);
+
+/*
+ * DECISION C, settled match pages (Jorge, 2026-11-15): a match page whose game
+ * has its final score and kicked off more than SETTLED_MATCH_DAYS days ago is
+ * built from a frozen record of that game (src/lib/settledMatch.ts): the
+ * result, the pre-match odds, xG and likely scores, and both clubs' table rows
+ * as they stood just after it. It no longer follows its league's results, so a
+ * new result elsewhere in the league doesn't rebuild it; only a correction of
+ * the game itself (its score, date or clubs, which the refresh job watches)
+ * does, or its 30-day revalidate. The tradeoff: its two club cards stop
+ * showing the clubs' current position, points and form (they say "after this
+ * match" and link to the club pages, which keep the live numbers). Shorter
+ * keeps more pages following the league (more rebuilds); longer freezes later.
+ */
+export const SETTLED_MATCH_DAYS = 7;
