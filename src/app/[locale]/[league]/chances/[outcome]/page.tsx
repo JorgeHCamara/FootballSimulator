@@ -17,8 +17,14 @@ import { loadLeague, type LoadedLeague } from "../../../../../lib/clubPage.ts";
 import { latestReportPath, readSnapshots, seasonReports } from "../../../../../lib/oddsReports.ts";
 import { OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd } from "../../../../../lib/site.ts";
 
-/** As the league page: rebuilt when the league's results change, else every six hours at most (ISR). */
-export const revalidate = 21600;
+/**
+ * As the league page: rebuilt when the league's results change, else every six hours at most (ISR).
+ * Its own literal is the longest it may go (Next only takes a literal here): what it
+ * reads sets the real clock, six hours (24 with choice A, src/lib/costChoices.ts: the
+ * league's data and the outlook marker are kept that long, and a page follows the
+ * shortest-lived entry it reads).
+ */
+export const revalidate = 86400;
 /** Room for the shared outlook on a cold server (see the club page). */
 export const maxDuration = 60;
 

@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { Flag } from "../../../../../components/Flag.tsx";
+import { ClientMessages } from "../../../../../components/ClientMessages.tsx";
 import { LeagueSimulator } from "../../../../../components/LeagueSimulator.tsx";
 import { ShareMenu } from "../../../../../components/ShareMenu.tsx";
 import { getLeagueBySlug } from "../../../../../config/leagues.ts";
+import { SHARE_PAGE_SCOPE } from "../../../../../i18n/clientMessages.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
+import { packFixtures } from "../../../../../lib/fixturePack.ts";
 import { domesticPriors, leagueMatchParams } from "../../../../../lib/priors.ts";
 import { loadSharedScenario } from "../../../../../lib/sharedScenario.ts";
 import { alternates, OG_LOCALE, SITE_NAME } from "../../../../../lib/site.ts";
@@ -68,7 +71,7 @@ export default async function SharePage({ params }: { params: Params }) {
   };
   const cta = "flex h-11 items-center justify-center rounded-lg px-4 text-sm font-semibold";
 
-  return (
+  const page = (
     <div className="space-y-6" data-testid="share-page">
       <header className="space-y-3">
         <span className="inline-flex rounded-full bg-pitch-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-pitch-700 dark:bg-pitch-900/40 dark:text-pitch-100">
@@ -99,7 +102,7 @@ export default async function SharePage({ params }: { params: Params }) {
       <LeagueSimulator
         league={league}
         teams={data.teams}
-        fixtures={data.fixtures}
+        fixtures={packFixtures(data.fixtures)}
         seasonKey={data.seasonKey}
         season={data.season}
         scenario={predictions}
@@ -118,4 +121,5 @@ export default async function SharePage({ params }: { params: Params }) {
       </div>
     </div>
   );
+  return <ClientMessages scope={SHARE_PAGE_SCOPE}>{page}</ClientMessages>;
 }

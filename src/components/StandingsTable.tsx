@@ -42,7 +42,7 @@ interface Props {
 export function StandingsTable({ league, rows, teams, zonePositions, qualified, qualifiedNote, deductions, carried, note, zoneByTeam }: Props) {
   const t = useTranslations("Simulator");
   const tz = useTranslations("Zones");
-  const cell = "px-1.5 py-2 text-center tabular-nums";
+  const cell = "standings-cell";
   const optional = `${cell} hidden sm:table-cell`;
 
   return (

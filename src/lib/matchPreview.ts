@@ -12,6 +12,7 @@ import { hasClubPages } from "./clubs.ts";
 import { fetchEspnGameState, type EspnGameState } from "./espn.ts";
 import { getLeagueData, getPastSeasonData, noDataCache, type LeagueData } from "./leagueData.ts";
 import { findMatch, slugDate, type MatchRef } from "./matches.ts";
+import { SAFETY_NET_SECONDS, safetyNetSeconds } from "./costChoices.ts";
 
 /** Where a game stands when its page is rendered. */
 export type MatchState = "upcoming" | "live" | "played" | "off";
@@ -123,6 +124,26 @@ export async function settledGameState(code: string, slug: string, eventId: numb
   }
 }
 
+/**
+ * With choice A (src/lib/costChoices.ts: a 24-hour safety net), a game due
+ * within that long, or under way, keeps its page on six hours: match day
+ * starts six hours before kick-off, and a page kept 24 hours from the day
+ * before would miss it (the live score, the final one). A tiny entry kept six
+ * hours, read only then: without choice A every page already follows six
+ * hours, and nothing is read.
+ */
+export async function matchDayClock(code: string, kickoff: string, now = Date.now(), net = safetyNetSeconds()): Promise<boolean> {
+  if (net <= SAFETY_NET_SECONDS) return false;
+  const time = Date.parse(kickoff);
+  if (time - MATCH_DAY_BEFORE - net * 1000 > now || now > time + MATCH_DAY_AFTER) return false;
+  try {
+    await unstable_cache(async () => code, ["match-day-clock", code], { revalidate: SAFETY_NET_SECONDS })();
+  } catch (error) {
+    if (!noDataCache(error)) throw error;
+  }
+  return true;
+}
+
 const seasonLabel = (data: LeagueData) => (data.tournaments ? (data.season.split(" ").at(-1) ?? data.season) : data.season);
 
 const preMatchModels = new Map<string, LeagueModel>();
@@ -176,6 +197,9 @@ export const locateMatch = cache(async (leagueSlug: string, slug: string): Promi
   if ("moved" in found) return { moved: found.moved.path };
   const { match } = found;
   const { fixture } = match;
+
+  // Choice A only: a game due within a day keeps its page on six hours (see matchDayClock).
+  if (!fixture.result) await matchDayClock(league.code, fixture.utcDate);
 
   // Match day: the game's own state, fresher than the league's data.
   let result = fixture.result;

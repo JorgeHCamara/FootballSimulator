@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { AdSlot } from "../../../../components/AdSlot.ts";
+import { ClientMessages } from "../../../../components/ClientMessages.tsx";
 import { Flag } from "../../../../components/Flag.tsx";
 import { Icon } from "../../../../components/Icon.tsx";
 import { JsonLd } from "../../../../components/JsonLd.tsx";
 import { PastWinners } from "../../../../components/PastWinners.tsx";
 import { CUPS, getCupBySlug } from "../../../../config/cups.ts";
 import { getLeagueBySlug, type SiteLocale } from "../../../../config/leagues.ts";
+import { PAST_WINNERS_SCOPE } from "../../../../i18n/clientMessages.ts";
 import { Link } from "../../../../i18n/navigation.ts";
 import { routing } from "../../../../i18n/routing.ts";
 import { OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../lib/site.ts";
@@ -135,7 +137,9 @@ export default async function PastWinnersPage({ params }: { params: Params }) {
         </span>
       </div>
 
-      <PastWinners rows={rows} comingSoon={rows.length === 0} />
+      <ClientMessages scope={PAST_WINNERS_SCOPE}>
+        <PastWinners rows={rows} comingSoon={rows.length === 0} />
+      </ClientMessages>
 
       {/* The same reserved placement as the league and club pages: nothing unless the slots are turned on (src/lib/adSlots.ts). */}
       <AdSlot kind="inContent" />

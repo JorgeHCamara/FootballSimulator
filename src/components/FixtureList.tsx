@@ -100,7 +100,7 @@ export function FixtureList(props: Props) {
           aria-label={t("fixtures")}
         >
           {matchdays.map((md) => (
-            <option key={md} value={md} className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+            <option key={md} value={md} className="select-option">
               {md === PLAYOFF_MATCHDAY ? t(playoff?.knockout ? "knockoutPhase" : "playoffs") : md === PLAYOUT_MATCHDAY ? t("playOut") : (roundLabels?.[md] ?? t("matchday", { number: md }))}
             </option>
           ))}
@@ -435,8 +435,7 @@ function parseGoals(text: string): number | null {
 }
 
 /** A row's icon buttons (preview, dice): 44px on phones, 32px from tablets up. */
-const actionButton =
-  "flex h-11 w-11 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 sm:h-8 sm:w-8 dark:hover:bg-zinc-800 dark:hover:text-zinc-100";
+const actionButton = "fixture-action";
 
 /** A club's short name, linking to its own page when it has one (prefetched on intent: a matchday puts twenty on screen). */
 function TeamName({ team }: { team: Team }) {
@@ -472,8 +471,8 @@ export function MatchRow({ fixture, home, away, prediction, onScore, onSimulate,
   };
 
   const showInputs = !locked || editing;
-  const scoreBox =
-    "h-9 w-10 rounded-md border text-center text-base font-bold tabular-nums outline-none focus:border-pitch-500 focus:ring-2 focus:ring-pitch-500/30";
+  // The box (.score-box, src/app/globals.css); the focus colours stay utilities, so they still win over inputTone's.
+  const scoreBox = "score-box focus:border-pitch-500 focus:ring-2 focus:ring-pitch-500/30";
   const inputTone = prediction
     ? "border-pitch-500/60 bg-pitch-50 dark:bg-pitch-900/40"
     : "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950";

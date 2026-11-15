@@ -249,7 +249,7 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
                       if (!team) return null;
                       return (
                         <tr key={id}>
-                          <th scope="row" className="sticky left-0 z-10 max-w-36 border-r border-t border-r-zinc-200 border-t-zinc-200/70 bg-white px-2 py-1 text-left font-medium dark:border-r-zinc-800 dark:border-t-zinc-800 dark:bg-zinc-900">
+                          <th scope="row" className="projected-row-head">
                             <span className="flex min-w-0 items-center gap-1.5">
                               <TeamBadge team={team} size={16} />
                               <span className="truncate">{name(id, true)}</span>
@@ -261,7 +261,7 @@ export function ProjectedTable({ history, teams, entryNames, labels, locale }: P
                             return (
                               <td
                                 key={i}
-                                className={`border-t border-zinc-200/70 px-1 py-1 text-center dark:border-zinc-800 ${e.modelChange ? "border-l-2 border-l-zinc-400 dark:border-l-zinc-500" : ""} ${zone ? ZONE_STYLES[zone].row : ""} ${i === index ? "font-extrabold outline outline-1 -outline-offset-1 outline-pitch-600" : ""}`}
+                                className={`projected-cell ${e.modelChange ? "border-l-2 border-l-zinc-400 dark:border-l-zinc-500" : ""} ${zone ? ZONE_STYLES[zone].row : ""} ${i === index ? "font-extrabold outline outline-1 -outline-offset-1 outline-pitch-600" : ""}`}
                               >
                                 {place ?? "–"}
                               </td>

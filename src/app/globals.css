@@ -18,6 +18,66 @@ body {
   @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
 }
 
+/*
+ * Classes repeated on every page, as one short name each: the page's HTML and
+ * its RSC data carry the class once per element, so fifty links with six
+ * utilities each were kilobytes on every page (components layer: a utility on
+ * the same element still wins, as before).
+ */
+@layer components {
+  /* The footer's competition links (src/components/SiteFooter.tsx). */
+  .footer-league {
+    @apply flex items-center gap-1.5 text-zinc-600 hover:text-pitch-700 dark:text-zinc-400 dark:hover:text-pitch-100;
+  }
+  /* A club without a crest: its code on a coloured disc (src/components/TeamBadge.tsx), on every table and list. */
+  .team-disc {
+    @apply inline-flex shrink-0 items-center justify-center rounded-full font-bold text-white;
+  }
+  /* A club page's fixtures: home or away, its odds bar, and the league's other clubs. */
+  .venue-home,
+  .venue-away {
+    @apply inline-flex h-5 w-5 shrink-0 items-center justify-center rounded text-[10px] font-bold;
+  }
+  /* (The page's own classes also named text-pitch-800, a shade the theme doesn't define: it never set a colour, so it isn't here.) */
+  .venue-home {
+    @apply bg-pitch-100 dark:bg-pitch-900/50 dark:text-pitch-100;
+  }
+  .venue-away {
+    @apply bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200;
+  }
+  .odds-track {
+    @apply mt-1 flex h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700;
+  }
+  .club-tile {
+    @apply flex min-w-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800;
+  }
+  /* The simulator's tables and fixtures (StandingsTable, ProjectedTable, FixtureList), a row or cell at a time. */
+  .standings-cell {
+    @apply px-1.5 py-2 text-center tabular-nums;
+  }
+  .projected-row-head {
+    @apply sticky left-0 z-10 max-w-36 border-r border-t border-r-zinc-200 border-t-zinc-200/70 bg-white px-2 py-1 text-left font-medium dark:border-r-zinc-800 dark:border-t-zinc-800 dark:bg-zinc-900;
+  }
+  .projected-cell {
+    @apply border-t border-zinc-200/70 px-1 py-1 text-center dark:border-zinc-800;
+  }
+  .fixture-action {
+    @apply flex h-11 w-11 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 sm:h-8 sm:w-8 dark:hover:bg-zinc-800 dark:hover:text-zinc-100;
+  }
+  .score-box {
+    @apply h-9 w-10 rounded-md border text-center text-base font-bold tabular-nums outline-none;
+  }
+  .select-option {
+    @apply bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100;
+  }
+  /* A 16px flag from the sprite (FooterFlag): what <Flag width={16}> sets inline. */
+  .flag-16 {
+    border-radius: 1.6px;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08);
+    flex-shrink: 0;
+  }
+}
+
 /* Hide number input spinners: scores are typed or simulated. */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {

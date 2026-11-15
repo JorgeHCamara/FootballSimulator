@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { AdSlot } from "../../../components/AdSlot.ts";
+import { ClientMessages } from "../../../components/ClientMessages.tsx";
 import { CupSimulator } from "../../../components/CupSimulator.tsx";
 import { LeagueFactsSection } from "../../../components/LeagueFactsSection.tsx";
 import { ProjectedSection } from "../../../components/ProjectedSection.tsx";
@@ -14,15 +15,18 @@ import { TournamentSwitch } from "../../../components/TournamentSwitch.tsx";
 import { COMPETITIONS, getCompetitionBySlug, type CompetitionConfig } from "../../../config/competitions.ts";
 import type { CupConfig } from "../../../config/cups.ts";
 import type { LeagueConfig, SiteLocale } from "../../../config/leagues.ts";
+import { CUP_SCOPE, LEAGUE_SCOPE } from "../../../i18n/clientMessages.ts";
 import { Link } from "../../../i18n/navigation.ts";
 import { IntentLink } from "../../../components/IntentLink.tsx";
 import { routing } from "../../../i18n/routing.ts";
 import { getCupData, type CupData } from "../../../lib/cupData.ts";
 import { getContinentalPriors, getExternalSeeds } from "../../../lib/continental.ts";
 import { getLeagueData, type LeagueData } from "../../../lib/leagueData.ts";
+import { packFixtures } from "../../../lib/fixturePack.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates, faqJsonLd, fill, type FaqItem } from "../../../lib/site.ts";
 import { Icon } from "../../../components/Icon.tsx";
 import { hasClubPages } from "../../../lib/clubs.ts";
+import { pageClock } from "../../../lib/sharedOutlook.ts";
 import { latestReportPath, readSnapshots, seasonReports } from "../../../lib/oddsReports.ts";
 import { leagueChancePath, snapshotOutcomeKey, snapshotOutcomes } from "../../../lib/chancePages.ts";
 import { hasPastWinners, pastWinnersPath } from "../../../lib/winnersData.ts";
@@ -30,8 +34,12 @@ import { hasPastWinners, pastWinnersPath } from "../../../lib/winnersData.ts";
 /**
  * Rebuilt when the league's results change, else every six hours at most:
  * the league's data is only replaced when new results are in (/api/revalidate/leagues revalidates its tags; see leagueDataKeepSeconds), and a league whose data is kept an hour (no route, football-data.org, the cups) still refreshes hourly through its fetches.
+ * Its own literal is the longest it may go (Next only takes a literal here): what it
+ * reads sets the real clock, six hours (24 with choice A, src/lib/costChoices.ts: the
+ * league's data and the outlook marker are kept that long, and a page follows the
+ * shortest-lived entry it reads).
  */
-export const revalidate = 21600;
+export const revalidate = 86400;
 
 type Params = Promise<{ locale: string; league: string }>;
 
@@ -157,6 +165,10 @@ export default async function LeaguePage({ params }: { params: Params }) {
   setRequestLocale(locale);
   const loaded = await load(slug);
   if (!loaded) notFound();
+  // A cup's or a continental competition's page reads no outlook marker (the safety net every page with club
+  // pages reads, see markPage), and a render that shares another language's load in flight (a build) reads no
+  // entry of its own: the net, as before this page's literal became the longer one.
+  if (loaded.kind === "cup" || !hasClubPages(loaded.config)) await pageClock(loaded.config.code);
 
   // The latest "what changed" report (domestic leagues with snapshots), and the chance pages its places make.
   const latestSnapshot =
@@ -340,41 +352,44 @@ export default async function LeaguePage({ params }: { params: Params }) {
         )}
       </header>
 
-      {loaded.kind === "cup" ? (
-        <CupSimulator cup={loaded.config} data={loaded.data} />
-      ) : loaded.data.tournaments && loaded.config.annual ? (
-        // Several tournaments a season (Argentina): a switch between them and the annual table.
-        <TournamentSwitch
-          league={{ ...loaded.config, annual: loaded.config.annual }}
-          teams={leagueTeams}
-          tournaments={loaded.data.tournaments}
-          current={loaded.data.tournaments.find((x) => x.seasonKey === loaded.data.seasonKey)?.id ?? loaded.data.tournaments[0]!.id}
-          {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
-          {...(priorStrengths ? { priorStrengths } : {})}
-          {...(matchParams ? { matchParams } : {})}
-          {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
-          {...(pastWinners ? { pastWinners } : {})}
-          {...(loaded.config.promotionPath && loaded.data.seasonYear !== undefined ? { seasonYear: loaded.data.seasonYear } : {})}
-          {...(loaded.data.promotionGames ? { promotionGames: loaded.data.promotionGames } : {})}
-        />
-      ) : (
-        <LeagueSimulator
-          league={loaded.config}
-          teams={leagueTeams}
-          fixtures={loaded.data.fixtures}
-          seasonKey={loaded.data.seasonKey}
-          season={loaded.data.season}
-          {...(loaded.data.postseason ? { postseason: loaded.data.postseason } : {})}
-          {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
-          {...(priorStrengths ? { priorStrengths } : {})}
-          {...(matchParams ? { matchParams } : {})}
-          {...(external ? { externalSeeds: external.rows } : {})}
-          {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
-          {...(loaded.data.firstPhaseIds ? { firstPhaseIds: loaded.data.firstPhaseIds } : {})}
-          {...(loaded.data.fallbackOrder ? { fallbackOrder: loaded.data.fallbackOrder } : {})}
-          {...(pastWinners ? { pastWinners } : {})}
-        />
-      )}
+      {/* The simulator's messages: a cup's or a league's (src/i18n/clientMessages.ts). */}
+      <ClientMessages scope={loaded.kind === "cup" ? CUP_SCOPE : LEAGUE_SCOPE}>
+        {loaded.kind === "cup" ? (
+          <CupSimulator cup={loaded.config} data={loaded.data} />
+        ) : loaded.data.tournaments && loaded.config.annual ? (
+          // Several tournaments a season (Argentina): a switch between them and the annual table.
+          <TournamentSwitch
+            league={{ ...loaded.config, annual: loaded.config.annual }}
+            teams={leagueTeams}
+            tournaments={loaded.data.tournaments}
+            current={loaded.data.tournaments.find((x) => x.seasonKey === loaded.data.seasonKey)?.id ?? loaded.data.tournaments[0]!.id}
+            {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
+            {...(priorStrengths ? { priorStrengths } : {})}
+            {...(matchParams ? { matchParams } : {})}
+            {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
+            {...(pastWinners ? { pastWinners } : {})}
+            {...(loaded.config.promotionPath && loaded.data.seasonYear !== undefined ? { seasonYear: loaded.data.seasonYear } : {})}
+            {...(loaded.data.promotionGames ? { promotionGames: loaded.data.promotionGames } : {})}
+          />
+        ) : (
+          <LeagueSimulator
+            league={loaded.config}
+            teams={leagueTeams}
+            fixtures={packFixtures(loaded.data.fixtures)}
+            seasonKey={loaded.data.seasonKey}
+            season={loaded.data.season}
+            {...(loaded.data.postseason ? { postseason: loaded.data.postseason } : {})}
+            {...(loaded.data.groups ? { groups: loaded.data.groups } : {})}
+            {...(priorStrengths ? { priorStrengths } : {})}
+            {...(matchParams ? { matchParams } : {})}
+            {...(external ? { externalSeeds: external.rows } : {})}
+            {...(loaded.data.deductions ? { deductions: loaded.data.deductions } : {})}
+            {...(loaded.data.firstPhaseIds ? { firstPhaseIds: loaded.data.firstPhaseIds } : {})}
+            {...(loaded.data.fallbackOrder ? { fallbackOrder: loaded.data.fallbackOrder } : {})}
+            {...(pastWinners ? { pastWinners } : {})}
+          />
+        )}
+      </ClientMessages>
 
       {loaded.kind === "league" && hasClubPages(loaded.config) && <ProjectedSection league={loaded.config} data={loaded.data} locale={locale as SiteLocale} />}
 
