@@ -1034,6 +1034,7 @@
     "played": "Played",
     "form": "Form",
     "formEmpty": "No games yet",
+    "afterMatch": "After this match",
     "impactTitle": "What this result means",
     "impactNote": "Each result played out over {count} simulated seasons, with its likeliest score; every other game is simulated the same way each time, so the change is this result's alone.",
     "impactNow": "Now",

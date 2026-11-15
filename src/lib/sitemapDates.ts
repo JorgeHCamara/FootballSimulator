@@ -8,6 +8,9 @@ import type { Fixture } from "../engine/types.ts";
  * when what it shows last really changed, or nothing when that isn't known:
  * - a league's club, match and chance pages: the league's latest result
  *   (every club's chances move with any result of the league);
+ * - a settled match page (its game played more than SETTLED_MATCH_DAYS days
+ *   ago, src/lib/settledMatch.ts): the moment it settled, for good (it no
+ *   longer follows its league's results);
  * - a report: its round's day; the latest report and the hub: the latest round's;
  * - the quiz: today's set (it changes with the UTC day);
  * - the home page: the latest result among the leagues it features;
@@ -56,6 +59,8 @@ export interface SitemapDates {
   latestReports: ReadonlyMap<string, string>;
   /** The slugs of the leagues the home page features. */
   home: readonly string[];
+  /** Each settled match page, by path, with the moment it settled (settleTime). */
+  settled?: ReadonlyMap<string, Date>;
   now: number;
 }
 
@@ -66,6 +71,8 @@ export function lastModifiedOf(path: string, dates: SitemapDates): Date | undefi
   if (path === "/odds") return latestOf([...dates.latestReports.values()].map(roundDay));
   const round = dates.rounds.get(path) ?? dates.latestReports.get(path);
   if (round) return roundDay(round);
+  const settled = dates.settled?.get(path);
+  if (settled) return settled;
   // "/premier-league", "/premier-league/team/arsenal", "/premier-league/match/…", "/premier-league/chances/title".
   const [, slug, section] = path.split("/");
   if (!slug || !dates.leagues.has(slug)) return undefined;

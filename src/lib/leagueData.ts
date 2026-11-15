@@ -503,6 +503,29 @@ export async function uncachedLeagueData(league: LeagueConfig, year?: number): P
   }
 }
 
+/** This server's straight-from-the-source reads (sourceData), a few minutes each. */
+const sources = new Map<string, Promise<LeagueData | undefined>>();
+const SOURCE_KEEP_MS = 300_000;
+
+/**
+ * A league's season straight from its source (uncachedLeagueData), shared by
+ * this server for a few minutes: for frozen entries worked out inside a cached
+ * function (a past round's odds report, a settled match's record), so a
+ * crawler's visit to a league's old pages downloads its season once, not once
+ * a page.
+ */
+export function sourceData(league: LeagueConfig, year?: number): Promise<LeagueData | undefined> {
+  const id = `${league.code}:${year ?? "current"}`;
+  let promise = sources.get(id);
+  if (!promise) {
+    promise = uncachedLeagueData(league, year);
+    sources.set(id, promise);
+    const forget = () => setTimeout(() => sources.delete(id), SOURCE_KEEP_MS).unref?.();
+    promise.then(forget, forget);
+  }
+  return promise;
+}
+
 const pastInflight = new Map<string, Promise<LeagueData | undefined>>();
 
 /**

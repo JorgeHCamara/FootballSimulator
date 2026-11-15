@@ -1034,6 +1034,7 @@
     "played": "Partidos",
     "form": "Racha",
     "formEmpty": "Sin partidos aún",
+    "afterMatch": "Tras este partido",
     "impactTitle": "Qué significa cada resultado",
     "impactNote": "Cada resultado jugado en {count} temporadas simuladas, con su resultado más probable; el resto de partidos se simula igual cada vez, así que el cambio se debe solo a este resultado.",
     "impactNow": "Ahora",

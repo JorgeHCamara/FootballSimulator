@@ -1034,6 +1034,7 @@
     "played": "Jogos",
     "form": "Forma",
     "formEmpty": "Nenhum jogo ainda",
+    "afterMatch": "Após este jogo",
     "impactTitle": "O que cada resultado significa",
     "impactNote": "Cada resultado simulado em {count} temporadas, com o seu placar mais provável; os outros jogos são simulados da mesma forma em todas, então a diferença vem só deste resultado.",
     "impactNow": "Agora",

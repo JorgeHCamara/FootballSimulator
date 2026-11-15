@@ -4,7 +4,7 @@ import type { LeagueConfig } from "../config/leagues.ts";
 import type { Fixture, Team } from "../engine/types.ts";
 import { archiveTag } from "./archiveTag.ts";
 import { cacheScope, configFingerprint } from "./dataCacheKey.ts";
-import { noDataCache, uncachedLeagueData, type LeagueData } from "./leagueData.ts";
+import { noDataCache, sourceData, type LeagueData } from "./leagueData.ts";
 import { buildReport, reportGames, seasonReports, type OddsReport, type SeasonReports } from "./oddsReports.ts";
 import type { LeagueSnapshots } from "./snapshots.ts";
 
@@ -79,22 +79,6 @@ export function archivedRound(report: OddsReport, data: LeagueData | undefined, 
   // An older season's report: its clubs that have left the league since, without a page.
   for (const t of past?.teams ?? []) if (wanted.has(t.id) && !teams.has(t.id)) teams.set(t.id, { ...t, slug: undefined, page: undefined } as Team);
   return { games, teams: [...teams.values()] };
-}
-
-/** This server's straight-from-the-source reads for entries, a few minutes each: a crawler's visit to a league's past rounds downloads it once. */
-const sources = new Map<string, Promise<LeagueData | undefined>>();
-const SOURCE_KEEP_MS = 300_000;
-
-function sourceData(league: LeagueConfig, year?: number): Promise<LeagueData | undefined> {
-  const id = `${league.code}:${year ?? "current"}`;
-  let promise = sources.get(id);
-  if (!promise) {
-    promise = uncachedLeagueData(league, year);
-    sources.set(id, promise);
-    const forget = () => setTimeout(() => sources.delete(id), SOURCE_KEEP_MS).unref?.();
-    promise.then(forget, forget);
-  }
-  return promise;
 }
 
 /** Works out a past round's entry; throws when the league's data can't be read (nothing is stored then). */

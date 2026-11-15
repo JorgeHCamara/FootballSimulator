@@ -41,12 +41,12 @@ describe("which leagues a refresh run checks", () => {
     assert.equal(activeGame(data([], { tournaments }), now), true);
   });
 
-  it("an idle league on its turn, every PERIODIC_RUNS runs (three hours): each league once in every six runs, the leagues spread over them", () => {
+  it("an idle league on its turn, every PERIODIC_RUNS runs (six hours with choice B): each league once in every PERIODIC_RUNS runs, the leagues spread over them", () => {
     for (const league of LEAGUES) {
       const turns = Array.from({ length: PERIODIC_RUNS * 4 }, (_, i) => periodicTurn(league.code, now + i * RUN_MS));
       assert.equal(turns.filter(Boolean).length, 4, league.code);
       const first = turns.indexOf(true);
-      assert.deepEqual(turns.flatMap((t, i) => (t ? [i - first] : [])), [0, 6, 12, 18], `${league.code}: every three hours`);
+      assert.deepEqual(turns.flatMap((t, i) => (t ? [i - first] : [])), [0, 1, 2, 3].map((k) => k * PERIODIC_RUNS), `${league.code}: every PERIODIC_RUNS runs`);
     }
     // A run started a few minutes late is still the same run.
     assert.equal(periodicTurn("PL", now + 20 * 60_000), periodicTurn("PL", now));

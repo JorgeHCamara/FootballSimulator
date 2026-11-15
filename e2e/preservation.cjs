@@ -40,7 +40,14 @@ async function samplePaths(page) {
   const clubChance = clubHrefs.find((h) => /^\/en\/premier-league\/team\/[^/]+\/chances\//.test(h));
   const sitemap = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
   const today = new Date().toISOString().slice(0, 10);
-  const played = [...sitemap.matchAll(/<loc>[^<]*?(\/en\/premier-league\/match\/[^<]*-(\d{4}-\d{2}-\d{2}))<\/loc>/g)].find((m) => m[2] < today)?.[1];
+  // Played games in the sitemap (the last 30 days): the oldest is settled (src/lib/settledMatch.ts), the newest
+  // (a few days old) still follows its league.
+  const day = 86_400_000;
+  const playedGames = [...sitemap.matchAll(/<loc>[^<]*?(\/en\/premier-league\/match\/[^<]*-(\d{4}-\d{2}-\d{2}))<\/loc>/g)]
+    .filter((m) => m[2] < today)
+    .sort((a, b) => (a[2] < b[2] ? -1 : a[2] > b[2] ? 1 : 0));
+  const played = playedGames.find((m) => Date.parse(`${m[2]}T12:00:00Z`) < Date.now() - 10 * day)?.[1];
+  const recent = playedGames.filter((m) => Date.parse(`${m[2]}T12:00:00Z`) > Date.now() - 6 * day).at(-1)?.[1];
   const round = [...sitemap.matchAll(/<loc>[^<]*?(\/en\/premier-league\/odds\/matchday-\d+)<\/loc>/g)].map((m) => m[1])[0];
   const strip = (path) => path.replace(/^\/en/, "");
   const paths = {
@@ -57,6 +64,7 @@ async function samplePaths(page) {
     leagueChance: "/premier-league/chances/title",
     matchUpcoming: upcoming && strip(upcoming),
     matchPlayed: played && strip(played),
+    matchRecent: recent && strip(recent),
     odds: "/premier-league/odds",
     oddsRound: round && strip(round),
     oddsHub: "/odds",
@@ -80,6 +88,16 @@ async function readPage(page) {
     return {
       title: document.title,
       text: text(document.body.innerText),
+      // A settled match page (src/lib/settledMatch.ts) shows its clubs' table as it stood after the game: its
+      // text is compared without that section, which has its own tests.
+      settled: document.querySelector('[data-testid="match-page"]')?.getAttribute("data-settled") === "true",
+      textOutsideForm: (() => {
+        const form = document.querySelector('[data-testid="match-form-table"]');
+        if (form) form.style.display = "none";
+        const outside = text(document.body.innerText);
+        if (form) form.style.display = "";
+        return outside;
+      })(),
       links: [...document.querySelectorAll("a[href]")].map((a) => `${attr(a, "href")} | ${text(a.textContent)} | ${attr(a, "aria-label")}`),
       images: [...document.querySelectorAll("img")].map((img) => `${attr(img, "src")} | ${attr(img, "alt")}`),
       meta: [...document.querySelectorAll("head meta")].map((m) => `${attr(m, "name") || attr(m, "property") || attr(m, "charset") || attr(m, "http-equiv")}=${attr(m, "content")}`).sort(),
@@ -166,7 +184,10 @@ function checkInvariants(url, view, { indexable }) {
           differences.push(`${key}: missing`);
           continue;
         }
-        for (const field of Object.keys(was)) {
+        // A page settled since the capture: everything but its clubs' section, as captured; that section has its
+        // own tests (the "after this match" label, the table as it stood).
+        const skip = now.settled && !was.settled ? ["text", "phoneText", "settled"] : [];
+        for (const field of Object.keys(was).filter((f) => !skip.includes(f))) {
           try {
             assert.deepEqual(now[field], was[field]);
           } catch (error) {
@@ -174,8 +195,23 @@ function checkInvariants(url, view, { indexable }) {
           }
         }
       }
-      if (capture.sitemap !== before.sitemap) differences.push("sitemap.xml differs");
+      // The sitemap: the same addresses, each with the same date, but a settled match's: its settle time
+      // (src/lib/sitemapDates.ts, tested there).
+      const entries = (xml) => new Map([...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => [m[1].match(/<loc>([^<]*)<\/loc>/)[1], m[1]]));
+      const [was, now] = [entries(before.sitemap), entries(capture.sitemap)];
+      if ([...was.keys()].join("\n") !== [...now.keys()].join("\n")) differences.push("sitemap.xml: another set of addresses");
+      const settledDate = (url) => /\/match\/.*-(\d{4}-\d{2}-\d{2})$/.exec(url)?.[1];
+      for (const [url, entry] of was) {
+        const other = now.get(url);
+        if (other === undefined || other === entry) continue;
+        const date = settledDate(url);
+        const stripped = (e) => e.replace(/<lastmod>[^<]*<\/lastmod>/, "");
+        const settledAt = date && new Date(Date.parse(`${date}T12:00:00Z`) + 8 * 86_400_000).toISOString();
+        if (!date || stripped(other) !== stripped(entry) || !other.includes(`<lastmod>${settledAt}</lastmod>`)) differences.push(`sitemap.xml: ${url} differs`);
+      }
       if (capture.robots !== before.robots) differences.push("robots.txt differs");
+      const settledNow = Object.entries(capture.pages).filter(([, v]) => v.settled).map(([k]) => k);
+      console.log(`settled match pages: ${settledNow.join(", ") || "none"}`);
       assert.deepEqual(differences, [], `pages differ from the capture:\n${differences.join("\n\n")}`);
       console.log(`${Object.keys(before.pages).length} pages, the sitemap and robots.txt: as captured`);
     }
