@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { ClientMessages } from "../../../../components/ClientMessages.tsx";
 import { OddsReportView } from "../../../../components/OddsReportView.tsx";
+import { SHARE_MENU_SCOPE } from "../../../../i18n/clientMessages.ts";
 import { reportMetadata } from "../../../../lib/oddsText.ts";
 import { loadReport } from "../../../../lib/oddsPage.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../../lib/site.ts";
@@ -36,5 +38,9 @@ export default async function LatestOddsPage({ params }: { params: Params }) {
   setRequestLocale(locale);
   const loaded = await loadReport(league);
   if (!loaded) notFound();
-  return <OddsReportView loaded={loaded} locale={locale} />;
+  return (
+    <ClientMessages scope={SHARE_MENU_SCOPE}>
+      <OddsReportView loaded={loaded} locale={locale} />
+    </ClientMessages>
+  );
 }

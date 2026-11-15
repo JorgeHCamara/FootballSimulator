@@ -27,8 +27,14 @@ import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../.
  * before kick-off, so a page built before it is rebuilt in time). Once the
  * game has its final score the page is back to six hours (settledGameState
  * in src/lib/matchPreview.ts).
+ * Its own literal is the longest it may go (Next only takes a literal here): what it
+ * reads sets the real clock, six hours (24 with choice A, src/lib/costChoices.ts: the
+ * league's data and the outlook marker are kept that long, and a page follows the
+ * shortest-lived entry it reads). With choice A, a game
+ * due within the next day keeps the six hours (matchDayClock), so its page is still
+ * rebuilt by match day.
  */
-export const revalidate = 21600;
+export const revalidate = 86400;
 /** Three season simulations for "What this result means" on a first visit. */
 export const maxDuration = 60;
 

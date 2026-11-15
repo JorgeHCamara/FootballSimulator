@@ -8,11 +8,10 @@ import type { ReactNode } from "react";
 import { SiteFooter } from "../../components/SiteFooter.tsx";
 import { SiteHeader } from "../../components/SiteHeader.tsx";
 import { COMPETITIONS } from "../../config/competitions.ts";
+import { LAYOUT_SCOPE, pickMessages } from "../../i18n/clientMessages.ts";
 import { routing } from "../../i18n/routing.ts";
 import { ADSENSE_CLIENT, GOOGLE_SITE_VERIFICATION, HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../lib/site.ts";
 import "../globals.css";
-
-const CLIENT_NAMESPACES = ["Nav", "Simulator", "Zones", "Countries", "Continents", "Cup", "PastWinners", "Promotion"];
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -53,11 +52,9 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  // Client components only use these namespaces; the long SEO/FAQ copy stays on the server.
-  const messages = await getMessages();
-  const clientMessages = Object.fromEntries(
-    CLIENT_NAMESPACES.filter((ns) => ns in messages).map((ns) => [ns, messages[ns]]),
-  );
+  // Only the header's messages: a page with client components of its own sends theirs (ClientMessages,
+  // src/i18n/clientMessages.ts), and the long SEO/FAQ copy stays on the server.
+  const clientMessages = pickMessages(await getMessages(), LAYOUT_SCOPE);
 
   return (
     <html lang={HREFLANG[locale]}>

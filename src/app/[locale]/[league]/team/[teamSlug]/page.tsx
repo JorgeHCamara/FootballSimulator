@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { AdSlot } from "../../../../../components/AdSlot.ts";
+import { ClientMessages } from "../../../../../components/ClientMessages.tsx";
 import { Flag } from "../../../../../components/Flag.tsx";
 import { Icon, type IconName } from "../../../../../components/Icon.tsx";
 import { JsonLd } from "../../../../../components/JsonLd.tsx";
@@ -11,6 +12,7 @@ import { TeamBadge } from "../../../../../components/TeamBadge.tsx";
 import { zoneHex, ZONE_STYLES } from "../../../../../components/zones.ts";
 import type { SiteLocale, ZoneKind } from "../../../../../config/leagues.ts";
 import type { FormResult, Team, TeamId } from "../../../../../engine/types.ts";
+import { SHARE_MENU_SCOPE } from "../../../../../i18n/clientMessages.ts";
 import { Link } from "../../../../../i18n/navigation.ts";
 import { IntentLink } from "../../../../../components/IntentLink.tsx";
 import { mustWinGames, toughestGames, type ClubFixture } from "../../../../../lib/clubOutlook.ts";
@@ -21,8 +23,14 @@ import { listOf, ordinal, percent, placeRange } from "../../../../../lib/clubTex
 import { inIndexWindow, matchPath, matchSlug } from "../../../../../lib/matches.ts";
 import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../../../lib/site.ts";
 
-/** As the league page: rebuilt when the league's results change, else every six hours at most (see its revalidate). */
-export const revalidate = 21600;
+/**
+ * As the league page: rebuilt when the league's results change, else every six hours at most (see its revalidate).
+ * Its own literal is the longest it may go (Next only takes a literal here): what it
+ * reads sets the real clock, six hours (24 with choice A, src/lib/costChoices.ts: the
+ * league's data and the outlook marker are kept that long, and a page follows the
+ * shortest-lived entry it reads).
+ */
+export const revalidate = 86400;
 /**
  * Room for a cold render (the league's data from ESPN, its conferences retried,
  * the shared outlook worked out) when many club pages are visited at once,
@@ -65,6 +73,12 @@ const FORM: Record<FormResult, { icon: IconName; className: string }> = {
 };
 
 const card = "rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900";
+
+/**
+ * A share as a bar's width, to a ten-thousandth of a percent: far finer than a browser lays out (a 64th of a
+ * pixel), so the bars are drawn exactly as before, without each float's 17 digits, dozens of times a page.
+ */
+const barWidth = (share: number) => `${Math.round(share * 1e6) / 1e4}%`;
 
 export default async function ClubPage({ params }: { params: Params }) {
   const { locale, league: slug, teamSlug } = await params;
@@ -130,7 +144,7 @@ export default async function ClubPage({ params }: { params: Params }) {
 
   const venue = (f: ClubFixture) => (
     <span
-      className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded text-[10px] font-bold ${f.home ? "bg-pitch-100 text-pitch-800 dark:bg-pitch-900/50 dark:text-pitch-100" : "bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200"}`}
+      className={f.home ? "venue-home" : "venue-away"}
       title={t(f.home ? "home" : "away")}
     >
       <span aria-hidden>{t(f.home ? "homeShort" : "awayShort")}</span>
@@ -161,10 +175,10 @@ export default async function ClubPage({ params }: { params: Params }) {
         <span className="text-zinc-500">{pct(f.draw)}</span>
         <span className="text-red-600 dark:text-red-400">{pct(f.loss)}</span>
       </div>
-      <div className="mt-1 flex h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-        <span className="bg-pitch-600" style={{ width: `${f.win * 100}%` }} />
-        <span className="bg-zinc-400" style={{ width: `${f.draw * 100}%` }} />
-        <span className="bg-red-500" style={{ width: `${f.loss * 100}%` }} />
+      <div className="odds-track">
+        <span className="bg-pitch-600" style={{ width: barWidth(f.win) }} />
+        <span className="bg-zinc-400" style={{ width: barWidth(f.draw) }} />
+        <span className="bg-red-500" style={{ width: barWidth(f.loss) }} />
       </div>
     </div>
   );
@@ -198,7 +212,7 @@ export default async function ClubPage({ params }: { params: Params }) {
     </li>
   );
 
-  return (
+  const page = (
     <div className="space-y-6" data-testid="club-page">
       <JsonLd
         data={[
@@ -322,7 +336,7 @@ export default async function ClubPage({ params }: { params: Params }) {
               <p className="mt-2 text-2xl font-extrabold tabular-nums">{pct(zone.chance)}</p>
               {zone.ranges.length > 0 && <p className="text-xs text-zinc-500">{zone.ranges.map(([from, to]) => placeRange(from, to, lang)).join(", ")}</p>}
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                <div className="h-full rounded-full" style={{ width: `${zone.chance * 100}%`, background: zoneHex(zone.kind) }} />
+                <div className="h-full rounded-full" style={{ width: barWidth(zone.chance), background: zoneHex(zone.kind) }} />
               </div>
             </div>
           ))}
@@ -341,7 +355,7 @@ export default async function ClubPage({ params }: { params: Params }) {
                 </p>
               )}
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                <div className="h-full rounded-full bg-pitch-600" style={{ width: `${club.playoff.win * 100}%` }} />
+                <div className="h-full rounded-full bg-pitch-600" style={{ width: barWidth(club.playoff.win) }} />
               </div>
             </div>
           )}
@@ -403,7 +417,7 @@ export default async function ClubPage({ params }: { params: Params }) {
                   {share >= 0.05 && <span className="mb-1 hidden text-[10px] font-semibold tabular-nums text-zinc-600 sm:block dark:text-zinc-300">{pct(share)}</span>}
                   <div
                     className={`w-full rounded-t-sm ${kind ? "" : "bg-zinc-300 dark:bg-zinc-600"}`}
-                    style={{ height: `${Math.max(share > 0 ? 2 : 0, (share / maxShare) * 100)}%`, ...(kind ? { background: zoneHex(kind) } : {}) }}
+                    style={{ height: barWidth(Math.max(share > 0 ? 0.02 : 0, share / maxShare)), ...(kind ? { background: zoneHex(kind) } : {}) }}
                   />
                 </div>
               );
@@ -487,7 +501,7 @@ export default async function ClubPage({ params }: { params: Params }) {
             <li key={other.id}>
               <IntentLink
                 href={other.page ?? leaguePath}
-                className="flex min-w-0 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                className="club-tile"
               >
                 <TeamBadge team={other} size={20} />
                 <span className="truncate">{other.name}</span>
@@ -498,5 +512,5 @@ export default async function ClubPage({ params }: { params: Params }) {
       </section>
     </div>
   );
+  return <ClientMessages scope={SHARE_MENU_SCOPE}>{page}</ClientMessages>;
 }
-

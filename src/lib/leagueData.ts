@@ -1,5 +1,6 @@
 // The file itself (".js"): these modules also run outside Next (scripts, tests), whose Node needs the extension.
 import { unstable_cache } from "next/cache.js";
+import { cache } from "react";
 import { gamesPerTeam, isStage, seasonsOf, type EspnStages, type LeagueConfig } from "../config/leagues.ts";
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
@@ -12,6 +13,7 @@ import { withClubPages } from "./clubs.ts";
 import { ratingXgWeight } from "../engine/ratings.ts";
 import { readXg } from "./xgStore.ts";
 import { espnDataKey } from "./dataCacheKey.ts";
+import { safetyNetSeconds } from "./costChoices.ts";
 
 export interface LeagueData {
   teams: Team[];
@@ -103,11 +105,11 @@ const REVALIDATE_SECONDS = 3600;
 /** How long a league's cached ESPN data is kept without the route (an hour, as before it; and football-data.org's leagues, which the route doesn't check). */
 export const KEEP_WITHOUT_ROUTE_SECONDS = 3600;
 
-/** How long with the route on: only a safety net for when its job doesn't run (new results come in through the route). */
+/** How long with the route on: only a safety net for when its job doesn't run (new results come in through the route). 24 hours with choice A (src/lib/costChoices.ts). */
 export const KEEP_WITH_ROUTE_SECONDS = 21600;
 
-/** How long a league's cached ESPN data is kept: long while the route brings new results in (REVALIDATE_TOKEN set), an hour without. */
-export const leagueDataKeepSeconds = (env: Record<string, string | undefined> = process.env) => (env.REVALIDATE_TOKEN ? KEEP_WITH_ROUTE_SECONDS : KEEP_WITHOUT_ROUTE_SECONDS);
+/** How long a league's cached ESPN data is kept: long while the route brings new results in (REVALIDATE_TOKEN set: six hours, 24 with choice A), an hour without. */
+export const leagueDataKeepSeconds = (env: Record<string, string | undefined> = process.env) => (env.REVALIDATE_TOKEN ? safetyNetSeconds(env) : KEEP_WITHOUT_ROUTE_SECONDS);
 
 const isBuildPhase = () => process.env.NEXT_PHASE === "phase-production-build";
 
@@ -143,6 +145,7 @@ export function keptLeagueKey(league: LeagueConfig, years?: readonly number[], n
 }
 
 const inflight = new Map<string, Promise<LeagueData>>();
+const baseInflight = new Map<string, Promise<LeagueData>>();
 
 export function seasonLabel(season: Pick<ApiSeason, "startDate" | "endDate">): string {
   const start = season.startDate.slice(0, 4);
@@ -403,18 +406,35 @@ function loadSample(league: LeagueConfig): LeagueData {
  * error is thrown, so the previously generated (real) page stays in place; on a
  * Vercel build it fails the deployment, so the live site keeps its real data.
  */
-export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
+export const getLeagueData = cache(function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
   // Share one request per league across the 3 language versions of its page and
   // their metadata. During a build the result is kept for the whole build; at
   // runtime only while the request is in flight, so hourly refreshes still fetch.
-  const pending = inflight.get(league.code);
+  // And within a render (React's cache: the page, its metadata and every component
+  // that asks), one load: each data-cache read is a billed Runtime Cache read on
+  // Vercel, and a page asking twice read its league's data, xG and outlook twice.
+  return shared(inflight, league, () => getLeagueBase(league).then((data) => withXg(league, data)));
+});
+
+/**
+ * The league's data without its stored xG: what the refresh job compares
+ * (refreshVersion; the xG on both sides of that comparison is the same entry,
+ * so it never decides it). Shared like getLeagueData's.
+ */
+export function getLeagueBase(league: LeagueConfig): Promise<LeagueData> {
+  return shared(baseInflight, league, () => loadLeagueData(league).then((data) => ({ ...data, teams: withClubPages(league, data.teams) })));
+}
+
+/** One load per league while it's in flight (for the whole build during one). */
+function shared(map: Map<string, Promise<LeagueData>>, league: LeagueConfig, load: () => Promise<LeagueData>): Promise<LeagueData> {
+  const pending = map.get(league.code);
   if (pending) return pending;
-  const promise = loadLeagueData(league).then(async (data) => withXg(league, { ...data, teams: withClubPages(league, data.teams) }));
-  inflight.set(league.code, promise);
+  const promise = load();
+  map.set(league.code, promise);
   const forget = () => {
-    if (!isBuildPhase()) inflight.delete(league.code);
+    if (!isBuildPhase()) map.delete(league.code);
   };
-  promise.then(forget, () => inflight.delete(league.code));
+  promise.then(forget, () => map.delete(league.code));
   return promise;
 }
 
@@ -425,7 +445,11 @@ export function getLeagueData(league: LeagueConfig): Promise<LeagueData> {
  */
 async function withXg(league: LeagueConfig, data: LeagueData): Promise<LeagueData> {
   if (data.source !== "live" || data.provider !== "espn" || !(ratingXgWeight(league) > 0)) return data;
-  const stored = await readXg(league.code);
+  return attachXg(data, await readXg(league.code));
+}
+
+/** The stored xG of the data's played games (by ESPN game id), as LeagueData.xg; the data as it is when none has any. */
+export function attachXg(data: LeagueData, stored: Readonly<Record<number, readonly [number, number]>>): LeagueData {
   const games = [...data.fixtures, ...(data.postseason ?? []), ...(data.tournaments ?? []).flatMap((t) => [...t.fixtures, ...(t.postseason ?? [])])];
   const xg: Record<number, readonly [number, number]> = {};
   for (const f of games) if (f.result && stored[f.id]) xg[f.id] = stored[f.id]!;
@@ -438,12 +462,13 @@ async function withXg(league: LeagueConfig, data: LeagueData): Promise<LeagueDat
  * (src/app/api/revalidate/leagues) compares the cached copy with. Undefined
  * when ESPN fails; the cached copy itself with sample data.
  */
-export async function freshLeagueData(league: LeagueConfig): Promise<LeagueData | undefined> {
+export async function freshLeagueData(league: LeagueConfig, { xg = true }: { xg?: boolean } = {}): Promise<LeagueData | undefined> {
   // Sample data, or a first-party league's committed season: nothing fresher to fetch.
-  if (process.env.FOOTSIMU_SAMPLE_DATA === "1" || league.firstParty) return getLeagueData(league);
+  if (process.env.FOOTSIMU_SAMPLE_DATA === "1" || league.firstParty) return xg ? getLeagueData(league) : getLeagueBase(league);
   try {
     const data = await loadEspn(league, undefined, true);
-    return await withXg(league, { ...data, teams: withClubPages(league, data.teams) });
+    const base = { ...data, teams: withClubPages(league, data.teams) };
+    return xg ? await withXg(league, base) : base;
   } catch (error) {
     console.warn(`${league.code}: no fresh ESPN data:`, error);
     return undefined;

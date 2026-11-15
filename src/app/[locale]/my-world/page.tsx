@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ClientMessages } from "../../../components/ClientMessages.tsx";
 import { MyWorld } from "../../../components/MyWorld.tsx";
 import { PastWinnersProvider, type RealWinners } from "../../../components/PastWinnersProvider.tsx";
 import { WorldHero } from "../../../components/WorldHero.tsx";
 import { WorldPlayingFlag } from "../../../components/WorldPlayingFlag.tsx";
 import type { SiteLocale } from "../../../config/leagues.ts";
+import { MY_WORLD_SCOPE } from "../../../i18n/clientMessages.ts";
 import { divisionConfig, WORLD_LEAGUES } from "../../../lib/myWorld.ts";
 import { worldStartPack } from "../../../lib/myWorldStart.ts";
 import { leagueWinners } from "../../../lib/winnersData.ts";
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function Page({ params }: { params: Params }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [messages, pack] = await Promise.all([getMessages(), worldStartPack()]);
+  const pack = await worldStartPack();
   // Each league's real Past Winners (src/data/history), for the world's own seasons to go on top of; a league without a file shows the world's only.
   const realWinners: RealWinners = Object.fromEntries(
     WORLD_LEAGUES.flatMap((code) => {
@@ -61,11 +62,11 @@ export default async function Page({ params }: { params: Params }) {
       <WorldHero />
       {/* The game's own words, the league simulator's (its fixtures and dice) and the cups': the rest of the site's client messages aren't needed inside it. */}
       <div id={PLAY_ANCHOR} className="scroll-mt-4">
-        <NextIntlClientProvider locale={locale} messages={{ World: messages.World, Simulator: messages.Simulator, PastWinners: messages.PastWinners, Cup: messages.Cup, Zones: messages.Zones }}>
+        <ClientMessages scope={MY_WORLD_SCOPE}>
           <PastWinnersProvider value={realWinners}>
             <MyWorld pack={pack} locale={langOf(locale)} />
           </PastWinnersProvider>
-        </NextIntlClientProvider>
+        </ClientMessages>
       </div>
     </div>
   );

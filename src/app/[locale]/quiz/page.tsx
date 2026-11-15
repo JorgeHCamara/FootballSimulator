@@ -7,6 +7,7 @@ import { ordinal, percent } from "../../../lib/clubText.ts";
 import type { QuizQuestion } from "../../../lib/quiz.ts";
 import { quizDayClock, todaysQuiz } from "../../../lib/quizPage.ts";
 import { OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
+import { pageClock } from "../../../lib/sharedOutlook.ts";
 
 /**
  * A new set every day (UTC). The page is rebuilt:
@@ -16,8 +17,12 @@ import { OG_LOCALE, SITE_NAME, alternates } from "../../../lib/site.ts";
  *   what's left of the day, so the new set is up within about a minute of
  *   midnight UTC (it was within the hour);
  * - else every six hours at most, the safety net every league page has.
+ * Its own literal is the longest it may go (Next only takes a literal here): what it
+ * reads sets the real clock, six hours (24 with choice A, src/lib/costChoices.ts: the
+ * league's data and the outlook marker are kept that long, and a page follows the
+ * shortest-lived entry it reads).
  */
-export const revalidate = 21600;
+export const revalidate = 86400;
 /** Room for the day's two live outlooks on a cold server (they're shared with the club pages). */
 export const maxDuration = 60;
 
@@ -75,6 +80,8 @@ function itemOf(q: QuizQuestion, lang: SiteLocale, t: Translate, tz: TranslateZo
 export default async function Page({ params }: { params: Params }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  // The safety net whatever its leagues' data does (a render that loads none reads no other entry): see pageClock.
+  await pageClock("quiz");
   const lang = langOf(locale);
   const [t, tz] = await Promise.all([getTranslations("Quiz"), getTranslations("Zones")]);
   const now = new Date();

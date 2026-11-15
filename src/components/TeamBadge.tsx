@@ -18,8 +18,9 @@ export function TeamBadge({ team, size = 20, textless = false }: { team: Team; s
   return (
     <span
       aria-hidden
-      className="inline-flex shrink-0 items-center justify-center rounded-full font-bold text-white"
-      style={{ width: size, height: size, fontSize: size * 0.36, background: `hsl(${hue} 60% 30%)` }}
+      className="team-disc"
+      // The code's size to a hundredth of a pixel (7.2, not 7.199999999999999: the same text, fewer bytes on every page).
+      style={{ width: size, height: size, fontSize: Math.round(size * 36) / 100, background: `hsl(${hue} 60% 30%)` }}
     >
       {textless ? <span className="before:content-[attr(data-tla)]" data-tla={team.tla.slice(0, 3)} /> : team.tla.slice(0, 3)}
     </span>

@@ -1,7 +1,21 @@
 import { useTranslations } from "next-intl";
 import { COMPETITIONS } from "../config/competitions.ts";
+import type { FlagCode } from "../config/leagues.ts";
+import { flagSpriteUrl } from "../lib/flagSprite.tsx";
 import { IntentLink } from "./IntentLink.tsx";
-import { Flag } from "./Flag.tsx";
+
+/**
+ * A competition's flag as <Flag code={code} width={16} /> draws it, its
+ * shapes referenced from the sprite (src/lib/flagSprite.tsx) instead of
+ * inline: fifty flags on every page, sent once as a file the browser keeps.
+ */
+function FooterFlag({ code }: { code: FlagCode }) {
+  return (
+    <svg viewBox="0 0 30 20" width={16} height={(16 * 2) / 3} aria-hidden="true" focusable="false" className="flag-16">
+      <use href={`${flagSpriteUrl()}#${code}`} />
+    </svg>
+  );
+}
 
 export function SiteFooter() {
   const t = useTranslations("Footer");
@@ -14,8 +28,8 @@ export function SiteFooter() {
             {COMPETITIONS.map((l) => (
               <li key={l.code}>
                 {/* Fifty competitions on every page: prefetched on intent only (src/components/IntentLink.tsx). */}
-                <IntentLink href={`/${l.slug}`} className="flex items-center gap-1.5 text-zinc-600 hover:text-pitch-700 dark:text-zinc-400 dark:hover:text-pitch-100">
-                  <Flag code={l.flag} width={16} />
+                <IntentLink href={`/${l.slug}`} className="footer-league">
+                  <FooterFlag code={l.flag} />
                   {l.name}
                 </IntentLink>
               </li>

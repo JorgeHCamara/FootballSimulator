@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { ClientMessages } from "../../../../../components/ClientMessages.tsx";
 import { OddsReportView } from "../../../../../components/OddsReportView.tsx";
+import { SHARE_MENU_SCOPE } from "../../../../../i18n/clientMessages.ts";
 import { reportMetadata } from "../../../../../lib/oddsText.ts";
 import { loadReport } from "../../../../../lib/oddsPage.ts";
 import { roundFromParam } from "../../../../../lib/oddsReports.ts";
@@ -47,5 +49,9 @@ export default async function RoundOddsPage({ params }: { params: Params }) {
   const n = roundFromParam(round);
   const loaded = n === undefined ? undefined : await loadReport(league, n);
   if (!loaded) notFound();
-  return <OddsReportView loaded={loaded} locale={locale} />;
+  return (
+    <ClientMessages scope={SHARE_MENU_SCOPE}>
+      <OddsReportView loaded={loaded} locale={locale} />
+    </ClientMessages>
+  );
 }
