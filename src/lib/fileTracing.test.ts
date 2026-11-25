@@ -53,7 +53,7 @@ function groupsRead(entry: string): Set<TracedGroup> {
 const walk = (dir: string): string[] => readdirSync(join(root, dir)).flatMap((name) => (statSync(join(root, dir, name)).isDirectory() ? walk(join(dir, name)) : [join(dir, name)]));
 /** Every server entry under src/app, as Turbopack names it ("/[locale]/[league]/page", "/sitemap.xml/route"), and its file. */
 const entries = walk("src/app")
-  .filter((f) => /\/(page|route|opengraph-image|twitter-image)\.tsx?$/.test(f) || /^src\/app\/(sitemap|robots|manifest)\.ts$/.test(f))
+  .filter((f) => /\/(page|route|opengraph-image|twitter-image)\.tsx?$/.test(f) || /^src\/app\/(sitemap|robots|manifest)\.ts$/.test(f) || /^src\/app\/.+\/sitemap\.ts$/.test(f))
   .map((file) => {
     const inApp = file.slice("src/app".length).replace(/\.tsx?$/, "");
     const name = /\/page$/.test(inApp)
@@ -62,7 +62,10 @@ const entries = walk("src/app")
         ? inApp
         : /^\/(sitemap|robots|manifest)$/.test(inApp)
           ? `${inApp}.${{ "/sitemap": "xml", "/robots": "txt", "/manifest": "webmanifest" }[inApp]}/route`
-          : `${inApp}/route`;
+          : /.\/sitemap$/.test(inApp)
+            ? // A sitemap in pieces (generateSitemaps): "/sitemaps/sitemap/[__metadata_id__]/route".
+              `${inApp}/[__metadata_id__]/route`
+            : `${inApp}/route`;
     return { file, route: name };
   });
 

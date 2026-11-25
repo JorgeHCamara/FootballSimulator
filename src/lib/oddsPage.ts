@@ -70,8 +70,7 @@ export const loadReport = cache(async (leagueSlug: string, round?: number): Prom
 });
 
 /** Every report's address (without the locale) with its round's day, and each league's latest-report page with its latest round's, for the sitemap. */
-export async function reportPaths(): Promise<{ latest: { path: string; date: string }[]; rounds: { path: string; date: string }[] }> {
-  const leagues = LEAGUES.filter(hasClubPages);
+export async function reportPaths(leagues: readonly LeagueConfig[] = LEAGUES.filter(hasClubPages)): Promise<{ latest: { path: string; date: string }[]; rounds: { path: string; date: string }[] }> {
   const latest: { path: string; date: string }[] = [];
   const rounds: { path: string; date: string }[] = [];
   await Promise.all(

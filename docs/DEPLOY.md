@@ -66,7 +66,7 @@ Redeploy after changing variables: **Deployments → … → Redeploy**.
 - **footsimu.com must be the primary domain.** `https://footsimu.com/pt` should load directly, and `https://www.footsimu.com/pt` should redirect (308) to it. If it's the other way round, Google sees every page's canonical address pointing at a redirect and may not index the site. Fix it under **Settings → Domains**: `footsimu.com` with no redirect, `www.footsimu.com` redirecting to `footsimu.com`. Check with `curl -I https://footsimu.com/pt` (expect `200`) and `curl -I https://www.footsimu.com/pt` (expect `308`).
 - `https://footsimu.com` redirects to your language (for example `/pt` on a Portuguese browser).
 - League pages show real teams.
-- `https://footsimu.com/sitemap.xml` and `/robots.txt` list footsimu.com URLs.
+- `https://footsimu.com/sitemap.xml` (an index of the sitemap's pieces) and `/robots.txt` list footsimu.com URLs; `npm run sitemap:check` passes.
 - Pasting a league link into WhatsApp or X shows the preview image.
 
 ## 7. Google Search Console

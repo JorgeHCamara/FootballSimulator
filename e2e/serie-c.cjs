@@ -6,6 +6,7 @@
 
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
+const { fullSitemap } = require("./sitemap.cjs");
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 const LEAGUE = "brasileirao-serie-c";
@@ -161,7 +162,7 @@ function watchRequests(page) {
       const menu = page.locator('[data-testid="league-menu"]');
       await menu.getByRole("button", { name: "South America" }).click();
       assert.deepEqual((await menu.locator("#menu-br a").allInnerTexts()).map((x) => x.trim()), ["Brasileirão Série A", "Brasileirão Série B", "Brasileirão Série C", "Copa do Brasil"]);
-      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const path of [`/en/${LEAGUE}`, `/pt/${LEAGUE}`, `/es/${LEAGUE}`, `/pt/${LEAGUE}/team/santa-cruz`]) assert.match(sitemap, new RegExp(path.replace(/\//g, "\\/")));
       await page.goto(`${BASE_URL}/en/${LEAGUE}`);
       assert.match(await page.getByTestId("league-facts").innerText(), /top 8 go into two groups \(1st, 4th, 5th, 8th: Group A; 2nd, 3rd, 6th, 7th: Group B\)/);

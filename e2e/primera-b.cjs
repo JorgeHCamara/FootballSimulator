@@ -6,6 +6,7 @@
 
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
+const { fullSitemap } = require("./sitemap.cjs");
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 const LEAGUE = "colombia-primera-b";
@@ -155,7 +156,7 @@ const thirdParty = (hosts) => [...new Set(hosts)].filter((h) => /espn|wiki|twimg
       const menu = page.locator('[data-testid="league-menu"]');
       await menu.getByRole("button", { name: "South America" }).click();
       assert.ok((await menu.locator("#menu-co a").allInnerTexts()).map((x) => x.trim()).includes("Primera B"));
-      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const path of [`/en/${LEAGUE}`, `/pt/${LEAGUE}`, `/es/${LEAGUE}`, `/es/${LEAGUE}/team/envigado`]) assert.match(sitemap, new RegExp(path.replace(/\//g, "\\/")));
       await page.goto(`${BASE_URL}/en/${LEAGUE}`);
       const facts = await page.getByTestId("league-facts").innerText();

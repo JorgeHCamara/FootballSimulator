@@ -22,6 +22,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const { chromium } = require("playwright");
+const { fullSitemap } = require("./sitemap.cjs");
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 const LOCALES = ["en", "pt", "es"];
@@ -38,7 +39,7 @@ async function samplePaths(page) {
   const clubHrefs = await page.$$eval("a[href]", (as) => [...new Set(as.map((a) => a.getAttribute("href")))]);
   const upcoming = clubHrefs.find((h) => /^\/en\/premier-league\/match\//.test(h));
   const clubChance = clubHrefs.find((h) => /^\/en\/premier-league\/team\/[^/]+\/chances\//.test(h));
-  const sitemap = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
+  const sitemap = await fullSitemap(BASE_URL);
   const today = new Date().toISOString().slice(0, 10);
   // Played games in the sitemap (the last 30 days): the oldest is settled (src/lib/settledMatch.ts), the newest
   // (a few days old) still follows its league.
@@ -167,7 +168,7 @@ function checkInvariants(url, view, { indexable }) {
         console.log("ok");
       }
     }
-    capture.sitemap = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
+    capture.sitemap = await fullSitemap(BASE_URL);
     capture.robots = await (await fetch(`${BASE_URL}/robots.txt`)).text();
     assert.deepEqual(errors, [], "errors or missing messages after hydration");
 
@@ -199,7 +200,16 @@ function checkInvariants(url, view, { indexable }) {
       // (src/lib/sitemapDates.ts, tested there).
       const entries = (xml) => new Map([...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => [m[1].match(/<loc>([^<]*)<\/loc>/)[1], m[1]]));
       const [was, now] = [entries(before.sitemap), entries(capture.sitemap)];
-      if ([...was.keys()].join("\n") !== [...now.keys()].join("\n")) differences.push("sitemap.xml: another set of addresses");
+      // In any order (the sitemap now comes in pieces); a game at the window's edges may come or go between
+      // the two captures (and the pieces leave a game out a day before its page turns noindex).
+      const atEdge = (url) => {
+        const date = /\/match\/.*-(\d{4}-\d{2}-\d{2})$/.exec(url)?.[1];
+        if (!date) return false;
+        const at = Date.parse(`${date}T12:00:00Z`);
+        return Math.abs(at - (Date.now() - 30 * 86_400_000)) < 3 * 86_400_000 || Math.abs(at - (Date.now() + 14 * 86_400_000)) < 3 * 86_400_000;
+      };
+      const addresses = (map) => [...map.keys()].filter((url) => !atEdge(url)).sort().join("\n");
+      if (addresses(was) !== addresses(now)) differences.push("sitemap.xml: another set of addresses");
       const settledDate = (url) => /\/match\/.*-(\d{4}-\d{2}-\d{2})$/.exec(url)?.[1];
       for (const [url, entry] of was) {
         const other = now.get(url);

@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import sitemap from "../app/sitemap.ts";
+import { allSitemapEntries as sitemap, SITEMAP_PAST_DAYS, sitemapEntries } from "./sitemapEntries.ts";
+import { SITE_SITEMAP, sitemapIds } from "./sitemapIds.ts";
+import { matchOutsideWindow } from "./sitemapWindow.ts";
+import { LEAGUES } from "../config/leagues.ts";
+import { hasClubPages } from "./clubs.ts";
 import { getLeagueByCode } from "../config/leagues.ts";
 import { leagueFacts } from "./leagueFacts.ts";
 import { adsTxt, adsenseClient } from "./site.ts";
@@ -171,5 +175,62 @@ describe("the sitemap", () => {
     }
     for (const locale of ["pt", "es"]) assert.equal(games.filter((e) => e.url.includes(`/${locale}/`)).length, games.length / 3);
     assert.ok(!games.some((e) => e.url.includes("/champions-league/")));
+    assert.deepEqual(games.filter((e) => matchOutsideWindow(e.url)).map((e) => e.url), []);
+  });
+
+  it("works the window out from the moment it's made, not the build's: a sitemap made days later moves with it", async () => {
+    const day = 86_400_000;
+    for (const shift of [-12, 9, 20]) {
+      const now = Date.now() + shift * day;
+      const games = (await sitemap(now)).filter((e) => e.url.includes("/match/"));
+      assert.ok(games.length > 0, `games ${shift} days on`);
+      assert.deepEqual(games.filter((e) => matchOutsideWindow(e.url, now)).map((e) => e.url), [], `${shift} days on`);
+    }
+  });
+
+  it("leaves a game out a day before its page turns noindex, so a piece served a day old lists none", async () => {
+    const day = 86_400_000;
+    const now = Date.now();
+    assert.equal(SITEMAP_PAST_DAYS, 29);
+    const games = (await sitemap(now)).filter((e) => e.url.includes("/match/"));
+    const oldest = games.map((e) => Date.parse(`${e.url.slice(-10)}T12:00:00Z`)).sort((a, b) => a - b)[0]!;
+    // The address has the local day: a day's leeway.
+    assert.ok(oldest >= now - (SITEMAP_PAST_DAYS + 1) * day, new Date(oldest).toISOString());
+    for (const e of games) assert.ok(!matchOutsideWindow(e.url, now + day), `${e.url}, a day later`);
+  });
+
+  it("comes in pieces: the site's and one per league with club pages, each address in exactly one", async () => {
+    const ids = sitemapIds();
+    assert.deepEqual(ids, [SITE_SITEMAP, ...LEAGUES.filter(hasClubPages).map((l) => l.slug)]);
+    assert.equal(await sitemapEntries("champions-league"), undefined, "no piece for a competition without club pages");
+    const now = Date.now();
+    const seen = new Map<string, string>();
+    for (const id of ids) {
+      const entries = (await sitemapEntries(id, now))!;
+      assert.ok(entries.length > 0, id);
+      for (const e of entries) {
+        assert.ok(!seen.has(e.url), `${e.url} in ${seen.get(e.url)} and ${id}`);
+        seen.set(e.url, id);
+        // A league's piece holds only that league's pages.
+        if (id !== SITE_SITEMAP) assert.match(e.url, new RegExp(`^https://footsimu\\.com/(en|pt|es)/${id}/`));
+      }
+    }
+    assert.equal(seen.size, (await sitemap(now)).length);
+    // The site's: the home page, the competitions, the site's own pages, the hub and the quiz.
+    const site = (await sitemapEntries(SITE_SITEMAP, now))!.map((e) => e.url);
+    for (const path of ["", "/premier-league", "/fa-cup", "/about", "/odds", "/quiz", "/premier-league/past-winners"]) assert.ok(site.includes(`https://footsimu.com/en${path}`), path || "/");
+  });
+});
+
+describe("matchOutsideWindow", () => {
+  const now = Date.parse("2026-11-25T18:00:00Z");
+  it("allows the past 30 days and the next 14, with a day either side for the league's time zone", () => {
+    for (const day of ["2026-10-26", "2026-10-27", "2026-11-25", "2026-12-09", "2026-12-10"]) assert.equal(matchOutsideWindow(`https://footsimu.com/en/premier-league/match/arsenal-vs-chelsea-${day}`, now), false, day);
+  });
+  it("flags games older or further ahead, such as a sitemap stuck at its build's window", () => {
+    for (const day of ["2026-10-16", "2026-10-25", "2026-12-11"]) assert.equal(matchOutsideWindow(`https://footsimu.com/en/premier-league/match/arsenal-vs-chelsea-${day}`, now), true, day);
+  });
+  it("leaves other addresses alone", () => {
+    assert.equal(matchOutsideWindow("https://footsimu.com/en/premier-league/team/arsenal", now), false);
   });
 });
