@@ -138,19 +138,23 @@ async function chancePaths(league: LeagueConfig, data: LeagueData): Promise<stri
 /**
  * Every club page's path (without the locale), every match page's for games
  * inside the index window (INDEX_PAST_DAYS ago to INDEX_NEXT_DAYS ahead), and
- * the chance pages (chancePaths), league by league; a league whose data
+ * the chance pages (chancePaths), league by league (`leagues`: every league
+ * with club pages, or only those asked for; `pastDays`: how far back the
+ * games go, INDEX_PAST_DAYS unless asked for fewer); a league whose data
  * can't load is left out. `results`: when each league's results last changed,
  * by its slug (lastResultAt; undefined before its first result), for the
  * sitemap's dates.
  */
-export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: string[]; matches: string[]; chances: string[]; results: Map<string, Date | undefined>; settled: Map<string, Date> }> {
-  const leagues = LEAGUES.filter(hasClubPages);
+export async function clubAndMatchPaths(
+  now = Date.now(),
+  { leagues = LEAGUES.filter(hasClubPages), pastDays = INDEX_PAST_DAYS }: { leagues?: readonly LeagueConfig[]; pastDays?: number } = {},
+): Promise<{ clubs: string[]; matches: string[]; chances: string[]; results: Map<string, Date | undefined>; settled: Map<string, Date> }> {
   const day = 86_400_000;
   const pages = await Promise.all(
     leagues.map((league) =>
       getLeagueData(league).then(
         async (data) => {
-          const shown = matchesBetween(league, data, now - INDEX_PAST_DAYS * day, now + INDEX_NEXT_DAYS * day);
+          const shown = matchesBetween(league, data, now - pastDays * day, now + INDEX_NEXT_DAYS * day);
           return {
             clubs: data.teams.flatMap((team) => (team.page ? [team.page] : [])),
             matches: shown.map((m) => m.path),
@@ -174,4 +178,21 @@ export async function clubAndMatchPaths(now = Date.now()): Promise<{ clubs: stri
     results: new Map(pages.flatMap((p) => (p.result ? [p.result] : []))),
     settled: new Map(pages.flatMap((p) => p.settled)),
   };
+}
+
+/**
+ * When each league's results last changed (lastResultAt), by its slug: what
+ * clubAndMatchPaths' `results` holds, without working out any page's path. A
+ * league whose data can't load is left out.
+ */
+export async function latestResults(now = Date.now(), leagues: readonly LeagueConfig[] = LEAGUES.filter(hasClubPages)): Promise<Map<string, Date | undefined>> {
+  const results = await Promise.all(
+    leagues.map((league) =>
+      getLeagueData(league).then(
+        (data) => [[league.slug, lastResultAt(allGames(data), now)] as const],
+        () => [],
+      ),
+    ),
+  );
+  return new Map(results.flat());
 }

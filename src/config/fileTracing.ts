@@ -42,8 +42,8 @@ export type TracedGroup = keyof typeof TRACED_FILES;
 
 /**
  * Each server entry, as Turbopack names it (its route under src/app, then
- * "/page" for a page or "/route" for a route handler, a card image or the
- * sitemap), and the groups of files it reads. Entries not listed read none.
+ * "/page" for a page or "/route" for a route handler, a card image or a
+ * sitemap piece), and the groups of files it reads. Entries not listed read none.
  */
 export const ROUTE_FILES: Record<string, readonly TracedGroup[]> = {
   "/[locale]/page": ["xg"],
@@ -72,7 +72,7 @@ export const ROUTE_FILES: Record<string, readonly TracedGroup[]> = {
   "/[locale]/[league]/share/[code]/opengraph-image/route": ["cards", "xg"],
   "/[locale]/[league]/share/[code]/twitter-image/route": ["cards", "xg"],
   "/api/revalidate/leagues/route": ["xg"],
-  "/sitemap.xml/route": ["history", "snapshots", "xg"],
+  "/sitemaps/sitemap/[__metadata_id__]/route": ["history", "snapshots", "xg"],
 };
 
 /**
