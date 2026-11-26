@@ -12,6 +12,7 @@ import { attachXg, noDataCache, sourceData, type LeagueData } from "./leagueData
 import { allGames } from "./leagueRefresh.ts";
 import { gameXg, preMatchModel, seasonLabel } from "./matchPreview.ts";
 import { findMatch, slugDate, type MatchRef } from "./matches.ts";
+import { perfLog, since } from "./perfLog.ts";
 import { SIM_VERSION } from "./simVersion.ts";
 import { readXg } from "./xgStore.ts";
 
@@ -190,9 +191,21 @@ export const settledEntry = (code: string) => ({ tags: [matchSettledTag(code)], 
  */
 export async function readSettledMatch(league: LeagueConfig, slug: string, now = Date.now()): Promise<SettledMatchRecord | undefined> {
   if (!(now >= settleTime(slug))) return undefined;
-  const work = () => workOut(league, slug, now);
+  const start = performance.now();
+  // For the [perf] line only: set when this call read the league's season from its source (a data cache miss).
+  let built: number | undefined;
+  const work = async () => {
+    const t0 = performance.now();
+    try {
+      return await workOut(league, slug, now);
+    } finally {
+      built = since(t0);
+    }
+  };
   try {
-    return await unstable_cache(work, settledKey(league, slug), settledEntry(league.code))();
+    const record = await unstable_cache(work, settledKey(league, slug), settledEntry(league.code))();
+    perfLog({ op: "settled-match", key: `${league.slug}/${slug}`, ms: since(start), cache: built === undefined ? "hit" : "miss", ...(built !== undefined ? { buildMs: built } : {}) });
+    return record;
   } catch (error) {
     if (noDataCache(error)) return work().catch(() => undefined);
     if (!(error instanceof NotSettled)) console.warn(`${league.code} ${slug}: no settled record, the live page instead:`, error);

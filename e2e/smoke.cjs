@@ -4,6 +4,7 @@
 // Requires Playwright with Chromium (npx playwright install chromium).
 
 const assert = require("node:assert/strict");
+const { assertImpactCacheControl } = require("./impactHeader.cjs");
 const { chromium } = require("playwright");
 const { fullSitemap, sitemapPieces } = require("./sitemap.cjs");
 
@@ -2151,11 +2152,13 @@ async function step(name, fn) {
       assert.equal(await p.getByTestId("match-impact-loading").count(), 0);
       assert.ok((await p.getByTestId("match-impact-row").count()) >= 2);
       // Its own address: JSON, kept by the CDN, not for search engines; an unknown game's is a 404.
+      const askedAt = Date.now();
       const impact = await p.request.get(`${new URL(p.url()).pathname}/impact`.replace(/^/, BASE_URL));
       assert.equal(impact.status(), 200);
       assert.match(impact.headers()["content-type"], /application\/json/);
       assert.equal(impact.headers()["x-robots-tag"], "noindex");
-      assert.match(impact.headers()["cache-control"], /s-maxage=10800, stale-while-revalidate=86400/);
+      // Kept by the CDN by its kick-off: three hours within 48 hours of it, longer further off (impactCacheControl).
+      await assertImpactCacheControl(impact.headers()["cache-control"], ld["@graph"][0].startDate, askedAt, Date.now(), "impact");
       const numbers = await impact.json();
       assert.ok(numbers.rows.length >= 2);
       // The same numbers in every language, each in its own words.

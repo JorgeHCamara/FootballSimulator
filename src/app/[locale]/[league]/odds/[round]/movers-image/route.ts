@@ -1,3 +1,4 @@
+import { timedCard } from "../../../../../../lib/cardPerf.ts";
 import { moversCardImage } from "../../../../../../lib/oddsCard.tsx";
 import { roundFromParam } from "../../../../../../lib/oddsReports.ts";
 
@@ -13,5 +14,5 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   const { locale, league, round } = await params;
   const n = roundFromParam(round);
   if (n === undefined) return new Response(null, { status: 404 });
-  return moversCardImage(locale, league, n);
+  return timedCard("movers", locale, `${league}/${round}`, () => moversCardImage(locale, league, n));
 }

@@ -5,13 +5,14 @@ import { percent } from "../../../../../lib/clubText.ts";
 import { loadMatch } from "../../../../../lib/matchPreview.ts";
 import { OG_SIZE } from "../../../../../lib/ogImage.tsx";
 import { crestDataUri, renderGenericShareCard, renderMatchCard } from "../../../../../lib/shareCard.tsx";
+import { timedCard } from "../../../../../lib/cardPerf.ts";
 
 export const alt = "FootSimu match prediction";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
 /** A match page's card: the two clubs, when they meet, and the model's win/draw/loss chances (with the final score once played). */
-export default async function Image({ params }: { params: Promise<{ locale: string; league: string; matchSlug: string }> }) {
+async function drawImage({ params }: { params: Promise<{ locale: string; league: string; matchSlug: string }> }) {
   const { locale, league: slug, matchSlug } = await params;
   const lang = (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
   const [t, ts] = await Promise.all([getTranslations({ locale: lang, namespace: "Match" }), getTranslations({ locale: lang, namespace: "ShareCard" })]);
@@ -42,4 +43,10 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
     ],
     cta: t("card.cta"),
   }, cache);
+}
+
+/** The card, with its [perf] line (src/lib/cardPerf.ts). */
+export default async function Image(props: { params: Promise<{ locale: string; league: string; matchSlug: string }> }) {
+  const p = await props.params;
+  return timedCard("match", p.locale, `${p.league}/${p.matchSlug}`, () => drawImage(props));
 }

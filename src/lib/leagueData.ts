@@ -5,7 +5,7 @@ import { gamesPerTeam, isStage, seasonsOf, type EspnStages, type LeagueConfig } 
 import { withFallbackCrests } from "../config/crests.ts";
 import { applyTeamOverrides } from "../config/teamOverrides.ts";
 import type { Fixture, Team } from "../engine/types.ts";
-import { EspnError, espnFixtures, espnSplitSeason, espnTeams, espnVenues, fetchEspnDeductions, fetchEspnGroups, fetchEspnSeason, type EspnEvent } from "./espn.ts";
+import { EspnError, espnFixtures, espnSplitSeason, espnTeams, espnVenues, fetchEspnDeductions, fetchEspnGroups, fetchEspnSeason, ESPN_TIMEOUT_MS, type EspnEvent, type EspnInit } from "./espn.ts";
 import { FootballDataError, fetchMatches, mapMatches, seasonOf, teamsFromMatches, type ApiSeason } from "./footballData.ts";
 import { sampleLeague } from "./sampleLeague.ts";
 import { firstPartyData } from "./firstParty.ts";
@@ -199,13 +199,14 @@ export function currentSeasonYear(league: LeagueConfig, now = new Date()): numbe
  * Until at least half of a new season's fixtures are published, the previous
  * season is shown.
  */
-async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh = false): Promise<LeagueData> {
+async function loadEspn(league: LeagueConfig, years?: readonly number[], fresh = false, limits: Pick<EspnInit, "timeoutMs" | "perf"> = {}): Promise<LeagueData> {
   const feed = league.espn;
   if (!feed) throw new Error(`${league.code} has no ESPN feed`);
   const { slug, seasons, weeklyRounds } = feed;
   // `fresh`: straight from ESPN, past the data cache (see freshLeagueData). Otherwise called inside keptEspn,
   // which keeps the data as read: Next makes these requests no-store there.
-  const init: RequestInit = fresh ? { cache: "no-store" } : { next: { revalidate: leagueDataKeepSeconds(), tags: [`league:${league.code}`] } };
+  // `limits`: the refresh route's per-request timeout and [perf] lines (freshLeagueData), on fresh loads only.
+  const init: EspnInit = fresh ? { cache: "no-store", ...limits } : { next: { revalidate: leagueDataKeepSeconds(), tags: [`league:${league.code}`] } };
   const perTeam = gamesPerTeam(league);
   const current = currentSeasonYear(league);
   for (const year of years ?? [current, current - 1]) {
@@ -332,7 +333,7 @@ export const noDataCache = (error: unknown) => error instanceof Error && error.m
  * rate limit), the last groups it gave stand instead of failing every page of
  * the league. A fresh load (freshLeagueData) asks ESPN itself.
  */
-async function keptEspnGroups(league: LeagueConfig, year: number, init: RequestInit, fresh: boolean) {
+async function keptEspnGroups(league: LeagueConfig, year: number, init: EspnInit, fresh: boolean) {
   const load = () => withRetry(() => loadEspnGroups(league, year, init));
   if (fresh) return load();
   try {
@@ -344,7 +345,7 @@ async function keptEspnGroups(league: LeagueConfig, year: number, init: RequestI
 }
 
 /** The league's groups (conferences) with their clubs, matched to the config by ESPN's group names. */
-async function loadEspnGroups(league: LeagueConfig, year: number, init: RequestInit) {
+async function loadEspnGroups(league: LeagueConfig, year: number, init: EspnInit) {
   const espnGroups = await fetchEspnGroups(league.espn!.slug, year, init);
   return league.groups!.map((group) => {
     const found = espnGroups.find((g) => g.name.includes(group.espnName));
@@ -466,7 +467,8 @@ export async function freshLeagueData(league: LeagueConfig, { xg = true }: { xg?
   // Sample data, or a first-party league's committed season: nothing fresher to fetch.
   if (process.env.FOOTSIMU_SAMPLE_DATA === "1" || league.firstParty) return xg ? getLeagueData(league) : getLeagueBase(league);
   try {
-    const data = await loadEspn(league, undefined, true);
+    // Each ESPN request given up after ESPN_TIMEOUT_MS: the route then keeps the cached copy (refreshReason "unavailable").
+    const data = await loadEspn(league, undefined, true, { timeoutMs: ESPN_TIMEOUT_MS, perf: true });
     const base = { ...data, teams: withClubPages(league, data.teams) };
     return xg ? await withXg(league, base) : base;
   } catch (error) {
