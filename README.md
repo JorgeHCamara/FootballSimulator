@@ -163,7 +163,7 @@ The expensive operations each log one line to Vercel's runtime logs (free; filte
 - `og-image`: a share card drawn (`route`, `locale`, `kb`, the `sMaxAge` it went out with).
 - `not-a-locale`: an address whose first segment isn't a language (`/llms.txt`, `/wp-login.php`…): a cacheable 404 before anything is read (`src/lib/localeGuard.ts`). `/favicon.ico` is a file in `public/`.
 
-How long the CDN keeps them: a match's impact answer a day (stale a week; its numbers are one data-cache entry per game for every language, keyed by the game alone more than 48 hours before kick-off and kept 24 hours, `src/lib/impactCache.ts`); a live share card a day (browsers an hour; `CARD_CACHE_HEADERS`). `e2e/cost.cjs` checks them.
+How long the CDN keeps them: a match's impact answer by its kick-off (`impactCacheControl`, `src/lib/impactCache.ts`). Within 48 hours of kick-off (or after it), three hours, stale a day, as before; its numbers follow every result in the data cache (keyed by the league's data version and xG). Further off, as long as the game stays far: up to a day, stale up to a week; its numbers are keyed by the game alone (no data version) and kept 24 hours, so they can lag other results in the league by up to a day. Either way one data-cache entry per game for every language. A live share card a day (browsers an hour; `CARD_CACHE_HEADERS`). `e2e/cost.cjs` checks them.
 
 After deploying, set `NEXT_PUBLIC_SITE_URL` to the live domain and `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` to your Google Search Console code, then submit `/sitemap.xml` in Search Console.
 

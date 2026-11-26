@@ -1,6 +1,7 @@
 // Cost guards: what the CDN may keep, and what never reaches a function twice.
-// - A match's "What this result means" (…/impact): public, kept a day by the CDN and served stale a week
-//   (repeated requests are cacheable), the same answer on every request, and the same numbers in EN, PT and ES.
+// - A match's "What this result means" (…/impact): public and cacheable (repeated requests too), kept by the CDN
+//   by its kick-off (impactCacheControl: three hours within 48 hours of it, up to a day further off), the same
+//   answer on every request, and the same numbers in EN, PT and ES.
 // - A live share card: kept a day by the CDN (browsers an hour).
 // - /favicon.ico: the brand icon, a static file (no function).
 // - Addresses that aren't a language (/llms.txt, /wp-login.php, /xmlrpc.php): a cacheable 404, not a 500.
@@ -9,6 +10,7 @@
 //   BASE_URL=http://localhost:3000 node e2e/cost.cjs
 
 const assert = require("node:assert/strict");
+const { assertImpactCacheControl, kickoffOf } = require("./impactHeader.cjs");
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 
@@ -29,18 +31,22 @@ const numbersOf = (view) => ({
   // The impact answer: cacheable, stable, one set of numbers for the three languages.
   let checked = 0;
   for (const match of matches.slice(0, 3)) {
+    const kickoff = kickoffOf(await (await fetch(`${BASE_URL}${match}`)).text());
     const views = {};
     for (const lang of ["en", "pt", "es"]) {
       const url = `${BASE_URL}${match.replace(/^\/en\//, `/${lang}/`)}/impact`;
+      const askedAt = Date.now();
       const first = await fetch(url);
       const second = await fetch(url);
+      const answeredAt = Date.now();
       for (const res of [first, second]) {
         assert.equal(res.status, 200, `${url}: HTTP ${res.status}`);
         const cc = res.headers.get("cache-control");
-        assert.match(cc ?? "", /^public, /, `${url}: public`);
-        assert.ok(sMaxAge(cc) >= 86400, `${url}: kept a day by the CDN (${cc})`);
-        assert.ok(swr(cc) >= 604800, `${url}: served stale a week (${cc})`);
+        assert.match(cc ?? "", /^public, max-age=0, /, `${url}: public`);
+        assert.ok(sMaxAge(cc) >= 10800, `${url}: kept at least three hours by the CDN (${cc})`);
+        assert.ok(swr(cc) >= 86400, `${url}: served stale at least a day (${cc})`);
         assert.doesNotMatch(cc ?? "", /no-store|private|no-cache/, `${url}: nothing that stops the CDN`);
+        await assertImpactCacheControl(cc, kickoff, askedAt, answeredAt, url);
       }
       const [a, b] = [await first.text(), await second.text()];
       assert.equal(a, b, `${url}: the same answer on a repeated request`);
@@ -86,7 +92,7 @@ const numbersOf = (view) => ({
   assert.equal((await fetch(`${BASE_URL}/es`)).status, 200);
   assert.equal((await fetch(`${BASE_URL}/`, { redirect: "manual" })).status, 307);
 
-  console.log(`cost: impact cacheable and the same in EN/PT/ES (${checked} games), live card a day, favicon, junk paths 404`);
+  console.log(`cost: impact cacheable by kick-off and the same in EN/PT/ES (${checked} games), live card a day, favicon, junk paths 404`);
 })().catch((error) => {
   console.error(error);
   process.exit(1);

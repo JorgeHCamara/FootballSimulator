@@ -25,8 +25,31 @@ export const IMPACT_KEEP_SECONDS = 86_400;
 /** Beyond this long before kick-off (ms), the entry isn't keyed by the league's data version: 48 hours. */
 export const IMPACT_FAR_MS = 48 * 3_600_000;
 
-/** The route's answer for a game (numbers or null): kept a day by the CDN, served stale a week while it's redrawn. */
+/** Is the game more than IMPACT_FAR_MS away from kick-off? */
+export const isFarFromKickoff = (kickoff: string, now: number = Date.now()) => Date.parse(kickoff) - now > IMPACT_FAR_MS;
+
+/** The route's answer for a game far from kick-off, at most: kept a day by the CDN, served stale a week while it's redrawn. */
 export const IMPACT_CACHE_CONTROL = `public, max-age=0, s-maxage=${IMPACT_KEEP_SECONDS}, stale-while-revalidate=604800`;
+
+/** …and for a game within 48 hours of kick-off (or under way): three hours, stale a day, as before the far key. */
+export const IMPACT_NEAR_CACHE_CONTROL = "public, max-age=0, s-maxage=10800, stale-while-revalidate=86400";
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+/**
+ * The route's Cache-Control for a game, by its kick-off, split as its key is
+ * (impactKeyFor): within 48 hours of kick-off or after it, IMPACT_NEAR_CACHE_CONTROL,
+ * so the CDN copy follows each new result as it did before. Further off, the
+ * CDN may keep it as long as the game stays far, T seconds (until 48 hours
+ * before kick-off): s-maxage T, between three hours and a day, and
+ * stale-while-revalidate T, between a day and a week. A far copy then
+ * outlives the 48-hour line by no more than the near margins.
+ */
+export function impactCacheControl(kickoff: string, now: number = Date.now()): string {
+  if (!isFarFromKickoff(kickoff, now)) return IMPACT_NEAR_CACHE_CONTROL;
+  const untilNear = Math.floor((Date.parse(kickoff) - IMPACT_FAR_MS - now) / 1000);
+  return `public, max-age=0, s-maxage=${clamp(untilNear, 10_800, IMPACT_KEEP_SECONDS)}, stale-while-revalidate=${clamp(untilNear, 86_400, 604_800)}`;
+}
 
 /** The route's 404 (no such game, or moved): kept an hour by the CDN, so a crawler's repeats don't each look it up. */
 export const IMPACT_MISSING_CACHE_CONTROL = "public, max-age=0, s-maxage=3600";
@@ -60,8 +83,6 @@ export function impactCacheKey({ league, slug, dataVersion, xg }: ImpactKeyParts
   return ["match-impact", league, slug, dataVersion, xg, `sim-${SIM_VERSION}`];
 }
 
-/** Is the game more than IMPACT_FAR_MS away from kick-off? */
-export const isFarFromKickoff = (kickoff: string, now: number = Date.now()) => Date.parse(kickoff) - now > IMPACT_FAR_MS;
 
 /** A far-off game's key: league, match, kick-off and SIM_VERSION (no data version, no xG, no locale). */
 export function farImpactCacheKey({ league, slug, kickoff }: { league: string; slug: string; kickoff: string }): string[] {
