@@ -4,7 +4,9 @@
 // Requires Playwright with Chromium (npx playwright install chromium).
 
 const assert = require("node:assert/strict");
+const { assertImpactCacheControl } = require("./impactHeader.cjs");
 const { chromium } = require("playwright");
+const { fullSitemap, sitemapPieces } = require("./sitemap.cjs");
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 const LEAGUE = `${BASE_URL}/en/bundesliga`;
@@ -635,7 +637,7 @@ async function step(name, fn) {
       await p.getByTestId("view-chances").click();
       await p.waitForURL(/\/en\/fa-cup#chances$/);
       await p.locator('[role="tab"][aria-selected="true"]', { hasText: "Chances" }).waitFor();
-      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       assert.doesNotMatch(sitemap, /fa-cup\/past-winners/, "not in the sitemap until it has its history");
       await p.goto(`${BASE_URL}/pt/copa-do-brasil/past-winners`);
       assert.equal((await p.locator("h1").innerText()).trim(), "Campeões anteriores da Copa do Brasil");
@@ -1661,7 +1663,7 @@ async function step(name, fn) {
       assert.equal(await p.locator('script[src*="adsbygoogle"]').count(), 0);
       assert.equal(await p.locator('meta[name="google-adsense-account"]').count(), 0);
       if (!process.env.EXPECT_ADSENSE) assert.equal((await p.request.get(`${BASE_URL}/ads.txt`)).status(), 404);
-      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const page of ["about", "privacy", "contact"]) assert.match(sitemap, new RegExp(`footsimu\\.com/es/${page}<`));
       await p.close();
     });
@@ -1787,7 +1789,7 @@ async function step(name, fn) {
       assert.equal(await p.getByTestId("past-winners-tab").count(), 0);
       assert.equal((await p.request.get(`${BASE_URL}/en/primeira-liga/past-winners`)).status(), 404);
       // The sitemap lists the page in every language.
-      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/premier-league/past-winners<`));
       // PT and ES.
       await p.goto(`${BASE_URL}/pt/premier-league/past-winners`);
@@ -1981,7 +1983,7 @@ async function step(name, fn) {
       assert.match(await page.title(), /^Football Simulator/);
       assert.equal(await page.locator("main svg[viewBox='0 0 30 20']").count() >= 6, true, "home flags");
 
-      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       assert.match(sitemap, /footsimu\.com\/pt\/brasileirao/);
       const robots = await (await page.request.get(`${BASE_URL}/robots.txt`)).text();
       assert.match(robots, /Sitemap: https:\/\/footsimu\.com\/sitemap\.xml/);
@@ -2059,7 +2061,7 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}${href.replace(/^\/en/, "/es")}`);
       assert.match(await p.getByTestId("club-subtitle").innerText(), / · Probabilidades de título, Champions League y descenso$/);
       // Conferences (MLS) and annual tables (Argentina) have pages too; continental competitions don't.
-      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const slug of ["mls", "argentina-primera-division", "greek-super-league", "brasileirao"]) {
         const url = sitemap.match(new RegExp(`https://footsimu.com/en/${slug}/team/[a-z0-9-]+`))?.[0];
         assert.ok(url, slug);
@@ -2079,7 +2081,7 @@ async function step(name, fn) {
     });
 
     await step("MLS club pages: every club's page answers 200 in every language, all requested at once", async () => {
-      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       const paths = [...new Set([...sitemap.matchAll(/<loc>https:\/\/footsimu\.com\/en(\/mls\/team\/[a-z0-9-]+)<\/loc>/g)].map((m) => m[1]))];
       assert.equal(paths.length, 30, "every MLS club");
       // A crawl: every club page in every language at the same moment.
@@ -2090,7 +2092,7 @@ async function step(name, fn) {
     });
 
     await step("club pages: play-off chances (Championship promotion, the MLS Cup) next to the play-off places", async () => {
-      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       const first = (slug) => sitemap.match(new RegExp(`https://footsimu\\.com(/en/${slug}/team/[a-z0-9-]+)`))[1];
       await p.goto(`${BASE_URL}${first("championship")}`);
@@ -2110,7 +2112,7 @@ async function step(name, fn) {
     });
 
     await step("match pages: odds, scores, dice, what each result means, played games, SEO, card, redirects, sitemap", async () => {
-      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       const urls = [...sitemap.matchAll(/<loc>https:\/\/footsimu\.com(\/en\/premier-league\/match\/[a-z0-9-]+)<\/loc>/g)].map((m) => m[1]);
       assert.ok(urls.length > 0, "games in the sitemap");
       const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
@@ -2150,11 +2152,13 @@ async function step(name, fn) {
       assert.equal(await p.getByTestId("match-impact-loading").count(), 0);
       assert.ok((await p.getByTestId("match-impact-row").count()) >= 2);
       // Its own address: JSON, kept by the CDN, not for search engines; an unknown game's is a 404.
+      const askedAt = Date.now();
       const impact = await p.request.get(`${new URL(p.url()).pathname}/impact`.replace(/^/, BASE_URL));
       assert.equal(impact.status(), 200);
       assert.match(impact.headers()["content-type"], /application\/json/);
       assert.equal(impact.headers()["x-robots-tag"], "noindex");
-      assert.match(impact.headers()["cache-control"], /s-maxage=10800, stale-while-revalidate=86400/);
+      // Kept by the CDN by its kick-off: three hours within 48 hours of it, longer further off (impactCacheControl).
+      await assertImpactCacheControl(impact.headers()["cache-control"], ld["@graph"][0].startDate, askedAt, Date.now(), "impact");
       const numbers = await impact.json();
       assert.ok(numbers.rows.length >= 2);
       // The same numbers in every language, each in its own words.
@@ -2363,7 +2367,7 @@ async function step(name, fn) {
       assert.match(await p.getByTestId("odds-movers").innerText(), /first report/);
       assert.equal(await p.locator('[data-testid="odds-table"] svg[data-icon^="trending"]').count(), 0, "no changes");
       assert.doesNotMatch(await p.getByTestId("odds-table").innerText(), /±0/, "no made-up ±0");
-      const firstMap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const firstMap = await fullSitemap(BASE_URL);
       assert.ok(!firstMap.includes(`https://footsimu.com${first}<`), "the first report isn't in the sitemap");
       assert.ok(firstMap.includes(`https://footsimu.com${archive[0]}<`), "the latest is");
       // Portuguese and Spanish.
@@ -2379,7 +2383,7 @@ async function step(name, fn) {
       assert.equal(await p.locator("h1").count(), 1);
       assert.ok((await p.getByTestId("odds-hub-item").count()) >= 30);
       // Every report in the sitemap.
-      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const path of ["/en/odds", "/pt/premier-league/odds", ...archive.slice(0, -1).map((a) => a.replace(/^\/en/, "/es"))]) assert.ok(sitemap.includes(`https://footsimu.com${path}<`), path);
       await p.close();
       // Phones: nothing past the screen's edge; the menu's link.
@@ -2454,7 +2458,7 @@ async function step(name, fn) {
       assert.equal(firstCard.status(), 200);
       assert.deepEqual(await pngSize(firstCard), [1200, 630]);
       // Not pages: none of them in the sitemap.
-      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       assert.doesNotMatch(sitemap, /movers-image|opengraph-image/);
 
       // A club page: its card under its chances, with the share menu (as well as the one in its header).
@@ -2591,7 +2595,7 @@ async function step(name, fn) {
         assert.equal((await p.request.get(`${BASE_URL}${path}`)).status(), 404, path);
       }
       // The sitemap: the league's pages, and clubs' while open.
-      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       assert.match(sitemap, /footsimu\.com\/en\/premier-league\/chances\/title</);
       assert.match(sitemap, /footsimu\.com\/es\/premier-league\/team\/[a-z0-9-]+\/chances\/relegation</);
       assert.ok(!sitemap.includes(`footsimu.com${favourite}/chances/relegation<`), "a settled club page isn't listed");
@@ -2693,7 +2697,7 @@ async function step(name, fn) {
         await phone.locator('[data-testid="quiz-question"][data-index="1"]').waitFor();
         await phone.close();
       }
-      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/quiz<`));
     });
 
@@ -2701,7 +2705,7 @@ async function step(name, fn) {
       // The default build (the site as it is during the AdSense review) has no slots. A build with
       // NEXT_PUBLIC_ADS_SLOTS=1 (and the debug flag) is checked with E2E_ADS=1.
       const flagged = process.env.E2E_ADS === "1";
-      const sitemap = await (await page.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       const club = sitemap.match(/https:\/\/footsimu\.com(\/en\/premier-league\/team\/[a-z0-9-]+)</)[1];
       for (const [width, height, phone] of [[1280, 900, false], [390, 844, true]]) {
         const ctx = await browser.newContext({ viewport: { width, height }, ...(phone ? { isMobile: true, hasTouch: true } : {}) });
@@ -2745,7 +2749,7 @@ async function step(name, fn) {
       assert.equal(await card.getAttribute("href"), "/en/my-world");
       assert.ok((await card.boundingBox()).y < 900, "on the first screen");
       assert.equal(await p.getByTestId("nav-my-world").getAttribute("href"), "/en/my-world");
-      const sitemap = await (await p.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/my-world<`));
       await card.click();
       await p.waitForURL(/\/en\/my-world$/);
@@ -3804,7 +3808,7 @@ async function step(name, fn) {
       const england = (await phone.locator('[data-testid="mobile-menu"] a').allInnerTexts()).map((x) => x.trim());
       assert.ok(england.indexOf("EFL Cup") === england.indexOf("FA Cup") + 1, england.join(", "));
       assert.equal(await phone.locator('[data-testid="mobile-menu"] a', { hasText: "EFL Cup" }).getAttribute("href"), "/en/efl-cup");
-      const sitemap = await (await phone.request.get(`${BASE_URL}/sitemap.xml`)).text();
+      const sitemap = await fullSitemap(BASE_URL);
       for (const locale of ["en", "pt", "es"]) assert.match(sitemap, new RegExp(`footsimu\\.com/${locale}/efl-cup<`));
       await phone.context().close();
     });
@@ -4016,7 +4020,23 @@ async function step(name, fn) {
 
     await step("sitemap: every address in three languages; dates say when each last changed, never when the sitemap was built", async () => {
       const started = Date.now();
-      const xml = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
+      // /sitemap.xml is an index of pieces: the site's and one per league. Each stays far below the 4.5 MB a
+      // Vercel function may answer with, or it could never be regenerated at run time (as the single 6.5 MB
+      // sitemap couldn't), and no game in it is outside the index window (the past 30 days, the next 14).
+      const pieces = await sitemapPieces(BASE_URL);
+      assert.ok(pieces.length > 10, `${pieces.length} pieces`);
+      assert.ok(pieces.some((p) => p.loc === "https://footsimu.com/sitemaps/sitemap/site.xml"), "the site's piece");
+      assert.ok(pieces.some((p) => p.loc === "https://footsimu.com/sitemaps/sitemap/premier-league.xml"), "a league's piece");
+      for (const p of pieces) {
+        assert.ok(Buffer.byteLength(p.text) < 2 * 1024 * 1024, `${p.loc}: ${Buffer.byteLength(p.text)} bytes`);
+        assert.match(p.text, /<urlset[^>]*>/, p.loc);
+      }
+      const xml = pieces.map((p) => p.text).join("\n");
+      const day = 86_400_000;
+      for (const [, date] of xml.matchAll(/<loc>[^<]*\/match\/[a-z0-9-]+-(\d{4}-\d{2}-\d{2})<\/loc>/g)) {
+        const at = Date.parse(`${date}T12:00:00Z`);
+        assert.ok(at >= started - 31 * day && at <= started + 15 * day, `a game of ${date} in the sitemap`);
+      }
       const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => ({ loc: /<loc>([^<]+)<\/loc>/.exec(m[1])[1], lastmod: /<lastmod>([^<]+)<\/lastmod>/.exec(m[1])?.[1] }));
       const path = (e) => new URL(e.loc).pathname;
       const of = (pathname) => entries.find((e) => path(e) === pathname);
@@ -4048,7 +4068,7 @@ async function step(name, fn) {
       for (const e of settled) assert.equal(e.lastmod, settledAt(e), path(e));
       assert.deepEqual([...new Set(own.filter((e) => !settled.includes(e)).map((e) => e.lastmod))], [league], "its club, match and chance pages, in three languages");
       // Asked for again: the same dates (nothing is stamped "now").
-      const again = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
+      const again = await fullSitemap(BASE_URL);
       const strip = (text) => text.replace(/<lastmod>[^<]*<\/lastmod>/g, "");
       assert.equal(strip(again), strip(xml));
       const datesOf = (text) => [...text.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((m) => m[1]);

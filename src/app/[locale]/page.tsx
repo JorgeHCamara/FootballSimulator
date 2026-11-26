@@ -8,6 +8,7 @@ import { COMPETITIONS } from "../../config/competitions.ts";
 import { HOME_LEAGUES, LEAGUES, type SiteLocale } from "../../config/leagues.ts";
 import { Link } from "../../i18n/navigation.ts";
 import { HREFLANG, MY_WORLD_LISTED, SITE_NAME, SITE_URL, faqJsonLd, type FaqItem } from "../../lib/site.ts";
+import { requireLocale } from "../../lib/localeGuard.ts";
 import { pageClock } from "../../lib/sharedOutlook.ts";
 
 /**
@@ -27,6 +28,8 @@ export const maxDuration = 60;
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  // Not a language (/favicon.ico, /wp-login.php…): a 404 before anything is read (src/lib/localeGuard.ts).
+  requireLocale(locale);
   setRequestLocale(locale);
   // The safety net whatever its leagues' data does (a render that loads none reads no other entry): see pageClock.
   await pageClock("home");

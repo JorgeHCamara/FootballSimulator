@@ -7,6 +7,7 @@ import { OG_SIZE } from "../../../../../lib/ogImage.tsx";
 import { cardRows, scenarioOutcome, SCENARIO_ITERATIONS } from "../../../../../lib/scenario.ts";
 import { crestDataUri, renderGenericShareCard, renderShareCard } from "../../../../../lib/shareCard.tsx";
 import { loadSharedScenario } from "../../../../../lib/sharedScenario.ts";
+import { timedCard } from "../../../../../lib/cardPerf.ts";
 
 export const alt = "FootSimu prediction";
 export const size = OG_SIZE;
@@ -17,7 +18,7 @@ export const contentType = "image/png";
  * (nothing is stored), or a branded card for the league when the link holds
  * no readable scenario.
  */
-export default async function Image({ params }: { params: Promise<{ locale: string; league: string; code: string }> }) {
+async function drawImage({ params }: { params: Promise<{ locale: string; league: string; code: string }> }) {
   const { locale, league: slug, code } = await params;
   const lang = (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
   const [t, tz] = await Promise.all([getTranslations({ locale: lang, namespace: "ShareCard" }), getTranslations({ locale: lang, namespace: "Zones" })]);
@@ -77,4 +78,10 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   });
   // With the crests; if one can't be drawn, names only; then the branded card.
   return firstCardThatRenders([() => card(true), () => card(false), generic]);
+}
+
+/** The card, with its [perf] line (src/lib/cardPerf.ts). */
+export default async function Image(props: { params: Promise<{ locale: string; league: string; code: string }> }) {
+  const p = await props.params;
+  return timedCard("share", p.locale, `${p.league}/${p.code}`, () => drawImage(props));
 }

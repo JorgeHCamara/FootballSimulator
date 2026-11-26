@@ -1,4 +1,5 @@
 import type { Fixture, Team } from "../engine/types.ts";
+import { perfLog, since } from "./perfLog.ts";
 
 // Client for ESPN's public site API: the only source for competitions
 // football-data.org's free tier doesn't cover (Brasileirão Série B) and the
@@ -6,6 +7,37 @@ import type { Fixture, Team } from "../engine/types.ts";
 // needs no key, but its shape may change without notice.
 
 const BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer";
+
+/** How long one ESPN request may take before it's given up (ms), where a caller asks for a limit (EspnInit.timeoutMs). */
+export const ESPN_TIMEOUT_MS = 8000;
+
+/**
+ * A request's options, plus two of ours (both off unless given):
+ * - timeoutMs: each request is aborted after that long (its own AbortSignal.timeout), so a slow ESPN can't
+ *   hold the function open. The caller sees an error, as for any failed request.
+ * - perf: one `[perf]` line per request (op "espn-fetch": the address past the API's base, its time with the
+ *   body read, its status or "timeout").
+ */
+export type EspnInit = RequestInit & { timeoutMs?: number; perf?: boolean };
+
+/** fetch, with EspnInit's two options (see there). */
+export async function espnFetch(url: string, { timeoutMs, perf, ...init }: EspnInit = {}): Promise<Response> {
+  const request = timeoutMs ? { ...init, signal: AbortSignal.timeout(timeoutMs) } : init;
+  if (!perf) return fetch(url, request);
+  const key = url.replace(/^https:\/\/site\.api\.espn\.com\/apis\/(site\/)?v2\/sports\/soccer\//, "");
+  const start = performance.now();
+  try {
+    const res = await fetch(url, request);
+    // The body read here (and handed on as it was), so the time is the whole download, within the same timeout.
+    const body = await res.arrayBuffer();
+    perfLog({ op: "espn-fetch", key, ms: since(start), cache: "miss", status: res.status, kb: Math.round(body.byteLength / 1024) });
+    return new Response([204, 205, 304].includes(res.status) ? null : body, { status: res.status, statusText: res.statusText, headers: res.headers });
+  } catch (error) {
+    const timedOut = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+    perfLog({ op: "espn-fetch", key, ms: since(start), cache: "miss", ...(timedOut ? { timeout: true } : { error: true }) });
+    throw error;
+  }
+}
 
 export interface EspnCompetitor {
   homeAway: "home" | "away";
@@ -54,8 +86,8 @@ export class EspnError extends Error {
 }
 
 /** Every event in one calendar year (ESPN's "dates" filter accepts a plain year, not a range). */
-export async function fetchEspnYear(slug: string, year: number, init: RequestInit = {}): Promise<EspnScoreboard> {
-  const res = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${year}&limit=1000`, init);
+export async function fetchEspnYear(slug: string, year: number, init: EspnInit = {}): Promise<EspnScoreboard> {
+  const res = await espnFetch(`${BASE_URL}/${slug}/scoreboard?dates=${year}&limit=1000`, init);
   if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} ${year}: HTTP ${res.status}`);
   return (await res.json()) as EspnScoreboard;
 }
@@ -99,15 +131,15 @@ export function monthsBetween(from: number, to: number): string[] {
  * by the calendar months the span touches instead. Events of every stage and
  * season in those days come back: the caller picks its own.
  */
-export async function fetchEspnDays(slug: string, from: number, to: number, init: RequestInit = {}): Promise<EspnEvent[]> {
+export async function fetchEspnDays(slug: string, from: number, to: number, init: EspnInit = {}): Promise<EspnEvent[]> {
   const day = 86_400_000;
   const range = `${yyyymmdd(from - day)}-${yyyymmdd(to + day)}`;
-  const res = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${range}&limit=300`, init);
+  const res = await espnFetch(`${BASE_URL}/${slug}/scoreboard?dates=${range}&limit=300`, init);
   if (res.ok) return ((await res.json()) as EspnScoreboard).events ?? [];
   if (res.status !== 400) throw new EspnError(res.status, `ESPN ${slug} ${range}: HTTP ${res.status}`);
   const byId = new Map<string, EspnEvent>();
   for (const month of monthsBetween(from - day, to + day)) {
-    const board = await fetch(`${BASE_URL}/${slug}/scoreboard?dates=${month}&limit=300`, init);
+    const board = await espnFetch(`${BASE_URL}/${slug}/scoreboard?dates=${month}&limit=300`, init);
     if (!board.ok) throw new EspnError(board.status, `ESPN ${slug} ${month}: HTTP ${board.status}`);
     for (const event of ((await board.json()) as EspnScoreboard).events ?? []) byId.set(event.id, event);
   }
@@ -159,8 +191,8 @@ export function espnDeductions(data: EspnStandings): Record<number, number> {
 }
 
 /** Points deductions in the league's current ESPN standings. */
-export async function fetchEspnDeductions(slug: string, year: number, init: RequestInit = {}): Promise<Record<number, number>> {
-  const res = await fetch(`https://site.api.espn.com/apis/v2/sports/soccer/${slug}/standings?season=${year}`, init);
+export async function fetchEspnDeductions(slug: string, year: number, init: EspnInit = {}): Promise<Record<number, number>> {
+  const res = await espnFetch(`https://site.api.espn.com/apis/v2/sports/soccer/${slug}/standings?season=${year}`, init);
   if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} standings ${year}: HTTP ${res.status}`);
   return espnDeductions((await res.json()) as EspnStandings);
 }
@@ -169,9 +201,9 @@ export async function fetchEspnDeductions(slug: string, year: number, init: Requ
 export async function fetchEspnGroups(
   slug: string,
   year: number,
-  init: RequestInit = {},
+  init: EspnInit = {},
 ): Promise<{ name: string; teamIds: number[] }[]> {
-  const res = await fetch(`https://site.api.espn.com/apis/v2/sports/soccer/${slug}/standings?season=${year}`, init);
+  const res = await espnFetch(`https://site.api.espn.com/apis/v2/sports/soccer/${slug}/standings?season=${year}`, init);
   if (!res.ok) throw new EspnError(res.status, `ESPN ${slug} standings ${year}: HTTP ${res.status}`);
   const data = (await res.json()) as EspnStandings;
   return (data.children ?? []).map((group) => ({
@@ -189,7 +221,7 @@ export async function fetchEspnSeason(
   slug: string,
   year: number,
   seasons: "split" | "calendar",
-  init: RequestInit = {},
+  init: EspnInit = {},
 ): Promise<EspnEvent[]> {
   const years = seasons === "split" ? [year, year + 1] : [year];
   const boards = await Promise.all(years.map((y) => fetchEspnYear(slug, y, init)));

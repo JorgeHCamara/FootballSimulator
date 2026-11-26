@@ -6,6 +6,7 @@ import { clubCardChances, loadClub } from "../../../../../lib/clubPage.ts";
 import { ordinal, placeRange } from "../../../../../lib/clubText.ts";
 import { OG_SIZE } from "../../../../../lib/ogImage.tsx";
 import { crestDataUri, renderClubCard, renderGenericShareCard } from "../../../../../lib/shareCard.tsx";
+import { timedCard } from "../../../../../lib/cardPerf.ts";
 
 export const alt = "FootSimu club chances";
 export const size = OG_SIZE;
@@ -14,7 +15,7 @@ export const contentType = "image/png";
 export const maxDuration = 60;
 
 /** A club page's card: its crest and name, where it stands and its chances (the page's own numbers). */
-export default async function Image({ params }: { params: Promise<{ locale: string; league: string; teamSlug: string }> }) {
+async function drawImage({ params }: { params: Promise<{ locale: string; league: string; teamSlug: string }> }) {
   const { locale, league: slug, teamSlug } = await params;
   const lang = (["en", "pt", "es"].includes(locale) ? locale : "en") as SiteLocale;
   const [t, tz, ts, tc] = await Promise.all([
@@ -45,4 +46,10 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
     });
   // With the crest; if it can't be drawn, with the initials; then the branded card.
   return firstCardThatRenders([() => card(true), () => card(false), generic]);
+}
+
+/** The card, with its [perf] line (src/lib/cardPerf.ts). */
+export default async function Image(props: { params: Promise<{ locale: string; league: string; teamSlug: string }> }) {
+  const p = await props.params;
+  return timedCard("team", p.locale, `${p.league}/${p.teamSlug}`, () => drawImage(props));
 }

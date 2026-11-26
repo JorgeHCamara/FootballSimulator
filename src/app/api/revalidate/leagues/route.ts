@@ -1,6 +1,7 @@
 import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 import { authorized } from "../../../../lib/leagueRefresh.ts";
+import { perfLog, since } from "../../../../lib/perfLog.ts";
 import { announcePublications, expireArchives, refreshLeagues } from "../../../../lib/refreshRun.ts";
 
 /** Every domestic league's ESPN data, a few leagues at a time. */
@@ -61,5 +62,11 @@ export async function GET(request: NextRequest) {
   if (publish) return Response.json(await announcePublications(publish, { expire }), noStore);
 
   const only = params.get("league")?.toUpperCase();
-  return Response.json(await refreshLeagues({ ...(only ? { only } : {}), full: params.get("full") === "1" }, { expire }), noStore);
+  const start = performance.now();
+  const run = await refreshLeagues({ ...(only ? { only } : {}), full: params.get("full") === "1" }, { expire });
+  // One [perf] line for the run (each ESPN request has its own, op "espn-fetch"): how many leagues were checked,
+  // downloaded and refreshed, and which ones were refreshed.
+  const unavailable = run.results.filter((r) => r.reason === "unavailable").length;
+  perfLog({ op: "revalidate-leagues", key: only ?? "all", ms: since(start), cache: "miss", checked: run.checked, fetched: run.fetched, scoreboards: run.scoreboards, refreshed: run.refreshed.length, unavailable, leagues: run.refreshed.join(",") });
+  return Response.json(run, noStore);
 }
