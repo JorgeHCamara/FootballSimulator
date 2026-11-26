@@ -13,7 +13,8 @@ describe("share cards: how long they're kept", () => {
   it("keeps a card that can't change far longer than a live one, and a stand-in briefly", () => {
     const cdn = (cache: keyof typeof CARD_CACHE_HEADERS) => maxAge(CARD_CACHE_HEADERS[cache]["Cache-Control"], "s-maxage");
     assert.equal(cdn("final"), 31536000);
-    assert.equal(cdn("live"), 3600);
+    assert.equal(cdn("live"), 86400, "a day at the CDN: no revalidate tag reaches these responses, so not a week");
+    assert.equal(maxAge(CARD_CACHE_HEADERS.live["Cache-Control"], "max-age"), 3600, "browsers keep an hour, as before");
     assert.equal(cdn("brief"), 300);
     for (const cache of ["final", "live", "brief"] as const) assert.match(CARD_CACHE_HEADERS[cache]["Cache-Control"], /^public, /);
   });

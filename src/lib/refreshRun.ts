@@ -1,7 +1,7 @@
 import { LEAGUES, type LeagueConfig } from "../config/leagues.ts";
 import { archiveTag } from "./archiveTag.ts";
 import { hasClubPages } from "./clubs.ts";
-import { fetchEspnDays, type EspnEvent } from "./espn.ts";
+import { ESPN_TIMEOUT_MS, fetchEspnDays, type EspnEvent } from "./espn.ts";
 import { freshLeagueData, getLeagueBase, type LeagueData } from "./leagueData.ts";
 import { activeSpan, refreshPlan, refreshReason, scoreboardVerdict, type CheckWhy, type RefreshReason } from "./leagueRefresh.ts";
 import { parsePublications, publicationState, publishedSource, publishedTag, type PublicationState, type PublishedSource } from "./publishedData.ts";
@@ -55,7 +55,7 @@ export async function refreshLeagues({ only, full }: { only?: string; full?: boo
   // publication (announcePublications), as before.
   const cachedOf = deps.cached ?? ((league: LeagueConfig) => getLeagueBase(league).catch(() => undefined));
   const freshOf = deps.fresh ?? ((league: LeagueConfig) => freshLeagueData(league, { xg: false }));
-  const scoreboard = deps.scoreboard ?? ((slug: string, from: number, to: number) => fetchEspnDays(slug, from, to, { cache: "no-store" }));
+  const scoreboard = deps.scoreboard ?? ((slug: string, from: number, to: number) => fetchEspnDays(slug, from, to, { cache: "no-store", timeoutMs: ESPN_TIMEOUT_MS, perf: true }));
   const leagues = LEAGUES.filter((l) => hasClubPages(l) && (!only || l.code === only));
   const now = deps.now ?? Date.now();
   const results: RefreshResult[] = [];

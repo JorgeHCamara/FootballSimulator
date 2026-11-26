@@ -2155,7 +2155,7 @@ async function step(name, fn) {
       assert.equal(impact.status(), 200);
       assert.match(impact.headers()["content-type"], /application\/json/);
       assert.equal(impact.headers()["x-robots-tag"], "noindex");
-      assert.match(impact.headers()["cache-control"], /s-maxage=10800, stale-while-revalidate=86400/);
+      assert.match(impact.headers()["cache-control"], /^public, max-age=0, s-maxage=86400, stale-while-revalidate=604800$/);
       const numbers = await impact.json();
       assert.ok(numbers.rows.length >= 2);
       // The same numbers in every language, each in its own words.

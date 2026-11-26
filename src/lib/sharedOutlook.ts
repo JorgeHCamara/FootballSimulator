@@ -8,6 +8,7 @@ import type { LeagueData } from "./leagueData.ts";
 import { SCENARIO_ITERATIONS, SCENARIO_SEED } from "./scenario.ts";
 import { SIM_VERSION } from "./simVersion.ts";
 import { safetyNetSeconds } from "./costChoices.ts";
+import { perfLog, since } from "./perfLog.ts";
 
 /*
  * One season outlook per league, data version and model, shared by every page
@@ -85,18 +86,40 @@ const pending = new Map<string, Promise<MonteCarloResult>>();
 function sharedRun(league: LeagueConfig, setup: OutlookSetup, version: string): Promise<MonteCarloResult> {
   const shape: RunShape = setup.input.playoff ? "playoff" : "table";
   const id = `${league.code}:${version}:${shape}`;
+  const start = performance.now();
+  // For the [perf] line only: did this call run the simulation (miss), wait for one in flight (shared), or neither (hit)?
+  let ran: "run" | "shared" | undefined;
+  let runMs: number | undefined;
   const work = () => {
     let promise = pending.get(id);
     if (!promise) {
-      promise = Promise.resolve().then(() => runMonteCarlo({ ...setup.input, iterations: SCENARIO_ITERATIONS, seed: SCENARIO_SEED }));
+      ran = "run";
+      promise = Promise.resolve().then(() => {
+        const t0 = performance.now();
+        const result = runMonteCarlo({ ...setup.input, iterations: SCENARIO_ITERATIONS, seed: SCENARIO_SEED });
+        runMs = since(t0);
+        return result;
+      });
       pending.set(id, promise);
       const forget = () => pending.delete(id);
       promise.then(forget, forget);
-    }
+    } else ran = "shared";
     return promise;
   };
   // The same data and model always give the same run: kept until runTag is revalidated.
-  return fromDataCache(work, outlookKey(league.code, version, shape), [runTag(league.code)]);
+  const run = fromDataCache(work, outlookKey(league.code, version, shape), [runTag(league.code)]);
+  void run.then(() =>
+    perfLog({
+      op: "league-outlook",
+      key: league.slug,
+      ms: since(start),
+      cache: ran ? "miss" : "hit",
+      version,
+      ...(ran === "shared" ? { shared: true } : {}),
+      ...(runMs !== undefined ? { runMs, runs: SCENARIO_ITERATIONS } : {}),
+    }),
+  ).catch(() => {});
+  return run;
 }
 
 /**
