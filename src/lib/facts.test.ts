@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { allSitemapEntries as sitemap, SITEMAP_PAST_DAYS, sitemapEntries } from "./sitemapEntries.ts";
+import { inIndexWindow, leagueMatches } from "./matches.ts";
+import { getLeagueData } from "./leagueData.ts";
+import { allSitemapEntries as sitemap, SITEMAP_MAX_AGE_DAYS, SITEMAP_PAST_DAYS, sitemapEntries } from "./sitemapEntries.ts";
 import { SITE_SITEMAP, sitemapIds } from "./sitemapIds.ts";
 import { matchOutsideWindow } from "./sitemapWindow.ts";
 import { LEAGUES } from "../config/leagues.ts";
@@ -162,7 +164,7 @@ describe("the sitemap", () => {
     assert.equal(new Set(urls).size, urls.length, "no duplicates");
   });
 
-  it("lists every league game from the past 30 days to the next 14, in every language", async () => {
+  it("lists every league game from the past 6 days to the next 7, in every language", async () => {
     const entries = await sitemap();
     const games = entries.filter((e) => e.url.includes("/match/"));
     assert.ok(games.length > 0);
@@ -170,7 +172,7 @@ describe("the sitemap", () => {
     for (const e of games) {
       const date = Date.parse(`${e.url.slice(-10)}T12:00:00Z`);
       // The address has the local day: up to a day either side of the window in UTC.
-      assert.ok(date >= Date.now() - 31 * day && date <= Date.now() + 15 * day, e.url);
+      assert.ok(date >= Date.now() - 7 * day && date <= Date.now() + 8 * day, e.url);
       assert.match(e.url, /\/(en|pt|es)\/[a-z0-9-]+\/match\/[a-z0-9-]+-vs-[a-z0-9-]+-\d{4}-\d{2}-\d{2}$/);
     }
     for (const locale of ["pt", "es"]) assert.equal(games.filter((e) => e.url.includes(`/${locale}/`)).length, games.length / 3);
@@ -191,12 +193,36 @@ describe("the sitemap", () => {
   it("leaves a game out a day before its page turns noindex, so a piece served a day old lists none", async () => {
     const day = 86_400_000;
     const now = Date.now();
-    assert.equal(SITEMAP_PAST_DAYS, 29);
+    assert.equal(SITEMAP_PAST_DAYS, 6);
     const games = (await sitemap(now)).filter((e) => e.url.includes("/match/"));
     const oldest = games.map((e) => Date.parse(`${e.url.slice(-10)}T12:00:00Z`)).sort((a, b) => a - b)[0]!;
     // The address has the local day: a day's leeway.
     assert.ok(oldest >= now - (SITEMAP_PAST_DAYS + 1) * day, new Date(oldest).toISOString());
     for (const e of games) assert.ok(!matchOutsideWindow(e.url, now + day), `${e.url}, a day later`);
+  });
+
+  it("lists only indexable match pages: none would say noindex now, or when the piece is SITEMAP_MAX_AGE_DAYS old", async () => {
+    const day = 86_400_000;
+    // Each match page's kick-off, by its address in every language.
+    const kickoffs = new Map<string, string>();
+    for (const l of LEAGUES.filter(hasClubPages)) {
+      for (const m of leagueMatches(l, await getLeagueData(l))) for (const locale of ["en", "pt", "es"]) kickoffs.set(`https://footsimu.com/${locale}${m.path}`, m.fixture.utcDate);
+    }
+    for (const shift of [0, -5, 4]) {
+      const now = Date.now() + shift * day;
+      const entries = await sitemap(now);
+      const games = entries.filter((e) => e.url.includes("/match/"));
+      assert.ok(games.length > 0, `games ${shift} days on`);
+      for (const locale of ["en", "pt", "es"]) assert.ok(games.some((e) => e.url.includes(`/${locale}/`)), `${locale}, ${shift} days on`);
+      for (const e of games) {
+        const kickoff = kickoffs.get(e.url);
+        assert.ok(kickoff, `${e.url} is a league game`);
+        assert.ok(inIndexWindow(kickoff, now), `${e.url} (${kickoff}) indexable when listed, ${shift} days on`);
+        assert.ok(inIndexWindow(kickoff, now + SITEMAP_MAX_AGE_DAYS * day), `${e.url} (${kickoff}) still indexable when the piece is ${SITEMAP_MAX_AGE_DAYS} day old`);
+      }
+      // The other kinds are listed as before: clubs, chances, the hubs, the site's pages.
+      for (const kind of ["/team/", "/chances/", "/odds"]) assert.ok(entries.some((e) => e.url.includes(kind)), `${kind}, ${shift} days on`);
+    }
   });
 
   it("comes in pieces: the site's and one per league with club pages, each address in exactly one", async () => {
@@ -224,11 +250,11 @@ describe("the sitemap", () => {
 
 describe("matchOutsideWindow", () => {
   const now = Date.parse("2026-11-25T18:00:00Z");
-  it("allows the past 30 days and the next 14, with a day either side for the league's time zone", () => {
-    for (const day of ["2026-10-26", "2026-10-27", "2026-11-25", "2026-12-09", "2026-12-10"]) assert.equal(matchOutsideWindow(`https://footsimu.com/en/premier-league/match/arsenal-vs-chelsea-${day}`, now), false, day);
+  it("allows the past 7 days and the next 7, with a day either side for the league's time zone", () => {
+    for (const day of ["2026-11-18", "2026-11-19", "2026-11-25", "2026-12-02", "2026-12-03"]) assert.equal(matchOutsideWindow(`https://footsimu.com/en/premier-league/match/arsenal-vs-chelsea-${day}`, now), false, day);
   });
   it("flags games older or further ahead, such as a sitemap stuck at its build's window", () => {
-    for (const day of ["2026-10-16", "2026-10-25", "2026-12-11"]) assert.equal(matchOutsideWindow(`https://footsimu.com/en/premier-league/match/arsenal-vs-chelsea-${day}`, now), true, day);
+    for (const day of ["2026-10-26", "2026-11-17", "2026-12-04", "2026-12-10"]) assert.equal(matchOutsideWindow(`https://footsimu.com/en/premier-league/match/arsenal-vs-chelsea-${day}`, now), true, day);
   });
   it("leaves other addresses alone", () => {
     assert.equal(matchOutsideWindow("https://footsimu.com/en/premier-league/team/arsenal", now), false);

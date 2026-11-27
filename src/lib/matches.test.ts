@@ -54,12 +54,12 @@ describe("match page addresses", () => {
     assert.equal(slugDate(m.slug), Date.parse(`${m.slug.slice(-10)}T12:00:00Z`));
   });
 
-  it("the index window: 30 days back, 14 ahead", () => {
+  it("the index window: 7 days back, 7 ahead (src/lib/indexPolicy.test.ts has its edges)", () => {
     const now = Date.parse("2026-11-05T12:00:00Z");
-    assert.equal(inIndexWindow("2026-10-06T12:00:00Z", now), true);
-    assert.equal(inIndexWindow("2026-10-06T11:59:00Z", now), false);
-    assert.equal(inIndexWindow("2026-11-19T12:00:00Z", now), true);
-    assert.equal(inIndexWindow("2026-11-19T12:01:00Z", now), false);
+    assert.equal(inIndexWindow("2026-10-29T12:00:00Z", now), true);
+    assert.equal(inIndexWindow("2026-10-29T11:59:59Z", now), false);
+    assert.equal(inIndexWindow("2026-11-12T12:00:00Z", now), true);
+    assert.equal(inIndexWindow("2026-11-12T12:00:01Z", now), false);
   });
 
   it("the sitemap's window: games between two times", () => {

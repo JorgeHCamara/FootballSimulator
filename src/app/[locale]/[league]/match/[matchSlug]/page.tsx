@@ -37,8 +37,10 @@ import { HREFLANG, OG_LOCALE, SITE_NAME, SITE_URL, alternates } from "../../../.
  * (src/lib/settledMatch.ts): no league data read, so a new result elsewhere leaves
  * it alone; it's rebuilt when the refresh job sees the game itself corrected
  * (matchSettledTag), or after 30 days: this literal (every other page reads an
- * entry kept 24 hours at most). Inside the index window it lasts only until it
- * leaves it, so it says noindex on time (indexWindowClock).
+ * entry kept 24 hours at most). A game settles after it has left the index window
+ * (both 7 days after kick-off; settling waits for the day after the address's
+ * date), so a settled page says noindex; were one still inside the window, it
+ * would last only until it leaves it (indexWindowClock).
  */
 export const revalidate = 2592000;
 /** Three season simulations for "What this result means" on a first visit. */
@@ -89,7 +91,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title,
     description,
     alternates: alternates(locale, path),
-    // Games far from today (over 30 days ago, over 14 ahead): the page loads, search engines are pointed at the current ones.
+    // Games far from today (kicked off over INDEX_PAST_DAYS ago, or over INDEX_NEXT_DAYS ahead: src/lib/indexPolicy.ts):
+    // the page loads, search engines are pointed at the current ones. A page's `robots` replaces the layout's whole
+    // (metadata merges shallowly), its `googleBot` with it, so no indexable googlebot tag is left behind.
     ...(inIndexWindow(loaded.match.fixture.utcDate) ? {} : { robots: { index: false, follow: true } }),
     // The card comes from the opengraph-image and twitter-image files next to this page.
     openGraph: { type: "website", siteName: SITE_NAME, title, description, url: `/${locale}${path}`, locale: OG_LOCALE[locale] },
