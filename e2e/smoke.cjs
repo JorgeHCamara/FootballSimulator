@@ -4081,7 +4081,8 @@ async function step(name, fn) {
       const day = 86_400_000;
       for (const [, date] of xml.matchAll(/<loc>[^<]*\/match\/[a-z0-9-]+-(\d{4}-\d{2}-\d{2})<\/loc>/g)) {
         const at = Date.parse(`${date}T12:00:00Z`);
-        assert.ok(at >= started - 31 * day && at <= started + 15 * day, `a game of ${date} in the sitemap`);
+        // The index window (src/lib/indexPolicy.ts): 6 days back in the sitemap, 7 ahead, a day's leeway for the local date.
+        assert.ok(at >= started - 7 * day && at <= started + 8 * day, `a game of ${date} in the sitemap`);
       }
       const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => ({ loc: /<loc>([^<]+)<\/loc>/.exec(m[1])[1], lastmod: /<lastmod>([^<]+)<\/lastmod>/.exec(m[1])?.[1] }));
       const path = (e) => new URL(e.loc).pathname;
@@ -4102,17 +4103,15 @@ async function step(name, fn) {
       assert.ok(Date.parse(league) < started - 60_000, `not the build's time: ${league}`);
       const own = entries.filter((e) => /^\/(en|pt|es)\/premier-league(\/(team|match|chances)\/.+)?$/.test(path(e)));
       assert.ok(own.length > 100);
-      // A settled game's page (src/lib/settledMatch.ts: its final score in, kicked off over a week ago) no longer
-      // follows the league: it's dated when it settled, its address's date plus eight days, noon UTC.
+      // A settled game's page (src/lib/settledMatch.ts: its final score in, kicked off over a week ago, settled on its
+      // address's date plus eight days, noon UTC) has left the index window by then: none is listed, so every
+      // listed page follows the league.
       const settledAt = (e) => {
         const date = /\/match\/.*-(\d{4}-\d{2}-\d{2})$/.exec(path(e))?.[1];
-        const at = date && Date.parse(`${date}T12:00:00Z`) + 8 * 86_400_000;
-        return at && at <= started ? new Date(at).toISOString() : undefined;
+        return date && Date.parse(`${date}T12:00:00Z`) + 8 * 86_400_000 <= started;
       };
-      const settled = own.filter((e) => settledAt(e) && e.lastmod !== league);
-      assert.ok(settled.length >= 3 * 10, `settled match pages: ${settled.length}`);
-      for (const e of settled) assert.equal(e.lastmod, settledAt(e), path(e));
-      assert.deepEqual([...new Set(own.filter((e) => !settled.includes(e)).map((e) => e.lastmod))], [league], "its club, match and chance pages, in three languages");
+      assert.deepEqual(own.filter(settledAt).map(path), [], "no settled match page in the sitemap");
+      assert.deepEqual([...new Set(own.map((e) => e.lastmod))], [league], "its club, match and chance pages, in three languages");
       // Asked for again: the same dates (nothing is stamped "now").
       const again = await fullSitemap(BASE_URL);
       const strip = (text) => text.replace(/<lastmod>[^<]*<\/lastmod>/g, "");
