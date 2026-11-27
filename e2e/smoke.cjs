@@ -2205,6 +2205,50 @@ async function step(name, fn) {
       assert.equal(await p.locator('nav[aria-label="Breadcrumb"]').count(), 1);
       // Inside the index window: indexable.
       assert.equal(await p.locator('meta[name="robots"][content*="noindex"]').count(), 0);
+      // The index window (src/lib/indexPolicy.ts): 7 days either side of kick-off. In every language, a page
+      // loads (200) with its canonical and hreflang; inside the window it's indexable, outside it says
+      // `noindex, follow` (no googlebot tag left saying otherwise) and isn't in the sitemap.
+      const DAY = 86_400_000;
+      const slugDay = (url) => Date.parse(`${url.slice(-10)}T12:00:00Z`);
+      const indexing = async (url, indexable, label) => {
+        for (const [lang, path] of [["en", "en"], ["pt-BR", "pt"], ["es", "es"]]) {
+          const localized = url.replace(/^\/en/, `/${path}`);
+          const res = await p.goto(`${BASE_URL}${localized}`);
+          assert.equal(res.status(), 200, `${label} ${lang}`);
+          assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com${localized}`, `${label} ${lang} canonical`);
+          for (const [hl, hp] of [["en", "en"], ["pt-BR", "pt"], ["es", "es"], ["x-default", "en"]]) {
+            assert.equal(await p.locator(`link[rel="alternate"][hreflang="${hl}"]`).getAttribute("href"), `https://footsimu.com${url.replace(/^\/en/, `/${hp}`)}`, `${label} ${lang} hreflang ${hl}`);
+          }
+          const robots = await p.locator('meta[name="robots"]').getAttribute("content");
+          const googlebot = (await p.locator('meta[name="googlebot"]').count()) ? await p.locator('meta[name="googlebot"]').getAttribute("content") : null;
+          if (indexable) {
+            assert.doesNotMatch(robots ?? "", /noindex/, `${label} ${lang} robots`);
+            assert.doesNotMatch(googlebot ?? "", /noindex/, `${label} ${lang} googlebot`);
+            assert.ok(sitemap.includes(`https://footsimu.com${localized}<`), `${label} ${lang} in the sitemap`);
+          } else {
+            assert.match(robots ?? "", /^noindex,\s*follow$/, `${label} ${lang} robots`);
+            assert.ok(googlebot === null || /noindex/.test(googlebot), `${label} ${lang} googlebot: ${googlebot}`);
+            assert.ok(!sitemap.includes(`https://footsimu.com${localized}<`), `${label} ${lang} not in the sitemap`);
+          }
+        }
+      };
+      // A near upcoming game and a recent result (both from the sitemap: within 7 days).
+      assert.ok(slugDay(upcoming) <= Date.now() + 8 * DAY, `${upcoming} within a week`);
+      assert.ok(slugDay(playedUrl) >= Date.now() - 8 * DAY, `${playedUrl} within a week`);
+      await indexing(upcoming, true, "near upcoming");
+      await indexing(playedUrl, true, "recent result");
+      // An older result (over 7 days after kick-off): an earlier matchday's game, from the league page.
+      await p.goto(`${BASE_URL}${playedUrl}`);
+      const playedMatchday = Number((await p.getByTestId("match-subtitle").innerText()).match(/Matchday (\d+)$/)[1]);
+      await p.goto(`${BASE_URL}/en/premier-league`);
+      let olderUrl;
+      for (let md = playedMatchday - 1; md >= 1 && !olderUrl; md--) {
+        await p.getByTestId("matchday-select").selectOption(String(md));
+        const href = await p.locator('[data-testid="fixtures"]').getByRole("link", { name: "Match preview" }).first().getAttribute("href");
+        if (slugDay(href) < Date.now() - 9 * DAY) olderUrl = href;
+      }
+      assert.ok(olderUrl, "a result over a week old");
+      await indexing(olderUrl, false, "older result");
       // A game moved to another day: its old address redirects; an unknown one is a 404.
       const moved = await p.request.get(`${BASE_URL}${upcoming.replace(/\d{2}$/, (d) => String(Number(d) === 1 ? 2 : Number(d) - 1).padStart(2, "0"))}`, { maxRedirects: 0 });
       assert.equal(moved.status(), 308);
@@ -2213,7 +2257,7 @@ async function step(name, fn) {
       assert.equal((await p.goto(`${BASE_URL}/en/premier-league/match/nobody-vs-noone-2026-11-08`)).status(), 404);
       // The clubs' other meeting is months away: no redirect to it, a 404.
       assert.equal((await p.goto(`${BASE_URL}${upcoming.replace(/\d{4}-\d{2}-\d{2}$/, "2027-05-20")}`)).status(), 404);
-      // Far from today (over 14 days ahead): the page loads, asking not to be indexed.
+      // Far from today (over 7 days ahead): the page loads, asking not to be indexed.
       const leaguePage = await p.goto(`${BASE_URL}/en/premier-league`);
       assert.equal(leaguePage.status(), 200);
       // The last matchday: far ahead.
@@ -2223,10 +2267,12 @@ async function step(name, fn) {
         await matchdays.selectOption(last);
       }
       const farHref = await p.locator('[data-testid="fixtures"]').getByRole("link", { name: "Match preview" }).last().getAttribute("href");
+      assert.ok(slugDay(farHref) > Date.now() + 8 * DAY, `${farHref} over a week ahead`);
       const far = await p.goto(`${BASE_URL}${farHref}`);
       assert.equal(far.status(), 200);
       assert.match(await p.locator('meta[name="robots"]').getAttribute("content"), /noindex,\s*follow/);
       assert.ok(!sitemap.includes(`https://footsimu.com${farHref}<`), "not in the sitemap");
+      await indexing(farHref, false, "far upcoming");
       // Breadcrumb label in Portuguese and Spanish.
       await p.goto(`${BASE_URL}${upcoming.replace(/^\/en/, "/pt")}`);
       assert.equal(await p.locator('nav[aria-label="Trilha de navegação"]').count(), 1);
@@ -4035,7 +4081,8 @@ async function step(name, fn) {
       const day = 86_400_000;
       for (const [, date] of xml.matchAll(/<loc>[^<]*\/match\/[a-z0-9-]+-(\d{4}-\d{2}-\d{2})<\/loc>/g)) {
         const at = Date.parse(`${date}T12:00:00Z`);
-        assert.ok(at >= started - 31 * day && at <= started + 15 * day, `a game of ${date} in the sitemap`);
+        // The index window (src/lib/indexPolicy.ts): 6 days back in the sitemap, 7 ahead, a day's leeway for the local date.
+        assert.ok(at >= started - 7 * day && at <= started + 8 * day, `a game of ${date} in the sitemap`);
       }
       const entries = [...xml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => ({ loc: /<loc>([^<]+)<\/loc>/.exec(m[1])[1], lastmod: /<lastmod>([^<]+)<\/lastmod>/.exec(m[1])?.[1] }));
       const path = (e) => new URL(e.loc).pathname;
@@ -4056,17 +4103,15 @@ async function step(name, fn) {
       assert.ok(Date.parse(league) < started - 60_000, `not the build's time: ${league}`);
       const own = entries.filter((e) => /^\/(en|pt|es)\/premier-league(\/(team|match|chances)\/.+)?$/.test(path(e)));
       assert.ok(own.length > 100);
-      // A settled game's page (src/lib/settledMatch.ts: its final score in, kicked off over a week ago) no longer
-      // follows the league: it's dated when it settled, its address's date plus eight days, noon UTC.
+      // A settled game's page (src/lib/settledMatch.ts: its final score in, kicked off over a week ago, settled on its
+      // address's date plus eight days, noon UTC) has left the index window by then: none is listed, so every
+      // listed page follows the league.
       const settledAt = (e) => {
         const date = /\/match\/.*-(\d{4}-\d{2}-\d{2})$/.exec(path(e))?.[1];
-        const at = date && Date.parse(`${date}T12:00:00Z`) + 8 * 86_400_000;
-        return at && at <= started ? new Date(at).toISOString() : undefined;
+        return date && Date.parse(`${date}T12:00:00Z`) + 8 * 86_400_000 <= started;
       };
-      const settled = own.filter((e) => settledAt(e) && e.lastmod !== league);
-      assert.ok(settled.length >= 3 * 10, `settled match pages: ${settled.length}`);
-      for (const e of settled) assert.equal(e.lastmod, settledAt(e), path(e));
-      assert.deepEqual([...new Set(own.filter((e) => !settled.includes(e)).map((e) => e.lastmod))], [league], "its club, match and chance pages, in three languages");
+      assert.deepEqual(own.filter(settledAt).map(path), [], "no settled match page in the sitemap");
+      assert.deepEqual([...new Set(own.map((e) => e.lastmod))], [league], "its club, match and chance pages, in three languages");
       // Asked for again: the same dates (nothing is stamped "now").
       const again = await fullSitemap(BASE_URL);
       const strip = (text) => text.replace(/<lastmod>[^<]*<\/lastmod>/g, "");

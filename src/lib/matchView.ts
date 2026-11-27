@@ -104,6 +104,10 @@ const DAY = 86_400_000;
  * INDEX_PAST_DAYS days old: the page is indexable, later it says noindex):
  * kept no longer than until it leaves the window, so it says noindex on time,
  * as the live page did. A tiny entry, read only then.
+ * With INDEX_PAST_DAYS = SETTLED_MATCH_DAYS = 7 a game settles only after it
+ * has left the window (settleTime is always more than 7 days after kick-off),
+ * so this reads nothing today; it keeps a settled page honest should the two
+ * ever part.
  */
 async function indexWindowClock(kickoff: string, now: number): Promise<void> {
   const end = Date.parse(kickoff) + INDEX_PAST_DAYS * DAY;
