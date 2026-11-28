@@ -90,9 +90,9 @@ describe("files traced into the server functions", () => {
     }
   });
 
-  it("routes that read nothing get nothing: robots.txt, the legal pages, the site's and leagues' own cards", () => {
+  it("routes that read nothing get nothing: robots.txt, the legal pages, How it works, the site's and leagues' own cards", () => {
     const includes = tracingIncludes();
-    for (const route of ["/robots.txt/route", "/[locale]/about/page", "/[locale]/privacy/page", "/[locale]/contact/page", "/[locale]/opengraph-image/route", "/[locale]/[league]/opengraph-image/route"]) {
+    for (const route of ["/robots.txt/route", "/[locale]/about/page", "/[locale]/how-it-works/page", "/[locale]/privacy/page", "/[locale]/contact/page", "/[locale]/opengraph-image/route", "/[locale]/[league]/opengraph-image/route"]) {
       assert.deepEqual(Object.keys(includes).filter((glob) => matches(glob, route)), [], route);
     }
     // The fonts only where a card is drawn.

@@ -1649,11 +1649,11 @@ async function step(name, fn) {
       await p.goto(`${BASE_URL}/en/privacy`);
       const privacy = await p.locator('[data-testid="legal-page"]').innerText();
       for (const words of [/Last updated/, /local storage/, /Vercel Web Analytics/, /Google AdSense/, /consent/]) assert.match(privacy, words);
-      // The footer reaches them, in the page's language.
+      // The footer reaches them, in the page's language (How it works between About and Privacy).
       await p.goto(`${BASE_URL}/pt/premier-league`);
       const links = p.locator('[data-testid="site-links"] a');
-      assert.deepEqual(await links.allInnerTexts(), ["Sobre", "Privacidade", "Contato"]);
-      await links.nth(1).click();
+      assert.deepEqual(await links.allInnerTexts(), ["Sobre", "Como funciona", "Privacidade", "Contato"]);
+      await links.nth(2).click();
       await p.waitForURL(/\/pt\/privacy$/);
       // About links to Contact inside the site.
       await p.goto(`${BASE_URL}/en/about`);
@@ -1666,6 +1666,90 @@ async function step(name, fn) {
       const sitemap = await fullSitemap(BASE_URL);
       for (const page of ["about", "privacy", "contact"]) assert.match(sitemap, new RegExp(`footsimu\\.com/es/${page}<`));
       await p.close();
+    });
+
+    await step("How FootSimu works: in every language, indexable, with its diagram and example, linked from the footer only", async () => {
+      const p = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      const sitemap = await fullSitemap(BASE_URL);
+      const pages = {
+        en: { title: "How FootSimu works", link: "How it works" },
+        pt: { title: "Como o FootSimu funciona", link: "Como funciona" },
+        es: { title: "Cómo funciona FootSimu", link: "Cómo funciona" },
+      };
+      for (const [locale, { title, link }] of Object.entries(pages)) {
+        const response = await p.goto(`${BASE_URL}/${locale}/how-it-works`);
+        assert.equal(response.status(), 200, `${locale}/how-it-works`);
+        assert.equal((await p.locator("h1").innerText()).trim(), title);
+        assert.equal(await p.title(), `${title} | FootSimu`);
+        const article = p.getByTestId("how-it-works-page");
+        assert.equal(await p.locator("h1").count(), 1);
+        assert.equal(await article.getByTestId("how-it-works-step").count(), 4, `${locale}: four steps`);
+        assert.ok(await article.getByTestId("how-it-works-diagram").isVisible());
+        assert.ok(await article.getByTestId("how-it-works-example").isVisible());
+        assert.ok((await article.locator("h2").count()) >= 8, `${locale}: its sections`);
+        assert.match(await article.innerText(), locale === "en" ? /10,000/ : /10\.000/);
+        // Server-rendered: the article is in the HTML as sent.
+        const html = await (await p.request.get(`${BASE_URL}/${locale}/how-it-works`)).text();
+        assert.match(html, /data-testid="how-it-works-page"/);
+        assert.ok(html.includes(title), `${locale}: the heading in the HTML`);
+        // Indexable, with canonical and hreflang.
+        assert.doesNotMatch((await p.locator('meta[name="robots"]').getAttribute("content")) ?? "", /noindex/);
+        assert.equal(await p.locator('link[rel="canonical"]').getAttribute("href"), `https://footsimu.com/${locale}/how-it-works`);
+        for (const [lang, path] of [["en", "en"], ["pt-BR", "pt"], ["es", "es"], ["x-default", "en"]]) {
+          assert.equal(await p.locator(`link[rel="alternate"][hreflang="${lang}"]`).getAttribute("href"), `https://footsimu.com/${path}/how-it-works`, `${locale} ${lang}`);
+        }
+        // JSON-LD: an article and its breadcrumbs.
+        const ld = JSON.parse(await p.locator('script[type="application/ld+json"]').first().textContent());
+        const types = ld["@graph"].map((x) => x["@type"]);
+        assert.deepEqual(types, ["Article", "BreadcrumbList"]);
+        assert.equal(ld["@graph"][0].headline, title);
+        assert.equal(ld["@graph"][0].url, `https://footsimu.com/${locale}/how-it-works`);
+        assert.equal(ld["@graph"][0].publisher.name, "FootSimu");
+        assert.equal(ld["@graph"][1].itemListElement.at(-1).item, `https://footsimu.com/${locale}/how-it-works`);
+        // The footer links it, in this language, here and on a league page.
+        for (const path of [`/${locale}/how-it-works`, `/${locale}/premier-league`]) {
+          if (path !== `/${locale}/how-it-works`) await p.goto(`${BASE_URL}${path}`);
+          const footerLink = p.locator('[data-testid="site-links"] a[href$="/how-it-works"]');
+          assert.equal(await footerLink.count(), 1, `${path}: footer link`);
+          assert.equal(await footerLink.getAttribute("href"), `/${locale}/how-it-works`);
+          assert.equal((await footerLink.innerText()).trim(), link);
+          // Nowhere else: not in the header or the competitions menu (the language switcher's links to this page aside).
+          assert.equal(await p.locator('a[href$="/how-it-works"]:not([hreflang])').count(), 1, `${path}: the footer only`);
+          assert.equal(await p.locator("header").getByText(link, { exact: true }).count(), 0, `${path}: not in the header`);
+        }
+        // In the sitemap.
+        assert.ok(sitemap.includes(`https://footsimu.com/${locale}/how-it-works<`), `${locale} in the sitemap`);
+      }
+      // The language switcher moves between the three addresses.
+      await p.goto(`${BASE_URL}/en/how-it-works`);
+      await p.locator('header a[hreflang="pt"]').click();
+      await p.waitForURL(/\/pt\/how-it-works$/);
+      await p.locator('header a[hreflang="es"]').click();
+      await p.waitForURL(/\/es\/how-it-works$/);
+      await p.locator('header a[hreflang="en"]').click();
+      await p.waitForURL(/\/en\/how-it-works$/);
+      // The footer link goes there.
+      await p.goto(`${BASE_URL}/es/premier-league`);
+      await p.locator('[data-testid="site-links"] a[href$="/how-it-works"]').click();
+      await p.waitForURL(/\/es\/how-it-works$/);
+      await p.close();
+      // On a phone: the diagram's steps stack, nothing overflows, and the mobile menu has no such item.
+      const phone = await (await browser.newContext({ viewport: { width: 360, height: 800 }, hasTouch: true, isMobile: true })).newPage();
+      await phone.goto(`${BASE_URL}/pt/how-it-works`);
+      const boxes = await phone.getByTestId("how-it-works-step").evaluateAll((els) => els.map((e) => e.getBoundingClientRect()).map((r) => ({ top: r.top, left: r.left })));
+      assert.ok(boxes.every((b, i) => i === 0 || b.top > boxes[i - 1].top), "stacked on a phone");
+      assert.ok(await phone.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "no sideways scroll");
+      // The footer's four links wrap on a narrow phone, none cut off.
+      const footerLinks = await phone.locator('[data-testid="site-links"] a').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().right));
+      assert.equal(footerLinks.length, 4);
+      assert.ok(footerLinks.every((r) => r <= 360), "footer links inside the screen");
+      await phone.locator('[data-testid="mobile-menu-button"]').tap();
+      const menu = phone.locator('[data-testid="mobile-menu"]');
+      await menu.waitFor();
+      for (const button of await menu.locator('[data-testid="mobile-continent-button"]').all()) await button.tap();
+      assert.equal(await menu.locator('a[href$="/how-it-works"]').count(), 0, "not in the mobile menu");
+      assert.equal(await menu.getByText("Como funciona", { exact: true }).count(), 0);
+      await phone.close();
     });
 
     await step("domestic chances carry a note on early-season estimates; continental ones don't", async () => {

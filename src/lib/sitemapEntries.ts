@@ -64,7 +64,7 @@ async function siteEntries(now: number): Promise<MetadataRoute.Sitemap> {
   const paths = ["", ...COMPETITIONS.map((c) => `/${c.slug}`), ...sitePages, ...pastWinners, "/odds", "/quiz", ...(MY_WORLD_LISTED ? ["/my-world"] : [])];
   return paths.flatMap((path) =>
     entries(path, dates, {
-      // About, Privacy, Contact: rarely change.
+      // About, How it works, Privacy, Contact: rarely change.
       changeFrequency: sitePages.has(path) || pastWinners.has(path) ? "monthly" : path ? "daily" : "weekly",
       priority: sitePages.has(path) ? 0.3 : pastWinners.has(path) ? 0.6 : path === "/quiz" || path === "/my-world" ? 0.8 : path ? 0.9 : 1,
     }),

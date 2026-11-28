@@ -71,7 +71,7 @@ describe("each sitemap address's date", () => {
   });
 
   it("no date where none is known: nothing made up", () => {
-    for (const path of ["/about", "/privacy", "/contact", "/my-world", "/fa-cup", "/premier-league/past-winners", "/ligue-1", "/ligue-1/team/psg"]) {
+    for (const path of ["/about", "/how-it-works", "/privacy", "/contact", "/my-world", "/fa-cup", "/premier-league/past-winners", "/ligue-1", "/ligue-1/team/psg"]) {
       assert.equal(lastModifiedOf(path, dates), undefined, path);
     }
     assert.equal(latestOf([undefined, undefined]), undefined);

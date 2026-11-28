@@ -253,6 +253,7 @@
     "disclaimer": "FootSimu is not affiliated with any league or club. Simulations are for entertainment only.",
     "crestCredit": "Some crests: TheSportsDB",
     "about": "About",
+    "howItWorks": "How it works",
     "privacy": "Privacy",
     "contact": "Contact"
   },
@@ -1696,5 +1697,115 @@
     "playoff": "Play-off",
     "simulating": "Simulating the rest of the season…",
     "note": "The rest of the season played 1,500 times, with your predictions: every tournament, the aggregate table, and the grand final and play-off when they are held."
+  },
+  "HowItWorks": {
+    "title": "How FootSimu works",
+    "description": "How FootSimu turns real fixtures and results into team ratings, match probabilities and season chances: the data, the model, the 10,000 simulated seasons and their limits.",
+    "deck": "Where the numbers come from, what the model does with them, and how to read the percentages.",
+    "diagramLabel": "From data to probabilities, in four steps",
+    "diagram": [
+      {
+        "title": "Data",
+        "text": "Real fixtures, results and tables"
+      },
+      {
+        "title": "Ratings",
+        "text": "Attack and defence for each club"
+      },
+      {
+        "title": "10,000 simulations",
+        "text": "The rest of the season, 10,000 times"
+      },
+      {
+        "title": "Probabilities",
+        "text": "Match odds and season chances"
+      }
+    ],
+    "sections": [
+      {
+        "id": "what",
+        "h": "What FootSimu is",
+        "p": [
+          "FootSimu is a free football simulator. Every league starts from its real table and fixtures. You can type in the scores you expect, simulate a matchday or the rest of the season, and see each club's chances of winning the title, qualifying or going down. Every upcoming match also gets a prediction. It is made for fun, not for betting."
+        ]
+      },
+      {
+        "id": "data",
+        "h": "Where the data comes from",
+        "p": [
+          "Fixtures, results and tables come mainly from ESPN's public website feed, which is unofficial and can change without notice. For some major leagues, football-data.org's free service is the fallback when ESPN can't be read. Brazil's Série C and Colombia's Primera B aren't covered by either, so FootSimu keeps its own copy: Série C's from the official results of the CBF, Brazil's football confederation, and Primera B's compiled by hand from the Spanish Wikipedia's season article. No outside feed is read for them.",
+          "For a set of major competitions FootSimu also stores ESPN's expected goals (xG), a measure of the quality of the chances each side created. They feed the ratings only in Brazil's Série A and MLS, at half weight alongside real goals, because testing found a clear gain only there. Crests ESPN lacks come from TheSportsDB, a community database."
+        ]
+      },
+      {
+        "id": "ratings",
+        "h": "How team strength is rated",
+        "p": [
+          "Each club gets an attack rating (how many goals it scores compared with an average side) and a defence rating (how many it concedes). Both come from this season's real results, weighed against the opponent: three goals against the best defence say more than three against the worst.",
+          "A handful of games is not enough to know a team, so the ratings start from last season's and move away as results come in; in most leagues last season counts about as much as 18 current matches. A club with no record from last season starts below average. Every match this season counts equally, with no extra weight on recent form. Scores you type in never change a rating; only real results do."
+        ]
+      },
+      {
+        "id": "match",
+        "h": "The match model",
+        "p": [
+          "For each fixture, the home side's expected goals are the league's average home goals multiplied by its attack rating and the visitors' defence rating; the visitors' figure is built the same way from the average away goals. These are the expected goals shown on a match page: the model's forecast for that game, not the xG ESPN records after it is played. Home advantage is the same for every club in a league, and a game on neutral ground gets none.",
+          "Those two figures become a chance for every possible score, using the Poisson distribution, the standard model for goals, with a small correction: real matches end 0–0 and 1–1 a little more often, and 1–0 or 0–1 a little less often, than two independent teams would suggest. The home, draw and away percentages and the likeliest scores all come from that one table. They are the model's own probabilities; bookmakers' odds are not an input.",
+          "When you roll the dice or simulate games, the score filled in is picked among the likeliest few, so a click never gives a freak result. The season chances draw from every possible score."
+        ]
+      },
+      {
+        "id": "season",
+        "h": "10,000 simulated seasons",
+        "p": [
+          "To work out a club's chances, FootSimu plays the rest of the season 10,000 times. Real results and the scores you entered stay; every other match gets a score drawn from the match model. Each final table is sorted with the league's official tiebreakers, and play-offs and cups follow their real formats: a draw already made stands, and later rounds are drawn in the simulation. In cups and continental competitions, clubs are rated from their domestic form.",
+          "In domestic leagues each simulated season first nudges every club's ratings slightly up or down, more so early on, when few games have been played. The ratings are estimates, and the chances should say so. The chance shown for a place or zone is the share of the 10,000 seasons in which the club finished there."
+        ]
+      },
+      {
+        "id": "reading",
+        "h": "How to read the probabilities",
+        "p": [
+          "A 70% title chance means the club won the league in about 7,000 of the 10,000 seasons: a strong position, not a decided race. A 51% home win is a lean, not a certainty. And the single likeliest score usually doesn't happen: a 1–1 at 13% is the best single guess, yet it is missing from most simulated matches."
+        ]
+      },
+      {
+        "id": "limits",
+        "h": "Limitations",
+        "p": [
+          "No model can promise a result. Early in a season the range of possible finishes is wide, and the model can disagree sharply with the live table. It knows nothing about injuries, suspensions, line-ups, tactics or transfers, except as they later show up in results. Feeds can be late or wrong, and qualification rules and cup paths can change. If you spot a mistake, please [let us know](contact). The simulations are entertainment, not betting advice."
+        ]
+      },
+      {
+        "id": "updates",
+        "h": "How often the numbers change",
+        "p": [
+          "A scheduled check runs every 30 minutes. A league with a game coming up, under way or just finished is checked on every run, so a new result usually appears about half an hour after the feed has it. A quiet league is checked every six hours, which is when a rescheduled fixture or a corrected score shows up. The European and South American club competitions refresh about once a day, domestic cup draws hourly, and Série C and Primera B whenever FootSimu updates its own copy.",
+          "Pages are rebuilt when a league's data changes, and at least once a day. The probabilities move when results change, or when you enter a score, not on a fixed clock."
+        ]
+      },
+      {
+        "id": "accuracy",
+        "h": "Is it accurate?",
+        "p": [
+          "The model is tested against finished seasons it hasn't seen, and its main choices were settled that way. The low-score correction stayed because it helped; a separate home advantage for each club and extra weight on recent games were dropped because they made forecasts worse; the nudge in each simulated season was tuned the same way. The numbers are estimates, tested against the past, never a guarantee."
+        ]
+      },
+      {
+        "id": "credits",
+        "h": "Data credits",
+        "p": [
+          "Fixtures, results, tables and expected goals: ESPN, with [football-data.org](https://www.football-data.org/) as a fallback. Some crests: [TheSportsDB](https://www.thesportsdb.com/). FootSimu is not affiliated with any league, club or football body; club names and crests belong to their owners and are used only to identify the clubs."
+        ]
+      }
+    ],
+    "example": {
+      "title": "Example (illustrative, not a real match)",
+      "setup": "Club A host Club B in a league averaging 1.50 home and 1.20 away goals a game. Club A score 15% more than an average side and concede 10% less; Club B have an average attack and concede 5% less.",
+      "xg": "Expected goals: Club A 1.64, Club B 1.08.",
+      "outcomes": "Club A win 49%, draw 27%, Club B win 24%.",
+      "scores": "Likeliest scores: 1–1 (13%), 1–0 (10%), 2–1 (10%).",
+      "note": "The likeliest score comes up in only about one match in eight, and Club A, the favourites, fail to win slightly more often than they win."
+    }
   }
 }

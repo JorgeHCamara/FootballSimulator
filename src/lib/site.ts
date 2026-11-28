@@ -7,8 +7,9 @@ export const GOOGLE_SITE_VERIFICATION =
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://footsimu.com").replace(/\/$/, "");
 
-/** Pages about the site itself, linked from the footer. */
-export const SITE_PAGES = ["about", "privacy", "contact"] as const;
+/** Pages about the site itself, linked from the footer (in this order) and listed in the sitemap's "site" piece. */
+export const SITE_PAGES = ["about", "how-it-works", "privacy", "contact"] as const;
+export type SitePage = (typeof SITE_PAGES)[number];
 
 export const CONTACT_EMAIL = "contact@footsimu.com";
 

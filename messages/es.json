@@ -253,6 +253,7 @@
     "disclaimer": "FootSimu no está afiliado a ninguna liga ni club. Las simulaciones son solo para entretenimiento.",
     "crestCredit": "Algunos escudos: TheSportsDB",
     "about": "Acerca de",
+    "howItWorks": "Cómo funciona",
     "privacy": "Privacidad",
     "contact": "Contacto"
   },
@@ -1696,5 +1697,115 @@
     "playoff": "Repechaje",
     "simulating": "Simulando el resto de la temporada…",
     "note": "El resto de la temporada jugado 1.500 veces, con tus pronósticos: cada torneo, la reclasificación, y la Gran Final y el repechaje cuando se juegan."
+  },
+  "HowItWorks": {
+    "title": "Cómo funciona FootSimu",
+    "description": "Cómo FootSimu convierte partidos y resultados reales en la fuerza de cada equipo, probabilidades por partido y opciones en la temporada: los datos, el modelo, las 10.000 temporadas simuladas y sus límites.",
+    "deck": "De dónde salen los números, qué hace el modelo con ellos y cómo leer los porcentajes.",
+    "diagramLabel": "De los datos a las probabilidades, en cuatro pasos",
+    "diagram": [
+      {
+        "title": "Datos",
+        "text": "Partidos, resultados y tablas reales"
+      },
+      {
+        "title": "Fuerza",
+        "text": "Ataque y defensa de cada club"
+      },
+      {
+        "title": "10.000 simulaciones",
+        "text": "El resto de la temporada, 10.000 veces"
+      },
+      {
+        "title": "Probabilidades",
+        "text": "Pronósticos y opciones en la temporada"
+      }
+    ],
+    "sections": [
+      {
+        "id": "what",
+        "h": "Qué es FootSimu",
+        "p": [
+          "FootSimu es un simulador de fútbol gratuito. Cada liga parte de su tabla y su calendario reales. Puedes escribir tus marcadores, simular una jornada o el resto de la temporada y ver las opciones de cada club de ser campeón, clasificarse o descender. Cada próximo partido tiene además un pronóstico. Está hecho para divertirse, no para apostar."
+        ]
+      },
+      {
+        "id": "data",
+        "h": "De dónde salen los datos",
+        "p": [
+          "Partidos, resultados y tablas vienen sobre todo del feed público de la web de ESPN, que no es oficial y puede cambiar sin aviso. En algunas grandes ligas, el servicio gratuito de football-data.org sirve de respaldo si ESPN falla. La Série C de Brasil y la Primera B de Colombia no están en ninguna de las dos fuentes, así que FootSimu mantiene su propia copia: la de la Série C, con los resultados oficiales de la CBF, y la de la Primera B, recopilada a mano del artículo de la temporada en la Wikipedia en español. No se consulta ningún feed externo para ellas.",
+          "Para un grupo de competiciones importantes, FootSimu guarda también los goles esperados (xG) de ESPN, una medida de la calidad de las ocasiones que generó cada equipo. Solo entran en la fuerza de los equipos en la Série A de Brasil y en la MLS, con la mitad del peso junto a los goles reales, porque las pruebas mostraron una mejora clara solo ahí. Los escudos que ESPN no tiene vienen de TheSportsDB, una base de datos comunitaria."
+        ]
+      },
+      {
+        "id": "ratings",
+        "h": "Cómo se mide la fuerza de cada equipo",
+        "p": [
+          "Cada club recibe una nota de ataque (cuántos goles marca frente a un equipo medio) y una de defensa (cuántos encaja). Las dos salen de los resultados reales de esta temporada, ponderados por el rival: tres goles a la mejor defensa dicen más que tres a la peor.",
+          "Pocos partidos no bastan para conocer a un equipo, así que las notas parten de las de la temporada pasada y se alejan de ellas con cada resultado; en la mayoría de las ligas, la temporada pasada pesa más o menos como 18 partidos de la actual. Un club sin historial de la temporada pasada empieza por debajo de la media. Todos los partidos de esta temporada cuentan igual, sin peso extra para la racha reciente. Los marcadores que escribes nunca cambian una nota; solo los resultados reales."
+        ]
+      },
+      {
+        "id": "match",
+        "h": "El modelo de cada partido",
+        "p": [
+          "En cada partido, los goles esperados del local son la media de goles de los locales en la liga multiplicada por su nota de ataque y por la nota de defensa del visitante; los del visitante, igual, con la media de goles de los visitantes. Son los goles esperados de la página del partido: el pronóstico del modelo, no el xG que ESPN registra después. La ventaja de jugar en casa es la misma para todos los clubes de una liga, y un partido en campo neutral no tiene ninguna.",
+          "Esas dos cifras dan una probabilidad para cada marcador posible con la distribución de Poisson, el modelo clásico para los goles, y una pequeña corrección: en la realidad, el 0-0 y el 1-1 salen algo más, y el 1-0 o el 0-1 algo menos, de lo que dirían dos equipos independientes. Los porcentajes de local, empate y visitante, y los marcadores más probables, salen de esa misma tabla. Son las probabilidades del propio modelo; las cuotas de las casas de apuestas no se usan.",
+          "Cuando tiras el dado o simulas partidos, el marcador sale de entre los pocos más probables, así que un clic nunca da un resultado disparatado. Las opciones en la temporada tienen en cuenta todos los marcadores posibles."
+        ]
+      },
+      {
+        "id": "season",
+        "h": "10.000 temporadas simuladas",
+        "p": [
+          "Para calcular las opciones de un club, FootSimu juega el resto de la temporada 10.000 veces. Los resultados reales y tus marcadores se mantienen; los demás partidos reciben un marcador sorteado por el modelo. Cada tabla final se ordena con los criterios de desempate oficiales de la liga, y los playoffs y las copas siguen su formato real: un sorteo ya hecho se respeta, y las rondas siguientes se sortean en la simulación. En las copas y en las competiciones continentales, los clubes se valoran por su rendimiento en sus ligas.",
+          "En las ligas nacionales, cada temporada simulada empieza moviendo un poco las notas de cada club, arriba o abajo, y más al principio, cuando hay pocos partidos jugados. Las notas son estimaciones, y las opciones tienen que reflejarlo. La probabilidad que se muestra para un puesto o una zona es la parte de las 10.000 temporadas en que el club terminó ahí."
+        ]
+      },
+      {
+        "id": "reading",
+        "h": "Cómo leer las probabilidades",
+        "p": [
+          "Un 70% de opciones de título significa que el club fue campeón en unas 7.000 de las 10.000 temporadas: una posición fuerte, no una liga decidida. Un 51% de victoria local es una inclinación, no una certeza. Y el marcador más probable normalmente no se da: un 1-1 con un 13% es el mejor pronóstico individual, pero no aparece en la mayoría de los partidos simulados."
+        ]
+      },
+      {
+        "id": "limits",
+        "h": "Limitaciones",
+        "p": [
+          "Ningún modelo garantiza un resultado. Al principio de la temporada el abanico de posiciones posibles es amplio, y el modelo puede discrepar mucho de la tabla actual. No sabe nada de lesiones, sanciones, alineaciones, tácticas o fichajes, salvo cuando se notan después en los resultados. Los feeds pueden fallar o llegar tarde, y las reglas de clasificación y los cuadros de copa pueden cambiar. Si ves un error, [avísanos](contact). Las simulaciones son entretenimiento, no consejos de apuestas."
+        ]
+      },
+      {
+        "id": "updates",
+        "h": "Cada cuánto cambian los números",
+        "p": [
+          "Cada 30 minutos se ejecuta una comprobación automática. Una liga con un partido a punto de empezar, en juego o recién terminado se revisa cada vez, así que un resultado nuevo suele aparecer una media hora después de llegar al feed. Una liga sin partidos cerca se revisa cada seis horas; ahí aparecen los partidos reprogramados y los marcadores corregidos. Las copas continentales de Europa y Sudamérica se actualizan más o menos una vez al día, los sorteos de las copas nacionales cada hora, y la Série C y la Primera B cuando FootSimu actualiza su propia copia.",
+          "Las páginas se regeneran cuando cambian los datos de una liga, y al menos una vez al día. Las probabilidades se mueven con los resultados, o con tus marcadores, no con un reloj fijo."
+        ]
+      },
+      {
+        "id": "accuracy",
+        "h": "¿Es fiable?",
+        "p": [
+          "El modelo se prueba con temporadas terminadas que no ha visto, y así se tomaron sus decisiones principales. La corrección de los marcadores bajos se quedó porque ayudaba; una ventaja de local distinta para cada club y un peso extra para los partidos recientes se descartaron porque empeoraban los pronósticos; el ajuste de cada temporada simulada se calibró de la misma manera. Los números son estimaciones, contrastadas con el pasado, nunca una garantía."
+        ]
+      },
+      {
+        "id": "credits",
+        "h": "Créditos de los datos",
+        "p": [
+          "Partidos, resultados, tablas y goles esperados: ESPN, con [football-data.org](https://www.football-data.org/) como respaldo. Algunos escudos: [TheSportsDB](https://www.thesportsdb.com/). FootSimu no está afiliado a ninguna liga, club ni organismo del fútbol; los nombres y escudos pertenecen a sus dueños y se usan solo para identificar a los clubes."
+        ]
+      }
+    ],
+    "example": {
+      "title": "Ejemplo (ilustrativo, no es un partido real)",
+      "setup": "El Club A recibe al Club B en una liga donde los locales marcan 1,50 goles por partido de media y los visitantes 1,20. El Club A marca un 15% más que un equipo medio y encaja un 10% menos; el Club B tiene un ataque medio y encaja un 5% menos.",
+      "xg": "Goles esperados: Club A 1,64, Club B 1,08.",
+      "outcomes": "Victoria del Club A 49%, empate 27%, victoria del Club B 24%.",
+      "scores": "Marcadores más probables: 1-1 (13%), 1-0 (10%), 2-1 (10%).",
+      "note": "El marcador más probable sale en uno de cada ocho partidos, más o menos, y el Club A, el favorito, deja de ganar algo más a menudo de lo que gana."
+    }
   }
 }

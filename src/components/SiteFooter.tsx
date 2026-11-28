@@ -1,8 +1,12 @@
 import { useTranslations } from "next-intl";
 import { COMPETITIONS } from "../config/competitions.ts";
 import { flagSpriteUrl } from "../lib/flagSprite.tsx";
+import { SITE_PAGES, type SitePage } from "../lib/site.ts";
 import { FooterLeagues, type FooterLeague } from "./FooterLeagues.tsx";
 import { IntentLink } from "./IntentLink.tsx";
+
+/** Each site page's label in the Footer messages. */
+const LABELS = { about: "about", "how-it-works": "howItWorks", privacy: "privacy", contact: "contact" } as const satisfies Record<SitePage, string>;
 
 export function SiteFooter() {
   const t = useTranslations("Footer");
@@ -13,11 +17,11 @@ export function SiteFooter() {
         <nav aria-label={seo("otherLeagues")}>
           <FooterLeagues leagues={COMPETITIONS.map((l): FooterLeague => [l.code, l.slug, l.name, l.flag])} sprite={flagSpriteUrl()} />
         </nav>
-        <ul className="mt-6 flex justify-center gap-x-5 text-sm" data-testid="site-links">
-          {(["about", "privacy", "contact"] as const).map((page) => (
+        <ul className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm" data-testid="site-links">
+          {SITE_PAGES.map((page) => (
             <li key={page}>
               <IntentLink href={`/${page}`} className="text-zinc-600 hover:text-pitch-700 hover:underline dark:text-zinc-400 dark:hover:text-pitch-100">
-                {t(page)}
+                {t(LABELS[page])}
               </IntentLink>
             </li>
           ))}

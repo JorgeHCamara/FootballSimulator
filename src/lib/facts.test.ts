@@ -9,7 +9,7 @@ import { LEAGUES } from "../config/leagues.ts";
 import { hasClubPages } from "./clubs.ts";
 import { getLeagueByCode } from "../config/leagues.ts";
 import { leagueFacts } from "./leagueFacts.ts";
-import { adsTxt, adsenseClient } from "./site.ts";
+import { adsTxt, adsenseClient, SITE_PAGES } from "./site.ts";
 
 const league = (code: string) => getLeagueByCode(code as Parameters<typeof getLeagueByCode>[0])!;
 
@@ -106,6 +106,22 @@ describe("the sitemap", () => {
   it("lists About, Privacy and Contact in every language", async () => {
     const urls = (await sitemap()).map((e) => e.url);
     for (const locale of ["en", "pt", "es"]) for (const page of ["about", "privacy", "contact"]) assert.ok(urls.some((u) => u.endsWith(`/${locale}/${page}`)), `${locale}/${page}`);
+  });
+
+  it("lists How FootSimu works in every language, in the site's piece, with its alternates and no made-up date", async () => {
+    assert.ok(SITE_PAGES.includes("how-it-works"));
+    const site = (await sitemapEntries(SITE_SITEMAP))!;
+    for (const locale of ["en", "pt", "es"]) {
+      const entry = site.find((e) => e.url === `https://footsimu.com/${locale}/how-it-works`);
+      assert.ok(entry, `${locale}/how-it-works`);
+      assert.equal(entry.lastModified, undefined);
+      assert.equal(entry.changeFrequency, "monthly");
+      assert.deepEqual(entry.alternates!.languages, {
+        en: "https://footsimu.com/en/how-it-works",
+        "pt-BR": "https://footsimu.com/pt/how-it-works",
+        es: "https://footsimu.com/es/how-it-works",
+      });
+    }
   });
 
   it("lists each league's past winners page in every language, as a page that changes once a season", async () => {
@@ -244,7 +260,7 @@ describe("the sitemap", () => {
     assert.equal(seen.size, (await sitemap(now)).length);
     // The site's: the home page, the competitions, the site's own pages, the hub and the quiz.
     const site = (await sitemapEntries(SITE_SITEMAP, now))!.map((e) => e.url);
-    for (const path of ["", "/premier-league", "/fa-cup", "/about", "/odds", "/quiz", "/premier-league/past-winners"]) assert.ok(site.includes(`https://footsimu.com/en${path}`), path || "/");
+    for (const path of ["", "/premier-league", "/fa-cup", "/about", "/how-it-works", "/odds", "/quiz", "/premier-league/past-winners"]) assert.ok(site.includes(`https://footsimu.com/en${path}`), path || "/");
   });
 });
 
