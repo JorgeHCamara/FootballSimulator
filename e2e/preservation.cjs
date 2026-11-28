@@ -29,7 +29,7 @@ const LOCALES = ["en", "pt", "es"];
 const SITE_PAGES = ["about", "privacy", "contact"];
 
 /** The sample pages, by kind: every kind of indexable page the site renders. */
-async function samplePaths(page) {
+async function samplePaths(page, live) {
   // The club, match and chance addresses come from the league page itself (the sample clubs and dates).
   await page.goto(`${BASE_URL}/en/premier-league`);
   const hrefs = await page.$$eval("a[href]", (as) => [...new Set(as.map((a) => a.getAttribute("href")))]);
@@ -41,14 +41,22 @@ async function samplePaths(page) {
   const clubChance = clubHrefs.find((h) => /^\/en\/premier-league\/team\/[^/]+\/chances\//.test(h));
   const sitemap = await fullSitemap(BASE_URL);
   const today = new Date().toISOString().slice(0, 10);
-  // Played games in the sitemap (the last 30 days): the oldest is settled (src/lib/settledMatch.ts), the newest
-  // (a few days old) still follows its league.
+  // Played games: the newest in the sitemap (its last 6 days) still follows its league. A settled one (over a
+  // week old, src/lib/settledMatch.ts) has left the index window and the sitemap (src/lib/indexPolicy.ts), so
+  // it's an earlier matchday's game on the league page (picked with JavaScript, the matchday menu).
   const day = 86_400_000;
   const playedGames = [...sitemap.matchAll(/<loc>[^<]*?(\/en\/premier-league\/match\/[^<]*-(\d{4}-\d{2}-\d{2}))<\/loc>/g)]
     .filter((m) => m[2] < today)
     .sort((a, b) => (a[2] < b[2] ? -1 : a[2] > b[2] ? 1 : 0));
-  const played = playedGames.find((m) => Date.parse(`${m[2]}T12:00:00Z`) < Date.now() - 10 * day)?.[1];
   const recent = playedGames.filter((m) => Date.parse(`${m[2]}T12:00:00Z`) > Date.now() - 6 * day).at(-1)?.[1];
+  let played;
+  await live.goto(`${BASE_URL}/en/premier-league`);
+  const matchdays = live.getByTestId("matchday-select");
+  for (let md = Number(await matchdays.inputValue()) - 1; md >= 1 && !played; md--) {
+    await matchdays.selectOption(String(md));
+    const href = await live.locator('[data-testid="fixtures"]').getByRole("link", { name: "Match preview" }).first().getAttribute("href");
+    if (Date.parse(`${href.slice(-10)}T12:00:00Z`) < Date.now() - 10 * day) played = href;
+  }
   const round = [...sitemap.matchAll(/<loc>[^<]*?(\/en\/premier-league\/odds\/matchday-\d+)<\/loc>/g)].map((m) => m[1])[0];
   const strip = (path) => path.replace(/^\/en/, "");
   const paths = {
@@ -148,7 +156,7 @@ function checkInvariants(url, view, { indexable }) {
 
   const capture = { pages: {} };
   try {
-    const paths = await samplePaths(page);
+    const paths = await samplePaths(page, live);
     for (const locale of LOCALES) {
       for (const [kind, path] of Object.entries(paths)) {
         const url = `${BASE_URL}/${locale}${path}`;

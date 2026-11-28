@@ -11,6 +11,8 @@ import type { Fixture } from "../engine/types.ts";
  * - a settled match page (its game played more than SETTLED_MATCH_DAYS days
  *   ago, src/lib/settledMatch.ts): the moment it settled, for good (it no
  *   longer follows its league's results);
+ *   with the 7-day index window (src/lib/indexPolicy.ts) none is listed today:
+ *   a game leaves the sitemap before it settles;
  * - a report: its round's day; the latest report and the hub: the latest round's;
  * - the quiz: today's set (it changes with the UTC day);
  * - the home page: the latest result among the leagues it features;

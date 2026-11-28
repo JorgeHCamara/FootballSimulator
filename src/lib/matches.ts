@@ -20,19 +20,9 @@ export { localDate, matchPath, matchSlug };
 const DATE_SUFFIX = /^(.+)-(\d{4}-\d{2}-\d{2})$/;
 
 const DAY = 86_400_000;
-/**
- * The games search engines are pointed at: kicking off from this many days
- * ago to this many ahead. They're in the sitemap, indexable, and linked from
- * the club and league pages; other games' pages load but ask not to be indexed.
- */
-export const INDEX_PAST_DAYS = 30;
-export const INDEX_NEXT_DAYS = 14;
 
-/** Is a game (by its kick-off) inside the window search engines are pointed at? */
-export const inIndexWindow = (utcDate: string, now = Date.now()) => {
-  const time = Date.parse(utcDate);
-  return time >= now - INDEX_PAST_DAYS * DAY && time <= now + INDEX_NEXT_DAYS * DAY;
-};
+// The window of games search engines are pointed at (src/lib/indexPolicy.ts), re-exported for the pages that read it from here.
+export { INDEX_NEXT_DAYS, INDEX_PAST_DAYS, inIndexWindow } from "./indexPolicy.ts";
 
 /** An old address redirects to the same clubs' game only when that game is at most this many days from the address's date. */
 export const MOVED_WITHIN_DAYS = 21;
